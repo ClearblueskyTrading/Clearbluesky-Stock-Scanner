@@ -1,0 +1,16 @@
+{
+  "trend_min_score": "70",
+  "swing_min_score": "60",
+  "dip_min_percent": 1.0,
+  "dip_max_percent": 5.0,
+  "min_price": "5",
+  "max_price": "500",
+  "min_avg_volume": "500000",
+  "trend_min_quarter_perf": "10",
+  "trend_require_ma_stack": true,
+  "dip_require_news_check": true,
+  "dip_require_analyst_check": true,
+  "broker_url": "https://www.schwab.com",
+  "other_ai_url": "",
+  "finviz_api_key": ""
+}

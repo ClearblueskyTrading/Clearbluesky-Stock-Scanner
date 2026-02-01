@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swing Scan Results - 20260131_2247</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 2em; margin-bottom: 5px; }
+        .header p { opacity: 0.8; }
+        
+        .ai-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .ai-btn { padding: 12px 24px; border: none; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ai-btn.claude { background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%); color: white; }
+        .ai-btn.gemini { background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; }
+        .ai-btn.chatgpt { background: linear-gradient(135deg, #10A37F 0%, #1A7F64 100%); color: white; }
+        .ai-btn.copy { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; }
+        
+        .copied { position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .summary { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .summary h2 { margin-bottom: 15px; color: #1a1a2e; }
+        .summary table { width: 100%; border-collapse: collapse; }
+        .summary th, .summary td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .summary th { background: #f8f9fa; color: #666; font-weight: 600; }
+        .summary tr:hover { background: #f8f9fa; }
+        
+        .stock-card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stock-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .stock-rank { width: 50px; height: 50px; background: #1a1a2e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
+        .stock-info { flex: 1; }
+        .stock-info h2 { font-size: 1.8em; color: #1a1a2e; }
+        .stock-info .company { color: #666; margin-top: 5px; }
+        
+        .stock-score { text-align: center; padding: 15px 25px; border-radius: 15px; }
+        .stock-score.score-high { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; }
+        .stock-score.score-mid { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
+        .stock-score.score-low { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; }
+        .score-num { font-size: 2em; font-weight: bold; display: block; }
+        .score-label { font-size: 0.85em; opacity: 0.9; }
+        
+        .stock-metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
+        .metric { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
+        .metric span { display: block; color: #666; font-size: 0.85em; margin-bottom: 5px; }
+        .metric b { font-size: 1.1em; color: #1a1a2e; }
+        
+        .chart-container { margin: 20px 0; text-align: center; }
+        .chart { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        .news { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .news ul { margin-left: 20px; margin-top: 10px; }
+        .news li { margin-bottom: 5px; color: #555; }
+        
+        .footer { text-align: center; padding: 30px; color: #666; }
+        
+        @media (max-width: 768px) {
+            .stock-metrics { grid-template-columns: repeat(3, 1fr); }
+            .ai-buttons { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Swing Scan Results</h1>
+        <p>January 31, 2026 at 10:47 PM | 15 Qualifying Stocks</p>
+        
+        <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 15px; margin: 15px auto; max-width: 600px;">
+            <p style="margin: 0 0 10px 0; font-size: 14px;">📝 <b>How to use:</b></p>
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">1. Click "Copy AI Prompt" below</p>
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">2. Click an AI button (Claude, Gemini, etc.)</p>
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">3. Press Ctrl+V (or Cmd+V) to paste the prompt</p>
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">4. Get BUY/SELL/HOLD recommendations!</p>
+        </div>
+        
+        <div class="ai-buttons">
+            <button class="ai-btn copy" onclick="copyPrompt()">📋 Copy AI Prompt</button>
+            <button class="ai-btn claude" onclick="openAI('claude')">🤖 Claude</button>
+            <button class="ai-btn gemini" onclick="openAI('gemini')">✨ Gemini</button>
+            <button class="ai-btn chatgpt" onclick="openAI('chatgpt')">💬 ChatGPT</button>
+            <button class="ai-btn qwen" onclick="openAI('qwen')" style="background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);">🚀 Qwen3 (Free)</button>
+            <button class="ai-btn other" onclick="openAI('other')" style="background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);">🔗 Other</button>
+        </div>
+        
+        <p style="font-size: 12px; opacity: 0.7; margin-top: 10px;">💡 Qwen3: Select model "Qwen3-VL-235B-A22B" - Free super AI with vision (can read charts!)</p>
+    </div>
+    
+    <div class="copied" id="copied">✓ Prompt Copied to Clipboard! Now paste (Ctrl+V) in your AI chat.</div>
+    
+    <div class="container">
+        <div class="summary">
+            <h2>📈 Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Ticker</th><th>Score</th><th>Rating</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td><b>CEVA</b></td><td>100</td><td>ELITE</td></tr><tr><td>2</td><td><b>SYRE</b></td><td>100</td><td>ELITE</td></tr><tr><td>3</td><td><b>TYRA</b></td><td>100</td><td>ELITE</td></tr><tr><td>4</td><td><b>ORIC</b></td><td>100</td><td>ELITE</td></tr><tr><td>5</td><td><b>BFLY</b></td><td>100</td><td>ELITE</td></tr><tr><td>6</td><td><b>ZETA</b></td><td>100</td><td>ELITE</td></tr><tr><td>7</td><td><b>CORZ</b></td><td>100</td><td>ELITE</td></tr><tr><td>8</td><td><b>KOPN</b></td><td>100</td><td>ELITE</td></tr><tr><td>9</td><td><b>SPWR</b></td><td>100</td><td>ELITE</td></tr><tr><td>10</td><td><b>VIR</b></td><td>100</td><td>ELITE</td></tr><tr><td>11</td><td><b>ANNX</b></td><td>100</td><td>ELITE</td></tr><tr><td>12</td><td><b>GLUE</b></td><td>100</td><td>ELITE</td></tr><tr><td>13</td><td><b>VERA</b></td><td>100</td><td>ELITE</td></tr><tr><td>14</td><td><b>RGNX</b></td><td>100</td><td>ELITE</td></tr><tr><td>15</td><td><b>MLYS</b></td><td>100</td><td>ELITE</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        
+            <div class="stock-card" id="stock-CEVA">
+                <div class="stock-header">
+                    <div class="stock-rank">#1</div>
+                    <div class="stock-info">
+                        <h2>CEVA</h2>
+                        <p class="company">Ceva Inc | Technology</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>21.09</b></div>
+                    <div class="metric"><span>Change</span><b>-4.87%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.83x</b></div>
+                    <div class="metric"><span>RSI</span><b>39.41</b></div>
+                    <div class="metric"><span>Target</span><b>$34.00</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=CEVA&ty=c&ta=1&p=d&s=l" alt="CEVA Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/274499/ceva-inc-schedules-fourth-quarter-and-full-year-2025-earnings-release-and-conference-call" target="_blank" style="color:#2563eb; text-decoration:none;">Ceva, Inc. Schedules Fourth Quarter and Full Year 2025 Earnings Release and Conf</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="/news/267934/ceva-delivers-real-time-ai-acceleration-on-nxps-processors-for-software-defined-vehicles" target="_blank" style="color:#2563eb; text-decoration:none;">Ceva Delivers Real-Time AI Acceleration on NXP's Processors for Software-Defined</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="/news/267925/bos-semiconductors-selects-cevas-ai-dsp-for-next-generation-adas-platforms" target="_blank" style="color:#2563eb; text-decoration:none;">BOS Semiconductors Selects Ceva's AI DSP for Next-Generation ADAS Platforms</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-SYRE">
+                <div class="stock-header">
+                    <div class="stock-rank">#2</div>
+                    <div class="stock-info">
+                        <h2>SYRE</h2>
+                        <p class="company">Spyre Therapeutics Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>31.98</b></div>
+                    <div class="metric"><span>Change</span><b>-4.76%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.76x</b></div>
+                    <div class="metric"><span>RSI</span><b>48.46</b></div>
+                    <div class="metric"><span>Target</span><b>$56.43</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=SYRE&ty=c&ta=1&p=d&s=l" alt="SYRE Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/285778/spyre-therapeutics-announces-grants-of-inducement-awards" target="_blank" style="color:#2563eb; text-decoration:none;">Spyre Therapeutics Announces Grants of Inducement Awards</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="/news/277776/wall-street-bullish-on-spyre-therapeutics-inc-syre-with-strong-buy-rating" target="_blank" style="color:#2563eb; text-decoration:none;">Wall Street Bullish on Spyre Therapeutics, Inc. (SYRE) with Strong Buy Rating</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="/news/273357/spyre-therapeutics-poised-for-transformational-2026-with-six-expected-proof-of-concept-readouts-beginning-in-q2" target="_blank" style="color:#2563eb; text-decoration:none;">Spyre Therapeutics Poised for Transformational 2026 With Six Expected Proof-of-C</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-TYRA">
+                <div class="stock-header">
+                    <div class="stock-rank">#3</div>
+                    <div class="stock-info">
+                        <h2>TYRA</h2>
+                        <p class="company">Tyra Biosciences Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>30.82</b></div>
+                    <div class="metric"><span>Change</span><b>-4.70%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.81x</b></div>
+                    <div class="metric"><span>RSI</span><b>62.87</b></div>
+                    <div class="metric"><span>Target</span><b>$40.38</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=TYRA&ty=c&ta=1&p=d&s=l" alt="TYRA Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/241932/tyra-biosciences-strengthens-leadership-team-with-appointments-of-bhavesh-ashar-as-chief-operating-officer-and-heather-faulds-as-chief-regulatory-officer" target="_blank" style="color:#2563eb; text-decoration:none;">Tyra Biosciences Strengthens Leadership Team with Appointments of Bhavesh Ashar </a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="/news/227882/tyra-biosciences-announces-participation-at-upcoming-investor-events" target="_blank" style="color:#2563eb; text-decoration:none;">Tyra Biosciences Announces Participation at Upcoming Investor Events</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="/news/219591/tyra-biosciences-reports-third-quarter-2025-financial-results-and-highlights" target="_blank" style="color:#2563eb; text-decoration:none;">Tyra Biosciences Reports Third Quarter 2025 Financial Results and Highlights</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-ORIC">
+                <div class="stock-header">
+                    <div class="stock-rank">#4</div>
+                    <div class="stock-info">
+                        <h2>ORIC</h2>
+                        <p class="company">ORIC Pharmaceuticals Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>10.26</b></div>
+                    <div class="metric"><span>Change</span><b>-4.65%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.04x</b></div>
+                    <div class="metric"><span>RSI</span><b>46.91</b></div>
+                    <div class="metric"><span>Target</span><b>$21.00</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=ORIC&ty=c&ta=1&p=d&s=l" alt="ORIC Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="https://finance.yahoo.com/news/piper-sandler-puts-weight-behind-105925049.html" target="_blank" style="color:#2563eb; text-decoration:none;">Piper Sandler Puts its Weight Behind 2 Strong Buy Cancer Stocks</a> <span style="color:#888; font-size:0.85em;">(TipRanks)</span></li><li><a href="https://finance.yahoo.com/m/c7015bf5-8074-347d-bbfe-e111160e71c6/oric-pharmaceuticals-stock.html" target="_blank" style="color:#2563eb; text-decoration:none;">Oric Pharmaceuticals Stock Sees Healthy RS Rating Jump To 80</a> <span style="color:#888; font-size:0.85em;">(Investor's Business Daily)</span></li><li><a href="/news/276309/precision-killers-why-big-pharma-is-betting-billions-to-beat-a-170b-patent-cliff" target="_blank" style="color:#2563eb; text-decoration:none;">Precision Killers: Why Big Pharma is Betting Billions to Beat a $170B Patent Cli</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-BFLY">
+                <div class="stock-header">
+                    <div class="stock-rank">#5</div>
+                    <div class="stock-info">
+                        <h2>BFLY</h2>
+                        <p class="company">Butterfly Network Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>3.96</b></div>
+                    <div class="metric"><span>Change</span><b>-4.58%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.74x</b></div>
+                    <div class="metric"><span>RSI</span><b>47.35</b></div>
+                    <div class="metric"><span>Target</span><b>$5.06</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=BFLY&ty=c&ta=1&p=d&s=l" alt="BFLY Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/288445/ai-medical-imaging-revolution-software-native-tech-disrupts-45b-market" target="_blank" style="color:#2563eb; text-decoration:none;">AI Medical Imaging Revolution: Software-Native Tech Disrupts $45B Market</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="https://finance.yahoo.com/news/butterfly-network-price-target-raised-134538846.html" target="_blank" style="color:#2563eb; text-decoration:none;">Butterfly Network price target raised to $5.50 from $4 at Lake Street</a> <span style="color:#888; font-size:0.85em;">(TipRanks)</span></li><li><a href="/news/279068/bedside-breakthrough-ai-brings-mri-precision-to-every-clinic" target="_blank" style="color:#2563eb; text-decoration:none;">Bedside Breakthrough: AI Brings MRI-Precision to Every Clinic</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-ZETA">
+                <div class="stock-header">
+                    <div class="stock-rank">#6</div>
+                    <div class="stock-info">
+                        <h2>ZETA</h2>
+                        <p class="company">Zeta Global Holdings Corp | Technology</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>18.58</b></div>
+                    <div class="metric"><span>Change</span><b>-4.57%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.04x</b></div>
+                    <div class="metric"><span>RSI</span><b>38.92</b></div>
+                    <div class="metric"><span>Target</span><b>$30.25</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=ZETA&ty=c&ta=1&p=d&s=l" alt="ZETA Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/294071/zeta-global-holdings-zeta-early-momentum-a-sign-of-application-saas-comeback-in-2026" target="_blank" style="color:#2563eb; text-decoration:none;">Zeta Global Holdings' (ZETA) Early Momentum A Sign Of Application SaaS Comeback </a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="https://www.barrons.com/articles/dan-ives-webush-etf-orbs-stock-a1bf38b0?mod=bar_FV" target="_blank" style="color:#2563eb; text-decoration:none;">He's Wall Street's Biggest Showman. Should You Trust Him?</a> <span style="color:#888; font-size:0.85em;">(Barrons.com)</span></li><li><a href="/news/293472/goldman-sachs-ups-zeta-global-zeta-pt-to-26-anticipates-software-sector-ma-surge-strategic-synergies-in-2026" target="_blank" style="color:#2563eb; text-decoration:none;">Goldman Sachs Ups Zeta Global (ZETA) PT to $26, Anticipates Software-Sector M&A </a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-CORZ">
+                <div class="stock-header">
+                    <div class="stock-rank">#7</div>
+                    <div class="stock-info">
+                        <h2>CORZ</h2>
+                        <p class="company">Core Scientific Inc | Technology</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>17.99</b></div>
+                    <div class="metric"><span>Change</span><b>-4.51%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.01x</b></div>
+                    <div class="metric"><span>RSI</span><b>51.89</b></div>
+                    <div class="metric"><span>Target</span><b>$26.66</b></div>
+                    <div class="metric"><span>P/E</span><b>129.15</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=CORZ&ty=c&ta=1&p=d&s=l" alt="CORZ Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/293011/keefe-bruyette-raises-core-scientific-corz-pt-following-pivot-from-bitcoin-mining-to-ai-infrastructure" target="_blank" style="color:#2563eb; text-decoration:none;">Keefe Bruyette Raises Core Scientific (CORZ) PT Following Pivot From Bitcoin Min</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="https://finance.yahoo.com/m/6f5bf3b4-6fdd-35ee-8e20-f8fa7ad8c682/bitcoin-mining-stock-prices.html" target="_blank" style="color:#2563eb; text-decoration:none;">Bitcoin mining stock prices open Tuesday with mixed returns</a> <span style="color:#888; font-size:0.85em;">(Blockspace)</span></li><li><a href="https://finance.yahoo.com/news/crypto-currents-bitgo-raises-212-150111878.html" target="_blank" style="color:#2563eb; text-decoration:none;">Crypto Currents: BitGo raises $212.8M in U.S. IPO</a> <span style="color:#888; font-size:0.85em;">(TipRanks)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-KOPN">
+                <div class="stock-header">
+                    <div class="stock-rank">#8</div>
+                    <div class="stock-info">
+                        <h2>KOPN</h2>
+                        <p class="company">Kopin Corp | Technology</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>2.55</b></div>
+                    <div class="metric"><span>Change</span><b>-4.49%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.75x</b></div>
+                    <div class="metric"><span>RSI</span><b>43.40</b></div>
+                    <div class="metric"><span>Target</span><b>$4.69</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=KOPN&ty=c&ta=1&p=d&s=l" alt="KOPN Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/284148/can-amat-lead-the-display-market-with-advanced-oled-and-arvr-push" target="_blank" style="color:#2563eb; text-decoration:none;">Can AMAT Lead the Display Market With Advanced OLED and AR/VR Push?</a> <span style="color:#888; font-size:0.85em;">(Zacks)</span></li><li><a href="https://finance.yahoo.com/news/kopin-announces-1m-order-darkwave-141750742.html" target="_blank" style="color:#2563eb; text-decoration:none;">Kopin announces $1M order for DarkWAVE Module platform</a> <span style="color:#888; font-size:0.85em;">(TipRanks)</span></li><li><a href="https://www.businesswire.com/news/home/20260114839365/en" target="_blank" style="color:#2563eb; text-decoration:none;">Kopin to Exhibit at Major Defense and AR/VR Industry Events in January 2026</a> <span style="color:#888; font-size:0.85em;">(Business Wire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-SPWR">
+                <div class="stock-header">
+                    <div class="stock-rank">#9</div>
+                    <div class="stock-info">
+                        <h2>SPWR</h2>
+                        <p class="company">SunPower Inc | Technology</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>1.72</b></div>
+                    <div class="metric"><span>Change</span><b>-4.44%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.91x</b></div>
+                    <div class="metric"><span>RSI</span><b>48.01</b></div>
+                    <div class="metric"><span>Target</span><b>$5.70</b></div>
+                    <div class="metric"><span>P/E</span><b>10.63</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=SPWR&ty=c&ta=1&p=d&s=l" alt="SPWR Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/294011/sunpower-spwr-achieves-first-monolith-panel-installation-as-silicon-valley-demand-surges-following-rec-partnership" target="_blank" style="color:#2563eb; text-decoration:none;">SunPower (SPWR) Achieves First "Monolith" Panel Installation as Silicon Valley D</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="/news/291430/sunpower-national-battery-storage-initiative" target="_blank" style="color:#2563eb; text-decoration:none;">SunPower National Battery Storage Initiative</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="/news/286741/first-sunpower-monolith-panel-installation" target="_blank" style="color:#2563eb; text-decoration:none;">First SunPower Monolith Panel Installation</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-VIR">
+                <div class="stock-header">
+                    <div class="stock-rank">#10</div>
+                    <div class="stock-info">
+                        <h2>VIR</h2>
+                        <p class="company">Vir Biotechnology Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>7.44</b></div>
+                    <div class="metric"><span>Change</span><b>-4.37%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.06x</b></div>
+                    <div class="metric"><span>RSI</span><b>60.95</b></div>
+                    <div class="metric"><span>Target</span><b>$17.11</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=VIR&ty=c&ta=1&p=d&s=l" alt="VIR Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/288542/registration-ready-how-2026s-clinical-leaders-are-beating-cancer-benchmarks" target="_blank" style="color:#2563eb; text-decoration:none;">Registration-Ready: How 2026's Clinical Leaders Are Beating Cancer Benchmarks</a> <span style="color:#888; font-size:0.85em;">(PR Newswire)</span></li><li><a href="https://www.businesswire.com/news/home/20260112023074/en" target="_blank" style="color:#2563eb; text-decoration:none;">Vir Biotechnology Provides Updates on Chronic Hepatitis Delta and Oncology Progr</a> <span style="color:#888; font-size:0.85em;">(Business Wire)</span></li><li><a href="https://www.businesswire.com/news/home/20260105543597/en" target="_blank" style="color:#2563eb; text-decoration:none;">Vir Biotechnology to Present at the 44th Annual J.P. Morgan Healthcare Conferenc</a> <span style="color:#888; font-size:0.85em;">(Business Wire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-ANNX">
+                <div class="stock-header">
+                    <div class="stock-rank">#11</div>
+                    <div class="stock-info">
+                        <h2>ANNX</h2>
+                        <p class="company">Annexon Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>6.24</b></div>
+                    <div class="metric"><span>Change</span><b>-4.29%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.64x</b></div>
+                    <div class="metric"><span>RSI</span><b>55.90</b></div>
+                    <div class="metric"><span>Target</span><b>$14.71</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=ANNX&ty=c&ta=1&p=d&s=l" alt="ANNX Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/279423/annexon-reports-inducement-grants-to-new-employees-under-nasdaq-listing-rule-5635c4" target="_blank" style="color:#2563eb; text-decoration:none;">Annexon Reports Inducement Grants to New Employees Under Nasdaq Listing Rule 563</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="https://finance.yahoo.com/m/12e41dd5-3dfa-3ae4-b825-bf4060e4a7ed/annexon-maps-%E2%80%9Cpivotal%E2%80%9D-2026.html" target="_blank" style="color:#2563eb; text-decoration:none;">Annexon Maps Pivotal 2026 at JPM Conference: ANX007 Phase 3 GA Readout, ANX005 F</a> <span style="color:#888; font-size:0.85em;">(MarketBeat)</span></li><li><a href="/news/273228/annexon-accelerating-next-generation-targeted-immunotherapy-platform-for-treatment-of-neuroinflammatory-diseases-with-multiple-registrational-milestones-in-2026" target="_blank" style="color:#2563eb; text-decoration:none;">Annexon Accelerating Next Generation Targeted Immunotherapy Platform for Treatme</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-GLUE">
+                <div class="stock-header">
+                    <div class="stock-rank">#12</div>
+                    <div class="stock-info">
+                        <h2>GLUE</h2>
+                        <p class="company">Monte Rosa Therapeutics Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>20.52</b></div>
+                    <div class="metric"><span>Change</span><b>-3.93%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.98x</b></div>
+                    <div class="metric"><span>RSI</span><b>48.39</b></div>
+                    <div class="metric"><span>Target</span><b>$33.80</b></div>
+                    <div class="metric"><span>P/E</span><b>67.19</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=GLUE&ty=c&ta=1&p=d&s=l" alt="GLUE Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="https://www.barrons.com/articles/staar-surgical-alumis-and-more-stocks-see-action-from-activist-investors-81707559?mod=bar_FV" target="_blank" style="color:#2563eb; text-decoration:none;">Staar Surgical, Alumis, and More Stocks See Action From Activist Investors</a> <span style="color:#888; font-size:0.85em;">(Barrons.com)</span></li><li><a href="/news/271634/monte-rosa-therapeutics-announces-pricing-of-300-million-underwritten-public-offering" target="_blank" style="color:#2563eb; text-decoration:none;">Monte Rosa Therapeutics Announces Pricing of $300 Million Underwritten Public Of</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="/news/271039/glue-stock-up-45-on-positive-interim-data-on-inflammation-drug" target="_blank" style="color:#2563eb; text-decoration:none;">GLUE Stock Up 45% on Positive Interim Data on Inflammation Drug</a> <span style="color:#888; font-size:0.85em;">(Zacks)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-VERA">
+                <div class="stock-header">
+                    <div class="stock-rank">#13</div>
+                    <div class="stock-info">
+                        <h2>VERA</h2>
+                        <p class="company">Vera Therapeutics Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>43.26</b></div>
+                    <div class="metric"><span>Change</span><b>-3.87%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.82x</b></div>
+                    <div class="metric"><span>RSI</span><b>41.10</b></div>
+                    <div class="metric"><span>Target</span><b>$75.15</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=VERA&ty=c&ta=1&p=d&s=l" alt="VERA Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/293013/is-vera-therapeutics-vera-one-of-the-best-high-short-interest-stocks-with-biggest-upside-potential" target="_blank" style="color:#2563eb; text-decoration:none;">Is Vera Therapeutics (VERA) One of the Best High Short Interest Stocks with Bigg</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="/news/289746/vera-therapeutics-announces-appointment-of-matt-skelton-to-chief-commercial-officer" target="_blank" style="color:#2563eb; text-decoration:none;">Vera Therapeutics Announces Appointment of Matt Skelton to Chief Commercial Offi</a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="/news/285453/clinical-success-lifts-vera-vera-shares-boosting-fund-returns" target="_blank" style="color:#2563eb; text-decoration:none;">Clinical Success Lifts Vera (VERA) Shares, Boosting Fund Returns</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-RGNX">
+                <div class="stock-header">
+                    <div class="stock-rank">#14</div>
+                    <div class="stock-info">
+                        <h2>RGNX</h2>
+                        <p class="company">Regenxbio Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>11.16</b></div>
+                    <div class="metric"><span>Change</span><b>-3.79%</b></div>
+                    <div class="metric"><span>Volume</span><b>1.30x</b></div>
+                    <div class="metric"><span>RSI</span><b>36.53</b></div>
+                    <div class="metric"><span>Target</span><b>$32.58</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=RGNX&ty=c&ta=1&p=d&s=l" alt="RGNX Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/293226/regenxbio-rgnx-soars-54-is-further-upside-left-in-the-stock" target="_blank" style="color:#2563eb; text-decoration:none;">Regenxbio (RGNX) Soars 5.4%: Is Further Upside Left in the Stock?</a> <span style="color:#888; font-size:0.85em;">(Zacks)</span></li><li><a href="https://finance.yahoo.com/news/regenxbio-selloff-overreaction-clinical-hold-151044791.html" target="_blank" style="color:#2563eb; text-decoration:none;">Regenxbio selloff an overreaction to clinical hold, says Leerink</a> <span style="color:#888; font-size:0.85em;">(TipRanks)</span></li><li><a href="/news/290449/fda-clinical-hold-knocks-regenxbio-stock" target="_blank" style="color:#2563eb; text-decoration:none;">FDA Clinical Hold Knocks REGENXBIO Stock</a> <span style="color:#888; font-size:0.85em;">(Benzinga)</span></li></ul></div>
+            </div>
+            
+            <div class="stock-card" id="stock-MLYS">
+                <div class="stock-header">
+                    <div class="stock-rank">#15</div>
+                    <div class="stock-info">
+                        <h2>MLYS</h2>
+                        <p class="company">Mineralys Therapeutics Inc | Healthcare</p>
+                    </div>
+                    <div class="stock-score score-high">
+                        <span class="score-num">100</span>
+                        <span class="score-label">ELITE</span>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric"><span>Price</span><b>30.89</b></div>
+                    <div class="metric"><span>Change</span><b>-3.74%</b></div>
+                    <div class="metric"><span>Volume</span><b>0.59x</b></div>
+                    <div class="metric"><span>RSI</span><b>35.41</b></div>
+                    <div class="metric"><span>Target</span><b>$50.88</b></div>
+                    <div class="metric"><span>P/E</span><b>-</b></div>
+                </div>
+                
+                <div class="chart-container">
+                    <img src="https://finviz.com/chart.ashx?t=MLYS&ty=c&ta=1&p=d&s=l" alt="MLYS Daily Chart" class="chart">
+                </div>
+                
+                <div class='news'><b>📰 Recent News:</b><ul><li><a href="/news/293023/mineralys-therapeutics-mlys-files-lorundrostat-nda-following-positive-clinical-milestones" target="_blank" style="color:#2563eb; text-decoration:none;">Mineralys Therapeutics (MLYS) Files Lorundrostat NDA Following Positive Clinical</a> <span style="color:#888; font-size:0.85em;">(Insider Monkey)</span></li><li><a href="/news/268049/mineralys-therapeutics-provides-corporate-update-and-announces-participation-in-upcoming-lifesci-partners-corporate-access-event-in-january-2026" target="_blank" style="color:#2563eb; text-decoration:none;">Mineralys Therapeutics Provides Corporate Update and Announces Participation in </a> <span style="color:#888; font-size:0.85em;">(GlobeNewswire)</span></li><li><a href="/news/262334/the-zacks-analyst-blog-mineralys-lyell-insmed-and-nektar" target="_blank" style="color:#2563eb; text-decoration:none;">The Zacks Analyst Blog Mineralys, Lyell, Insmed and Nektar</a> <span style="color:#888; font-size:0.85em;">(Zacks)</span></li></ul></div>
+            </div>
+            
+    </div>
+    
+    <div class="footer">
+        <p>ClearBlueSky Stock Scanner & AI Research Tool | Made with Claude</p>
+        <p style="font-size: 12px; margin-top: 5px;">Contact: Discord ID 340935763405570048 | For educational purposes only</p>
+    </div>
+    
+    <script>
+        const aiPrompt = `You are a professional stock analyst. Analyze these swing scan candidates.
+
+IMPORTANT: For each stock:
+1. Look at the daily chart image provided in this report to assess technicals
+2. Search for recent news on each ticker to check for catalysts or red flags
+3. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
+
+═══════════════════════════════════════════════════
+STOCKS TO ANALYZE: CEVA, SYRE, TYRA, ORIC, BFLY, ZETA, CORZ, KOPN, SPWR, VIR, ANNX, GLUE, VERA, RGNX, MLYS
+═══════════════════════════════════════════════════
+
+DATA SUMMARY:
+- CEVA: Scanner Score 100, Price \$21.09, Today -4.87%, RSI 39.41, Target \$34.00, P/E -, RelVol 0.83x
+- SYRE: Scanner Score 100, Price \$31.98, Today -4.76%, RSI 48.46, Target \$56.43, P/E -, RelVol 0.76x
+- TYRA: Scanner Score 100, Price \$30.82, Today -4.70%, RSI 62.87, Target \$40.38, P/E -, RelVol 1.81x
+- ORIC: Scanner Score 100, Price \$10.26, Today -4.65%, RSI 46.91, Target \$21.00, P/E -, RelVol 1.04x
+- BFLY: Scanner Score 100, Price \$3.96, Today -4.58%, RSI 47.35, Target \$5.06, P/E -, RelVol 0.74x
+- ZETA: Scanner Score 100, Price \$18.58, Today -4.57%, RSI 38.92, Target \$30.25, P/E -, RelVol 1.04x
+- CORZ: Scanner Score 100, Price \$17.99, Today -4.51%, RSI 51.89, Target \$26.66, P/E 129.15, RelVol 1.01x
+- KOPN: Scanner Score 100, Price \$2.55, Today -4.49%, RSI 43.40, Target \$4.69, P/E -, RelVol 0.75x
+- SPWR: Scanner Score 100, Price \$1.72, Today -4.44%, RSI 48.01, Target \$5.70, P/E 10.63, RelVol 0.91x
+- VIR: Scanner Score 100, Price \$7.44, Today -4.37%, RSI 60.95, Target \$17.11, P/E -, RelVol 1.06x
+- ANNX: Scanner Score 100, Price \$6.24, Today -4.29%, RSI 55.90, Target \$14.71, P/E -, RelVol 0.64x
+- GLUE: Scanner Score 100, Price \$20.52, Today -3.93%, RSI 48.39, Target \$33.80, P/E 67.19, RelVol 0.98x
+- VERA: Scanner Score 100, Price \$43.26, Today -3.87%, RSI 41.10, Target \$75.15, P/E -, RelVol 0.82x
+- RGNX: Scanner Score 100, Price \$11.16, Today -3.79%, RSI 36.53, Target \$32.58, P/E -, RelVol 1.30x
+- MLYS: Scanner Score 100, Price \$30.89, Today -3.74%, RSI 35.41, Target \$50.88, P/E -, RelVol 0.59x
+
+═══════════════════════════════════════════════════
+FOR EACH STOCK, PROVIDE:
+═══════════════════════════════════════════════════
+
+1. YOUR SCORE (1-100):
+   - 90-100: Elite setup, high conviction
+   - 80-89: Excellent, strong setup
+   - 70-79: Good, worth considering
+   - 60-69: Decent, smaller position
+   - Below 60: Skip
+
+2. CHART ANALYSIS:
+   - Trend direction
+   - Key support level
+   - Key resistance level
+   - Any patterns visible
+
+3. NEWS CHECK:
+   - Search recent news for this ticker
+   - Any catalysts (earnings, upgrades, contracts)?
+   - Any red flags (downgrades, lawsuits, guidance cuts)?
+   - Is the move EMOTIONAL (trade it) or FUNDAMENTAL (skip it)?
+
+4. RECOMMENDATION: BUY / HOLD / PASS
+
+5. IF BUY - ORDER SETTINGS:
+   - Entry Price: \$XX.XX (limit order price)
+   - Position Size: X shares (for \$2,000-5,000 position)
+   - Stop Loss: \$XX.XX (where to exit if wrong)
+   - Target 1: \$XX.XX (take 50% profit)
+   - Target 2: \$XX.XX (trail rest with stop)
+   
+6. ORDER TYPE RECOMMENDATION:
+   - Use LIMIT order at \$XX.XX, or
+   - Use STOP-LIMIT if breaks above \$XX.XX, or
+   - Use TRAILING STOP of X% for profit protection
+
+═══════════════════════════════════════════════════
+FINAL SUMMARY:
+═══════════════════════════════════════════════════
+
+TOP 3 PICKS (ranked by your score):
+For each pick give: Ticker, Your Score, Entry, Stop, Target, Why
+
+AVOID LIST:
+Which stocks to skip and why (news red flags, bad chart, etc.)
+
+NEWS ALERTS:
+Any breaking news or upcoming events (earnings dates, FDA decisions, etc.) that could affect these trades
+
+MARKET CONTEXT:
+Current market conditions affecting these trades
+
+RISK MANAGEMENT:
+- Best order type for current volatility
+- Suggested trailing stop % for winners
+- Max position size recommendation
+`;
+        
+        function copyPrompt() {
+            navigator.clipboard.writeText(aiPrompt).then(() => {
+                const copied = document.getElementById('copied');
+                copied.style.display = 'block';
+                copied.style.background = '#10B981';
+                copied.textContent = '✓ Prompt Copied to Clipboard! Now paste (Ctrl+V) in your AI chat.';
+                setTimeout(() => { copied.style.display = 'none'; }, 4000);
+            }).catch(err => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = aiPrompt;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const copied = document.getElementById('copied');
+                copied.style.display = 'block';
+                setTimeout(() => { copied.style.display = 'none'; }, 4000);
+            });
+        }
+        
+        function openAI(service) {
+            const urls = {
+                'claude': 'https://claude.ai/new',
+                'gemini': 'https://gemini.google.com/app',
+                'chatgpt': 'https://chat.openai.com/',
+                'qwen': 'https://chat.qwen.ai/c/guest',
+                'other': ''
+            };
+            window.open(urls[service], '_blank');
+        }
+    </script>
+</body>
+</html>
