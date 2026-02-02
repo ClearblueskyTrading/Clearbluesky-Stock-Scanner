@@ -4,10 +4,23 @@
 
 **ClearBlueSky Stock Scanner** is a free, open-source desktop application for scanning stocks and generating AI-ready analysis reports. It uses Python/Tkinter for the GUI and Finviz for market data.
 
-- **Version**: 5.1
+- **Version**: 5.2
 - **License**: MIT
 - **Platform**: Windows (Python 3.10+)
 - **Purpose**: Educational stock analysis tool (not financial advice)
+
+## What's New in v5.2
+
+1. **Scan Complete Alerts** - Sound and toast notifications when scans finish
+2. **One-Click Rescan** - Quick rescan button (🔄) next to each scanner
+3. **Dark Mode Reports** - Toggle in Settings for dark-themed HTML reports
+4. **Sector Filter** - Filter scans by market sector in Settings
+5. **Earnings Proximity Filter** - Flags/penalizes stocks near earnings dates
+6. **Short Interest Flagging** - Displays short float % and squeeze indicators
+7. **Multi-Timeframe RSI** - Enhanced RSI analysis with weekly/monthly context
+8. **Custom Watchlist Scanner** - Scan your own list of tickers
+9. **Scan History + CSV Export** - Track past scans and export results
+10. **Auto-Scan Scheduling** - Schedule daily scans at specific times
 
 ## Quick Start Commands
 
@@ -27,48 +40,64 @@ pip install finvizfinance finviz pandas requests beautifulsoup4
 
 ```
 Clearbluesky-Stock-Scanner/
+├── CLAUDE.md                # This file - AI assistant guide
 ├── CLAUDE_AI_GUIDE.md       # Detailed rebuild guide (comprehensive)
 ├── README.txt               # User documentation
 ├── LICENSE.txt              # MIT license
 ├── INSTALL.bat              # Windows installer script
 │
 └── app/                     # Main application code
-    ├── app.py               # Main GUI application (929 lines)
-    ├── trend_scan_v2.py     # Trend momentum scanner (191 lines)
-    ├── enhanced_dip_scanner.py  # Swing/dip scanner (371 lines)
-    ├── report_generator.py  # HTML report builder (484 lines)
-    ├── scan_settings.py     # Settings dialogs & config (281 lines)
+    ├── app.py               # Main GUI application (~1100 lines)
+    ├── trend_scan_v2.py     # Trend momentum scanner
+    ├── enhanced_dip_scanner.py  # Swing/dip scanner with earnings/short analysis
+    ├── report_generator.py  # HTML report builder (light/dark mode)
+    ├── scan_settings.py     # Settings dialogs & config
+    ├── alerts.py            # Sound and toast notifications (NEW)
+    ├── watchlist_scanner.py # Custom watchlist scanner (NEW)
+    ├── scan_history.py      # Scan history & CSV export (NEW)
     ├── user_config.json     # User preferences (created at runtime)
+    ├── watchlist.json       # User's watchlist (created at runtime)
+    ├── scan_history.json    # Scan history (created at runtime)
     ├── RUNPOD_AI_GUIDE.txt  # Private AI setup guide
     ├── START.bat / RUN.bat  # Launchers
     ├── reports/             # Generated HTML reports
-    └── scans/               # Saved CSV scan data
+    ├── scans/               # Saved CSV scan data
+    └── exports/             # CSV exports (NEW)
 ```
 
 ## Architecture
 
 ```
-┌─────────────────────────────────┐
-│   app.py (Main GUI)             │
-│   - Tkinter UI                  │
-│   - Scanner orchestration       │
-│   - Progress tracking           │
-└──────────────┬──────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│   app.py (Main GUI)                                          │
+│   - Tkinter UI with 3 scanner cards                         │
+│   - Scanner orchestration & scheduling                       │
+│   - Progress tracking with alerts                           │
+└──────────────┬───────────────────────────────────────────────┘
                │
-    ┌──────────┴───────────┬─────────────────────┐
-    │                      │                     │
-┌───▼──────────────┐  ┌────▼──────────┐   ┌──────▼──────────┐
-│ trend_scan_v2.py │  │enhanced_dip_  │   │report_generator │
-│ (Trend Scanner)  │  │scanner.py     │   │.py              │
-│                  │  │(Swing Scanner)│   │(HTML Builder)   │
-└──────────────────┘  └───────────────┘   └─────────────────┘
-               │              │                    │
-               └──────────────┴────────────────────┘
-                              │
-                    ┌─────────▼─────────┐
-                    │ Finviz API/Scraper│
-                    │ (Data Source)     │
-                    └───────────────────┘
+    ┌──────────┼───────────┬─────────────────┬────────────────┐
+    │          │           │                 │                │
+┌───▼──────┐ ┌─▼────────┐ ┌▼──────────────┐ ┌▼────────────┐ ┌─▼──────────┐
+│trend_scan│ │enhanced_ │ │watchlist_    │ │report_     │ │alerts.py   │
+│_v2.py    │ │dip_      │ │scanner.py    │ │generator   │ │            │
+│          │ │scanner   │ │(NEW)         │ │.py         │ │Sound/Toast │
+│Trend     │ │.py       │ │              │ │            │ │Notifications│
+│Scanner   │ │          │ │Custom        │ │HTML Builder│ │            │
+│          │ │Swing     │ │Watchlist     │ │(Dark Mode) │ │            │
+└──────────┘ │Scanner   │ └──────────────┘ └────────────┘ └────────────┘
+             │          │
+             │+Earnings │        ┌──────────────┐
+             │+Short Int│        │scan_history  │
+             │+Multi RSI│        │.py (NEW)     │
+             └──────────┘        │              │
+                                 │History &     │
+                                 │CSV Export    │
+                                 └──────────────┘
+                    │
+          ┌─────────▼─────────┐
+          │ Finviz API/Scraper│
+          │ (Data Source)     │
+          └───────────────────┘
 ```
 
 ## Key Code Patterns
@@ -162,6 +191,22 @@ CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
 - Tkinter dialogs for configuration
 - Loads/saves user_config.json
 - Provides defaults for all settings
+- Sector filter options
+
+### alerts.py - Notification System (NEW in v5.2)
+- Sound notifications using Windows winsound
+- Custom toast popup notifications
+- Configurable in Settings
+
+### watchlist_scanner.py - Custom Watchlist (NEW in v5.2)
+- Load/save custom ticker lists
+- Comprehensive analysis per ticker
+- Same scoring system as other scanners
+
+### scan_history.py - History & Export (NEW in v5.2)
+- Track all past scans with timestamps
+- Export results to CSV files
+- View history in GUI
 
 ## Configuration Reference
 
@@ -179,9 +224,21 @@ CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
   "trend_require_ma_stack": true,
   "dip_require_news_check": true,
   "dip_require_analyst_check": true,
+  "dip_exclude_near_earnings": true,
+  "dip_earnings_days_threshold": 7,
+  "dip_multi_timeframe_rsi": true,
+  "sector_filter": "All Sectors",
   "broker_url": "https://www.schwab.com",
   "other_ai_url": "",
-  "finviz_api_key": ""
+  "finviz_api_key": "",
+  "report_dark_mode": false,
+  "alerts_enabled": true,
+  "alert_sound_enabled": true,
+  "alert_toast_enabled": true,
+  "scheduled_scan_enabled": false,
+  "scheduled_scan_time": "15:30",
+  "scheduled_scan_type": "Swing",
+  "scheduled_scan_index": "sp500"
 }
 ```
 

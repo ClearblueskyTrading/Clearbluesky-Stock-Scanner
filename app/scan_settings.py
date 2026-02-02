@@ -15,6 +15,39 @@ CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
 PORTFOLIO_FILE = os.path.join(BASE_DIR, "portfolio.json")
 
 
+# Available sectors for filtering
+SECTORS = [
+    "All Sectors",
+    "Technology",
+    "Healthcare",
+    "Financial",
+    "Consumer Cyclical",
+    "Consumer Defensive",
+    "Industrials",
+    "Energy",
+    "Basic Materials",
+    "Communication Services",
+    "Real Estate",
+    "Utilities"
+]
+
+# Sector mapping for Finviz filters
+SECTOR_FINVIZ_MAP = {
+    "All Sectors": None,
+    "Technology": "Technology",
+    "Healthcare": "Healthcare",
+    "Financial": "Financial",
+    "Consumer Cyclical": "Consumer Cyclical",
+    "Consumer Defensive": "Consumer Defensive",
+    "Industrials": "Industrials",
+    "Energy": "Energy",
+    "Basic Materials": "Basic Materials",
+    "Communication Services": "Communication Services",
+    "Real Estate": "Real Estate",
+    "Utilities": "Utilities"
+}
+
+
 def load_config():
     """Load user configuration"""
     defaults = {
@@ -24,24 +57,36 @@ def load_config():
         "dip_min_volume_ratio": 1.5,
         "dip_require_news_check": True,
         "dip_require_analyst_check": True,
-        
+        "dip_exclude_near_earnings": True,
+        "dip_earnings_days_threshold": 7,
+        "dip_multi_timeframe_rsi": True,
+
         # Risk Settings
         "risk_per_trade_percent": 2.0,
         "max_position_dollars": 5000,
         "max_daily_loss_dollars": 1000,
         "max_concurrent_positions": 5,
-        
+
         # Account
         "account_size": 20000,
-        
+
         # Trend Scan Parameters
         "trend_min_quarter_perf": 10,
         "trend_require_ma_stack": True,
-        
+
         # Filters
         "min_price": 5.0,
         "max_price": 500.0,
         "min_avg_volume": 500000,
+
+        # Sector Filter
+        "sector_filter": "All Sectors",
+
+        # Scheduled Scans
+        "scheduled_scan_enabled": False,
+        "scheduled_scan_time": "15:30",
+        "scheduled_scan_type": "Swing",
+        "scheduled_scan_index": "sp500",
     }
     
     if os.path.exists(CONFIG_FILE):
@@ -126,8 +171,20 @@ class ScanSettingsWindow:
                       variable=self.news_check_var).pack(anchor="w")
         
         self.analyst_check_var = tk.BooleanVar(value=self.config.get("dip_require_analyst_check", True))
-        tk.Checkbutton(dip_frame, text="Check analyst ratings & price targets", 
+        tk.Checkbutton(dip_frame, text="Check analyst ratings & price targets",
                       variable=self.analyst_check_var).pack(anchor="w")
+
+        self.earnings_check_var = tk.BooleanVar(value=self.config.get("dip_exclude_near_earnings", True))
+        tk.Checkbutton(dip_frame, text="Flag/penalize stocks near earnings",
+                      variable=self.earnings_check_var).pack(anchor="w")
+
+        # Earnings days threshold
+        row_earnings = tk.Frame(dip_frame)
+        row_earnings.pack(fill="x", pady=5)
+        tk.Label(row_earnings, text="   Days before earnings to flag:", width=25, anchor="w").pack(side="left")
+        self.earnings_days = tk.Entry(row_earnings, width=5)
+        self.earnings_days.pack(side="left")
+        self.earnings_days.insert(0, str(self.config.get("dip_earnings_days_threshold", 7)))
         
         # === TAB 2: Risk Settings ===
         risk_frame = tk.Frame(notebook, padx=15, pady=15)
@@ -181,12 +238,21 @@ class ScanSettingsWindow:
         # === TAB 3: Filters ===
         filter_frame = tk.Frame(notebook, padx=15, pady=15)
         notebook.add(filter_frame, text="Stock Filters")
-        
-        tk.Label(filter_frame, text="Stock Filters", 
+
+        tk.Label(filter_frame, text="Stock Filters",
                 font=("Arial", 12, "bold")).pack(anchor="w")
         tk.Label(filter_frame, text="Filter which stocks are included in scans",
                 font=("Arial", 9), fg="gray").pack(anchor="w", pady=(0,15))
-        
+
+        # Sector filter
+        row_sector = tk.Frame(filter_frame)
+        row_sector.pack(fill="x", pady=5)
+        tk.Label(row_sector, text="Sector:", width=15, anchor="w").pack(side="left")
+        self.sector_var = tk.StringVar(value=self.config.get("sector_filter", "All Sectors"))
+        sector_combo = ttk.Combobox(row_sector, textvariable=self.sector_var,
+                                    values=SECTORS, state="readonly", width=20)
+        sector_combo.pack(side="left")
+
         # Price range
         row_price = tk.Frame(filter_frame)
         row_price.pack(fill="x", pady=5)
@@ -198,7 +264,7 @@ class ScanSettingsWindow:
         self.max_price = tk.Entry(row_price, width=8)
         self.max_price.pack(side="left")
         self.max_price.insert(0, str(self.config.get("max_price", 500.0)))
-        
+
         # Min volume
         row_vol = tk.Frame(filter_frame)
         row_vol.pack(fill="x", pady=5)
@@ -206,7 +272,7 @@ class ScanSettingsWindow:
         self.min_volume = tk.Entry(row_vol, width=12)
         self.min_volume.pack(side="left")
         self.min_volume.insert(0, str(self.config.get("min_avg_volume", 500000)))
-        
+
         # Trend settings
         tk.Label(filter_frame, text="").pack()
         tk.Label(filter_frame, text="Trend Scan Settings:", font=("Arial", 10, "bold")).pack(anchor="w")
@@ -246,15 +312,18 @@ class ScanSettingsWindow:
                 "dip_min_volume_ratio": float(self.vol_ratio.get()),
                 "dip_require_news_check": self.news_check_var.get(),
                 "dip_require_analyst_check": self.analyst_check_var.get(),
-                
+                "dip_exclude_near_earnings": self.earnings_check_var.get(),
+                "dip_earnings_days_threshold": int(self.earnings_days.get()),
+
                 # Risk settings
                 "account_size": float(self.account_size.get()),
                 "risk_per_trade_percent": float(self.risk_pct.get()),
                 "max_position_dollars": float(self.max_pos.get()),
                 "max_daily_loss_dollars": float(self.max_loss.get()),
                 "max_concurrent_positions": int(self.max_positions.get()),
-                
+
                 # Filters
+                "sector_filter": self.sector_var.get(),
                 "min_price": float(self.min_price.get()),
                 "max_price": float(self.max_price.get()),
                 "min_avg_volume": int(self.min_volume.get()),

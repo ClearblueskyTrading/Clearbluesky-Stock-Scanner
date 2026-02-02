@@ -24,19 +24,19 @@ except ImportError:
 
 class HTMLReportGenerator:
     """Generate interactive HTML reports with AI copy buttons"""
-    
+
     def __init__(self, save_dir=None):
         if save_dir is None:
             save_dir = os.path.join(BASE_DIR, "reports")
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Referer': 'https://finviz.com/',
         }
-        
-        # Load config for custom AI URL
+
+        # Load config for custom AI URL and dark mode
         self.config = {}
         try:
             config_path = Path(os.path.join(BASE_DIR, "user_config.json"))
@@ -44,6 +44,9 @@ class HTMLReportGenerator:
                 self.config = json.load(open(config_path))
         except:
             pass
+
+        # Dark mode setting
+        self.dark_mode = self.config.get('report_dark_mode', False)
     
     def get_chart_url(self, ticker, timeframe='d'):
         """Get Finviz chart URL"""
@@ -76,6 +79,9 @@ class HTMLReportGenerator:
                 'perf_quarter': stock.get('Perf Quarter', 'N/A'),
                 'rel_volume': stock.get('Rel Volume', 'N/A'),
                 'recom': stock.get('Recom', 'N/A'),
+                'short_float': stock.get('Short Float', 'N/A'),
+                'short_ratio': stock.get('Short Ratio', 'N/A'),
+                'earnings': stock.get('Earnings', 'N/A'),
             })
             
             # Get news
@@ -159,6 +165,23 @@ class HTMLReportGenerator:
                 if news_items:
                     news_html = f"<div class='news'><b>📰 Recent News:</b><ul>{news_items}</ul></div>"
             
+            # Build badges for short interest and earnings
+            badges_html = ""
+            short_float = data.get('short_float', 'N/A')
+            if short_float and short_float != 'N/A':
+                try:
+                    sf_val = float(str(short_float).replace('%', ''))
+                    if sf_val >= 20:
+                        badges_html += '<span style="background:#dc3545;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-right:5px;">HIGH SHORT</span>'
+                    elif sf_val >= 10:
+                        badges_html += '<span style="background:#fd7e14;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-right:5px;">SQUEEZE?</span>'
+                except:
+                    pass
+
+            earnings = data.get('earnings', 'N/A')
+            if earnings and earnings != 'N/A' and earnings != '-':
+                badges_html += f'<span style="background:#6c757d;color:white;padding:2px 8px;border-radius:10px;font-size:11px;">ER: {earnings}</span>'
+
             stock_html = f"""
             <div class="stock-card" id="stock-{ticker}">
                 <div class="stock-header">
@@ -166,26 +189,27 @@ class HTMLReportGenerator:
                     <div class="stock-info">
                         <h2>{ticker}</h2>
                         <p class="company">{data.get('company', ticker)} | {data.get('sector', 'N/A')}</p>
+                        <div style="margin-top:5px;">{badges_html}</div>
                     </div>
                     <div class="stock-score score-{self._score_class(score)}">
                         <span class="score-num">{score}</span>
                         <span class="score-label">{self._score_label(score)}</span>
                     </div>
                 </div>
-                
+
                 <div class="stock-metrics">
                     <div class="metric"><span>Price</span><b>{data.get('price', 'N/A')}</b></div>
                     <div class="metric"><span>Change</span><b>{data.get('change', 'N/A')}</b></div>
                     <div class="metric"><span>Volume</span><b>{data.get('rel_volume', 'N/A')}x</b></div>
                     <div class="metric"><span>RSI</span><b>{data.get('rsi', 'N/A')}</b></div>
                     <div class="metric"><span>Target</span><b>${data.get('target', 'N/A')}</b></div>
-                    <div class="metric"><span>P/E</span><b>{data.get('pe', 'N/A')}</b></div>
+                    <div class="metric"><span>Short %</span><b>{data.get('short_float', 'N/A')}</b></div>
                 </div>
-                
+
                 <div class="chart-container">
                     <img src="{self.get_chart_url(ticker, 'd')}" alt="{ticker} Daily Chart" class="chart">
                 </div>
-                
+
                 {news_html}
             </div>
             """
@@ -295,17 +319,149 @@ RISK MANAGEMENT:
         if score >= 60: return "DECENT"
         return "WEAK"
     
+    def _get_light_mode_css(self):
+        """Return light mode CSS styles"""
+        return """
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 2em; margin-bottom: 5px; }
+        .header p { opacity: 0.8; }
+
+        .ai-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .ai-btn { padding: 12px 24px; border: none; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ai-btn.claude { background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%); color: white; }
+        .ai-btn.gemini { background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; }
+        .ai-btn.chatgpt { background: linear-gradient(135deg, #10A37F 0%, #1A7F64 100%); color: white; }
+        .ai-btn.copy { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; }
+
+        .copied { position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .summary { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .summary h2 { margin-bottom: 15px; color: #1a1a2e; }
+        .summary table { width: 100%; border-collapse: collapse; }
+        .summary th, .summary td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .summary th { background: #f8f9fa; color: #666; font-weight: 600; }
+        .summary tr:hover { background: #f8f9fa; }
+
+        .stock-card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stock-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .stock-rank { width: 50px; height: 50px; background: #1a1a2e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
+        .stock-info { flex: 1; }
+        .stock-info h2 { font-size: 1.8em; color: #1a1a2e; }
+        .stock-info .company { color: #666; margin-top: 5px; }
+
+        .stock-score { text-align: center; padding: 15px 25px; border-radius: 15px; }
+        .stock-score.score-high { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; }
+        .stock-score.score-mid { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
+        .stock-score.score-low { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; }
+        .score-num { font-size: 2em; font-weight: bold; display: block; }
+        .score-label { font-size: 0.85em; opacity: 0.9; }
+
+        .stock-metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
+        .metric { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
+        .metric span { display: block; color: #666; font-size: 0.85em; margin-bottom: 5px; }
+        .metric b { font-size: 1.1em; color: #1a1a2e; }
+
+        .chart-container { margin: 20px 0; text-align: center; }
+        .chart { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        .news { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .news ul { margin-left: 20px; margin-top: 10px; }
+        .news li { margin-bottom: 5px; color: #555; }
+
+        .footer { text-align: center; padding: 30px; color: #666; }
+
+        @media (max-width: 768px) {
+            .stock-metrics { grid-template-columns: repeat(3, 1fr); }
+            .ai-buttons { flex-direction: column; align-items: center; }
+        }
+        """
+
+    def _get_dark_mode_css(self):
+        """Return dark mode CSS styles"""
+        return """
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; }
+
+        .header { background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); color: white; padding: 30px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #30363d; }
+        .header h1 { font-size: 2em; margin-bottom: 5px; }
+        .header p { opacity: 0.8; }
+
+        .ai-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .ai-btn { padding: 12px 24px; border: none; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .ai-btn.claude { background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%); color: white; }
+        .ai-btn.gemini { background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; }
+        .ai-btn.chatgpt { background: linear-gradient(135deg, #10A37F 0%, #1A7F64 100%); color: white; }
+        .ai-btn.copy { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; }
+
+        .copied { position: fixed; top: 20px; right: 20px; background: #238636; color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .summary { background: #161b22; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 1px solid #30363d; }
+        .summary h2 { margin-bottom: 15px; color: #f0f6fc; }
+        .summary table { width: 100%; border-collapse: collapse; }
+        .summary th, .summary td { padding: 10px; text-align: left; border-bottom: 1px solid #30363d; }
+        .summary th { background: #21262d; color: #8b949e; font-weight: 600; }
+        .summary tr:hover { background: #21262d; }
+
+        .stock-card { background: #161b22; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 1px solid #30363d; }
+        .stock-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #30363d; }
+        .stock-rank { width: 50px; height: 50px; background: #238636; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
+        .stock-info { flex: 1; }
+        .stock-info h2 { font-size: 1.8em; color: #f0f6fc; }
+        .stock-info .company { color: #8b949e; margin-top: 5px; }
+
+        .stock-score { text-align: center; padding: 15px 25px; border-radius: 15px; }
+        .stock-score.score-high { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); color: white; }
+        .stock-score.score-mid { background: linear-gradient(135deg, #9e6a03 0%, #d29922 100%); color: white; }
+        .stock-score.score-low { background: linear-gradient(135deg, #da3633 0%, #f85149 100%); color: white; }
+        .score-num { font-size: 2em; font-weight: bold; display: block; }
+        .score-label { font-size: 0.85em; opacity: 0.9; }
+
+        .stock-metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
+        .metric { background: #21262d; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #30363d; }
+        .metric span { display: block; color: #8b949e; font-size: 0.85em; margin-bottom: 5px; }
+        .metric b { font-size: 1.1em; color: #f0f6fc; }
+
+        .chart-container { margin: 20px 0; text-align: center; }
+        .chart { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
+        .news { background: #21262d; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #30363d; }
+        .news ul { margin-left: 20px; margin-top: 10px; }
+        .news li { margin-bottom: 5px; color: #8b949e; }
+        .news a { color: #58a6ff; }
+
+        .footer { text-align: center; padding: 30px; color: #8b949e; }
+
+        @media (max-width: 768px) {
+            .stock-metrics { grid-template-columns: repeat(3, 1fr); }
+            .ai-buttons { flex-direction: column; align-items: center; }
+        }
+        """
+
     def _generate_html(self, scan_type, qualifying, stocks_html, ai_prompt, timestamp):
         """Generate complete HTML document"""
-        
+
         summary_rows = "".join([
             f"<tr><td>{i}</td><td><b>{q['ticker']}</b></td><td>{q['score']}</td><td>{self._score_label(q['score'])}</td></tr>"
             for i, q in enumerate(qualifying, 1)
         ])
-        
+
         # Escape prompt for JavaScript
         ai_prompt_escaped = ai_prompt.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
-        
+
+        # Select CSS based on dark mode setting
+        css_styles = self._get_dark_mode_css() if self.dark_mode else self._get_light_mode_css()
+
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -313,65 +469,7 @@ RISK MANAGEMENT:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{scan_type} Scan Results - {timestamp}</title>
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }}
-        
-        .header {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; position: sticky; top: 0; z-index: 100; }}
-        .header h1 {{ font-size: 2em; margin-bottom: 5px; }}
-        .header p {{ opacity: 0.8; }}
-        
-        .ai-buttons {{ display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }}
-        .ai-btn {{ padding: 12px 24px; border: none; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }}
-        .ai-btn:hover {{ transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }}
-        .ai-btn.claude {{ background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%); color: white; }}
-        .ai-btn.gemini {{ background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; }}
-        .ai-btn.chatgpt {{ background: linear-gradient(135deg, #10A37F 0%, #1A7F64 100%); color: white; }}
-        .ai-btn.copy {{ background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; }}
-        
-        .copied {{ position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000; animation: fadeIn 0.3s; }}
-        @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(-10px); }} to {{ opacity: 1; transform: translateY(0); }} }}
-        
-        .container {{ max-width: 1200px; margin: 0 auto; padding: 20px; }}
-        
-        .summary {{ background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        .summary h2 {{ margin-bottom: 15px; color: #1a1a2e; }}
-        .summary table {{ width: 100%; border-collapse: collapse; }}
-        .summary th, .summary td {{ padding: 10px; text-align: left; border-bottom: 1px solid #eee; }}
-        .summary th {{ background: #f8f9fa; color: #666; font-weight: 600; }}
-        .summary tr:hover {{ background: #f8f9fa; }}
-        
-        .stock-card {{ background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        .stock-header {{ display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }}
-        .stock-rank {{ width: 50px; height: 50px; background: #1a1a2e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }}
-        .stock-info {{ flex: 1; }}
-        .stock-info h2 {{ font-size: 1.8em; color: #1a1a2e; }}
-        .stock-info .company {{ color: #666; margin-top: 5px; }}
-        
-        .stock-score {{ text-align: center; padding: 15px 25px; border-radius: 15px; }}
-        .stock-score.score-high {{ background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; }}
-        .stock-score.score-mid {{ background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }}
-        .stock-score.score-low {{ background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; }}
-        .score-num {{ font-size: 2em; font-weight: bold; display: block; }}
-        .score-label {{ font-size: 0.85em; opacity: 0.9; }}
-        
-        .stock-metrics {{ display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }}
-        .metric {{ background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }}
-        .metric span {{ display: block; color: #666; font-size: 0.85em; margin-bottom: 5px; }}
-        .metric b {{ font-size: 1.1em; color: #1a1a2e; }}
-        
-        .chart-container {{ margin: 20px 0; text-align: center; }}
-        .chart {{ max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        
-        .news {{ background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 15px; }}
-        .news ul {{ margin-left: 20px; margin-top: 10px; }}
-        .news li {{ margin-bottom: 5px; color: #555; }}
-        
-        .footer {{ text-align: center; padding: 30px; color: #666; }}
-        
-        @media (max-width: 768px) {{
-            .stock-metrics {{ grid-template-columns: repeat(3, 1fr); }}
-            .ai-buttons {{ flex-direction: column; align-items: center; }}
-        }}
+        {css_styles}
     </style>
 </head>
 <body>

@@ -10,7 +10,7 @@ from typing import List, Dict, Optional
 from finviz.screener import Screener
 import finviz
 
-from scan_settings import load_config
+from scan_settings import load_config, SECTOR_FINVIZ_MAP
 
 # News keywords that suggest EMOTIONAL dip (buyable)
 EMOTIONAL_KEYWORDS = [
@@ -47,6 +47,68 @@ RATING_SCORES = {
 }
 
 
+def check_earnings_proximity(quote: dict) -> dict:
+    """
+    Check if stock has earnings coming up soon.
+    Returns dict with earnings info and risk assessment.
+    """
+    result = {
+        'earnings_date': None,
+        'days_to_earnings': None,
+        'earnings_risk': 'unknown',
+        'earnings_flag': None
+    }
+
+    try:
+        # Finviz provides earnings date in quote data
+        earnings_str = quote.get('Earnings', '')
+        if not earnings_str or earnings_str == '-':
+            return result
+
+        # Parse earnings date (format varies: "Feb 15 AMC", "Jan 28 BMO", etc.)
+        from datetime import datetime
+        import re
+
+        # Extract date part
+        date_match = re.match(r'([A-Za-z]{3}\s+\d{1,2})', earnings_str)
+        if date_match:
+            date_str = date_match.group(1)
+            current_year = datetime.now().year
+
+            try:
+                # Try parsing with current year
+                earnings_date = datetime.strptime(f"{date_str} {current_year}", "%b %d %Y")
+
+                # If earnings date is in the past, try next year
+                if earnings_date < datetime.now():
+                    earnings_date = datetime.strptime(f"{date_str} {current_year + 1}", "%b %d %Y")
+
+                days_to_earnings = (earnings_date - datetime.now()).days
+                result['earnings_date'] = earnings_date.strftime("%Y-%m-%d")
+                result['days_to_earnings'] = days_to_earnings
+
+                # Assess earnings risk
+                if days_to_earnings <= 3:
+                    result['earnings_risk'] = 'high'
+                    result['earnings_flag'] = f'EARNINGS IN {days_to_earnings} DAYS - High Risk'
+                elif days_to_earnings <= 7:
+                    result['earnings_risk'] = 'medium'
+                    result['earnings_flag'] = f'Earnings in {days_to_earnings} days'
+                elif days_to_earnings <= 14:
+                    result['earnings_risk'] = 'low'
+                    result['earnings_flag'] = f'Earnings in ~{days_to_earnings} days'
+                else:
+                    result['earnings_risk'] = 'none'
+
+            except ValueError:
+                pass
+
+    except Exception:
+        pass
+
+    return result
+
+
 def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     """
     Scan index for stocks down within configured range.
@@ -58,10 +120,11 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     min_price = float(config.get('min_price', 5.0))
     max_price = float(config.get('max_price', 500.0))
     min_volume = int(float(config.get('min_avg_volume', 500000)))
-    
+    sector_filter = config.get('sector_filter', 'All Sectors')
+
     # Index filter
     idx_filter = 'idx_sp500' if index == 'sp500' else 'idx_rut'
-    
+
     filters = [
         idx_filter,
         f'sh_price_o{int(min_price)}',
@@ -69,6 +132,26 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
         f'sh_avgvol_o{int(min_volume/1000)}',  # Finviz uses K
         'ta_change_d',  # Down today
     ]
+
+    # Add sector filter if specified
+    if sector_filter and sector_filter != "All Sectors":
+        # Map sector name to Finviz sector filter code
+        sector_codes = {
+            "Technology": "sec_technology",
+            "Healthcare": "sec_healthcare",
+            "Financial": "sec_financial",
+            "Consumer Cyclical": "sec_consumercyclical",
+            "Consumer Defensive": "sec_consumerdefensive",
+            "Industrials": "sec_industrials",
+            "Energy": "sec_energy",
+            "Basic Materials": "sec_basicmaterials",
+            "Communication Services": "sec_communicationservices",
+            "Real Estate": "sec_realestate",
+            "Utilities": "sec_utilities"
+        }
+        sector_code = sector_codes.get(sector_filter)
+        if sector_code:
+            filters.append(sector_code)
     
     try:
         screener = Screener(filters=filters, order='change')
@@ -104,7 +187,7 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
 def analyze_dip_quality(ticker: str) -> Dict:
     """
     Deep analysis of a dip candidate.
-    Checks news, analyst ratings, price targets.
+    Checks news, analyst ratings, price targets, earnings proximity.
     Returns quality assessment.
     """
     result = {
@@ -119,6 +202,12 @@ def analyze_dip_quality(ticker: str) -> Dict:
         'red_flags': [],
         'green_flags': [],
         'score': 50,  # Start neutral
+        'earnings_date': None,
+        'days_to_earnings': None,
+        'earnings_risk': 'unknown',
+        'short_float': None,
+        'short_ratio': None,
+        'short_interest_flag': None,
     }
     
     try:
@@ -223,21 +312,70 @@ def analyze_dip_quality(ticker: str) -> Dict:
         except:
             pass
 
-        # === TECHNICAL FACTORS ===
+        # === TECHNICAL FACTORS - ENHANCED RSI ANALYSIS ===
         # RSI - oversold is good for dips
         rsi = quote.get('RSI (14)', '')
         if rsi:
             try:
                 rsi_val = float(rsi)
+                result['rsi'] = rsi_val
+
+                # Get performance data for multi-timeframe context
+                perf_week = quote.get('Perf Week', '')
+                perf_month = quote.get('Perf Month', '')
+
+                # Analyze RSI with performance context
+                weekly_down = False
+                monthly_down = False
+
+                if perf_week and perf_week != '-':
+                    try:
+                        week_pct = float(perf_week.replace('%', ''))
+                        weekly_down = week_pct < -3  # Down more than 3% weekly
+                    except:
+                        pass
+
+                if perf_month and perf_month != '-':
+                    try:
+                        month_pct = float(perf_month.replace('%', ''))
+                        monthly_down = month_pct < -5  # Down more than 5% monthly
+                    except:
+                        pass
+
+                # Enhanced RSI scoring with multi-timeframe context
                 if rsi_val < 30:
                     result['green_flags'].append(f'Oversold RSI: {rsi_val:.0f}')
                     result['score'] += 10
+
+                    # Extra bonus if oversold with weekly/monthly downtrend (capitulation)
+                    if weekly_down and monthly_down:
+                        result['green_flags'].append('RSI oversold + multi-week selloff (capitulation?)')
+                        result['score'] += 10
+                    elif weekly_down:
+                        result['green_flags'].append('RSI oversold + weekly downtrend')
+                        result['score'] += 5
+
                 elif rsi_val < 40:
                     result['green_flags'].append(f'Low RSI: {rsi_val:.0f}')
                     result['score'] += 5
+
+                    if weekly_down:
+                        result['green_flags'].append('Low RSI with weekly weakness')
+                        result['score'] += 3
+
                 elif rsi_val > 70:
                     result['red_flags'].append(f'Overbought RSI: {rsi_val:.0f}')
                     result['score'] -= 5
+
+                    # If overbought but stock is down today, could be distribution
+                    if result.get('change', 0) < 0:
+                        result['red_flags'].append('Overbought RSI + down day (distribution?)')
+                        result['score'] -= 5
+
+                elif rsi_val > 50 and rsi_val <= 70:
+                    # Neutral to slightly bullish - note it
+                    result['rsi_note'] = f'RSI neutral-bullish: {rsi_val:.0f}'
+
             except:
                 pass
         
@@ -249,7 +387,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                 # These come as percentages from current price
                 sma50_pct = float(sma50.replace('%', ''))
                 sma200_pct = float(sma200.replace('%', ''))
-                
+
                 if sma50_pct > 0 and sma200_pct > 0:
                     result['green_flags'].append('Above SMA50 & SMA200')
                     result['score'] += 10
@@ -261,7 +399,63 @@ def analyze_dip_quality(ticker: str) -> Dict:
                     result['score'] -= 10
             except:
                 pass
-        
+
+        # === EARNINGS PROXIMITY CHECK ===
+        earnings_info = check_earnings_proximity(quote)
+        result['earnings_date'] = earnings_info['earnings_date']
+        result['days_to_earnings'] = earnings_info['days_to_earnings']
+        result['earnings_risk'] = earnings_info['earnings_risk']
+
+        if earnings_info['earnings_risk'] == 'high':
+            result['red_flags'].append(earnings_info['earnings_flag'])
+            result['score'] -= 20  # Significant penalty for imminent earnings
+        elif earnings_info['earnings_risk'] == 'medium':
+            result['red_flags'].append(earnings_info['earnings_flag'])
+            result['score'] -= 10
+        elif earnings_info['earnings_risk'] == 'low':
+            # Just a note, no score change
+            result['green_flags'].append(earnings_info['earnings_flag'])
+
+        # === SHORT INTEREST CHECK ===
+        short_float = quote.get('Short Float', '')
+        short_ratio = quote.get('Short Ratio', '')
+
+        if short_float and short_float != '-':
+            try:
+                sf_val = float(short_float.replace('%', ''))
+                result['short_float'] = sf_val
+
+                # High short interest can indicate squeeze potential or fundamental problems
+                if sf_val >= 20:
+                    result['short_interest_flag'] = 'HIGH_SHORT'
+                    result['red_flags'].append(f'High short interest: {sf_val:.1f}%')
+                    # Could be squeeze potential but also risky - slight penalty
+                    result['score'] -= 5
+                elif sf_val >= 10:
+                    result['short_interest_flag'] = 'ELEVATED_SHORT'
+                    result['green_flags'].append(f'Elevated short interest: {sf_val:.1f}% (squeeze potential)')
+                    # Moderate short interest on a dip could indicate squeeze opportunity
+                    result['score'] += 5
+                elif sf_val >= 5:
+                    result['short_interest_flag'] = 'MODERATE_SHORT'
+            except:
+                pass
+
+        if short_ratio and short_ratio != '-':
+            try:
+                sr_val = float(short_ratio)
+                result['short_ratio'] = sr_val
+
+                # Short ratio > 5 days to cover is significant
+                if sr_val >= 10:
+                    if not result.get('short_interest_flag'):
+                        result['short_interest_flag'] = 'HIGH_SHORT_RATIO'
+                    result['green_flags'].append(f'High days to cover: {sr_val:.1f} days')
+                elif sr_val >= 5:
+                    result['green_flags'].append(f'Days to cover: {sr_val:.1f}')
+            except:
+                pass
+
         # === FINAL RECOMMENDATION ===
         if result['score'] >= 75:
             result['recommendation'] = 'STRONG BUY'
@@ -288,22 +482,24 @@ def analyze_dip_quality(ticker: str) -> Dict:
 def run_enhanced_dip_scan(progress_callback=None, index: str = "sp500") -> List[Dict]:
     """
     Run full enhanced dip scan.
-    
+
     Args:
         progress_callback: function(msg) for status updates
         index: 'sp500' or 'russell2000'
-    
+
     1. Get stocks down within range
     2. Analyze each for news/analyst/targets
     3. Score and rank
     4. Return sorted results
     """
     config = load_config()
-    
+
     index_name = "S&P 500" if index == "sp500" else "Russell 2000"
-    
+    sector_filter = config.get('sector_filter', 'All Sectors')
+    sector_msg = f" [{sector_filter}]" if sector_filter != "All Sectors" else ""
+
     if progress_callback:
-        progress_callback(f"Scanning {index_name} for dips...")
+        progress_callback(f"Scanning {index_name}{sector_msg} for dips...")
     
     # Step 1: Get dip candidates
     candidates = get_sp500_dips(config, index)

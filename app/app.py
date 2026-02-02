@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v5.1
+# ClearBlueSky Stock Scanner v5.2
 # ============================================================
 
 import tkinter as tk
-VERSION = "5.1"
+VERSION = "5.2"
 from tkinter import ttk, messagebox
 import os
 import json
@@ -12,9 +12,17 @@ import traceback
 import time
 from datetime import datetime
 
-BASE_DIR = r"C:\TradingBot"
+# Use script directory for portable support
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
 LOG_FILE = os.path.join(BASE_DIR, "error_log.txt")
+
+# Import alerts module
+try:
+    from alerts import show_scan_complete_alert, load_alert_settings
+    ALERTS_AVAILABLE = True
+except ImportError:
+    ALERTS_AVAILABLE = False
 
 # Colors
 BG_DARK = "#1a1a2e"
@@ -161,6 +169,8 @@ class TradeBotApp:
         
         self.config = self.load_config()
         self.build_ui()
+        self.scheduler_id = None
+        self.update_scheduler()
         log("UI ready")
     
     def load_config(self):
@@ -252,17 +262,23 @@ class TradeBotApp:
         
         self.trend_btn = tk.Button(trend_btn_row, text="▶ Run Scan", command=self.run_trend,
                                    bg=GREEN, fg="white", font=("Arial", 10, "bold"),
-                                   width=12, height=1, cursor="hand2", relief="flat")
+                                   width=10, height=1, cursor="hand2", relief="flat")
         self.trend_btn.pack(side="left")
-        
+
+        self.trend_rescan_btn = tk.Button(trend_btn_row, text="🔄", command=self.run_trend,
+                                          bg="#e9ecef", fg="#333", font=("Arial", 10),
+                                          width=3, cursor="hand2", relief="flat",
+                                          state="disabled")
+        self.trend_rescan_btn.pack(side="left", padx=(3,0))
+
         self.trend_stop_btn = tk.Button(trend_btn_row, text="■ Stop", command=self.stop_trend_scan,
                                         bg="#dc3545", fg="white", font=("Arial", 9),
                                         width=5, cursor="hand2", relief="flat", state="disabled")
-        self.trend_stop_btn.pack(side="left", padx=(5,0))
-        
+        self.trend_stop_btn.pack(side="left", padx=(3,0))
+
         tk.Button(trend_btn_row, text="⚙", command=self.trend_settings,
                   bg="#e9ecef", fg="#333", font=("Arial", 10), width=3,
-                  cursor="hand2", relief="flat").pack(side="left", padx=(5,0))
+                  cursor="hand2", relief="flat").pack(side="left", padx=(3,0))
         
         self.trend_printer = AnimatedMoneyPrinter(trend_btn_row, bg="white")
         self.trend_printer.pack(side="right")
@@ -304,17 +320,23 @@ class TradeBotApp:
         
         self.swing_btn = tk.Button(swing_btn_row, text="▶ Run Scan", command=self.run_dips,
                                    bg=BLUE, fg="white", font=("Arial", 10, "bold"),
-                                   width=12, height=1, cursor="hand2", relief="flat")
+                                   width=10, height=1, cursor="hand2", relief="flat")
         self.swing_btn.pack(side="left")
-        
+
+        self.swing_rescan_btn = tk.Button(swing_btn_row, text="🔄", command=self.run_dips,
+                                          bg="#e9ecef", fg="#333", font=("Arial", 10),
+                                          width=3, cursor="hand2", relief="flat",
+                                          state="disabled")
+        self.swing_rescan_btn.pack(side="left", padx=(3,0))
+
         self.swing_stop_btn = tk.Button(swing_btn_row, text="■ Stop", command=self.stop_swing_scan,
                                         bg="#dc3545", fg="white", font=("Arial", 9),
                                         width=5, cursor="hand2", relief="flat", state="disabled")
-        self.swing_stop_btn.pack(side="left", padx=(5,0))
-        
+        self.swing_stop_btn.pack(side="left", padx=(3,0))
+
         tk.Button(swing_btn_row, text="⚙", command=self.dip_settings,
                   bg="#e9ecef", fg="#333", font=("Arial", 10), width=3,
-                  cursor="hand2", relief="flat").pack(side="left", padx=(5,0))
+                  cursor="hand2", relief="flat").pack(side="left", padx=(3,0))
         
         self.swing_printer = AnimatedMoneyPrinter(swing_btn_row, bg="white")
         self.swing_printer.pack(side="right")
@@ -322,10 +344,53 @@ class TradeBotApp:
         self.swing_progress = ProgressBar(swing_frame, width=300, height=18, color=BLUE)
         self.swing_progress.pack(padx=10, pady=(0,5))
         
-        self.swing_status = tk.Label(swing_frame, text="", font=("Arial", 8), 
+        self.swing_status = tk.Label(swing_frame, text="", font=("Arial", 8),
                                      bg="white", fg="#666")
         self.swing_status.pack(anchor="w", padx=10, pady=(0,5))
-        
+
+        # WATCHLIST SCANNER
+        watch_frame = tk.Frame(main, bg="white", relief="solid", bd=1)
+        watch_frame.pack(fill="x", pady=(0, 10), ipady=10, ipadx=10)
+
+        watch_top = tk.Frame(watch_frame, bg="white")
+        watch_top.pack(fill="x", padx=10, pady=(10,3))
+
+        tk.Label(watch_top, text="Watchlist Scanner", font=("Arial", 11, "bold"),
+                bg="white", fg="#333").pack(side="left")
+        tk.Label(watch_top, text="~5 sec/stock", font=("Arial", 9),
+                bg="white", fg="#888").pack(side="right")
+
+        tk.Label(watch_frame, text="Scan your custom list of tickers",
+                font=("Arial", 9, "italic"), bg="white", fg="#666").pack(anchor="w", padx=10)
+
+        watch_btn_row = tk.Frame(watch_frame, bg="white")
+        watch_btn_row.pack(fill="x", padx=10, pady=(8,5))
+
+        self.watch_btn = tk.Button(watch_btn_row, text="▶ Run Scan", command=self.run_watchlist,
+                                   bg=PURPLE, fg="white", font=("Arial", 10, "bold"),
+                                   width=10, height=1, cursor="hand2", relief="flat")
+        self.watch_btn.pack(side="left")
+
+        self.watch_rescan_btn = tk.Button(watch_btn_row, text="🔄", command=self.run_watchlist,
+                                          bg="#e9ecef", fg="#333", font=("Arial", 10),
+                                          width=3, cursor="hand2", relief="flat",
+                                          state="disabled")
+        self.watch_rescan_btn.pack(side="left", padx=(3,0))
+
+        tk.Button(watch_btn_row, text="📝", command=self.edit_watchlist,
+                  bg="#e9ecef", fg="#333", font=("Arial", 10), width=3,
+                  cursor="hand2", relief="flat").pack(side="left", padx=(3,0))
+
+        self.watch_printer = AnimatedMoneyPrinter(watch_btn_row, bg="white")
+        self.watch_printer.pack(side="right")
+
+        self.watch_progress = ProgressBar(watch_frame, width=300, height=18, color=PURPLE)
+        self.watch_progress.pack(padx=10, pady=(0,5))
+
+        self.watch_status = tk.Label(watch_frame, text="", font=("Arial", 8),
+                                     bg="white", fg="#666")
+        self.watch_status.pack(anchor="w", padx=10, pady=(0,5))
+
         # --- QUICK TICKER ---
         ticker_label = tk.Label(main, text="🔍 Quick Lookup", font=("Arial", 10, "bold"), 
                                bg="#f8f9fa", fg="#333")
@@ -354,11 +419,11 @@ class TradeBotApp:
         # Row 1: Quick links
         row1 = tk.Frame(btn_frame, bg="#f8f9fa")
         row1.pack(fill="x", pady=(0,5))
-        
+
         for text, cmd in [("🌐 Finviz", lambda: webbrowser.open("https://finviz.com")),
                           ("💼 Broker", self.open_broker),
                           ("📁 Reports", self.open_reports),
-                          ("📋 Logs", self.view_logs)]:
+                          ("📜 History", self.view_history)]:
             tk.Button(row1, text=text, command=cmd, bg="#e9ecef", fg="#333",
                      font=("Arial", 9), width=9, relief="flat", cursor="hand2").pack(side="left", padx=2)
         
@@ -385,8 +450,10 @@ class TradeBotApp:
         # Scan state
         self.trend_cancelled = False
         self.swing_cancelled = False
+        self.watch_cancelled = False
         self.trend_start_time = 0
         self.swing_start_time = 0
+        self.watch_start_time = 0
     
     # === SCANNER METHODS ===
     
@@ -443,21 +510,26 @@ class TradeBotApp:
             
             if self.trend_cancelled:
                 self.scan_complete(self.trend_progress, self.trend_status,
-                                   self.trend_printer, self.trend_btn, "Cancelled", self.trend_stop_btn)
+                                   self.trend_printer, self.trend_btn, "Cancelled", self.trend_stop_btn,
+                                   self.trend_rescan_btn, "Trend", 0, 0, False)
                 return
-            
+
             if df is not None and len(df) > 0:
                 elapsed = int(time.time() - self.trend_start_time)
-                self.generate_report_from_results(df.to_dict('records'), "Trend", 
+                self.generate_report_from_results(df.to_dict('records'), "Trend",
                     self.trend_progress, self.trend_status, self.trend_printer, self.trend_btn,
-                    self.trend_stop_btn, elapsed)
+                    self.trend_stop_btn, elapsed, self.trend_rescan_btn)
             else:
-                self.scan_complete(self.trend_progress, self.trend_status, 
-                                   self.trend_printer, self.trend_btn, "No results", self.trend_stop_btn)
+                elapsed = int(time.time() - self.trend_start_time)
+                self.scan_complete(self.trend_progress, self.trend_status,
+                                   self.trend_printer, self.trend_btn, "No results", self.trend_stop_btn,
+                                   self.trend_rescan_btn, "Trend", 0, elapsed, True)
         except Exception as e:
             log_error(e, "Trend failed")
+            elapsed = int(time.time() - self.trend_start_time)
             self.scan_complete(self.trend_progress, self.trend_status,
-                               self.trend_printer, self.trend_btn, "Error!", self.trend_stop_btn)
+                               self.trend_printer, self.trend_btn, "Error!", self.trend_stop_btn,
+                               self.trend_rescan_btn, "Trend", 0, elapsed, False)
             messagebox.showerror("Error", str(e))
     
     def run_dips(self):
@@ -502,31 +574,180 @@ class TradeBotApp:
             
             if self.swing_cancelled:
                 self.scan_complete(self.swing_progress, self.swing_status,
-                                   self.swing_printer, self.swing_btn, "Cancelled", self.swing_stop_btn)
+                                   self.swing_printer, self.swing_btn, "Cancelled", self.swing_stop_btn,
+                                   self.swing_rescan_btn, "Swing", 0, 0, False)
                 return
-            
+
             if results and len(results) > 0:
                 elapsed = int(time.time() - self.swing_start_time)
                 self.generate_report_from_results(results, "Swing",
                     self.swing_progress, self.swing_status, self.swing_printer, self.swing_btn,
-                    self.swing_stop_btn, elapsed)
+                    self.swing_stop_btn, elapsed, self.swing_rescan_btn)
             else:
+                elapsed = int(time.time() - self.swing_start_time)
                 self.scan_complete(self.swing_progress, self.swing_status,
-                                   self.swing_printer, self.swing_btn, "No dips today", self.swing_stop_btn)
+                                   self.swing_printer, self.swing_btn, "No dips today", self.swing_stop_btn,
+                                   self.swing_rescan_btn, "Swing", 0, elapsed, True)
         except Exception as e:
             log_error(e, "Swing failed")
+            elapsed = int(time.time() - self.swing_start_time)
             self.scan_complete(self.swing_progress, self.swing_status,
-                               self.swing_printer, self.swing_btn, "Error!", self.swing_stop_btn)
+                               self.swing_printer, self.swing_btn, "Error!", self.swing_stop_btn,
+                               self.swing_rescan_btn, "Swing", 0, elapsed, False)
             messagebox.showerror("Error", str(e))
-    
-    def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0):
+
+    def run_watchlist(self):
+        log("=== WATCHLIST SCAN ===")
+        self.watch_cancelled = False
+        self.watch_start_time = time.time()
+        self.watch_progress.set(5, "Starting...")
+        self.watch_status.config(text="Loading watchlist...")
+        self.watch_printer.start()
+        self.watch_btn.config(state="disabled")
+        self.root.update()
+
+        try:
+            from watchlist_scanner import scan_watchlist, load_watchlist
+
+            tickers = load_watchlist()
+            if not tickers:
+                self.watch_progress.set(0, "Empty watchlist")
+                self.watch_status.config(text="Add tickers first (click 📝)")
+                self.watch_printer.stop()
+                self.watch_btn.config(state="normal")
+                return
+
+            def progress(msg):
+                if self.watch_cancelled:
+                    return
+                log(f"Watchlist: {msg}")
+                elapsed = int(time.time() - self.watch_start_time)
+                time_str = f"{elapsed}s"
+
+                if "analyzing" in msg.lower():
+                    try:
+                        if "(" in msg and "/" in msg:
+                            parts = msg.split("(")[1].split(")")[0].split("/")
+                            cur, tot = int(parts[0]), int(parts[1])
+                            pct = 10 + int((cur / tot) * 80)
+                            self.watch_progress.set(pct, f"{pct}% ({time_str})")
+                            self.watch_status.config(text=msg[:50])
+                    except:
+                        pass
+                elif "complete" in msg.lower():
+                    self.watch_progress.set(90, f"90% ({time_str})")
+                self.root.update()
+
+            results = scan_watchlist(progress)
+
+            if results and len(results) > 0:
+                elapsed = int(time.time() - self.watch_start_time)
+                self.generate_report_from_results(results, "Watchlist",
+                    self.watch_progress, self.watch_status, self.watch_printer, self.watch_btn,
+                    None, elapsed, self.watch_rescan_btn)
+            else:
+                elapsed = int(time.time() - self.watch_start_time)
+                self.scan_complete(self.watch_progress, self.watch_status,
+                                   self.watch_printer, self.watch_btn, "No results", None,
+                                   self.watch_rescan_btn, "Watchlist", 0, elapsed, True)
+        except Exception as e:
+            log_error(e, "Watchlist failed")
+            elapsed = int(time.time() - self.watch_start_time)
+            self.scan_complete(self.watch_progress, self.watch_status,
+                               self.watch_printer, self.watch_btn, "Error!", None,
+                               self.watch_rescan_btn, "Watchlist", 0, elapsed, False)
+            messagebox.showerror("Error", str(e))
+
+    def edit_watchlist(self):
+        """Open watchlist editor window."""
+        from watchlist_scanner import load_watchlist, save_watchlist
+
+        win = tk.Toplevel(self.root)
+        win.title("Edit Watchlist")
+        win.geometry("350x450")
+        win.transient(self.root)
+        win.grab_set()
+        win.configure(bg="white")
+
+        tk.Label(win, text="Watchlist Editor", font=("Arial", 12, "bold"),
+                bg="white", fg="#333").pack(pady=(15,5))
+        tk.Label(win, text="Enter ticker symbols, one per line",
+                font=("Arial", 9), bg="white", fg="#666").pack()
+
+        # Text area for tickers
+        text_frame = tk.Frame(win, bg="white")
+        text_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+        scrollbar = tk.Scrollbar(text_frame)
+        scrollbar.pack(side="right", fill="y")
+
+        text_box = tk.Text(text_frame, wrap="word", font=("Consolas", 11),
+                          yscrollcommand=scrollbar.set, height=15)
+        text_box.pack(side="left", fill="both", expand=True)
+        scrollbar.config(command=text_box.yview)
+
+        # Load current watchlist
+        current = load_watchlist()
+        if current:
+            text_box.insert("1.0", "\n".join(current))
+
+        # Buttons
+        btn_frame = tk.Frame(win, bg="white")
+        btn_frame.pack(pady=10)
+
+        def save():
+            text = text_box.get("1.0", "end").strip()
+            tickers = [t.strip().upper() for t in text.split("\n") if t.strip()]
+            # Remove duplicates while preserving order
+            seen = set()
+            unique_tickers = []
+            for t in tickers:
+                if t and t not in seen:
+                    seen.add(t)
+                    unique_tickers.append(t)
+            save_watchlist(unique_tickers)
+            self.status.config(text=f"Watchlist saved: {len(unique_tickers)} tickers")
+            win.destroy()
+
+        def clear():
+            if messagebox.askyesno("Clear Watchlist", "Remove all tickers?"):
+                text_box.delete("1.0", "end")
+
+        tk.Button(btn_frame, text="Save", command=save, bg=PURPLE, fg="white",
+                 font=("Arial", 10, "bold"), width=10, relief="flat").pack(side="left", padx=5)
+
+        tk.Button(btn_frame, text="Clear All", command=clear, bg="#dc3545", fg="white",
+                 font=("Arial", 9), width=8, relief="flat").pack(side="left", padx=5)
+
+        tk.Button(btn_frame, text="Cancel", command=win.destroy, bg="#6c757d", fg="white",
+                 font=("Arial", 9), width=8, relief="flat").pack(side="left", padx=5)
+
+        # Example tickers
+        tk.Label(win, text="Example: AAPL, MSFT, NVDA, GOOGL, TSLA",
+                font=("Arial", 8), bg="white", fg="#999").pack(pady=(0,10))
+
+    def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, rescan_btn=None):
         """Generate HTML report"""
+        result_count = len(results) if results else 0
+
+        # Save to scan history
+        try:
+            from scan_history import add_scan_to_history
+            index = None
+            if scan_type == "Trend":
+                index = "sp500" if "S&P" in self.trend_index.get() else "russell2000"
+            elif scan_type == "Swing":
+                index = "sp500" if "S&P" in self.swing_index.get() else "russell2000"
+            add_scan_to_history(scan_type, results, index, elapsed)
+        except Exception as e:
+            log(f"History save error: {e}", "WARN")
+
         try:
             from report_generator import HTMLReportGenerator
-            
+
             min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 65))
             gen = HTMLReportGenerator()
-            
+
             def rpt_progress(msg):
                 if "Processing" in msg:
                     try:
@@ -536,9 +757,9 @@ class TradeBotApp:
                     except:
                         pass
                 self.root.update()
-            
+
             path = gen.generate_combined_report(results, scan_type, min_score, rpt_progress)
-            
+
             if path:
                 progress.set(100, f"Done! ({elapsed}s)")
                 status.config(text="Opening report in browser...")
@@ -548,19 +769,52 @@ class TradeBotApp:
         except Exception as e:
             log_error(e, "Report failed")
             status.config(text="Report error")
-        
+
         printer.stop()
         btn.config(state="normal")
         if stop_btn:
             stop_btn.config(state="disabled")
+        if rescan_btn:
+            rescan_btn.config(state="normal")
+
+        # Show alert notification
+        if ALERTS_AVAILABLE:
+            alert_settings = load_alert_settings()
+            if alert_settings.get('alerts_enabled', True):
+                show_scan_complete_alert(
+                    self.root,
+                    scan_type,
+                    result_count,
+                    elapsed,
+                    success=True,
+                    enable_sound=alert_settings.get('alert_sound_enabled', True),
+                    enable_toast=alert_settings.get('alert_toast_enabled', True)
+                )
     
-    def scan_complete(self, progress, status, printer, btn, msg, stop_btn=None):
+    def scan_complete(self, progress, status, printer, btn, msg, stop_btn=None,
+                      rescan_btn=None, scan_type=None, result_count=0, elapsed=0, success=True):
         progress.set(0, msg)
         status.config(text="")
         printer.stop()
         btn.config(state="normal")
         if stop_btn:
             stop_btn.config(state="disabled")
+        if rescan_btn:
+            rescan_btn.config(state="normal")
+
+        # Show alert notification
+        if ALERTS_AVAILABLE and scan_type:
+            alert_settings = load_alert_settings()
+            if alert_settings.get('alerts_enabled', True):
+                show_scan_complete_alert(
+                    self.root,
+                    scan_type,
+                    result_count,
+                    elapsed,
+                    success=success,
+                    enable_sound=alert_settings.get('alert_sound_enabled', True),
+                    enable_toast=alert_settings.get('alert_toast_enabled', True)
+                )
     
     # === SINGLE TICKER ===
     
@@ -832,23 +1086,24 @@ class TradeBotApp:
     def api_settings(self):
         win = tk.Toplevel(self.root)
         win.title("Settings")
-        win.geometry("350x200")
+        win.geometry("400x520")
         win.transient(self.root)
         win.grab_set()
         win.configure(bg="white")
-        
+
         tk.Label(win, text="Settings", font=("Arial", 12, "bold"),
                 bg="white", fg="#333").pack(pady=(15,10))
-        
+
         f = tk.Frame(win, bg="white", padx=20)
         f.pack(fill="x")
-        
+
+        # API Settings
         tk.Label(f, text="Finviz API Key (optional):", font=("Arial", 9),
                 bg="white", fg="#666").pack(anchor="w")
         api_var = tk.StringVar(value=self.config.get('finviz_api_key', ''))
         api_entry = tk.Entry(f, textvariable=api_var, width=40)
         api_entry.pack(anchor="w", pady=(2,10))
-        
+
         # Only mask if there's a value
         def update_mask(*args):
             if api_var.get():
@@ -857,20 +1112,95 @@ class TradeBotApp:
                 api_entry.config(show="")
         api_var.trace("w", update_mask)
         update_mask()  # Initial check
-        
+
         tk.Label(f, text="Broker URL:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
         broker_var = tk.StringVar(value=self.config.get('broker_url', 'https://www.schwab.com'))
         tk.Entry(f, textvariable=broker_var, width=40).pack(anchor="w", pady=(2,10))
-        
+
+        # Separator
+        tk.Frame(f, bg="#ddd", height=1).pack(fill="x", pady=10)
+
+        # Advanced Settings
+        tk.Label(f, text="Report & Alert Settings:", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", pady=(0,5))
+
+        # Dark mode toggle
+        dark_mode_var = tk.BooleanVar(value=self.config.get('report_dark_mode', False))
+        tk.Checkbutton(f, text="Dark mode reports", variable=dark_mode_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w")
+
+        # Alert settings
+        alerts_var = tk.BooleanVar(value=self.config.get('alerts_enabled', True))
+        tk.Checkbutton(f, text="Enable scan completion alerts", variable=alerts_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w")
+
+        sound_var = tk.BooleanVar(value=self.config.get('alert_sound_enabled', True))
+        tk.Checkbutton(f, text="Play sound on scan complete", variable=sound_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w", padx=(15,0))
+
+        toast_var = tk.BooleanVar(value=self.config.get('alert_toast_enabled', True))
+        tk.Checkbutton(f, text="Show toast notification", variable=toast_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w", padx=(15,0))
+
+        # Separator
+        tk.Frame(f, bg="#ddd", height=1).pack(fill="x", pady=10)
+
+        # Scheduled Scan Settings
+        tk.Label(f, text="Scheduled Scan (Auto-Run):", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", pady=(0,5))
+
+        scheduled_var = tk.BooleanVar(value=self.config.get('scheduled_scan_enabled', False))
+        tk.Checkbutton(f, text="Enable scheduled daily scan", variable=scheduled_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w")
+
+        sched_row = tk.Frame(f, bg="white")
+        sched_row.pack(fill="x", pady=5)
+
+        tk.Label(sched_row, text="Time (24hr):", font=("Arial", 9), bg="white").pack(side="left")
+        time_var = tk.StringVar(value=self.config.get('scheduled_scan_time', '15:30'))
+        time_entry = tk.Entry(sched_row, textvariable=time_var, width=8)
+        time_entry.pack(side="left", padx=5)
+
+        tk.Label(sched_row, text="Scan:", font=("Arial", 9), bg="white").pack(side="left", padx=(10,0))
+        scan_type_var = tk.StringVar(value=self.config.get('scheduled_scan_type', 'Swing'))
+        scan_combo = ttk.Combobox(sched_row, textvariable=scan_type_var,
+                                  values=["Trend", "Swing", "Watchlist"],
+                                  state="readonly", width=10)
+        scan_combo.pack(side="left", padx=5)
+
+        sched_row2 = tk.Frame(f, bg="white")
+        sched_row2.pack(fill="x", pady=2)
+
+        tk.Label(sched_row2, text="Index:", font=("Arial", 9), bg="white").pack(side="left")
+        index_var = tk.StringVar(value=self.config.get('scheduled_scan_index', 'sp500'))
+        index_combo = ttk.Combobox(sched_row2, textvariable=index_var,
+                                   values=["sp500", "russell2000"],
+                                   state="readonly", width=12)
+        index_combo.pack(side="left", padx=5)
+
+        tk.Label(f, text="💡 Swing scan at 3:30 PM recommended", font=("Arial", 8),
+                bg="white", fg="#888").pack(anchor="w")
+
         def save():
             self.config['finviz_api_key'] = api_var.get()
             self.config['broker_url'] = broker_var.get()
+            self.config['report_dark_mode'] = dark_mode_var.get()
+            self.config['alerts_enabled'] = alerts_var.get()
+            self.config['alert_sound_enabled'] = sound_var.get()
+            self.config['alert_toast_enabled'] = toast_var.get()
+            self.config['scheduled_scan_enabled'] = scheduled_var.get()
+            self.config['scheduled_scan_time'] = time_var.get()
+            self.config['scheduled_scan_type'] = scan_type_var.get()
+            self.config['scheduled_scan_index'] = index_var.get()
             with open(CONFIG_FILE, 'w') as f:
                 json.dump(self.config, f, indent=2)
             win.destroy()
-        
+            self.status.config(text="Settings saved")
+            # Update scheduler
+            self.update_scheduler()
+
         tk.Button(win, text="Save", command=save, bg=GREEN, fg="white",
-                 font=("Arial", 10, "bold"), width=10, relief="flat").pack(pady=10)
+                 font=("Arial", 10, "bold"), width=10, relief="flat").pack(pady=15)
     
     def open_broker(self):
         webbrowser.open(self.config.get('broker_url', 'https://www.schwab.com'))
@@ -882,7 +1212,165 @@ class TradeBotApp:
     def view_logs(self):
         if os.path.exists(LOG_FILE):
             os.startfile(LOG_FILE)
+
+    def view_history(self):
+        """Show scan history window with export options."""
+        from scan_history import get_recent_scans, export_history_to_csv, get_export_dir, clear_history
+
+        win = tk.Toplevel(self.root)
+        win.title("Scan History")
+        win.geometry("550x450")
+        win.transient(self.root)
+        win.configure(bg="white")
+
+        tk.Label(win, text="Scan History", font=("Arial", 12, "bold"),
+                bg="white", fg="#333").pack(pady=(15,5))
+
+        # History list
+        list_frame = tk.Frame(win, bg="white")
+        list_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side="right", fill="y")
+
+        columns = ("Date", "Type", "Index", "Results", "Time", "Top Picks")
+        tree = ttk.Treeview(list_frame, columns=columns, show="headings",
+                           yscrollcommand=scrollbar.set, height=12)
+        scrollbar.config(command=tree.yview)
+
+        # Column setup
+        tree.heading("Date", text="Date")
+        tree.heading("Type", text="Type")
+        tree.heading("Index", text="Index")
+        tree.heading("Results", text="Results")
+        tree.heading("Time", text="Time")
+        tree.heading("Top Picks", text="Top Picks")
+
+        tree.column("Date", width=120)
+        tree.column("Type", width=70)
+        tree.column("Index", width=80)
+        tree.column("Results", width=50)
+        tree.column("Time", width=50)
+        tree.column("Top Picks", width=150)
+
+        # Load history
+        scans = get_recent_scans(50)
+        for scan in scans:
+            try:
+                dt = datetime.fromisoformat(scan['timestamp'])
+                date_str = dt.strftime("%m/%d %I:%M %p")
+            except:
+                date_str = scan.get('id', 'Unknown')
+
+            top_picks = ', '.join([t['ticker'] for t in scan.get('top_tickers', [])[:3]])
+
+            tree.insert("", "end", values=(
+                date_str,
+                scan.get('type', 'Unknown'),
+                scan.get('index', '-') or '-',
+                scan.get('result_count', 0),
+                f"{scan.get('elapsed_time', 0)}s",
+                top_picks
+            ))
+
+        tree.pack(fill="both", expand=True)
+
+        # Buttons
+        btn_frame = tk.Frame(win, bg="white")
+        btn_frame.pack(pady=10)
+
+        def export_csv():
+            try:
+                path = export_history_to_csv()
+                if path:
+                    self.status.config(text=f"Exported to {os.path.basename(path)}")
+                    webbrowser.open(os.path.dirname(path))
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
+        def open_exports():
+            try:
+                export_dir = get_export_dir()
+                os.startfile(export_dir)
+            except:
+                pass
+
+        def clear_all():
+            if messagebox.askyesno("Clear History", "Remove all scan history?"):
+                clear_history()
+                for item in tree.get_children():
+                    tree.delete(item)
+                self.status.config(text="History cleared")
+
+        tk.Button(btn_frame, text="📥 Export CSV", command=export_csv,
+                 bg=GREEN, fg="white", font=("Arial", 9, "bold"),
+                 width=12, relief="flat").pack(side="left", padx=5)
+
+        tk.Button(btn_frame, text="📁 Open Exports", command=open_exports,
+                 bg="#6c757d", fg="white", font=("Arial", 9),
+                 width=12, relief="flat").pack(side="left", padx=5)
+
+        tk.Button(btn_frame, text="🗑 Clear", command=clear_all,
+                 bg="#dc3545", fg="white", font=("Arial", 9),
+                 width=8, relief="flat").pack(side="left", padx=5)
+
+        tk.Button(btn_frame, text="Close", command=win.destroy,
+                 bg="#e9ecef", fg="#333", font=("Arial", 9),
+                 width=8, relief="flat").pack(side="left", padx=5)
     
+    def update_scheduler(self):
+        """Update the scheduled scan timer."""
+        # Cancel existing scheduler
+        if self.scheduler_id:
+            self.root.after_cancel(self.scheduler_id)
+            self.scheduler_id = None
+
+        if not self.config.get('scheduled_scan_enabled', False):
+            log("Scheduler disabled")
+            return
+
+        # Calculate time until next scan
+        try:
+            scheduled_time = self.config.get('scheduled_scan_time', '15:30')
+            hour, minute = map(int, scheduled_time.split(':'))
+
+            now = datetime.now()
+            target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+            # If target time has passed today, schedule for tomorrow
+            if target <= now:
+                target = target.replace(day=target.day + 1)
+
+            delay_ms = int((target - now).total_seconds() * 1000)
+
+            if delay_ms > 0:
+                log(f"Scheduler: Next scan at {scheduled_time} (in {delay_ms/1000/60:.0f} minutes)")
+                self.scheduler_id = self.root.after(delay_ms, self.run_scheduled_scan)
+        except Exception as e:
+            log(f"Scheduler error: {e}", "WARN")
+
+    def run_scheduled_scan(self):
+        """Execute the scheduled scan."""
+        log("=== SCHEDULED SCAN TRIGGERED ===")
+
+        scan_type = self.config.get('scheduled_scan_type', 'Swing')
+        index = self.config.get('scheduled_scan_index', 'sp500')
+
+        # Set the index selector
+        index_display = "S&P 500" if index == "sp500" else "Russell 2000"
+
+        if scan_type == "Trend":
+            self.trend_index.set(index_display)
+            self.run_trend()
+        elif scan_type == "Swing":
+            self.swing_index.set(index_display)
+            self.run_dips()
+        elif scan_type == "Watchlist":
+            self.run_watchlist()
+
+        # Reschedule for tomorrow
+        self.root.after(1000, self.update_scheduler)
+
     def show_help(self):
         help_text = """
 ClearBlueSky Stock Scanner & AI Research Tool

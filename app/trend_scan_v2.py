@@ -13,6 +13,8 @@ from datetime import datetime
 from finvizfinance.screener.overview import Overview
 from finvizfinance.screener.performance import Performance
 
+from scan_settings import load_config, SECTOR_FINVIZ_MAP
+
 OUTPUT_DIR = os.path.join(BASE_DIR, "scans")
 
 def trend_scan(progress_callback=None, index="sp500"):
@@ -25,10 +27,15 @@ def trend_scan(progress_callback=None, index="sp500"):
         print(msg)
         if progress_callback:
             progress_callback(msg)
-    
+
+    # Load config for sector filter
+    config = load_config()
+    sector_filter = config.get('sector_filter', 'All Sectors')
+
     index_name = "S&P 500" if index == "sp500" else "Russell 2000"
-    progress(f"Starting Trend Scan ({index_name})...")
-    
+    sector_msg = f" [{sector_filter}]" if sector_filter != "All Sectors" else ""
+    progress(f"Starting Trend Scan ({index_name}{sector_msg})...")
+
     try:
         # Get overview data
         progress("Fetching overview data...")
@@ -41,11 +48,20 @@ def trend_scan(progress_callback=None, index="sp500"):
             'Average Volume': 'Over 500K',
             'Price': 'Over $5'
         }
+
+        # Add sector filter if specified
+        if sector_filter and sector_filter != "All Sectors":
+            finviz_sector = SECTOR_FINVIZ_MAP.get(sector_filter)
+            if finviz_sector:
+                filters['Sector'] = finviz_sector
+                progress(f"Filtering by sector: {finviz_sector}")
+
         overview.set_filter(filters_dict=filters)
         df_overview = overview.screener_view()
         
         progress("Fetching performance data...")
         perf = Performance()
+        # Use same filters including sector filter
         perf.set_filter(filters_dict=filters)
         df_perf = perf.screener_view()
         
