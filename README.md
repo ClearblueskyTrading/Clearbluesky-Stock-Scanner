@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v6.0
+# ClearBlueSky Stock Scanner v6.1
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF reports** you can analyze with any AI (Claude, Gemini, ChatGPT).
 
@@ -11,7 +11,7 @@ No API key required for the scanners. Optional [Finviz Elite](https://finviz.com
 
 ---
 
-## Quick start
+## Quick start (Windows)
 
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).  
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).  
@@ -22,11 +22,19 @@ No API key required for the scanners. Optional [Finviz Elite](https://finviz.com
 
 ---
 
+## Run on any OS (no Windows installer)
+
+- **Docker (Linux, macOS, Windows with WSL2):** From the project root run `docker compose build` then `docker compose up`. The GUI appears via X11. See **[DOCKER.md](DOCKER.md)** for X11 setup and options.
+- **Linux / macOS (native):** Install Python 3.10+ and tkinter (`python3-tk` on Debian/Ubuntu; `brew install python-tk` on macOS). Then run `./app/run.sh` or `python3 app/app.py` from the `app/` directory.
+
+---
+
 ## Requirements
 
-- **Windows 10 or 11**  
-- **Python 3.10+** (INSTALL.bat can install it)  
-- Internet connection for Finviz data  
+- **Windows:** Windows 10 or 11; **Python 3.10+** (INSTALL.bat can install it).  
+- **Linux / macOS:** Python 3.10+ and tkinter (see above).  
+- **Docker:** Any OS with Docker and X11 (see DOCKER.md).  
+- Internet connection for Finviz data.  
 
 ---
 
@@ -37,9 +45,13 @@ ClearBlueSky/
 ├── README.md           ← You are here
 ├── README.txt          ← Plain-text readme
 ├── LICENSE.txt
-├── INSTALL.bat         ← Run to install
+├── INSTALL.bat         ← Run to install (Windows)
+├── DOCKER.md           ← Run with Docker on any OS
 ├── CLAUDE_AI_GUIDE.md  ← Guide for modifying/rebuilding with AI
+├── Dockerfile
+├── docker-compose.yml
 └── app/
+    ├── run.sh          ← Run on Linux/macOS (no Docker)
     ├── app.py                  ← Main app
     ├── trend_scan_v2.py        ← Trend scanner
     ├── enhanced_dip_scanner.py ← Swing/dip scanner
@@ -75,4 +87,4 @@ Reports are PDF-only, date/time stamped. Each includes a Master Trading Report D
 
 ---
 
-*ClearBlueSky v6.0 – made with Claude AI*
+*ClearBlueSky v6.1 – made with Claude AI*

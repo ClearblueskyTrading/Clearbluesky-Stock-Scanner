@@ -1,0 +1,20 @@
+# ClearBlueSky - run with: docker compose up
+# On Linux, allow X11 first:  xhost +local:docker
+# On macOS: install XQuartz, start it, then:  xhost +localhost
+# Reports and scans are stored in ./reports and ./scans on your machine.
+
+services:
+  clearbluesky:
+    build: .
+    image: clearbluesky:6.1
+    container_name: clearbluesky
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      - ./reports:/app/reports
+      - ./scans:/app/scans
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    # Optional: persist settings (create empty file first or copy from container)
+    # - ./user_config.json:/app/user_config.json
+    stdin_open: true
+    tty: true

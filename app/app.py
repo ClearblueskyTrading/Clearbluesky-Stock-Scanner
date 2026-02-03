@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v6.0
+# ClearBlueSky Stock Scanner v6.1
 # ============================================================
 
 import tkinter as tk
-VERSION = "6.0"
+VERSION = "6.1"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -1285,7 +1285,7 @@ class TradeBotApp:
     
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v6.0
+ClearBlueSky Stock Scanner v6.1
 
 QUICK START:
 1. Select scan type (Trend or Swing) and index (S&P 500 or Russell 2000).
@@ -1313,7 +1313,7 @@ SCORES:
 
 Settings: Optional Finviz API key (stored locally, never in code).
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v6.0
+Made with Claude AI · ClearBlueSky v6.1
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 6.0 | Free & Open Source | Made with Claude AI
+   Version 6.1 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,7 +11,7 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v6.0
+   WHAT'S IN v6.1
 ════════════════════════════════════════════════════════════════════════════
 
 • Two scanners: Trend (long-term) and Swing (dips)
@@ -130,5 +130,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v6.0 – made with Claude AI
+   ClearBlueSky v6.1 – made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
