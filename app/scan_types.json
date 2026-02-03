@@ -1,0 +1,12 @@
+[
+  {
+    "id": "trend_long",
+    "label": "Trend - Long-term",
+    "scanner": "trend"
+  },
+  {
+    "id": "swing_dips",
+    "label": "Swing - Dips",
+    "scanner": "swing"
+  }
+]

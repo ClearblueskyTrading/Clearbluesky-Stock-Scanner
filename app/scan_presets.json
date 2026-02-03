@@ -1,0 +1,54 @@
+{
+  "Trend - Long-term": {
+    "config": {
+      "trend_min_score": 70,
+      "trend_min_quarter_perf": 10,
+      "min_price": 5,
+      "max_price": 500,
+      "min_avg_volume": 500000,
+      "trend_require_ma_stack": true
+    },
+    "scan_type": "Trend - Long-term",
+    "scan_index": "S&P 500"
+  },
+  "Swing - Dips": {
+    "config": {
+      "swing_min_score": 60,
+      "dip_min_percent": 1.0,
+      "dip_max_percent": 5.0,
+      "min_price": 5,
+      "max_price": 500,
+      "dip_require_news_check": true,
+      "dip_require_analyst_check": true
+    },
+    "scan_type": "Swing - Dips",
+    "scan_index": "S&P 500"
+  },
+  "Emotional Dip - Bounce": {
+    "config": {
+      "emotional_min_score": 65,
+      "emotional_dip_min_percent": 1.5,
+      "emotional_dip_max_percent": 4.0,
+      "emotional_min_volume_ratio": 1.8,
+      "emotional_min_upside_to_target": 10.0,
+      "emotional_require_above_sma200": true,
+      "emotional_require_buy_rating": true
+    },
+    "scan_type": "Emotional Dip - Bounce",
+    "scan_index": "S&P 500"
+  },
+  "Pre-Market Volume": {
+    "config": {
+      "premarket_min_score": 70,
+      "premarket_min_volume": 100000,
+      "premarket_min_relative_volume": 2.0,
+      "premarket_min_gap_percent": 2.0,
+      "premarket_max_gap_percent": 15.0,
+      "premarket_min_dollar_volume": 500000,
+      "premarket_min_vol_float_ratio": 0.01,
+      "premarket_track_sector_heat": true
+    },
+    "scan_type": "Pre-Market Volume",
+    "scan_index": "S&P 500"
+  }
+}

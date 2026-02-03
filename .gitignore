@@ -1,0 +1,30 @@
+# Release zip (upload as GitHub Release asset instead of committing)
+ClearBlueSky-*.zip
+
+# User data – never commit (contains optional API key and preferences)
+app/user_config.json
+
+# Generated / runtime
+app/error_log.txt
+app/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Reports and scan outputs (user-generated)
+app/reports/
+app/scans/
+
+# Optional: local preset exports (may contain user choices)
+# app/scan_presets.json
+# app/scanner_presets_export.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

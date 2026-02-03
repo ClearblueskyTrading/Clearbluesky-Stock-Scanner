@@ -1,0 +1,399 @@
+# ClearBlueSky Stock Scanner v5.1 - Complete Build Guide
+
+## For Claude AI (or any AI assistant)
+
+This document contains everything needed to understand, modify, or rebuild the ClearBlueSky Stock Scanner application. Upload this file to Claude and ask for help!
+
+---
+
+## PROJECT OVERVIEW
+
+**Name:** ClearBlueSky Stock Scanner  
+**Version:** 5.1  
+**Purpose:** Scan stocks for trading opportunities and generate AI-ready reports  
+**Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), HTML (reports)  
+**License:** MIT (free and open source)
+
+### Key Features
+- Trend Scanner: Finds stocks with strong momentum (90+ day holds)
+- Swing Scanner: Finds dip-buying opportunities (1-5 day trades)
+- HTML Reports: Beautiful charts and data for AI analysis
+- Multi-AI Support: Claude, Gemini, ChatGPT, Qwen3, or custom
+- Progress Timers: Shows elapsed time during scans
+- Stop Buttons: Cancel scans mid-progress
+- Private AI Guide: Instructions to build your own AI system
+
+---
+
+## FILE STRUCTURE
+
+```
+ClearBlueSky_v5.1/
+├── INSTALL.bat              # Windows installer script
+├── README.txt               # User documentation
+├── LICENSE.txt              # MIT license
+├── CLAUDE_AI_GUIDE.md       # This file - for AI rebuilding
+│
+└── app/
+    ├── app.py               # Main GUI application (900+ lines)
+    ├── trend_scan_v2.py     # Trend momentum scanner
+    ├── enhanced_dip_scanner.py  # Swing/dip scanner
+    ├── report_generator.py  # HTML report builder
+    ├── scan_settings.py     # Settings dialog manager
+    ├── user_config.json     # User preferences (API key, etc)
+    ├── RUNPOD_AI_GUIDE.txt  # Guide for building private AI
+    ├── START.bat            # Launch shortcut
+    ├── RUN.bat              # Direct Python launcher
+    ├── reports/             # Generated HTML reports
+    └── scans/               # Saved scan data
+```
+
+---
+
+## ARCHITECTURE
+
+### Data Flow
+```
+User clicks "Run Scan"
+    ↓
+Scanner (trend_scan_v2.py or enhanced_dip_scanner.py)
+    ↓
+Fetches data from Finviz (free scraping or Elite API)
+    ↓
+Scores and ranks stocks
+    ↓
+Report Generator (report_generator.py)
+    ↓
+Creates HTML with charts, data, AI prompts
+    ↓
+Opens in browser
+    ↓
+User copies prompt to AI for analysis
+```
+
+### Module Responsibilities
+
+**app.py** - Main application
+- Tkinter GUI (dark header, white cards)
+- Scanner controls and progress tracking
+- AI selection and URL configuration
+- Settings dialogs
+- Report launching
+
+**trend_scan_v2.py** - Trend Scanner
+- Fetches S&P 500 or Russell 2000 stocks from Finviz
+- Gets overview data (price, volume, market cap)
+- Gets performance data (weekly, monthly, quarterly)
+- Calculates momentum score
+- Returns DataFrame of top candidates
+
+**enhanced_dip_scanner.py** - Swing Scanner
+- Fetches stocks with recent price drops
+- Analyzes dip percentage and volume
+- Checks for news catalysts (optional)
+- Calculates recovery potential score
+- Returns list of dip opportunities
+
+**report_generator.py** - Report Builder
+- Takes scanner results
+- Fetches TradingView chart images
+- Builds beautiful HTML report
+- Embeds AI prompts for each AI tool
+- Saves to reports/ folder
+
+**scan_settings.py** - Settings Manager
+- Trend scanner settings (min score, MA stack, etc)
+- Swing scanner settings (dip %, price range, etc)
+- Saves/loads from user_config.json
+
+---
+
+## KEY CONFIGURATION
+
+### user_config.json
+```json
+{
+  "trend_min_score": "70",
+  "swing_min_score": "60",
+  "dip_min_percent": 1.0,
+  "dip_max_percent": 5.0,
+  "min_price": "5",
+  "max_price": "500",
+  "min_avg_volume": "500000",
+  "trend_min_quarter_perf": "10",
+  "trend_require_ma_stack": true,
+  "dip_require_news_check": true,
+  "dip_require_analyst_check": true,
+  "broker_url": "https://www.schwab.com",
+  "other_ai_url": "",
+  "finviz_api_key": ""
+}
+```
+
+### Paths (Windows)
+```python
+BASE_DIR = r"C:\TradingBot"  # or portable location
+CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
+LOG_FILE = os.path.join(BASE_DIR, "error_log.txt")
+```
+
+---
+
+## GUI COMPONENTS
+
+### Color Scheme
+```python
+BG_DARK = "#1a1a2e"      # Dark blue header
+GREEN = "#28a745"         # Trend scanner, success
+BLUE = "#007bff"          # Swing scanner
+PURPLE = "#6f42c1"        # Qwen/private AI
+PINK = "#E91E63"          # Donate button
+```
+
+### Main Window Structure
+```
+┌─────────────────────────────────────┐
+│  ☁️ ClearBlueSky (dark header)      │
+│  Stock Scanner v5.1                 │
+│  made with Claude                   │
+├─────────────────────────────────────┤
+│  🤖 AI Research Tool [Dropdown] ⚙  │
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────┐    │
+│  │ 📈 Trend Scanner            │    │
+│  │ [Index ▼] [▶ Run] [■ Stop]  │    │
+│  │ [====Progress====] 50% (12s)│    │
+│  └─────────────────────────────┘    │
+│  ┌─────────────────────────────┐    │
+│  │ 📉 Swing Scanner            │    │
+│  │ [Index ▼] [▶ Run] [■ Stop]  │    │
+│  │ [====Progress====] 25% (8s) │    │
+│  └─────────────────────────────┘    │
+├─────────────────────────────────────┤
+│ [Reports] [Broker] [Logs]           │
+│ [Settings] [Help] [Donate] [Exit]   │
+├─────────────────────────────────────┤
+│ Status: Ready                       │
+└─────────────────────────────────────┘
+```
+
+---
+
+## SCANNER LOGIC
+
+### Trend Scanner (trend_scan_v2.py)
+
+```python
+def trend_scan(progress_callback=None, index="sp500"):
+    """
+    1. Fetch overview data from Finviz (all stocks in index)
+    2. Fetch performance data (weekly, monthly, quarterly returns)
+    3. Merge datasets
+    4. Calculate momentum score:
+       - Quarterly performance (weight: 40%)
+       - Monthly performance (weight: 30%)
+       - Weekly performance (weight: 20%)
+       - Volume trend (weight: 10%)
+    5. Filter by MA stack if required (SMA20 > SMA50 > SMA200)
+    6. Return top 20 stocks by score
+    """
+```
+
+### Swing Scanner (enhanced_dip_scanner.py)
+
+```python
+def run_enhanced_dip_scan(progress_callback=None, index="sp500"):
+    """
+    1. Fetch stocks down 1-5% today from Finviz
+    2. Filter by price range and volume
+    3. For each stock:
+       - Calculate dip severity score
+       - Check RSI (oversold = better)
+       - Check if above 200 SMA (uptrend = better)
+       - Optional: Check recent news
+       - Optional: Check analyst ratings
+    4. Score and rank opportunities
+    5. Return top dip candidates
+    """
+```
+
+---
+
+## API MODES
+
+### Free Mode (No API Key)
+- Uses web scraping via finvizfinance library
+- Rate limited (1 request per second)
+- Slower but works without payment
+- May break if Finviz changes their HTML
+
+### Elite API Mode (With API Key)
+- Direct API access to Finviz
+- Much faster (30 seconds vs 2-3 minutes)
+- More reliable
+- Requires Finviz Elite subscription ($39/month)
+
+```python
+# Detection in scanners
+api_key = config.get('finviz_api_key', '')
+if api_key:
+    # Use Elite API
+    from finvizfinance.quote import finvizfinance
+    stock = finvizfinance(ticker, api_key=api_key)
+else:
+    # Use free scraping
+    from finvizfinance.screener.overview import Overview
+```
+
+---
+
+## PROGRESS TRACKING
+
+### Timer Implementation
+```python
+import time
+
+self.trend_start_time = time.time()
+
+def progress(msg):
+    elapsed = int(time.time() - self.trend_start_time)
+    self.trend_progress.set(50, f"50% ({elapsed}s)")
+```
+
+### Stop Button Implementation
+```python
+self.trend_cancelled = False
+
+def stop_trend_scan(self):
+    self.trend_cancelled = True
+
+def progress(msg):
+    if self.trend_cancelled:
+        return  # Stop processing
+```
+
+---
+
+## COMMON MODIFICATIONS
+
+### Add New AI Option
+1. Edit `ai_combo` values in `create_widgets()`
+2. Add URL in `open_ai()` method
+3. Add prompt template in `report_generator.py`
+
+### Change Scanner Parameters
+1. Edit defaults in `user_config.json`
+2. Add UI controls in `scan_settings.py`
+3. Use values in scanner files
+
+### Add New Scanner Type
+1. Create new `my_scanner.py` file
+2. Import in `app.py`
+3. Add UI card similar to trend/swing
+4. Add to report generator
+
+### Modify Report Appearance
+1. Edit HTML templates in `report_generator.py`
+2. CSS is inline in the `<style>` section
+3. Charts come from TradingView widget
+
+---
+
+## TROUBLESHOOTING
+
+### "No module named 'finvizfinance'"
+```bash
+pip install finvizfinance
+```
+
+### "Scan stuck / no progress"
+- Check internet connection
+- Finviz may be blocking (try later)
+- Try with API key for more reliable access
+
+### "Report won't open"
+- Check reports/ folder exists
+- Check browser is set as default for .html
+- Try opening file manually
+
+### "API key not working"
+- Verify key in Settings
+- Check Finviz Elite subscription is active
+- Key format should be alphanumeric string
+
+---
+
+## REBUILD FROM SCRATCH
+
+If you need to rebuild the entire app, here's the process:
+
+### 1. Create Project Structure
+```bash
+mkdir ClearBlueSky
+cd ClearBlueSky
+mkdir app app/reports app/scans
+```
+
+### 2. Create Requirements
+```
+finviz>=0.14
+finvizfinance>=0.14
+pandas>=1.5
+requests>=2.28
+pygame>=2.1
+```
+(Optional: beautifulsoup4 for scraping. pygame is used for scan-complete alarm MP3.)
+
+### 3. Build Components in Order
+1. `user_config.json` - Configuration
+2. `scan_settings.py` - Settings dialogs
+3. `trend_scan_v2.py` - Trend scanner
+4. `enhanced_dip_scanner.py` - Swing scanner
+5. `report_generator.py` - Report builder
+6. `app.py` - Main GUI
+7. Batch files for Windows
+
+### 4. Test Each Component
+```python
+# Test scanner
+from trend_scan_v2 import trend_scan
+df = trend_scan(print)
+print(df.head())
+```
+
+---
+
+## VERSION HISTORY
+
+- **v5.1** (Current): Timer, stop buttons, Learn How guide
+- **v5.0**: Timeout protection, cancel support (had bugs)
+- **v3.8**: Last stable release before v5 changes
+- **v3.5**: Original public release
+
+---
+
+## CONTACT & SUPPORT
+
+- **Discord:** 340935763405570048
+- **Donate:** https://www.directrelief.org/
+
+---
+
+## QUICK PROMPTS FOR CLAUDE
+
+**Add a feature:**
+> "Looking at this app structure, please add [feature]. Here's what I want it to do: [description]"
+
+**Fix a bug:**
+> "The scanner is [problem]. Here's the error: [error]. Please help fix it."
+
+**Explain code:**
+> "Please explain how the trend_scan function works step by step."
+
+**Modify UI:**
+> "I want to change the [element] to [new style]. How do I do that?"
+
+---
+
+*This guide was generated for ClearBlueSky Stock Scanner v5.1*
+*Made with Claude AI - Free and Open Source*
