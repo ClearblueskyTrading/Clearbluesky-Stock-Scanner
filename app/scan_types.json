@@ -8,5 +8,15 @@
     "id": "swing_dips",
     "label": "Swing - Dips",
     "scanner": "swing"
+  },
+  {
+    "id": "watchlist_open",
+    "label": "Watchlist - Near open",
+    "scanner": "watchlist"
+  },
+  {
+    "id": "insider",
+    "label": "Insider - Latest",
+    "scanner": "insider"
   }
 ]

@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 6.1 | Free & Open Source | Made with Claude AI
+   Version 6.3 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,14 +11,15 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v6.1
+   WHAT'S IN v6.3
 ════════════════════════════════════════════════════════════════════════════
 
-• Two scanners: Trend (long-term) and Swing (dips)
+• Three scanners: Trend (long-term), Swing (dips), Watchlist – % down today (1–25% slider)
 • PDF reports only – date/time stamped, with Master Trading Report Directive for AI
 • Watchlist – add up to 200 tickers; 2 beeps + top-of-report highlight when a watchlist stock appears in a scan
 • Import watchlist from Finviz CSV (Ticker or Symbol column)
-• Scan Config – adjust min score, dip %, price, volume per scan type
+• Scan Config – adjust min score, dip %, “% down today,” price, volume per scan type
+• Update notice – app checks for a newer version on startup and shows a link to download
 • Optional Finviz API key in Settings (stored only in user_config.json on your PC – never in code or in the app package)
 
 
@@ -39,6 +40,10 @@ Gemini, ChatGPT, or your own private AI.
 
 4. Done! Find "ClearBlueSky Scanner" shortcut on your Desktop
 
+OTHER WAYS TO RUN (no Windows installer):
+• Docker (any OS): From the project folder run "docker compose build" then "docker compose up". See DOCKER.md.
+• Linux / macOS: Install Python 3.10+ and tkinter, then run ./app/run.sh or "python3 app/app.py" from the app folder.
+
 
 ════════════════════════════════════════════════════════════════════════════
    QUICK START
@@ -46,9 +51,9 @@ Gemini, ChatGPT, or your own private AI.
 
 1. Launch the app (Desktop shortcut or app/START.bat)
 
-2. Select scan type: Trend - Long-term or Swing - Dips
+2. Select scan type: Trend - Long-term, Swing - Dips, or Watchlist - Near open
 
-3. Select index: S&P 500 or Russell 2000
+3. Select index: S&P 500 or Russell 2000 (N/A for Watchlist)
 
 4. Click "Run Scan". When done, the PDF report opens.
 
@@ -65,7 +70,7 @@ Gemini, ChatGPT, or your own private AI.
 ════════════════════════════════════════════════════════════════════════════
 
 FREE (no API key required):
-• Trend and Swing scanners
+• Trend, Swing, and Watchlist scanners (% down today 1–25%)
 • S&P 500 and Russell 2000
 • PDF reports with AI-oriented prompts
 • Watchlist with 2-beep alert and report highlight
@@ -78,28 +83,33 @@ OPTIONAL – Finviz Elite API key (e.g. from finviz.com):
 • Can improve speed/reliability; not required for core features
 
 
+
 ════════════════════════════════════════════════════════════════════════════
    FILES INCLUDED
 ════════════════════════════════════════════════════════════════════════════
 
-INSTALL.bat          – Run this to install
+INSTALL.bat          – Run this to install (Windows)
 README.txt           – This file
 README.md            – GitHub / markdown readme
 LICENSE.txt          – MIT license
+DOCKER.md            – Run with Docker on any OS
+Dockerfile, docker-compose.yml – Docker setup
 CLAUDE_AI_GUIDE.md   – Guide to rebuild/modify the app with AI
 
 app/
 ├── app.py                  – Main application
 ├── trend_scan_v2.py        – Trend scanner
 ├── enhanced_dip_scanner.py  – Swing/dip scanner
+├── watchlist_scanner.py     – Watchlist “% down today” scanner
 ├── report_generator.py     – PDF report builder
 ├── scan_settings.py        – Configuration
 ├── sound_utils.py          – Scan-complete & watchlist beeps
 ├── requirements.txt
-├── scan_types.json         – Scan types (Trend, Swing)
-├── START.bat / RUN.bat
+├── scan_types.json         – Scan types (Trend, Swing, Watchlist)
+├── START.bat / RUN.bat  – Start the app (Windows)
+├── run.sh               – Start on Linux/macOS (no Docker)
 ├── reports/                – Generated PDFs (created at runtime)
-└── user_config.json        – Created on first run; your settings (optional API key) go here – never in code
+└── user_config.json        – Created on first run; your settings (optional API keys) go here – never in code
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -130,5 +140,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v6.1 – made with Claude AI
+   ClearBlueSky v6.3 – made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

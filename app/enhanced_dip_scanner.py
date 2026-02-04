@@ -123,8 +123,19 @@ def analyze_dip_quality(ticker: str) -> Dict:
     }
     
     try:
-        # Get detailed quote data
-        quote = finviz.get_stock(ticker)
+        # Get detailed quote data (with retry on transient errors)
+        quote = None
+        for attempt in range(3):
+            try:
+                quote = finviz.get_stock(ticker)
+                if quote is not None:
+                    break
+            except Exception as e:
+                err_str = str(e).lower()
+                if attempt < 2 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                break
         
         if not quote:
             return result
@@ -190,9 +201,18 @@ def analyze_dip_quality(ticker: str) -> Dict:
             except:
                 pass
         
-        # === NEWS ANALYSIS ===
+        # === NEWS ANALYSIS === (with one retry on failure)
         try:
-            news = finviz.get_news(ticker)
+            news = None
+            for _ in range(2):
+                try:
+                    news = finviz.get_news(ticker)
+                    break
+                except Exception as e:
+                    if '429' in str(e).lower() or 'timeout' in str(e).lower():
+                        time.sleep(2)
+                        continue
+                    break
             if news:
                 news_text = ' '.join([n[1].lower() for n in news[:10]])  # Last 10 headlines
                 

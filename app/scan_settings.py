@@ -29,6 +29,16 @@ DEFAULT_SCAN_TYPES = [
         "label": "Swing - Dips",
         "scanner": "swing",  # uses enhanced_dip_scanner.run_enhanced_dip_scan
     },
+    {
+        "id": "watchlist_open",
+        "label": "Watchlist - Near open",
+        "scanner": "watchlist",  # uses watchlist_scanner.run_watchlist_scan
+    },
+    {
+        "id": "insider",
+        "label": "Insider - Latest",
+        "scanner": "insider",  # uses insider_scanner.run_insider_scan
+    },
 ]
 
 # Slider/param specs per scanner (core params only; strict institutional gates removed so scans pass)
@@ -66,6 +76,17 @@ SCAN_PARAM_SPECS = {
         {"key": "premarket_min_dollar_volume", "label": "Min $ Vol (K)", "min": 100, "max": 5000, "default": 500, "type": "int_vol_k"},
         {"key": "premarket_min_vol_float_ratio", "label": "Vol/Float", "min": 0, "max": 0.1, "default": 0.01, "type": "float"},
         {"key": "premarket_track_sector_heat", "label": "Track sector heat", "default": True, "type": "bool"},
+    ],
+    "watchlist": [
+        {"key": "watchlist_pct_down_from_open", "label": "% down today", "min": 1, "max": 25, "default": 5, "type": "float"},
+    ],
+    "insider": [
+        {"key": "insider_option", "label": "Insider view", "type": "choice", "default": "latest", "options": [
+            "latest", "latest buys", "latest sales",
+            "top week", "top week buys", "top week sales",
+            "top owner trade", "top owner buys", "top owner sales",
+        ]},
+        {"key": "insider_min_score", "label": "Min Score (report)", "min": 0, "max": 100, "default": 0, "type": "int"},
     ],
 }
 
@@ -186,6 +207,9 @@ def load_config():
         "premarket_max_spread_percent": 1.0,
         "premarket_min_vol_float_ratio": 0.01,
         "premarket_track_sector_heat": True,
+        
+        # Watchlist scanner (today's Change % down 1-25% — big-name dips)
+        "watchlist_pct_down_from_open": 5.0,
         
         # Scan-complete alarm (system sound: beep | asterisk | exclamation)
         "play_alarm_on_complete": True,

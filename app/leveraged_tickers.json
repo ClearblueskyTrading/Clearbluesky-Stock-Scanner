@@ -1,0 +1,14 @@
+{
+  "_comment": "Underlying ticker -> best leveraged bull ticker (2x/1.5x). See LEVERAGED_ETFS.md for full list and disclaimer. Leveraged ETFs are high-risk; not for long-term buy-and-hold.",
+  "MU": "MUU",
+  "NVDA": "NVDU",
+  "AAPL": "AAPU",
+  "TSLA": "TSLL",
+  "AMZN": "AMZU",
+  "MSFT": "MSFU",
+  "GOOGL": "GGLL",
+  "GOOG": "GGLL",
+  "META": "METU",
+  "NFLX": "NFXL",
+  "COIN": "CONL"
+}

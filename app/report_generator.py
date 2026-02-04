@@ -116,15 +116,34 @@ class ReportGenerator:
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
 
+    def _finviz_get_stock_with_retry(self, ticker, max_attempts=3):
+        """Call finviz.get_stock with retries on failure (timeout, 429, etc.)."""
+        last_error = None
+        for attempt in range(max_attempts):
+            try:
+                stock = finviz.get_stock(ticker)
+                if stock is not None:
+                    return stock
+            except Exception as e:
+                last_error = e
+                err_str = str(e).lower()
+                if attempt < max_attempts - 1 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                break
+        if last_error:
+            print(f"  Finviz get_stock for {ticker}: {last_error}")
+        return None
+
     def get_finviz_data(self, ticker):
-        """Get stock data from Finviz"""
+        """Get stock data from Finviz (with retry on transient errors)."""
         data = {'ticker': ticker, 'price': 'N/A', 'change': 'N/A'}
         
         if not FINVIZ_AVAILABLE:
             return data
         
-        try:
-            stock = finviz.get_stock(ticker)
+        stock = self._finviz_get_stock_with_retry(ticker)
+        if stock:
             data.update({
                 'price': stock.get('Price', 'N/A'),
                 'change': stock.get('Change', 'N/A'),
@@ -144,26 +163,50 @@ class ReportGenerator:
                 'rel_volume': stock.get('Rel Volume', 'N/A'),
                 'recom': stock.get('Recom', 'N/A'),
             })
-            
-            # Get news
-            try:
-                news = finviz.get_news(ticker)
-                if news:
-                    data['news'] = news[:5]
-                    print(f"  Got {len(news)} news items for {ticker}")
-                else:
+            # Get news (with one retry on failure)
+            for _ in range(2):
+                try:
+                    news = finviz.get_news(ticker)
+                    data['news'] = news[:5] if news else []
+                    break
+                except Exception as e:
+                    if '429' in str(e).lower() or 'timeout' in str(e).lower():
+                        time.sleep(2)
+                        continue
                     data['news'] = []
-            except Exception as e:
-                print(f"  News error for {ticker}: {e}")
-                data['news'] = []
-                
-        except Exception as e:
-            print(f"Error getting data for {ticker}: {e}")
+                    break
         
         return data
 
-    def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None):
-        """Generate ONE PDF report: analyst prompt at beginning, then stock data. Returns path to PDF (or .txt if no reportlab)."""
+    def _load_leveraged_mapping(self):
+        """Load underlying -> leveraged ticker mapping from leveraged_tickers.json. Returns dict (e.g. {'MU': 'MUU'})."""
+        path = Path(BASE_DIR) / "leveraged_tickers.json"
+        if not path.exists():
+            return {}
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {str(k).strip().upper(): str(v).strip().upper() for k, v in data.items() if not str(k).startswith("_") and v}
+        except Exception:
+            return {}
+
+    def _wrap_line(self, text, max_ch=90):
+        """Wrap a long line into list of strings of at most max_ch chars (break on space)."""
+        lines = []
+        for raw in text.split("\n"):
+            raw = raw.replace("\r", "")
+            while len(raw) > max_ch:
+                idx = raw.rfind(" ", 0, max_ch + 1)
+                if idx <= 0:
+                    idx = max_ch
+                lines.append(raw[:idx].strip())
+                raw = raw[idx:].strip()
+            if raw:
+                lines.append(raw)
+        return lines
+
+    def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None):
+        """Generate ONE PDF report."""
         def progress(msg):
             print(msg)
             if progress_callback:
@@ -197,13 +240,19 @@ class ReportGenerator:
         filepath_txt = self.save_dir / f"{base_name}.txt"
 
         stocks_data = []
+        insider_keys = ('Owner', 'Relationship', 'Date', 'Transaction', 'Cost', 'Shares', 'Value')
         for i, q in enumerate(qualifying, 1):
             ticker = q['ticker']
             score = q['score']
             on_watchlist = q.get('on_watchlist', False)
             progress(f"Processing {i}/{len(qualifying)}: {ticker}...")
             data = self.get_finviz_data(ticker)
-            stocks_data.append({'ticker': ticker, 'score': score, 'on_watchlist': on_watchlist, **data})
+            row = {'ticker': ticker, 'score': score, 'on_watchlist': on_watchlist, **data}
+            r = q.get('data', {})
+            for k in insider_keys:
+                if k in r and r[k] not in (None, '', 'N/A'):
+                    row[k] = r[k]
+            stocks_data.append(row)
             time.sleep(0.2)
 
         tickers_list = ", ".join([s['ticker'] for s in stocks_data])
@@ -287,6 +336,8 @@ RISK MANAGEMENT:
 - Max position size recommendation
 """
 
+        leveraged_mapping = self._load_leveraged_mapping()
+        LEVERAGED_MIN_SCORE = 60  # only suggest leveraged when score is "good"
         body_lines = [
             "",
             "═══════════════════════════════════════════════════",
@@ -295,10 +346,29 @@ RISK MANAGEMENT:
             ""
         ]
         for s in stocks_data:
-            body_lines.append(f"——— {s['ticker']} ———")
+            ticker = s['ticker']
+            score = s.get('score', 0)
+            body_lines.append(f"——— {ticker} ———")
             body_lines.append(f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x")
-            body_lines.append(f"Company: {s.get('company', s['ticker'])}  | Sector: {s.get('sector','N/A')}")
+            if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
+                body_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
+            if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
+                lev = leveraged_mapping[ticker]
+                body_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
+                body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")
+            body_lines.append(f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}")
             body_lines.append(f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}")
+            news_list = s.get('news') or []
+            if news_list:
+                body_lines.append("Headlines:")
+                for i, item in enumerate(news_list[:5]):
+                    if isinstance(item, (list, tuple)) and len(item) > 1:
+                        head = item[1]
+                    elif isinstance(item, dict):
+                        head = item.get('title') or item.get('headline') or str(item)
+                    else:
+                        head = str(item)
+                    body_lines.append(f"  {i+1}. {str(head).strip()}")
             body_lines.append("")
         full_text_txt = MASTER_TRADING_REPORT_DIRECTIVE.strip() + "\n\n" + ai_prompt + "\n".join(body_lines)
 
@@ -345,6 +415,7 @@ RISK MANAGEMENT:
             # 2) Per-ticker technicals
             for s in stocks_data:
                 ticker = s['ticker']
+                score = s.get('score', 0)
                 on_watchlist = s.get('on_watchlist', False)
                 y -= line_height
                 if y < margin + line_height:
@@ -360,10 +431,29 @@ RISK MANAGEMENT:
                 c.setFont("Helvetica", 9)
                 tech_lines = [
                     f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x",
+                ]
+                if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
+                    tech_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
+                if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
+                    lev = leveraged_mapping[ticker]
+                    tech_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
+                    tech_lines.append("  Leveraged ETFs are high-risk; not for long-term buy-and-hold (volatility decay).")
+                tech_lines.extend([
                     f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}",
                     f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}",
-                    ""
-                ]
+                ])
+                news_list = s.get('news') or []
+                if news_list:
+                    tech_lines.append("Headlines:")
+                    for i, item in enumerate(news_list[:5]):
+                        if isinstance(item, (list, tuple)) and len(item) > 1:
+                            head = item[1]
+                        elif isinstance(item, dict):
+                            head = item.get('title') or item.get('headline') or str(item)
+                        else:
+                            head = str(item)
+                        tech_lines.append(f"  {i+1}. {str(head).strip()}")
+                tech_lines.append("")
                 for line in tech_lines:
                     if y < margin + line_height:
                         c.showPage()

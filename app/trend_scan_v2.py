@@ -32,8 +32,8 @@ def trend_scan(progress_callback=None, index="sp500"):
     progress(f"Starting Trend Scan ({index_name})...")
     
     try:
-        # Get overview data
-        progress("Fetching overview data...")
+        # Get overview data (can take a minute for full index)
+        progress("Fetching overview data (this may take a minute)...")
         overview = Overview()
         filters = {
             'Index': 'S&P 500' if index == "sp500" else 'RUSSELL 2000',

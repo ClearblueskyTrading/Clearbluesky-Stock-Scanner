@@ -36,12 +36,12 @@ Reports and scan CSVs are written to `./reports` and `./scans` on your machine (
 
 ```bash
 # Build
-docker build -t clearbluesky:6.1 .
+docker build -t clearbluesky:6.3 .
 
 # Run (Linux example; allow X11 first: xhost +local:docker)
 docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v "$(pwd)/reports:/app/reports" -v "$(pwd)/scans:/app/scans" \
-  -it clearbluesky:6.1
+  -it clearbluesky:6.3
 ```
 
 On **macOS**, use the same `docker run` but ensure XQuartz is running and `DISPLAY` is set (e.g. `:0` or `host.docker.internal:0` depending on your setup).
@@ -53,11 +53,11 @@ On **macOS**, use the same `docker run` but ensure XQuartz is running and `DISPL
 Your Finviz API key and preferences are stored in `user_config.json` inside the container. To keep them across runs:
 
 1. Copy the file out once:  
-   `docker run --rm clearbluesky:6.1 cat /app/user_config.json > user_config.json`  
+   `docker run --rm clearbluesky:6.3 cat /app/user_config.json > user_config.json`  
    (edit it, then use the volume below.)
 2. Run with a bind mount:  
    add `-v "$(pwd)/user_config.json:/app/user_config.json"` to your `docker run` or add it under `volumes` in `docker-compose.yml`.
 
 ---
 
-*ClearBlueSky v6.1*
+*ClearBlueSky v6.3*

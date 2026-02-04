@@ -1,10 +1,10 @@
 @echo off
-title ClearBlueSky Stock Scanner v5.1 - Installer
+title ClearBlueSky Stock Scanner v6.3 - Installer
 color 0A
 
 echo.
 echo  ============================================
-echo    ClearBlueSky Stock Scanner v5.1
+echo    ClearBlueSky Stock Scanner v6.3
 echo    Free and Open Source - Made with Claude AI
 echo  ============================================
 echo.
@@ -87,11 +87,11 @@ if %errorLevel% neq 0 (
 echo  [3/5] Installing required packages...
 echo         This may take 1-2 minutes...
 python -m pip install --upgrade pip --quiet 2>nul
-python -m pip install finviz finvizfinance pandas requests pygame --quiet 2>nul
+python -m pip install finviz finvizfinance pandas requests pygame reportlab --quiet 2>nul
 
 if %errorLevel% neq 0 (
     echo  [!] Package install had warnings, retrying...
-    pip install finviz finvizfinance pandas requests pygame 2>nul
+    pip install finviz finvizfinance pandas requests pygame reportlab 2>nul
 )
 
 :: Create desktop shortcut

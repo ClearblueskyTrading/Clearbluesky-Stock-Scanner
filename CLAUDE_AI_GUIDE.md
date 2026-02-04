@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v5.1 - Complete Build Guide
+# ClearBlueSky Stock Scanner v6.3 - Complete Build Guide
 
 ## For Claude AI (or any AI assistant)
 
@@ -9,42 +9,46 @@ This document contains everything needed to understand, modify, or rebuild the C
 ## PROJECT OVERVIEW
 
 **Name:** ClearBlueSky Stock Scanner  
-**Version:** 5.1  
-**Purpose:** Scan stocks for trading opportunities and generate AI-ready reports  
-**Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), HTML (reports)  
+**Version:** 6.3  
+**Purpose:** Scan stocks for trading opportunities and generate AI-ready PDF reports  
+**Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), PDF (reports)  
 **License:** MIT (free and open source)
 
 ### Key Features
 - Trend Scanner: Finds stocks with strong momentum (90+ day holds)
 - Swing Scanner: Finds dip-buying opportunities (1-5 day trades)
-- HTML Reports: Beautiful charts and data for AI analysis
-- Multi-AI Support: Claude, Gemini, ChatGPT, Qwen3, or custom
+- PDF Reports: Date/time stamped, with Master Trading Report Directive for AI
+- Multi-AI Support: Claude, Gemini, ChatGPT, or any AI
 - Progress Timers: Shows elapsed time during scans
 - Stop Buttons: Cancel scans mid-progress
-- Private AI Guide: Instructions to build your own AI system
+- Update notice: Checks for new version on startup with download link
 
 ---
 
 ## FILE STRUCTURE
 
 ```
-ClearBlueSky_v5.1/
+ClearBlueSky/
 ├── INSTALL.bat              # Windows installer script
 ├── README.txt               # User documentation
+├── README.md                # GitHub / markdown readme
 ├── LICENSE.txt              # MIT license
+├── DOCKER.md                # Run with Docker on any OS
+├── Dockerfile, docker-compose.yml
 ├── CLAUDE_AI_GUIDE.md       # This file - for AI rebuilding
 │
 └── app/
-    ├── app.py               # Main GUI application (900+ lines)
+    ├── app.py               # Main GUI application
     ├── trend_scan_v2.py     # Trend momentum scanner
     ├── enhanced_dip_scanner.py  # Swing/dip scanner
-    ├── report_generator.py  # HTML report builder
+    ├── report_generator.py  # PDF report builder
     ├── scan_settings.py     # Settings dialog manager
+    ├── sound_utils.py       # Scan-complete & watchlist beeps
     ├── user_config.json     # User preferences (API key, etc)
-    ├── RUNPOD_AI_GUIDE.txt  # Guide for building private AI
-    ├── START.bat            # Launch shortcut
-    ├── RUN.bat              # Direct Python launcher
-    ├── reports/             # Generated HTML reports
+    ├── START.bat            # Launch shortcut (Windows)
+    ├── RUN.bat              # Direct Python launcher (Windows)
+    ├── run.sh               # Run on Linux/macOS
+    ├── reports/             # Generated PDF reports
     └── scans/               # Saved scan data
 ```
 
@@ -64,9 +68,9 @@ Scores and ranks stocks
     ↓
 Report Generator (report_generator.py)
     ↓
-Creates HTML with charts, data, AI prompts
+Creates PDF with data, AI prompts (Master Trading Report Directive)
     ↓
-Opens in browser
+Opens PDF
     ↓
 User copies prompt to AI for analysis
 ```
@@ -365,10 +369,10 @@ print(df.head())
 
 ## VERSION HISTORY
 
-- **v5.1** (Current): Timer, stop buttons, Learn How guide
-- **v5.0**: Timeout protection, cancel support (had bugs)
-- **v3.8**: Last stable release before v5 changes
-- **v3.5**: Original public release
+- **v6.3** (Current): Insider scanner, leveraged play suggestions (bull only), 5 headlines per ticker, reliability/quality improvements
+- **v6.2**: Update notice, Docker/cross-platform, cross-platform sound
+- **v6.1**: Docker, Linux/macOS support, cross-platform beeps
+- **v6.0**: PDF-only reports, watchlist, Master Trading Report Directive
 
 ---
 
@@ -395,5 +399,5 @@ print(df.head())
 
 ---
 
-*This guide was generated for ClearBlueSky Stock Scanner v5.1*
+*This guide was generated for ClearBlueSky Stock Scanner v6.3*
 *Made with Claude AI - Free and Open Source*

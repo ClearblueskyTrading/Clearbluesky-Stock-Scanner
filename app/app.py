@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v6.1
+# ClearBlueSky Stock Scanner v6.3
 # ============================================================
 
 import tkinter as tk
-VERSION = "6.1"
+VERSION = "6.3"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -12,6 +12,7 @@ import webbrowser
 import traceback
 import time
 import threading
+import re
 from datetime import datetime
 from scan_settings import (
     load_scan_types,
@@ -28,6 +29,10 @@ CONFIG_FILE = os.path.join(APP_DIR, "user_config.json")
 LOG_FILE = os.path.join(APP_DIR, "error_log.txt")
 DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
 WATCHLIST_MAX = 200
+
+# GitHub: check for new releases
+GITHUB_RELEASES_API = "https://api.github.com/repos/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
+GITHUB_RELEASES_PAGE = "https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
 
 # Colors
 BG_DARK = "#1a1a2e"
@@ -50,6 +55,65 @@ def log(msg, level="INFO"):
 def log_error(e, context=""):
     log(f"{context}: {str(e)}", "ERROR")
     log(traceback.format_exc(), "TRACE")
+
+
+def _parse_version(s):
+    """Convert version string like '6.3' or 'v6.3' to tuple (6, 3) for comparison."""
+    s = (s or "").strip().lstrip("v")
+    parts = re.findall(r"\d+", s)
+    if not parts:
+        return (0, 0)
+    return tuple(int(x) for x in parts[:2])
+
+
+def _show_update_notice(root, tag, url):
+    """Show a dialog that a new version is available, with link to download."""
+    win = tk.Toplevel(root)
+    win.title("Update available")
+    win.geometry("380x140")
+    win.resizable(False, False)
+    win.configure(bg="white")
+    win.transient(root)
+    f = tk.Frame(win, bg="white", padx=16, pady=14)
+    f.pack(fill="both", expand=True)
+    tk.Label(
+        f, text=f"A new version of ClearBlueSky is available: {tag}",
+        font=("Arial", 10, "bold"), bg="white", fg="#333", wraplength=340
+    ).pack(anchor="w", pady=(0, 6))
+    tk.Label(
+        f, text="Download the latest version from the link below.",
+        font=("Arial", 9), bg="white", fg="#555", wraplength=340
+    ).pack(anchor="w", pady=(0, 12))
+    btn_frame = tk.Frame(f, bg="white")
+    btn_frame.pack(fill="x")
+    tk.Button(
+        btn_frame, text="Open download page", font=("Arial", 9),
+        command=lambda: (webbrowser.open(url), win.destroy()), bg=BLUE, fg="white",
+        relief="flat", padx=12, pady=4, cursor="hand2"
+    ).pack(side="left", padx=(0, 8))
+    tk.Button(
+        btn_frame, text="Later", font=("Arial", 9),
+        command=win.destroy(), bg=GRAY, fg="white", relief="flat", padx=12, pady=4
+    ).pack(side="left")
+    win.update_idletasks()
+    win.grab_set()
+
+
+def _check_for_updates(root):
+    """Background thread: fetch latest release from GitHub; if newer, show notice on main thread."""
+    try:
+        import requests
+        r = requests.get(GITHUB_RELEASES_API, timeout=6)
+        r.raise_for_status()
+        data = r.json()
+        tag = data.get("tag_name", "")
+        url = data.get("html_url", GITHUB_RELEASES_PAGE)
+        latest = _parse_version(tag)
+        current = _parse_version(VERSION)
+        if latest > current:
+            root.after(0, lambda: _show_update_notice(root, tag, url))
+    except Exception:
+        pass
 
 
 class AnimatedMoneyPrinter(tk.Canvas):
@@ -182,9 +246,12 @@ class TradeBotApp:
             self.scan_types = [
                 {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
+                {"id": "watchlist_open", "label": "Watchlist - Near open", "scanner": "watchlist"},
             ]
         self.build_ui()
         log("UI ready")
+        # Check for new version after a short delay (non-blocking)
+        root.after(1500, lambda: threading.Thread(target=_check_for_updates, args=(root,), daemon=True).start())
     
     def load_config(self):
         try:
@@ -343,6 +410,8 @@ class TradeBotApp:
         # Scan state
         self.scan_cancelled = False
         self.scan_start_time = 0
+        self.last_scan_type = None
+        self.last_scan_time = None
     
     def _on_scan_types_changed(self):
         """Reload scan types after an import, updating the dropdown."""
@@ -462,6 +531,18 @@ class TradeBotApp:
                     tk.Entry(row, textvariable=var, font=("Arial", 9), width=36).pack(side="left", padx=(5, 0), fill="x", expand=True)
                     widget_vars[key] = (var, spec)
                     continue
+                if ptype == "choice":
+                    options = spec.get("options", [])
+                    default = cfg.get(key, spec.get("default", options[0] if options else ""))
+                    if default not in options and options:
+                        default = options[0]
+                    var = tk.StringVar(value=default)
+                    row = tk.Frame(sliders_frame, bg="white")
+                    row.pack(fill="x", pady=4)
+                    tk.Label(row, text=label_text, font=("Arial", 9), bg="white", width=32, anchor="w").pack(side="left")
+                    ttk.Combobox(row, textvariable=var, values=options, state="readonly", width=34, font=("Arial", 9)).pack(side="left", padx=(5, 0), fill="x", expand=True)
+                    widget_vars[key] = (var, spec)
+                    continue
                 else:
                     if ptype == "int_vol_k":
                         raw = cfg.get(key, spec.get("default", 500))
@@ -503,6 +584,8 @@ class TradeBotApp:
                 elif ptype == "bool":
                     self.config[key] = bool(val)
                 elif ptype == "str":
+                    self.config[key] = str(val).strip()
+                elif ptype == "choice":
                     self.config[key] = str(val).strip()
                 elif ptype == "int":
                     self.config[key] = int(round(val))
@@ -589,6 +672,10 @@ class TradeBotApp:
             return {"id": "trend_fallback", "label": label, "scanner": "trend"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
+        if "Watchlist" in label:
+            return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
+        if "insider" in label.lower():
+            return {"id": "insider_fallback", "label": label, "scanner": "insider"}
         return None
     
     def _run_trend_scan(self, index: str):
@@ -750,6 +837,148 @@ class TradeBotApp:
                 )
         except Exception as e:
             log_error(e, "Swing failed")
+            self.scan_complete(
+                self.scan_progress,
+                self.scan_status,
+                self.scan_printer,
+                self.scan_btn,
+                "Error!",
+                self.scan_stop_btn,
+            )
+            messagebox.showerror("Error", str(e))
+    
+    def _run_watchlist_scan(self):
+        """Internal helper to run the Watchlist (near open) scan using the unified UI."""
+        log("=== WATCHLIST SCAN ===")
+        self.scan_cancelled = False
+        self.scan_start_time = time.time()
+        self.scan_progress.set(5, "Starting...")
+        self.scan_status.config(text="Connecting...")
+        self.scan_printer.start()
+        self.scan_btn.config(state="disabled")
+        self.scan_stop_btn.config(state="normal")
+        self.root.update()
+        try:
+            from watchlist_scanner import run_watchlist_scan
+            def progress(msg):
+                if self.scan_cancelled:
+                    return
+                log(f"Watchlist: {msg}")
+                elapsed = int(time.time() - self.scan_start_time)
+                time_str = f"{elapsed}s"
+                self.scan_status.config(text=msg[:50])
+                if "(" in msg and "/" in msg:
+                    try:
+                        parts = msg.split("(")[1].split(")")[0].split("/")
+                        cur, tot = int(parts[0]), int(parts[1])
+                        pct = 10 + int((cur / tot) * 75) if tot else 50
+                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
+                    except Exception:
+                        pass
+                elif "Found" in msg:
+                    self.scan_progress.set(90, f"90% ({time_str})")
+                self.root.update()
+            results = run_watchlist_scan(progress_callback=progress, config=self.config)
+            if self.scan_cancelled:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "Cancelled",
+                    self.scan_stop_btn,
+                )
+                return
+            if results and len(results) > 0:
+                elapsed = int(time.time() - self.scan_start_time)
+                self.generate_report_from_results(
+                    results,
+                    "Watchlist",
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    self.scan_stop_btn,
+                    elapsed,
+                )
+            else:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "No watchlist tickers near open",
+                    self.scan_stop_btn,
+                )
+        except Exception as e:
+            log_error(e, "Watchlist scan failed")
+            self.scan_complete(
+                self.scan_progress,
+                self.scan_status,
+                self.scan_printer,
+                self.scan_btn,
+                "Error!",
+                self.scan_stop_btn,
+            )
+            messagebox.showerror("Error", str(e))
+    
+    def _run_insider_scan(self):
+        """Internal helper to run the Insider trading scan using the unified UI."""
+        log("=== INSIDER SCAN ===")
+        self.scan_cancelled = False
+        self.scan_start_time = time.time()
+        self.scan_progress.set(5, "Starting...")
+        self.scan_status.config(text="Fetching insider data...")
+        self.scan_printer.start()
+        self.scan_btn.config(state="disabled")
+        self.scan_stop_btn.config(state="normal")
+        self.root.update()
+        try:
+            from insider_scanner import run_insider_scan
+            def progress(msg):
+                if self.scan_cancelled:
+                    return
+                log(f"Insider: {msg}")
+                elapsed = int(time.time() - self.scan_start_time)
+                time_str = f"{elapsed}s"
+                self.scan_status.config(text=msg[:50])
+                if "Found" in msg:
+                    self.scan_progress.set(90, f"90% ({time_str})")
+                self.root.update()
+            results = run_insider_scan(progress_callback=progress, config=self.config)
+            if self.scan_cancelled:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "Cancelled",
+                    self.scan_stop_btn,
+                )
+                return
+            if results and len(results) > 0:
+                elapsed = int(time.time() - self.scan_start_time)
+                self.generate_report_from_results(
+                    results,
+                    "Insider",
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    self.scan_stop_btn,
+                    elapsed,
+                )
+            else:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "No insider transactions",
+                    self.scan_stop_btn,
+                )
+        except Exception as e:
+            log_error(e, "Insider scan failed")
             self.scan_complete(
                 self.scan_progress,
                 self.scan_status,
@@ -938,6 +1167,10 @@ class TradeBotApp:
             self._run_trend_scan(index)
         elif scanner_kind == "swing":
             self._run_swing_scan(index)
+        elif scanner_kind == "watchlist":
+            self._run_watchlist_scan()
+        elif scanner_kind == "insider":
+            self._run_insider_scan()
         elif scanner_kind == "emotional":
             self._run_emotional_scan(index)
         elif scanner_kind == "premarket":
@@ -950,7 +1183,7 @@ class TradeBotApp:
         try:
             from report_generator import HTMLReportGenerator
 
-            min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 65))
+            min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Insider") else 65))
             reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -974,13 +1207,16 @@ class TradeBotApp:
                         pass
                 self.root.update()
 
-            path = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set)
+            path = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config)
 
             if path:
                 progress.set(100, f"Done! ({elapsed}s)")
                 status.config(text="Opening PDF report...")
                 file_url = "file:///" + path.replace("\\", "/").lstrip("/")
                 webbrowser.open(file_url)
+                self.last_scan_type = scan_type
+                self.last_scan_time = datetime.now()
+                self._update_status_ready()
             else:
                 status.config(text=f"No stocks above score {min_score}")
         except Exception as e:
@@ -1001,6 +1237,18 @@ class TradeBotApp:
         if stop_btn:
             stop_btn.config(state="disabled")
         self._play_scan_alarm()
+        self._update_status_ready()
+
+    def _update_status_ready(self):
+        """Update bottom status to show Ready and last scan summary."""
+        try:
+            if self.last_scan_type and self.last_scan_time:
+                time_str = self.last_scan_time.strftime("%I:%M %p").lstrip("0") if hasattr(self.last_scan_time, "strftime") else str(self.last_scan_time)
+                self.status.config(text=f"Ready | Last scan: {self.last_scan_type}, {time_str}")
+            else:
+                self.status.config(text="Ready")
+        except Exception:
+            self.status.config(text="Ready")
     
     def _play_scan_alarm(self):
         """Play alarm sound when a scan finishes (if enabled)."""
@@ -1039,11 +1287,11 @@ class TradeBotApp:
     def api_settings(self):
         win = tk.Toplevel(self.root)
         win.title("Settings")
-        win.geometry("460x580")
+        win.geometry("520x600")
         win.transient(self.root)
         win.grab_set()
         win.configure(bg="white")
-        win.minsize(400, 500)
+        win.minsize(480, 500)
         
         # Scrollable container so all settings fit on any screen
         canvas = tk.Canvas(win, bg="white", highlightthickness=0)
@@ -1098,7 +1346,7 @@ class TradeBotApp:
         tk.Label(scroll_frame, text="Reports output folder", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
         tk.Label(scroll_frame, text="PDF reports (date/time stamped) are saved here. Default: reports folder next to the app.",
-                font=("Arial", 8), bg="white", fg="#666").pack(anchor="w", padx=20)
+                font=("Arial", 8), bg="white", fg="#666", wraplength=460, justify="left").pack(anchor="w", padx=20)
         reports_f = tk.Frame(scroll_frame, bg="white", padx=20)
         reports_f.pack(fill="x")
         reports_folder_var = tk.StringVar(value=self.config.get("reports_folder", "") or DEFAULT_REPORTS_DIR)
@@ -1117,7 +1365,7 @@ class TradeBotApp:
         tk.Label(scroll_frame, text="Scan-complete alarm", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
         tk.Label(scroll_frame, text="Play a system sound when a scan finishes.", font=("Arial", 8),
-                bg="white", fg="#666").pack(anchor="w", padx=20)
+                bg="white", fg="#666", wraplength=460, justify="left").pack(anchor="w", padx=20)
         
         alarm_f = tk.Frame(scroll_frame, bg="white", padx=20)
         alarm_f.pack(fill="x")
@@ -1185,14 +1433,30 @@ class TradeBotApp:
         update_count()
         btn_row = tk.Frame(f, bg="white")
         btn_row.pack(fill="x", pady=(8, 4))
+        def _valid_ticker(s):
+            s = (s or "").strip().upper()
+            if not s or len(s) > 5:
+                return None
+            if not s.isalpha():
+                return None
+            return s
+
         def add_ticker():
             if listbox.size() >= WATCHLIST_MAX:
                 messagebox.showinfo("Watchlist", f"Watchlist is limited to {WATCHLIST_MAX} tickers.", parent=win)
                 return
-            ticker = simpledialog.askstring("Add ticker", "Symbol:", parent=win)
-            if ticker and ticker.strip():
-                listbox.insert(tk.END, ticker.strip().upper())
-                update_count()
+            ticker = simpledialog.askstring("Add ticker", "Symbol (1–5 letters):", parent=win)
+            sym = _valid_ticker(ticker)
+            if not sym:
+                if ticker and ticker.strip():
+                    messagebox.showwarning("Watchlist", "Symbol must be 1–5 letters (e.g. AAPL).", parent=win)
+                return
+            existing = {listbox.get(i) for i in range(listbox.size())}
+            if sym in existing:
+                messagebox.showinfo("Watchlist", f"{sym} is already on the watchlist.", parent=win)
+                return
+            listbox.insert(tk.END, sym)
+            update_count()
         def remove_ticker():
             sel = listbox.curselection()
             if sel:
@@ -1228,6 +1492,7 @@ class TradeBotApp:
                 existing = {listbox.get(i) for i in range(listbox.size())}
                 ticker_col = None
                 imported = 0
+                skipped = 0
                 hit_limit = False
                 with open(path, "r", encoding="utf-8", errors="replace") as fp:
                     reader = csv.reader(fp)
@@ -1249,8 +1514,10 @@ class TradeBotApp:
                             continue
                         t = (row[ticker_col] or "").strip().upper()
                         if not t or len(t) > 10 or not t.isalpha():
+                            skipped += 1
                             continue
                         if t in existing:
+                            skipped += 1
                             continue
                         existing.add(t)
                         if listbox.size() >= WATCHLIST_MAX:
@@ -1260,6 +1527,8 @@ class TradeBotApp:
                         imported += 1
                 update_count()
                 msg = f"Imported {imported} ticker(s) from CSV."
+                if skipped > 0:
+                    msg += f" Skipped {skipped} invalid or duplicate."
                 if hit_limit:
                     msg += f" Watchlist limit ({WATCHLIST_MAX}) reached."
                 messagebox.showinfo("Import", msg, parent=win)
@@ -1285,7 +1554,7 @@ class TradeBotApp:
     
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v6.1
+ClearBlueSky Stock Scanner v6.3
 
 QUICK START:
 1. Select scan type (Trend or Swing) and index (S&P 500 or Russell 2000).
@@ -1313,7 +1582,7 @@ SCORES:
 
 Settings: Optional Finviz API key (stored locally, never in code).
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v6.1
+Made with Claude AI · ClearBlueSky v6.3
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

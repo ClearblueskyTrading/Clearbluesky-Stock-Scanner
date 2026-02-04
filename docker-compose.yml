@@ -6,7 +6,7 @@
 services:
   clearbluesky:
     build: .
-    image: clearbluesky:6.1
+    image: clearbluesky:6.3
     container_name: clearbluesky
     environment:
       - DISPLAY=${DISPLAY:-:0}
