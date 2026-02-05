@@ -31,8 +31,18 @@ DEFAULT_SCAN_TYPES = [
     },
     {
         "id": "watchlist_open",
-        "label": "Watchlist - Near open",
-        "scanner": "watchlist",  # uses watchlist_scanner.run_watchlist_scan
+        "label": "Watchlist 3pm",
+        "scanner": "watchlist",  # watchlist tickers down X% (slider 1–25%)
+    },
+    {
+        "id": "watchlist_tickers",
+        "label": "Watchlist - All tickers",
+        "scanner": "watchlist_tickers",  # uses watchlist_scanner.run_watchlist_tickers_scan, no params
+    },
+    {
+        "id": "velocity_leveraged",
+        "label": "Velocity Barbell",
+        "scanner": "velocity_leveraged",  # uses velocity_leveraged_scanner.run_velocity_leveraged_scan
     },
     {
         "id": "insider",
@@ -78,7 +88,12 @@ SCAN_PARAM_SPECS = {
         {"key": "premarket_track_sector_heat", "label": "Track sector heat", "default": True, "type": "bool"},
     ],
     "watchlist": [
-        {"key": "watchlist_pct_down_from_open", "label": "% down today", "min": 1, "max": 25, "default": 5, "type": "float"},
+        {"key": "watchlist_pct_down_from_open", "label": "% down (1–25%)", "min": 1, "max": 25, "default": 5, "type": "float"},
+    ],
+    "watchlist_tickers": [],  # no parameters — just scans all watchlist tickers
+    "velocity_leveraged": [
+        {"key": "velocity_min_sector_pct", "label": "Min sector % (up or down)", "min": -5, "max": 5, "default": 0, "type": "float"},
+        {"key": "velocity_barbell_theme", "label": "Theme", "type": "choice", "default": "auto", "options": ["auto", "barbell", "single_shot"]},
     ],
     "insider": [
         {"key": "insider_option", "label": "Insider view", "type": "choice", "default": "latest", "options": [
@@ -211,10 +226,16 @@ def load_config():
         # Watchlist scanner (today's Change % down 1-25% — big-name dips)
         "watchlist_pct_down_from_open": 5.0,
         
+        # Velocity Barbell scanner: min sector %, theme = auto | barbell | single_shot
+        "velocity_min_sector_pct": 0.0,
+        "velocity_barbell_theme": "auto",
+        
         # Scan-complete alarm (system sound: beep | asterisk | exclamation)
         "play_alarm_on_complete": True,
         "alarm_sound_choice": "beep",
 
+        # API keys – all blank by default; never commit user_config.json (see .gitignore)
+        "finviz_api_key": "",
         # OpenRouter API (for AI analysis; one key for all models)
         "openrouter_api_key": "",
         "openrouter_model": "google/gemini-3-pro-preview",  # or anthropic/claude-sonnet-4.5 (credits), tngtech/deepseek-r1t2-chimera:free (free)

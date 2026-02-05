@@ -1,10 +1,10 @@
 @echo off
-title ClearBlueSky Stock Scanner v6.4 - Installer
+title ClearBlueSky Stock Scanner v6.5 - Installer
 color 0A
 
 echo.
 echo  ============================================
-echo    ClearBlueSky Stock Scanner v6.4
+echo    ClearBlueSky Stock Scanner v6.5
 echo    Free and Open Source - Made with Claude AI
 echo  ============================================
 echo.
@@ -44,12 +44,14 @@ echo.
 :: Create directory
 if not exist "%INSTALL_PATH%" mkdir "%INSTALL_PATH%"
 
-:: Copy files
+:: Copy files (contents of app folder into INSTALL_PATH so app.py and requirements.txt are at root)
 echo  [1/5] Copying program files...
-xcopy /E /I /Y "%~dp0app" "%INSTALL_PATH%" >nul 2>&1
+xcopy "%~dp0app\*.*" "%INSTALL_PATH\" /E /Y >nul 2>&1
 if errorlevel 1 (
     copy /Y "%~dp0app\*.*" "%INSTALL_PATH%\" >nul 2>&1
 )
+:: Ensure no saved API keys or user config are installed – blank config on first run
+if exist "%INSTALL_PATH%\user_config.json" del /q "%INSTALL_PATH%\user_config.json" 2>nul
 
 :: Create subdirectories
 mkdir "%INSTALL_PATH%\reports" 2>nul
@@ -88,14 +90,14 @@ echo  [3/5] Installing required packages...
 echo         This may take 1-2 minutes...
 python -m pip install --upgrade pip --quiet 2>nul
 if exist "%INSTALL_PATH%\requirements.txt" (
-    python -m pip install -r "%INSTALL_PATH%\requirements.txt" --quiet 2>nul
+    python -m pip install -r "%INSTALL_PATH%\requirements.txt" --upgrade --quiet 2>nul
 ) else (
     python -m pip install finviz finvizfinance pandas requests pygame reportlab yfinance pandas-ta chromadb PyMuPDF --quiet 2>nul
 )
 if %errorLevel% neq 0 (
     echo  [!] Package install had warnings, retrying...
     if exist "%INSTALL_PATH%\requirements.txt" (
-        pip install -r "%INSTALL_PATH%\requirements.txt" 2>nul
+        pip install -r "%INSTALL_PATH%\requirements.txt" --upgrade 2>nul
     ) else (
         pip install finviz finvizfinance pandas requests pygame reportlab yfinance pandas-ta chromadb PyMuPDF 2>nul
     )

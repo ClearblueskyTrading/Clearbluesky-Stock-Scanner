@@ -1,10 +1,13 @@
 # Release zip (upload as GitHub Release asset instead of committing)
 ClearBlueSky-*.zip
 
+# Local backup (v6.4 before C# port)
+backup-v6.4/
+
 # Sample/user report PDFs in project root (do not commit)
 /Trend_Scan_Report_*.pdf
 
-# User data – never commit (contains optional API key and preferences)
+# User data – never commit (contains optional API keys and preferences)
 app/user_config.json
 
 # Generated / runtime

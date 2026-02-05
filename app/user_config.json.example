@@ -1,0 +1,21 @@
+{
+  "_comment": "Example config – copy to user_config.json if needed. All API keys are blank. Never commit user_config.json (see .gitignore).",
+  "finviz_api_key": "",
+  "openrouter_api_key": "",
+  "openrouter_model": "google/gemini-3-pro-preview",
+  "use_vision_charts": false,
+  "alpha_vantage_api_key": "",
+  "use_sec_insider_context": false,
+  "rag_books_folder": "",
+  "rag_enabled": false,
+  "include_ta_in_report": true,
+  "watchlist": [],
+  "reports_folder": "",
+  "play_alarm_on_complete": true,
+  "alarm_sound_choice": "beep",
+  "trend_min_score": 70,
+  "swing_min_score": 60,
+  "watchlist_pct_down_from_open": 5.0,
+  "velocity_min_sector_pct": 0.0,
+  "velocity_barbell_theme": "auto"
+}

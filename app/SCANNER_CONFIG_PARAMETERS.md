@@ -70,7 +70,40 @@ Single reference of every config parameter used by each scan. Use this for AI re
 
 ---
 
-## 4. Pre-Market Volume (`premarket`)
+## 4. Watchlist 3pm (`watchlist`)
+
+**Purpose:** Watchlist tickers that are down X% today (slider 1–25%). Best run ~3 PM.
+
+| Key | Label | Type | Min | Max | Default | Description |
+|-----|-------|------|-----|-----|---------|-------------|
+| `watchlist_pct_down_from_open` | % down (1–25%) | float | 1 | 25 | 5 | Minimum % down today for a watchlist ticker to qualify. Max is 25%. |
+
+**Data:** Uses `config["watchlist"]` (list of tickers). Scanner: `watchlist_scanner.run_watchlist_scan`.
+
+---
+
+## 5. Watchlist – All tickers (`watchlist_tickers`)
+
+**Purpose:** Scan all watchlist tickers with no filters. Returns current data for every ticker on the watchlist.
+
+No config parameters (empty `SCAN_PARAM_SPECS["watchlist_tickers"]`). Scanner: `watchlist_scanner.run_watchlist_tickers_scan`.
+
+---
+
+## 6. Velocity Barbell (`velocity_leveraged`)
+
+**Purpose:** Foundation + Runner (or Single Shot) from sector proxy signals. Uses sector ETFs (QQQ, SMH, SPY, etc.) to pick leading theme.
+
+| Key | Label | Type | Min | Max | Default | Description |
+|-----|-------|------|-----|-----|---------|-------------|
+| `velocity_min_sector_pct` | Min sector % (up or down) | float | -5 | 5 | 0 | Only recommend when leading sector’s Change % is at least this. |
+| `velocity_barbell_theme` | Theme | choice | — | — | auto | `auto` \| `barbell` \| `single_shot`. |
+
+**Data:** `velocity_leveraged_arsenal.json` (barbell_combos, single_shot_combos, sector_proxies). Scanner: `velocity_leveraged_scanner.run_velocity_leveraged_scan`.
+
+---
+
+## 7. Pre-Market Volume (`premarket`)
 
 **Purpose:** Unusual pre-market activity (7:00 AM – 9:25 AM). Gap, volume, float, dollar volume.
 
@@ -97,7 +130,7 @@ Single reference of every config parameter used by each scan. Use this for AI re
 | Min score for PDF | `{scan}_min_score` | From config: `trend_min_score`, `swing_min_score`, `emotional_min_score`, `premarket_min_score`. Used in app when calling report generator. |
 | Max tickers in PDF | Hardcoded | Top 15 tickers (by score) included in each PDF (`qualifying = qualifying[:15]` in `report_generator.py`). |
 
-Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.lower()}_min_score', 65)`.
+Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.lower()}_min_score', 65)`. Scans that use **min_score 0** (no filter): Watchlist, Watchlist 3pm, Watchlist – All tickers, Insider, Velocity Barbell.
 
 ---
 
@@ -125,29 +158,32 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 
 ## Summary table (config key → scan)
 
-| Key | Trend | Swing | Emotional | Pre-Market |
-|-----|-------|-------|-----------|------------|
-| `trend_min_score` | ✓ | | | |
-| `trend_min_quarter_perf` | ✓ | | | |
-| `trend_require_ma_stack` | ✓ | | | |
-| `swing_min_score` | | ✓ | | |
-| `dip_min_percent` | | ✓ | | |
-| `dip_max_percent` | | ✓ | | |
-| `emotional_min_score` | | | ✓ | |
-| `emotional_dip_min_percent` | | | ✓ | |
-| `emotional_dip_max_percent` | | | ✓ | |
-| `emotional_min_volume_ratio` | | | ✓ | |
-| `emotional_min_upside_to_target` | | | ✓ | |
-| `emotional_require_above_sma200` | | | ✓ | |
-| `emotional_require_buy_rating` | | | ✓ | |
-| `premarket_min_score` | | | | ✓ |
-| `premarket_min_volume` | | | | ✓ |
-| `premarket_min_relative_volume` | | | | ✓ |
-| `premarket_min_gap_percent` | | | | ✓ |
-| `premarket_max_gap_percent` | | | | ✓ |
-| `premarket_min_dollar_volume` | | | | ✓ |
-| `premarket_min_vol_float_ratio` | | | | ✓ |
-| `premarket_track_sector_heat` | | | | ✓ |
-| `min_price` | ✓ | ✓ | ✓ | ✓ |
-| `max_price` | ✓ | ✓ | ✓ | ✓ |
-| `min_avg_volume` | ✓ | ✓ | ✓ | ✓ |
+| Key | Trend | Swing | Emotional | Watchlist | Velocity | Pre-Market |
+|-----|-------|-------|-----------|-----------|----------|------------|
+| `trend_min_score` | ✓ | | | | | |
+| `trend_min_quarter_perf` | ✓ | | | | | |
+| `trend_require_ma_stack` | ✓ | | | | | |
+| `swing_min_score` | | ✓ | | | | |
+| `dip_min_percent` | | ✓ | | | | |
+| `dip_max_percent` | | ✓ | | | | |
+| `emotional_min_score` | | | ✓ | | | |
+| `emotional_dip_min_percent` | | | ✓ | | | |
+| `emotional_dip_max_percent` | | | ✓ | | | |
+| `emotional_min_volume_ratio` | | | ✓ | | | |
+| `emotional_min_upside_to_target` | | | ✓ | | | |
+| `emotional_require_above_sma200` | | | ✓ | | | |
+| `emotional_require_buy_rating` | | | ✓ | | | |
+| `watchlist_pct_down_from_open` | | | | ✓ | | |
+| `velocity_min_sector_pct` | | | | | ✓ | |
+| `velocity_barbell_theme` | | | | | ✓ | |
+| `premarket_min_score` | | | | | | ✓ |
+| `premarket_min_volume` | | | | | | ✓ |
+| `premarket_min_relative_volume` | | | | | | ✓ |
+| `premarket_min_gap_percent` | | | | | | ✓ |
+| `premarket_max_gap_percent` | | | | | | ✓ |
+| `premarket_min_dollar_volume` | | | | | | ✓ |
+| `premarket_min_vol_float_ratio` | | | | | | ✓ |
+| `premarket_track_sector_heat` | | | | | | ✓ |
+| `min_price` | ✓ | ✓ | ✓ | | | ✓ |
+| `max_price` | ✓ | ✓ | ✓ | | | ✓ |
+| `min_avg_volume` | ✓ | ✓ | ✓ | | | ✓ |

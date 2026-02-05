@@ -123,3 +123,72 @@ def run_watchlist_scan(
         time.sleep(0.15)
     progress(f"Found {len(results)} watchlist tickers {pct_down_min}–{pct_down_max}% down today.")
     return results
+
+
+def run_watchlist_tickers_scan(
+    progress_callback: Optional[Callable[[str], None]] = None,
+    config: Optional[Dict] = None,
+) -> List[Dict]:
+    """
+    Scan watchlist tickers only — no filters. Fetches current data for every ticker
+    on the watchlist and returns them all for the report.
+    progress_callback: optional(msg) for UI updates.
+    config: optional overrides; otherwise load_config() is used.
+    Returns list of dicts with Ticker, Score (100), and fields for report.
+    """
+    cfg = config or load_config()
+    watchlist = cfg.get("watchlist", []) or []
+    watchlist = [str(t).strip().upper() for t in watchlist if t]
+    if not watchlist:
+        if progress_callback:
+            progress_callback("Watchlist is empty. Add tickers in Watchlist first.")
+        return []
+
+    def progress(msg):
+        if progress_callback:
+            progress_callback(msg)
+
+    progress(f"Scanning {len(watchlist)} watchlist tickers (no filters)...")
+    results = []
+    total = len(watchlist)
+    for i, ticker in enumerate(watchlist):
+        if progress_callback:
+            progress(f"Checking ({i+1}/{total}): {ticker}")
+        try:
+            stock = None
+            for attempt in range(3):
+                try:
+                    stock = finviz.get_stock(ticker)
+                    if stock is not None:
+                        break
+                except Exception as e:
+                    err_str = str(e).lower()
+                    if attempt < 2 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
+                        time.sleep(1.5 * (attempt + 1))
+                        continue
+                    break
+            if not stock:
+                continue
+            price = _parse_num(stock.get("Price", 0))
+            if not price or price <= 0:
+                continue
+            vol_str = stock.get("Volume", "N/A")
+            change_str = stock.get("Change", "N/A")
+            results.append({
+                "Ticker": ticker,
+                "ticker": ticker,
+                "Score": 100,
+                "score": 100,
+                "Company": stock.get("Company", ticker),
+                "Price": price,
+                "Volume": vol_str,
+                "Change": change_str,
+                "Open": None,
+                "Sector": stock.get("Sector", "N/A"),
+                "Industry": stock.get("Industry", "N/A"),
+            })
+        except Exception:
+            continue
+        time.sleep(0.15)
+    progress(f"Found {len(results)} watchlist tickers.")
+    return results

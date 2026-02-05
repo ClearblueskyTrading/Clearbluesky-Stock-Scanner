@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 6.4 | Free & Open Source | Made with Claude AI
+   Version 6.5 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,10 +11,10 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v6.4
+   WHAT'S IN v6.5
 ════════════════════════════════════════════════════════════════════════════
 
-• Six scanners: Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market
+• Scanners: Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market
 • PDF + JSON reports – date/time stamped; JSON includes “instructions” for any AI
 • Optional OpenRouter AI – set API key in Settings; AI analysis saved as *_ai.txt
 • Optional: RAG (.txt/.pdf books), TA in report, Alpha Vantage sentiment, SEC insider context, chart images
@@ -53,9 +53,9 @@ OTHER WAYS TO RUN (no Windows installer):
 
 1. Launch the app (Desktop shortcut or app/START.bat)
 
-2. Select scan type: Trend - Long-term, Swing - Dips, or Watchlist - Near open
+2. Select scan type: Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, etc.
 
-3. Select index: S&P 500 or Russell 2000 (N/A for Watchlist)
+3. Select index: S&P 500 or Russell 2000 (N/A for Watchlist / Velocity Barbell / Insider)
 
 4. Click "Run Scan". When done, the PDF report opens.
 
@@ -72,7 +72,7 @@ OTHER WAYS TO RUN (no Windows installer):
 ════════════════════════════════════════════════════════════════════════════
 
 FREE (no API key required):
-• Trend, Swing, and Watchlist scanners (% down today 1–25%)
+• Trend, Swing, Watchlist 3pm (% down 1–25%), Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market
 • S&P 500 and Russell 2000
 • PDF reports with AI-oriented prompts
 • Watchlist with 2-beep alert and report highlight
@@ -102,16 +102,16 @@ app/
 ├── app.py                  – Main application
 ├── trend_scan_v2.py        – Trend scanner
 ├── enhanced_dip_scanner.py  – Swing/dip scanner
-├── watchlist_scanner.py     – Watchlist “% down today” scanner
+├── watchlist_scanner.py     – Watchlist 3pm (% down 1–25%), Watchlist – All tickers “% down today” scanner
 ├── report_generator.py     – PDF report builder
 ├── scan_settings.py        – Configuration
 ├── sound_utils.py          – Scan-complete & watchlist beeps
 ├── requirements.txt
-├── scan_types.json         – Scan types (Trend, Swing, Watchlist)
+├── scan_types.json         – Scan types (Trend, Swing, Watchlist 3pm, Velocity Barbell, Insider, …)
 ├── START.bat / RUN.bat  – Start the app (Windows)
 ├── run.sh               – Start on Linux/macOS (no Docker)
 ├── reports/                – Generated PDFs (created at runtime)
-└── user_config.json        – Created on first run; your settings (optional API keys) go here – never in code
+└── user_config.json        – Created on first run; blank API keys. Your optional keys go here – never in repo or release
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -119,8 +119,8 @@ app/
 ════════════════════════════════════════════════════════════════════════════
 
 Source and release zip: see the GitHub repo.
-Your API key (if you use one) is only in user_config.json on your machine;
-it is not in the source code or in the release package.
+Your API keys (if you use any) are only in user_config.json on your machine;
+they are not in the source code or in the release package. Config is blank on first run.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -142,5 +142,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v6.4 – made with Claude AI
+   ClearBlueSky v6.5 – made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

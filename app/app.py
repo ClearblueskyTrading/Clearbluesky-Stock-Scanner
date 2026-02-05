@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v6.4
+# ClearBlueSky Stock Scanner v6.5
 # ============================================================
 
 import tkinter as tk
-VERSION = "6.4"
+VERSION = "6.5"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -93,7 +93,7 @@ def _show_update_notice(root, tag, url):
     ).pack(side="left", padx=(0, 8))
     tk.Button(
         btn_frame, text="Later", font=("Arial", 9),
-        command=win.destroy(), bg=GRAY, fg="white", relief="flat", padx=12, pady=4
+        command=win.destroy, bg=GRAY, fg="white", relief="flat", padx=12, pady=4
     ).pack(side="left")
     win.update_idletasks()
     win.grab_set()
@@ -111,7 +111,7 @@ def _check_for_updates(root):
         latest = _parse_version(tag)
         current = _parse_version(VERSION)
         if latest > current:
-            root.after(0, lambda: _show_update_notice(root, tag, url))
+            root.after(0, lambda t=tag, u=url: _show_update_notice(root, t, u))
     except Exception:
         pass
 
@@ -246,7 +246,9 @@ class TradeBotApp:
             self.scan_types = [
                 {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
-                {"id": "watchlist_open", "label": "Watchlist - Near open", "scanner": "watchlist"},
+                {"id": "watchlist_open", "label": "Watchlist 3pm", "scanner": "watchlist"},
+                {"id": "watchlist_tickers", "label": "Watchlist - All tickers", "scanner": "watchlist_tickers"},
+                {"id": "velocity_leveraged", "label": "Velocity Barbell", "scanner": "velocity_leveraged"},
             ]
         self.build_ui()
         log("UI ready")
@@ -673,8 +675,12 @@ class TradeBotApp:
             return {"id": "trend_fallback", "label": label, "scanner": "trend"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
+        if "Watchlist" in label and "All tickers" in label:
+            return {"id": "watchlist_tickers_fallback", "label": label, "scanner": "watchlist_tickers"}
         if "Watchlist" in label:
             return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
+        if "Velocity" in label and "Leveraged" in label:
+            return {"id": "velocity_leveraged_fallback", "label": label, "scanner": "velocity_leveraged"}
         if "insider" in label.lower():
             return {"id": "insider_fallback", "label": label, "scanner": "insider"}
         return None
@@ -851,8 +857,8 @@ class TradeBotApp:
             messagebox.showerror("Error", str(e))
     
     def _run_watchlist_scan(self):
-        """Internal helper to run the Watchlist (near open) scan using the unified UI."""
-        log("=== WATCHLIST SCAN ===")
+        """Internal helper to run the Watchlist 3pm scan (watchlist tickers down X%, slider 1–25%)."""
+        log("=== WATCHLIST 3PM SCAN ===")
         self.scan_cancelled = False
         self.scan_start_time = time.time()
         self.scan_progress.set(5, "Starting...")
@@ -894,9 +900,10 @@ class TradeBotApp:
                 return
             if results and len(results) > 0:
                 elapsed = int(time.time() - self.scan_start_time)
+                scan_label = (self._get_current_scan_def() or {}).get("label", "Watchlist 3pm")
                 self.generate_report_from_results(
                     results,
-                    "Watchlist",
+                    scan_label,
                     self.scan_progress,
                     self.scan_status,
                     self.scan_printer,
@@ -910,11 +917,161 @@ class TradeBotApp:
                     self.scan_status,
                     self.scan_printer,
                     self.scan_btn,
-                    "No watchlist tickers near open",
+                    "No watchlist tickers down in range",
                     self.scan_stop_btn,
                 )
         except Exception as e:
             log_error(e, "Watchlist scan failed")
+            self.scan_complete(
+                self.scan_progress,
+                self.scan_status,
+                self.scan_printer,
+                self.scan_btn,
+                "Error!",
+                self.scan_stop_btn,
+            )
+            messagebox.showerror("Error", str(e))
+    
+    def _run_watchlist_tickers_scan(self):
+        """Internal helper to run the Watchlist - All tickers scan (no parameters)."""
+        log("=== WATCHLIST - ALL TICKERS SCAN ===")
+        self.scan_cancelled = False
+        self.scan_start_time = time.time()
+        self.scan_progress.set(5, "Starting...")
+        self.scan_status.config(text="Connecting...")
+        self.scan_printer.start()
+        self.scan_btn.config(state="disabled")
+        self.scan_stop_btn.config(state="normal")
+        self.root.update()
+        try:
+            from watchlist_scanner import run_watchlist_tickers_scan
+            def progress(msg):
+                if self.scan_cancelled:
+                    return
+                log(f"Watchlist tickers: {msg}")
+                elapsed = int(time.time() - self.scan_start_time)
+                time_str = f"{elapsed}s"
+                self.scan_status.config(text=msg[:50])
+                if "(" in msg and "/" in msg:
+                    try:
+                        parts = msg.split("(")[1].split(")")[0].split("/")
+                        cur, tot = int(parts[0]), int(parts[1])
+                        pct = 10 + int((cur / tot) * 75) if tot else 50
+                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
+                    except Exception:
+                        pass
+                elif "Found" in msg:
+                    self.scan_progress.set(90, f"90% ({time_str})")
+                self.root.update()
+            results = run_watchlist_tickers_scan(progress_callback=progress, config=self.config)
+            if self.scan_cancelled:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "Cancelled",
+                    self.scan_stop_btn,
+                )
+                return
+            if results and len(results) > 0:
+                elapsed = int(time.time() - self.scan_start_time)
+                self.generate_report_from_results(
+                    results,
+                    "Watchlist - All tickers",
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    self.scan_stop_btn,
+                    elapsed,
+                )
+            else:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "No watchlist tickers found",
+                    self.scan_stop_btn,
+                )
+        except Exception as e:
+            log_error(e, "Watchlist tickers scan failed")
+            self.scan_complete(
+                self.scan_progress,
+                self.scan_status,
+                self.scan_printer,
+                self.scan_btn,
+                "Error!",
+                self.scan_stop_btn,
+            )
+            messagebox.showerror("Error", str(e))
+    
+    def _run_velocity_leveraged_scan(self):
+        """Internal helper to run the Velocity Leveraged ETF scan (sector proxies → recommended vehicles)."""
+        log("=== VELOCITY LEVERAGED ETF SCAN ===")
+        self.scan_cancelled = False
+        self.scan_start_time = time.time()
+        self.scan_progress.set(5, "Starting...")
+        self.scan_status.config(text="Connecting...")
+        self.scan_printer.start()
+        self.scan_btn.config(state="disabled")
+        self.scan_stop_btn.config(state="normal")
+        self.root.update()
+        try:
+            from velocity_leveraged_scanner import run_velocity_leveraged_scan
+            def progress(msg):
+                if self.scan_cancelled:
+                    return
+                log(f"Velocity Leveraged: {msg}")
+                elapsed = int(time.time() - self.scan_start_time)
+                time_str = f"{elapsed}s"
+                self.scan_status.config(text=msg[:50])
+                if "(" in msg and "/" in msg:
+                    try:
+                        parts = msg.split("(")[1].split(")")[0].split("/")
+                        cur, tot = int(parts[0]), int(parts[1])
+                        pct = 10 + int((cur / tot) * 75) if tot else 50
+                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
+                    except Exception:
+                        pass
+                elif "Leading:" in msg:
+                    self.scan_progress.set(90, f"90% ({time_str})")
+                self.root.update()
+            results = run_velocity_leveraged_scan(progress_callback=progress, config=self.config)
+            if self.scan_cancelled:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "Cancelled",
+                    self.scan_stop_btn,
+                )
+                return
+            if results and len(results) > 0:
+                elapsed = int(time.time() - self.scan_start_time)
+                self.generate_report_from_results(
+                    results,
+                    "Velocity Barbell",
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    self.scan_stop_btn,
+                    elapsed,
+                )
+            else:
+                self.scan_complete(
+                    self.scan_progress,
+                    self.scan_status,
+                    self.scan_printer,
+                    self.scan_btn,
+                    "No recommendations",
+                    self.scan_stop_btn,
+                )
+        except Exception as e:
+            log_error(e, "Velocity Leveraged scan failed")
             self.scan_complete(
                 self.scan_progress,
                 self.scan_status,
@@ -1174,6 +1331,10 @@ class TradeBotApp:
             self._run_swing_scan(index)
         elif scanner_kind == "watchlist":
             self._run_watchlist_scan()
+        elif scanner_kind == "watchlist_tickers":
+            self._run_watchlist_tickers_scan()
+        elif scanner_kind == "velocity_leveraged":
+            self._run_velocity_leveraged_scan()
         elif scanner_kind == "insider":
             self._run_insider_scan()
         elif scanner_kind == "emotional":
@@ -1188,7 +1349,7 @@ class TradeBotApp:
         try:
             from report_generator import HTMLReportGenerator
 
-            min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Insider") else 65))
+            min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell") else 65))
             reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -1258,19 +1419,39 @@ class TradeBotApp:
                         progress.set(99, "Received")
                         status.config(text="Saving AI response...")
                         self.root.update()
+                        base = path[:-4] if path.lower().endswith(".pdf") else path
+                        ai_path = base + "_ai.txt"
                         if ai_response:
-                            base = path[:-4] if path.lower().endswith(".pdf") else path
-                            ai_path = base + "_ai.txt"
                             with open(ai_path, "w", encoding="utf-8") as f:
                                 f.write(ai_response)
                             webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
-                        progress.set(100, f"Done! ({elapsed}s)")
-                        status.config(text="AI analysis saved and opened" if ai_response else "AI response empty")
+                            progress.set(100, f"Done! ({elapsed}s)")
+                            status.config(text="AI analysis saved and opened")
+                        else:
+                            fallback = "AI returned no response (empty). You can paste the instructions below into another AI.\n\n--- Instructions ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
+                            try:
+                                with open(ai_path, "w", encoding="utf-8") as f:
+                                    f.write(fallback)
+                            except Exception:
+                                pass
+                            progress.set(100, f"Done ({elapsed}s)")
+                            status.config(text="AI response empty; see _ai.txt for instructions")
                         self._update_status_ready()
                     except Exception as e:
                         log_error(e, "OpenRouter analysis")
                         progress.set(100, f"Done ({elapsed}s)")
-                        status.config(text="AI analysis failed (see log)")
+                        err_short = str(e).strip()[:80]
+                        status.config(text=f"AI failed: {err_short}")
+                        base = path[:-4] if path.lower().endswith(".pdf") else path
+                        ai_path = base + "_ai.txt"
+                        fallback = f"AI analysis failed: {e}\n\nDetails in: {LOG_FILE}\n\n--- Instructions (paste into another AI if needed) ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
+                        try:
+                            with open(ai_path, "w", encoding="utf-8") as f:
+                                f.write(fallback)
+                            webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
+                        except Exception:
+                            pass
+                        messagebox.showwarning("AI analysis failed", f"{e}\n\nSee error_log.txt for details.\nA fallback _ai.txt was saved with instructions you can paste elsewhere.")
                         self._update_status_ready()
                 else:
                     progress.set(100, f"Done! ({elapsed}s)")
@@ -1785,10 +1966,10 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v6.4
+ClearBlueSky Stock Scanner v6.5
 
 QUICK START:
-1. Select scan type and index (N/A for Watchlist/Insider).
+1. Select scan type and index (N/A for Watchlist / Velocity Barbell / Insider).
 2. Click Run Scan. You get: PDF report + JSON analysis package.
 3. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
 
@@ -1800,7 +1981,9 @@ OUTPUTS (per run):
 SCANNERS:
 • Trend – Uptrending (S&P 500 / Russell 2000). Best: after close.
 • Swing – Oversold dips with news/analyst. Best: 2:30–4:00 PM.
-• Watchlist – Your tickers down 1–25% today. Config: % down slider.
+• Watchlist 3pm – Watchlist tickers down X% today (slider 1–25%). Best: ~3 PM.
+• Watchlist – All tickers – Scan all watchlist tickers, no filters.
+• Velocity Barbell – Foundation + Runner (or Single Shot) from sector signals. Config: min sector %, theme.
 • Insider – Latest insider transactions (Finviz).
 • Emotional Dip – Late-day dip setup. Best: ~3:30 PM.
 • Pre-Market – Pre-market volume. Best: 7–9:25 AM.
@@ -1818,7 +2001,7 @@ SETTINGS (optional):
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v6.4
+Made with Claude AI · ClearBlueSky v6.5
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

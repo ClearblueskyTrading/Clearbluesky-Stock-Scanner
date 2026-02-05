@@ -1,0 +1,73 @@
+# ClearBlueSky Stock Scanner v6.5
+
+**Release date:** February 2026
+
+---
+
+## What's New in v6.5
+
+### New Scanners
+
+- **Watchlist 3pm** – Renamed from "Watchlist – Near open." Scans your watchlist for tickers **down X% today** (slider **1–25%**). Best run around 3 PM. Config: **% down (1–25%)** slider.
+- **Watchlist – All tickers** – Scans **all** watchlist tickers with **no filters**. One-click snapshot of every ticker on your list. No parameters.
+- **Velocity Barbell** – **Foundation + Runner** (or **Single Shot**) strategy from sector signals. Uses sector proxy ETFs (QQQ, SMH, SPY, etc.) to see what’s leading, then recommends:
+  - **Barbell:** Foundation ticker ($5K) + **Runner Candidate 1** (score 90, with RSI/leverage) + **Runner Candidate 2** (score 95). Pick runners by oversold, catalysts, or technicals.
+  - **Single Shot:** One ticker ($10K) when theme is clear.
+  - Config: **Min sector % (up or down)** slider (-5 to +5), **Theme** (auto / barbell / single_shot).
+
+### Improvements
+
+- **AI analysis fallback** – If OpenRouter fails or returns empty, the app still writes a **fallback _ai.txt** with the error and the full instructions so you can paste them into another AI. Status bar shows a short error; a warning dialog points you to the log and _ai.txt.
+- **Install / update** – INSTALL.bat now copies app **contents** into the install folder (so `app.py` and `requirements.txt` are at the root) and uses **`pip install --upgrade`** so reruns upgrade dependencies.
+- **Update pop-up** – "Later" button no longer closed the dialog immediately; closure bug in the update notice lambda fixed.
+
+### Docs & Help
+
+- **In-app Help (❓)** – Updated for Watchlist 3pm, Watchlist – All tickers, and Velocity Barbell. N/A index note for Velocity Barbell and watchlist scans.
+- **README / README.txt** – Version 6.5, full scanner list, and quick start updated.
+
+---
+
+## Outputs (unchanged)
+
+| File | Contents |
+|------|----------|
+| `*_Scan_*.pdf` | Report with Master Trading Report Directive + per-ticker data. |
+| `*_Scan_*.json` | Same data + `instructions` for any AI. |
+| `*_Scan_*_ai.txt` | AI analysis (OpenRouter), or fallback with error + instructions if the API fails. |
+
+---
+
+## Scanners in v6.5
+
+| Scanner | Description |
+|---------|-------------|
+| **Trend** | Uptrending (S&P 500 / Russell 2000). Best: after close. |
+| **Swing – Dips** | Oversold dips with news/analyst. Best: 2:30–4:00 PM. |
+| **Watchlist 3pm** | Watchlist tickers down X% today (slider 1–25%). Best: ~3 PM. |
+| **Watchlist – All tickers** | All watchlist tickers, no filters. |
+| **Velocity Barbell** | Foundation + Runner (or Single Shot) from sector signals. Config: min sector %, theme. |
+| **Insider** | Latest insider transactions (Finviz). |
+| **Emotional Dip** | Late-day dip setup. Best: ~3:30 PM. |
+| **Pre-Market** | Pre-market volume. Best: 7–9:25 AM. |
+
+---
+
+## Upgrade from v6.4
+
+1. Replace the `app` folder (or re-run **INSTALL.bat** and choose your existing install path).
+2. Your **user_config.json**, **scan_types.json**, and **reports** are preserved. If you use custom scan types, add **Watchlist 3pm**, **Watchlist – All tickers**, and **Velocity Barbell** from the Scan dropdown or from **scan_types.json** (see repo).
+3. **Velocity Barbell** uses **velocity_leveraged_arsenal.json** and **velocity_leveraged_scanner.py** in `app/`. No extra setup.
+
+---
+
+## Release package
+
+- **File:** `ClearBlueSky-6.5.zip` (or tag `v6.5` on GitHub).
+- **Excluded from zip:** `user_config.json`, `error_log.txt`, `__pycache__/`, contents of `app/reports/` and `app/rag_store/`.
+- **No APIs or user data:** No API keys or user config are saved in the repo or the release. `user_config.json` is gitignored and is not copied during install; the app creates a blank config (all API keys empty) on first run. Optional: `app/user_config.json.example` is a blank template (safe to commit).
+- Safe to share; no API keys or user data included.
+
+---
+
+*ClearBlueSky v6.5 – made with Claude AI*
