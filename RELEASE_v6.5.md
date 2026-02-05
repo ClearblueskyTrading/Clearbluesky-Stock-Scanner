@@ -21,9 +21,13 @@
 - **Install / update** – INSTALL.bat now copies app **contents** into the install folder (so `app.py` and `requirements.txt` are at the root) and uses **`pip install --upgrade`** so reruns upgrade dependencies.
 - **Update pop-up** – "Later" button no longer closed the dialog immediately; closure bug in the update notice lambda fixed.
 
+### Index: ETFs
+
+- **ETFs** – The index dropdown (S&P 500 / Russell 2000) now includes **ETFs**. When you select **ETFs**, all index-based scanners (Trend, Swing – Dips, Emotional Dip, Pre-Market) and report market breadth use the **Finviz Exchange Traded Fund** universe.
+
 ### Docs & Help
 
-- **In-app Help (❓)** – Updated for Watchlist 3pm, Watchlist – All tickers, and Velocity Barbell. N/A index note for Velocity Barbell and watchlist scans.
+- **In-app Help (❓)** – Updated for Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, and ETFs index. N/A index note for Velocity Barbell and watchlist scans.
 - **README / README.txt** – Version 6.5, full scanner list, and quick start updated.
 
 ---
@@ -42,14 +46,14 @@
 
 | Scanner | Description |
 |---------|-------------|
-| **Trend** | Uptrending (S&P 500 / Russell 2000). Best: after close. |
-| **Swing – Dips** | Oversold dips with news/analyst. Best: 2:30–4:00 PM. |
+| **Trend** | Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close. |
+| **Swing – Dips** | Oversold dips with news/analyst (S&P 500 / Russell 2000 / ETFs). Best: 2:30–4:00 PM. |
 | **Watchlist 3pm** | Watchlist tickers down X% today (slider 1–25%). Best: ~3 PM. |
 | **Watchlist – All tickers** | All watchlist tickers, no filters. |
 | **Velocity Barbell** | Foundation + Runner (or Single Shot) from sector signals. Config: min sector %, theme. |
 | **Insider** | Latest insider transactions (Finviz). |
-| **Emotional Dip** | Late-day dip setup. Best: ~3:30 PM. |
-| **Pre-Market** | Pre-market volume. Best: 7–9:25 AM. |
+| **Emotional Dip** | Late-day dip setup (S&P 500 / Russell 2000 / ETFs). Best: ~3:30 PM. |
+| **Pre-Market** | Pre-market volume (S&P 500 / Russell 2000 / ETFs). Best: 7–9:25 AM. |
 
 ---
 

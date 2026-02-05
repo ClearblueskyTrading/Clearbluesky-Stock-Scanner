@@ -7,6 +7,7 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 ## [6.5] – February 2026
 
 ### Added
+- **ETFs index** – Index dropdown now includes **ETFs** (Finviz “Exchange Traded Fund” universe). Trend, Swing (Emotional Dip), Pre-Market, and report breadth all support ETFs when “ETFs” is selected.
 - **Watchlist 3pm** – Scan watchlist tickers down X% today (slider 1–25%). Best run ~3 PM.
 - **Watchlist – All tickers** – Scan all watchlist tickers with no filters.
 - **Velocity Barbell** – Foundation + Runner (or Single Shot) from sector signals. Config: min sector % (up or down), theme (auto / barbell / single_shot). Runner Candidate 1 & 2 with RSI/leverage.
