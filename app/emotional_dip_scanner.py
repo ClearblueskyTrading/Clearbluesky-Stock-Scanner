@@ -34,14 +34,14 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
     
     Args:
         progress_callback: function(msg) for status updates
-        index: 'sp500' or 'russell2000'
+        index: 'sp500', 'russell2000', or 'etfs'
     
     Returns:
         List of emotional dip candidates sorted by score
     """
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else "Russell 2000"
+    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
     
     if progress_callback:
         progress_callback(f"Scanning {index_name} for emotional dips...")

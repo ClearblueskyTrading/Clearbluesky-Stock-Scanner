@@ -21,28 +21,38 @@ def trend_scan(progress_callback=None, index="sp500"):
     """
     TREND SCAN with company info and scoring
     progress_callback: function(message) for status updates
-    index: 'sp500' or 'russell2000'
+    index: 'sp500', 'russell2000', or 'etfs'
     """
     def progress(msg):
         print(msg)
         if progress_callback:
             progress_callback(msg)
     
-    index_name = "S&P 500" if index == "sp500" else "Russell 2000"
+    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
     progress(f"Starting Trend Scan ({index_name})...")
     
     try:
         # Get overview data (can take a minute for full index)
         progress("Fetching overview data (this may take a minute)...")
         overview = Overview()
-        filters = {
-            'Index': 'S&P 500' if index == "sp500" else 'RUSSELL 2000',
-            '200-Day Simple Moving Average': 'Price above SMA200',
-            '50-Day Simple Moving Average': 'Price above SMA50',
-            '20-Day Simple Moving Average': 'Price above SMA20',
-            'Average Volume': 'Over 500K',
-            'Price': 'Over $5'
-        }
+        if index == "etfs":
+            filters = {
+                'Industry': 'Exchange Traded Fund',
+                '200-Day Simple Moving Average': 'Price above SMA200',
+                '50-Day Simple Moving Average': 'Price above SMA50',
+                '20-Day Simple Moving Average': 'Price above SMA20',
+                'Average Volume': 'Over 500K',
+                'Price': 'Over $5'
+            }
+        else:
+            filters = {
+                'Index': 'S&P 500' if index == "sp500" else 'RUSSELL 2000',
+                '200-Day Simple Moving Average': 'Price above SMA200',
+                '50-Day Simple Moving Average': 'Price above SMA50',
+                '20-Day Simple Moving Average': 'Price above SMA20',
+                'Average Volume': 'Over 500K',
+                'Price': 'Over $5'
+            }
         overview.set_filter(filters_dict=filters)
         df_overview = overview.screener_view()
         

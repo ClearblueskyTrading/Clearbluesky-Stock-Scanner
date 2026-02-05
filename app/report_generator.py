@@ -356,7 +356,7 @@ class ReportGenerator:
         return out
 
     def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None, index=None):
-        """Generate ONE PDF report. index='sp500' or 'russell2000' to include market breadth (full index fetch)."""
+        """Generate ONE PDF report. index='sp500', 'russell2000', or 'etfs' to include market breadth (full index fetch)."""
         def progress(msg):
             print(msg)
             if progress_callback:
@@ -459,7 +459,7 @@ class ReportGenerator:
             data_lines.append(line)
 
         market_breadth = None
-        if index and index in ("sp500", "russell2000"):
+        if index and index in ("sp500", "russell2000", "etfs"):
             try:
                 from breadth import fetch_full_index_for_breadth, calculate_market_breadth
                 all_stocks = fetch_full_index_for_breadth(index, progress)

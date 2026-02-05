@@ -304,7 +304,7 @@ class TradeBotApp:
         ttk.Combobox(
             type_row,
             textvariable=self.scan_index,
-            values=["S&P 500", "Russell 2000"],
+            values=["S&P 500", "Russell 2000", "ETFs"],
             state="readonly",
             width=10,
             font=("Arial", 9),
@@ -458,7 +458,7 @@ class TradeBotApp:
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
         tk.Label(main_f, text="Index:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
         idx_var = tk.StringVar(value=self.scan_index.get())
-        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
+        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -1320,7 +1320,8 @@ class TradeBotApp:
     def run_scan(self):
         """Entry point for the unified Scan button."""
         # Determine index
-        index = "sp500" if "S&P" in self.scan_index.get() else "russell2000"
+        idx_text = self.scan_index.get()
+        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else "russell2000")
         
         # Route based on selected scan-type definition
         scan_def = self._get_current_scan_def()
@@ -1345,7 +1346,7 @@ class TradeBotApp:
             messagebox.showwarning("Scan Type", "Please select a valid scan type.")
     
     def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, index=None):
-        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500' or 'russell2000' to include market breadth."""
+        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500', 'russell2000', or 'etfs' to include market breadth."""
         try:
             from report_generator import HTMLReportGenerator
 
@@ -1979,7 +1980,7 @@ OUTPUTS (per run):
 • *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
 
 SCANNERS:
-• Trend – Uptrending (S&P 500 / Russell 2000). Best: after close.
+• Trend – Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close.
 • Swing – Oversold dips with news/analyst. Best: 2:30–4:00 PM.
 • Watchlist 3pm – Watchlist tickers down X% today (slider 1–25%). Best: ~3 PM.
 • Watchlist – All tickers – Scan all watchlist tickers, no filters.

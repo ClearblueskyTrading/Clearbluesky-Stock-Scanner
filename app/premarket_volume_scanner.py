@@ -40,14 +40,14 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
     
     Args:
         progress_callback: function(msg) for status updates
-        index: 'sp500' or 'russell2000'
+        index: 'sp500', 'russell2000', or 'etfs'
     
     Returns:
         List of pre-market volume candidates sorted by score
     """
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else "Russell 2000"
+    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
     
     if progress_callback:
         progress_callback(f"Scanning {index_name} for pre-market volume activity...")
@@ -76,8 +76,11 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
     min_vol_float_ratio = float(config.get('premarket_min_vol_float_ratio', 0.01))
     track_sector_heat = config.get('premarket_track_sector_heat', True)
     
-    # Index filter
-    idx_filter = 'idx_sp500' if index == 'sp500' else 'idx_rut'
+    # Index filter (Finviz: idx_sp500, idx_rut, ind_exchangetradedfund for ETFs)
+    if index == 'etfs':
+        idx_filter = 'ind_exchangetradedfund'
+    else:
+        idx_filter = 'idx_sp500' if index == 'sp500' else 'idx_rut'
     
     # Use Finviz screener for unusual volume
     # Note: Finviz may not have pre-market volume directly, so we use regular volume

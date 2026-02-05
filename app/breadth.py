@@ -232,17 +232,20 @@ def fetch_full_index_for_breadth(
     index: str, progress_callback=None
 ) -> List[Dict[str, Any]]:
     """
-    Fetch full index (S&P 500 or Russell 2000) from Finviz for breadth calculation.
-    index: 'sp500' or 'russell2000'
+    Fetch full index (S&P 500, Russell 2000, or ETFs) from Finviz for breadth calculation.
+    index: 'sp500', 'russell2000', or 'etfs'
     Returns list of stock dicts (Finviz keys); empty list on error.
     """
-    if index not in ("sp500", "russell2000"):
+    if index not in ("sp500", "russell2000", "etfs"):
         return []
     try:
         from finviz.screener import Screener
     except ImportError:
         return []
-    idx_filter = "idx_sp500" if index == "sp500" else "idx_rut"
+    if index == "etfs":
+        idx_filter = "ind_exchangetradedfund"
+    else:
+        idx_filter = "idx_sp500" if index == "sp500" else "idx_rut"
     try:
         if progress_callback:
             progress_callback("Fetching index for breadth...")
