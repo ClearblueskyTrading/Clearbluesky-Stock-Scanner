@@ -214,6 +214,21 @@ def load_config():
         # Scan-complete alarm (system sound: beep | asterisk | exclamation)
         "play_alarm_on_complete": True,
         "alarm_sound_choice": "beep",
+
+        # OpenRouter API (for AI analysis; one key for all models)
+        "openrouter_api_key": "",
+        "openrouter_model": "google/gemini-3-pro-preview",  # or anthropic/claude-sonnet-4.5 (credits), tngtech/deepseek-r1t2-chimera:free (free)
+        "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
+        # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
+        "alpha_vantage_api_key": "",
+        # SEC EDGAR insider context (10b5-1 plan vs discretionary)
+        "use_sec_insider_context": False,
+        # RAG book knowledge (ChromaDB; folder of .txt trading books)
+        "rag_books_folder": "",
+        "rag_enabled": False,
+
+        # Report: include programmatic TA (yfinance + pandas-ta: SMAs, RSI, MACD, BB, ATR, Fib) per ticker
+        "include_ta_in_report": True,
     }
     
     if os.path.exists(CONFIG_FILE):
@@ -221,9 +236,15 @@ def load_config():
             with open(CONFIG_FILE, 'r') as f:
                 saved = json.load(f)
                 defaults.update(saved)
-        except:
+                # One-time migration: Gemini API -> OpenRouter
+                if saved.get("gemini_api_key") and not saved.get("openrouter_api_key"):
+                    defaults["openrouter_api_key"] = saved.get("gemini_api_key", "")
+                gm = saved.get("gemini_model")
+                if gm and not saved.get("openrouter_model"):
+                    defaults["openrouter_model"] = "google/gemini-3-pro-preview" if gm == "gemini-3-pro-preview" else "tngtech/deepseek-r1t2-chimera:free"
+        except Exception:
             pass
-    
+
     return defaults
 
 

@@ -1,15 +1,14 @@
-# ClearBlueSky Stock Scanner v6.3
+# ClearBlueSky Stock Scanner v6.4
 
-**Free desktop app** that scans the market for trading ideas and generates **PDF reports** you can analyze with any AI (Claude, Gemini, ChatGPT).
+**Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **Trend scanner** – Uptrending names (S&P 500 / Russell 2000)  
-- **Swing scanner** – Oversold dips with news/analyst check  
-- **Watchlist scanner** – Watchlist tickers that are down 1–25% today (today’s Change %); Config: “% down today” slider  
-- **Watchlist** – Get 2 beeps and top-of-report highlight when a watchlist ticker appears in any scan  
-- **PDF reports** – Date/time stamped, with Master Trading Report Directive for AI and per-ticker data  
-- **Update notice** – On startup, the app checks for a newer version and shows a notice with a link to download  
+- **Scanners** – Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000 where applicable)  
+- **Watchlist** – 2 beeps + ★ WATCHLIST when a watchlist ticker appears in any scan  
+- **Outputs** – PDF report, JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter  
+- **Optional AI pipeline** – OpenRouter API key → AI analysis saved as `*_ai.txt`; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context, chart images  
+- **Update notice** – On startup, checks for a newer version and shows a link to download  
 
-No API key required for the scanners. Optional [Finviz Elite](https://finviz.com) API key can be set in **Settings** (stored only in your local `user_config.json`, never in code or in this repo).
+No API key required for the scanners. Optional keys in **Settings**: Finviz, OpenRouter, Alpha Vantage (all stored only in local `user_config.json`).
 
 ---
 
@@ -17,8 +16,8 @@ No API key required for the scanners. Optional [Finviz Elite](https://finviz.com
 
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).  
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).  
-3. **Scan** – Choose **Trend**, **Swing**, **Watchlist - Near open**, or **Insider - Latest**; pick index (N/A for Watchlist/Insider); click **Run Scan**.  
-4. **Report** – PDF opens when the scan finishes; use it with your preferred AI.  
+3. **Scan** – Choose scan type (Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market); pick index where applicable; click **Run Scan**.  
+4. **Report** – PDF + JSON open when done. If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.  
 
 **Watchlist:** Click **Watchlist** to add symbols (max 200). You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it’s listed at the top of the report with a ★ WATCHLIST label.
 
@@ -78,9 +77,12 @@ ClearBlueSky/
 |----------------|------------------------|--------------------|
 | **Trend**      | Longer holds (weeks–months) | After market close |
 | **Swing – Dips** | Short-term dips (1–5 days) | 2:30–4:00 PM       |
-| **Watchlist – Near open** | Watchlist tickers down 1–25% today | Anytime; Config: “% down today” slider |
+| **Watchlist**  | Watchlist tickers down 1–25% today | Anytime; Config: “% down today” slider |
+| **Insider**    | Latest insider transactions (Finviz) | Anytime |
+| **Emotional Dip** | Late-day dip setup | ~3:30 PM |
+| **Pre-Market** | Pre-market volume | 7–9:25 AM |
 
-Reports are PDF-only, date/time stamped. Each includes a Master Trading Report Directive for AI and tells the AI to use Yahoo Finance for charts (e.g. `https://finance.yahoo.com/quote/AAPL/chart`).
+Reports: PDF (date/time stamped, Master Trading Report Directive + per-ticker data), JSON (same data + `instructions` for any AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: “Follow the instructions in the `instructions` field.” See **app/WORKFLOW.md** for the full pipeline.
 ---
 
 ## Support
@@ -91,4 +93,4 @@ Reports are PDF-only, date/time stamped. Each includes a Master Trading Report D
 
 ---
 
-*ClearBlueSky v6.3 – made with Claude AI*
+*ClearBlueSky v6.4 – made with Claude AI*

@@ -108,6 +108,8 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 - `alarm_sound_choice` – `"beep"` \| `"asterisk"` \| `"exclamation"` (system-style beeps).
 - `finviz_api_key` – Optional Finviz API key.
 - `broker_url` – Broker link (e.g. Schwab).
+- **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). `openrouter_model` – Model: `"google/gemini-3-pro-preview"` or `"anthropic/claude-sonnet-4.5"` (use credits), or `"tngtech/deepseek-r1t2-chimera:free"` (free, no credits). Selectable in Settings under “OpenRouter API (AI analysis)”.
+- **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the PDF gets programmatic TA from `ta_engine` (yfinance + pandas-ta): SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
 - Risk/position (legacy Settings tab): `account_size`, `risk_per_trade_percent`, `max_position_dollars`, `max_daily_loss_dollars`, `max_concurrent_positions`.
 
 ---

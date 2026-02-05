@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 6.3 | Free & Open Source | Made with Claude AI
+   Version 6.4 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,16 +11,18 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v6.3
+   WHAT'S IN v6.4
 ════════════════════════════════════════════════════════════════════════════
 
-• Three scanners: Trend (long-term), Swing (dips), Watchlist – % down today (1–25% slider)
-• PDF reports only – date/time stamped, with Master Trading Report Directive for AI
-• Watchlist – add up to 200 tickers; 2 beeps + top-of-report highlight when a watchlist stock appears in a scan
+• Six scanners: Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market
+• PDF + JSON reports – date/time stamped; JSON includes “instructions” for any AI
+• Optional OpenRouter AI – set API key in Settings; AI analysis saved as *_ai.txt
+• Optional: RAG (.txt/.pdf books), TA in report, Alpha Vantage sentiment, SEC insider context, chart images
+• Watchlist – up to 200 tickers; 2 beeps + ★ WATCHLIST when one appears in a scan
 • Import watchlist from Finviz CSV (Ticker or Symbol column)
-• Scan Config – adjust min score, dip %, “% down today,” price, volume per scan type
-• Update notice – app checks for a newer version on startup and shows a link to download
-• Optional Finviz API key in Settings (stored only in user_config.json on your PC – never in code or in the app package)
+• Scan Config – min score, dip %, “% down today,” price, volume per scan type
+• Update notice – app checks for newer version on startup
+• Optional API keys in Settings (Finviz, OpenRouter, Alpha Vantage – stored only in user_config.json)
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -140,5 +142,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v6.3 – made with Claude AI
+   ClearBlueSky v6.4 – made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

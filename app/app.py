@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v6.3
+# ClearBlueSky Stock Scanner v6.4
 # ============================================================
 
 import tkinter as tk
-VERSION = "6.3"
+VERSION = "6.4"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -392,7 +392,8 @@ class TradeBotApp:
         row2.pack(fill="x", pady=(0, 3))
         for text, cmd in [("⭐ Watchlist", self.open_watchlist),
                           ("⚙️ Settings", self.api_settings),
-                          ("❓ Help", self.show_help)]:
+                          ("❓ Help", self.show_help),
+                          ("📄 README", self.open_readme)]:
             tk.Button(row2, text=text, command=cmd, bg="#e9ecef", fg="#333",
                      font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
         
@@ -742,6 +743,7 @@ class TradeBotApp:
                     self.scan_btn,
                     self.scan_stop_btn,
                     elapsed,
+                    index=index,
                 )
             else:
                 self.scan_complete(
@@ -825,6 +827,7 @@ class TradeBotApp:
                     self.scan_btn,
                     self.scan_stop_btn,
                     elapsed,
+                    index=index,
                 )
             else:
                 self.scan_complete(
@@ -1050,6 +1053,7 @@ class TradeBotApp:
                     self.scan_btn,
                     self.scan_stop_btn,
                     elapsed,
+                    index=index,
                 )
             else:
                 self.scan_complete(
@@ -1133,6 +1137,7 @@ class TradeBotApp:
                     self.scan_btn,
                     self.scan_stop_btn,
                     elapsed,
+                    index=index,
                 )
             else:
                 self.scan_complete(
@@ -1178,8 +1183,8 @@ class TradeBotApp:
         else:
             messagebox.showwarning("Scan Type", "Please select a valid scan type.")
     
-    def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0):
-        """Generate PDF report (analyst prompt at beginning, then stock data)."""
+    def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, index=None):
+        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500' or 'russell2000' to include market breadth."""
         try:
             from report_generator import HTMLReportGenerator
 
@@ -1207,16 +1212,72 @@ class TradeBotApp:
                         pass
                 self.root.update()
 
-            path = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config)
+            path, analysis_text, analysis_package = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config, index=index)
 
             if path:
-                progress.set(100, f"Done! ({elapsed}s)")
-                status.config(text="Opening PDF report...")
                 file_url = "file:///" + path.replace("\\", "/").lstrip("/")
-                webbrowser.open(file_url)
                 self.last_scan_type = scan_type
                 self.last_scan_time = datetime.now()
-                self._update_status_ready()
+                content_to_send = json.dumps(analysis_package, indent=2) if analysis_package else (analysis_text or "") if self.config.get("openrouter_api_key") else ""
+                # If we're going to call OpenRouter, keep progress bar moving through AI phase
+                if self.config.get("openrouter_api_key") and content_to_send:
+                    progress.set(92, "Report saved")
+                    status.config(text="Opening PDF...")
+                    self.root.update()
+                    webbrowser.open(file_url)
+                    try:
+                        progress.set(94, "Preparing AI...")
+                        status.config(text="Building prompt...")
+                        self.root.update()
+                        from openrouter_client import analyze_with_config
+                        system_prompt = "You are a professional stock analyst. You are receiving a structured JSON analysis package (scan results, technical indicators, news). For each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
+                        if self.config.get("rag_enabled") and self.config.get("rag_books_folder"):
+                            try:
+                                from rag_engine import get_rag_context_for_scan
+                                rag_ctx = get_rag_context_for_scan(self.last_scan_type or "Scan", k=5)
+                                if rag_ctx:
+                                    system_prompt = system_prompt + "\n\n" + rag_ctx
+                            except Exception:
+                                pass
+                        progress.set(95, "Prompt ready")
+                        image_list = None
+                        if self.config.get("use_vision_charts") and analysis_package and analysis_package.get("stocks"):
+                            try:
+                                from chart_engine import get_charts_for_tickers
+                                tickers = [s.get("ticker") for s in analysis_package["stocks"] if s.get("ticker")]
+                                status.config(text="Generating chart images...")
+                                self.root.update()
+                                charts = get_charts_for_tickers(tickers, max_charts=5, progress_callback=lambda t: (status.config(text=f"Chart {t}..."), self.root.update()))
+                                image_list = [b64 for _, b64 in charts] if charts else None
+                            except Exception:
+                                image_list = None
+                        progress.set(97, "Sending to AI...")
+                        status.config(text="Sending to AI (OpenRouter) – may take a minute...")
+                        self.root.update()
+                        ai_response = analyze_with_config(self.config, system_prompt, content_to_send, image_base64_list=image_list)
+                        progress.set(99, "Received")
+                        status.config(text="Saving AI response...")
+                        self.root.update()
+                        if ai_response:
+                            base = path[:-4] if path.lower().endswith(".pdf") else path
+                            ai_path = base + "_ai.txt"
+                            with open(ai_path, "w", encoding="utf-8") as f:
+                                f.write(ai_response)
+                            webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
+                        progress.set(100, f"Done! ({elapsed}s)")
+                        status.config(text="AI analysis saved and opened" if ai_response else "AI response empty")
+                        self._update_status_ready()
+                    except Exception as e:
+                        log_error(e, "OpenRouter analysis")
+                        progress.set(100, f"Done ({elapsed}s)")
+                        status.config(text="AI analysis failed (see log)")
+                        self._update_status_ready()
+                else:
+                    progress.set(100, f"Done! ({elapsed}s)")
+                    status.config(text="Opening PDF report...")
+                    self.root.update()
+                    webbrowser.open(file_url)
+                    self._update_status_ready()
             else:
                 status.config(text=f"No stocks above score {min_score}")
         except Exception as e:
@@ -1273,7 +1334,7 @@ class TradeBotApp:
             from report_generator import HTMLReportGenerator
             reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
             gen = HTMLReportGenerator(save_dir=reports_dir)
-            path = gen.generate_combined_report_pdf([{'ticker': symbol, 'score': 80}], "Analysis", 0)
+            path, _, _ = gen.generate_combined_report_pdf([{'ticker': symbol, 'score': 80}], "Analysis", 0)
             if path:
                 file_url = "file:///" + path.replace("\\", "/").lstrip("/")
                 webbrowser.open(file_url)
@@ -1287,11 +1348,12 @@ class TradeBotApp:
     def api_settings(self):
         win = tk.Toplevel(self.root)
         win.title("Settings")
-        win.geometry("520x600")
+        win.geometry("620x720")
         win.transient(self.root)
         win.grab_set()
         win.configure(bg="white")
-        win.minsize(480, 500)
+        win.minsize(560, 580)
+        win.resizable(True, True)
         
         # Scrollable container so all settings fit on any screen
         canvas = tk.Canvas(win, bg="white", highlightthickness=0)
@@ -1339,16 +1401,168 @@ class TradeBotApp:
         tk.Label(f, text="Broker URL:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
         broker_var = tk.StringVar(value=self.config.get('broker_url', 'https://www.schwab.com'))
         tk.Entry(f, textvariable=broker_var, width=40).pack(anchor="w", pady=(2,10))
+
+        # --- OpenRouter API (AI analysis) ---
+        sep_openrouter = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_openrouter.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="OpenRouter API (AI analysis)", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Used when sending the analysis package to AI. One key for all models. Use credits for Gemini/Sonnet, or free model when no credits.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        openrouter_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        openrouter_f.pack(fill="x")
+        tk.Label(openrouter_f, text="API Key:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        openrouter_api_var = tk.StringVar(value=self.config.get("openrouter_api_key", "") or "")
+        openrouter_api_entry = tk.Entry(openrouter_f, textvariable=openrouter_api_var, width=40)
+        openrouter_api_entry.pack(anchor="w", pady=(2, 4))
+        def openrouter_update_mask(*args):
+            if openrouter_api_var.get():
+                openrouter_api_entry.config(show="*")
+            else:
+                openrouter_api_entry.config(show="")
+        openrouter_api_var.trace("w", openrouter_update_mask)
+        openrouter_update_mask()
+        tk.Label(openrouter_f, text="Model:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(8, 0))
+        OPENROUTER_MODELS = [
+            ("Gemini 3 Pro Preview (credits)", "google/gemini-3-pro-preview"),
+            ("Claude Sonnet 4.5 (credits)", "anthropic/claude-sonnet-4.5"),
+            ("DeepSeek R1 T2 Chimera (free)", "tngtech/deepseek-r1t2-chimera:free"),
+        ]
+        current_openrouter_id = self.config.get("openrouter_model", "google/gemini-3-pro-preview") or "google/gemini-3-pro-preview"
+        initial_label = "Gemini 3 Pro Preview (credits)"
+        for label, mid in OPENROUTER_MODELS:
+            if mid == current_openrouter_id:
+                initial_label = label
+                break
+        openrouter_model_var = tk.StringVar(value=initial_label)
+        openrouter_combo = ttk.Combobox(openrouter_f, textvariable=openrouter_model_var, width=38, state="readonly",
+                                        values=[label for label, _ in OPENROUTER_MODELS])
+        openrouter_combo.pack(anchor="w", pady=(2, 4))
+
+        def openrouter_model_from_display():
+            sel = openrouter_model_var.get()
+            for label, mid in OPENROUTER_MODELS:
+                if label == sel:
+                    return mid
+            return "google/gemini-3-pro-preview"
+        use_vision_var = tk.BooleanVar(value=self.config.get("use_vision_charts", False))
+        tk.Checkbutton(openrouter_f, text="Include chart images in AI analysis (vision layer; multimodal models only)", variable=use_vision_var,
+                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w", pady=(6, 0))
+
+        # --- News / Sentiment (Alpha Vantage) ---
+        sep_av = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_av.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="News / Sentiment (Alpha Vantage)", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Optional. Add sentiment score and earnings-in-news flag per ticker (NEWS_SENTIMENT). Free tier: 25 requests/day.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        av_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        av_f.pack(fill="x")
+        tk.Label(av_f, text="Alpha Vantage API Key:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        av_var = tk.StringVar(value=self.config.get("alpha_vantage_api_key", "") or "")
+        av_entry = tk.Entry(av_f, textvariable=av_var, width=40)
+        av_entry.pack(anchor="w", pady=(2, 4))
+        def av_mask(*args):
+            av_entry.config(show="*" if av_var.get() else "")
+        av_var.trace("w", av_mask)
+        av_mask()
+
+        # --- SEC insider context (10b5-1 vs discretionary) ---
+        sec_insider_var = tk.BooleanVar(value=self.config.get("use_sec_insider_context", False))
+        tk.Checkbutton(scroll_frame, text="Add SEC insider context for tickers with insider data (10b5-1 plan vs discretionary from Form 4)", variable=sec_insider_var,
+                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w", padx=20, pady=(4, 0))
+
+        # --- Backtest outcomes ---
+        sep_bt = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_bt.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="Backtest outcomes", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Signals are logged each scan. Update outcomes (T+1, T+3, T+5, T+10) to see historical win rates in the JSON/API.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        bt_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        bt_f.pack(fill="x")
+        def run_backtest_update():
+            try:
+                from backtest_db import update_outcomes
+                self.status.config(text="Updating backtest outcomes...")
+                win.update()
+                n = update_outcomes(progress_callback=lambda m: (self.status.config(text=m), win.update()))
+                self.status.config(text=f"Backtest: updated {n} outcomes")
+            except Exception as e:
+                log_error(e, "Backtest update")
+                self.status.config(text="Backtest update failed")
+        tk.Button(bt_f, text="Update backtest outcomes now", command=run_backtest_update, width=28).pack(anchor="w", pady=(2, 4))
+
+        # --- RAG book knowledge ---
+        sep_rag = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_rag.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="RAG book knowledge", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Folder of .txt and .pdf trading books. Build index (ChromaDB), then include excerpts in AI analysis.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        rag_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        rag_f.pack(fill="x")
+        rag_folder_var = tk.StringVar(value=self.config.get("rag_books_folder", "") or "")
+        tk.Label(rag_f, text="Books folder (.txt, .pdf):", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        rag_row = tk.Frame(rag_f, bg="white")
+        rag_row.pack(fill="x", pady=(2, 4))
+        tk.Entry(rag_row, textvariable=rag_folder_var, width=36).pack(side="left")
+        def browse_rag():
+            path = filedialog.askdirectory(title="Select folder of .txt / .pdf trading books", initialdir=rag_folder_var.get() or APP_DIR)
+            if path:
+                rag_folder_var.set(path)
+        tk.Button(rag_row, text="Browse...", command=browse_rag, width=8).pack(side="left", padx=(6, 0))
+        rag_status_lbl = tk.Label(rag_f, text="", font=("Arial", 8), bg="white", fg="#666")
+        rag_status_lbl.pack(anchor="w", pady=(2, 0))
+        def build_rag_index():
+            folder = rag_folder_var.get().strip()
+            rag_status_lbl.config(text="")
+            if not folder:
+                rag_status_lbl.config(text="Select a books folder first.")
+                messagebox.showwarning("RAG", "Select a books folder first.")
+                return
+            try:
+                from rag_engine import build_index
+                rag_status_lbl.config(text="Building RAG index...")
+                self.status.config(text="Building RAG index...")
+                win.update()
+                last_msg = [""]
+                def on_progress(m):
+                    last_msg[0] = m
+                    rag_status_lbl.config(text=m)
+                    self.status.config(text=m)
+                    win.update()
+                n = build_index(folder, progress_callback=on_progress)
+                rag_status_lbl.config(text=f"Indexed {n} chunks." if n else (last_msg[0] or "No .txt or .pdf chunks found."))
+                self.status.config(text=f"RAG index: {n} chunks")
+                if n:
+                    messagebox.showinfo("RAG", f"RAG index built: {n} chunks from your books folder.")
+                else:
+                    messagebox.showwarning("RAG", last_msg[0] or "No .txt or .pdf files found, or ChromaDB failed. Check the folder has .txt/.pdf files and that ChromaDB is installed (pip install chromadb PyMuPDF).")
+            except Exception as e:
+                log_error(e, "RAG build")
+                err = str(e)
+                rag_status_lbl.config(text="Build failed.")
+                self.status.config(text="RAG build failed")
+                messagebox.showerror("RAG build failed", err)
+        tk.Button(rag_f, text="Build RAG index", command=build_rag_index, width=20).pack(anchor="w", pady=(2, 4))
+        rag_enabled_var = tk.BooleanVar(value=self.config.get("rag_enabled", False))
+        tk.Checkbutton(rag_f, text="Include RAG excerpts in AI analysis", variable=rag_enabled_var,
+                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w")
         
         # --- Reports output folder ---
         sep_reports = tk.Frame(scroll_frame, bg="#ddd", height=1)
         sep_reports.pack(fill="x", padx=20, pady=8)
-        tk.Label(scroll_frame, text="Reports output folder", font=("Arial", 10, "bold"),
+        tk.Label(scroll_frame, text="Reports", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="PDF reports (date/time stamped) are saved here. Default: reports folder next to the app.",
-                font=("Arial", 8), bg="white", fg="#666", wraplength=460, justify="left").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="PDF reports (date/time stamped) are saved in the folder below. Include TA: SMAs, RSI, MACD, BB, ATR, Fib per ticker (slower when enabled).",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         reports_f = tk.Frame(scroll_frame, bg="white", padx=20)
         reports_f.pack(fill="x")
+        include_ta_var = tk.BooleanVar(value=self.config.get("include_ta_in_report", True))
+        tk.Checkbutton(reports_f, text="Include TA in report (SMAs, RSI, MACD, BB, ATR, Fib)", variable=include_ta_var,
+                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w", pady=(0, 6))
+        tk.Label(reports_f, text="Output folder:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
         reports_folder_var = tk.StringVar(value=self.config.get("reports_folder", "") or DEFAULT_REPORTS_DIR)
         reports_row = tk.Frame(reports_f, bg="white")
         reports_row.pack(fill="x", pady=(2, 4))
@@ -1365,13 +1579,13 @@ class TradeBotApp:
         tk.Label(scroll_frame, text="Scan-complete alarm", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
         tk.Label(scroll_frame, text="Play a system sound when a scan finishes.", font=("Arial", 8),
-                bg="white", fg="#666", wraplength=460, justify="left").pack(anchor="w", padx=20)
+                bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         
         alarm_f = tk.Frame(scroll_frame, bg="white", padx=20)
         alarm_f.pack(fill="x")
         play_alarm_var = tk.BooleanVar(value=self.config.get("play_alarm_on_complete", True))
         tk.Checkbutton(alarm_f, text="Play alarm when scan finishes", variable=play_alarm_var,
-                      bg="white", font=("Arial", 9)).pack(anchor="w")
+                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w")
         tk.Label(alarm_f, text="Sound:", font=("Arial", 9), bg="white").pack(anchor="w", pady=(6,0))
         alarm_row = tk.Frame(alarm_f, bg="white")
         alarm_row.pack(fill="x", pady=(2,4))
@@ -1388,8 +1602,16 @@ class TradeBotApp:
         def save():
             self.config['finviz_api_key'] = api_var.get()
             self.config['broker_url'] = broker_var.get()
+            self.config['openrouter_api_key'] = openrouter_api_var.get().strip()
+            self.config['openrouter_model'] = openrouter_model_from_display()
+            self.config['use_vision_charts'] = use_vision_var.get()
+            self.config['alpha_vantage_api_key'] = av_var.get().strip()
+            self.config['use_sec_insider_context'] = sec_insider_var.get()
+            self.config['rag_books_folder'] = rag_folder_var.get().strip()
+            self.config['rag_enabled'] = rag_enabled_var.get()
             raw_reports = reports_folder_var.get().strip()
             self.config['reports_folder'] = raw_reports if raw_reports else DEFAULT_REPORTS_DIR
+            self.config['include_ta_in_report'] = include_ta_var.get()
             self.config['play_alarm_on_complete'] = play_alarm_var.get()
             c = alarm_choice_var.get().strip().lower()
             self.config['alarm_sound_choice'] = c if c in ("beep", "asterisk", "exclamation") else "beep"
@@ -1552,37 +1774,51 @@ class TradeBotApp:
         if os.path.exists(LOG_FILE):
             os.startfile(LOG_FILE)
     
+    def open_readme(self):
+        """Open README.md from the app folder (browser or default app)."""
+        readme_path = os.path.join(APP_DIR, "README.md")
+        if os.path.isfile(readme_path):
+            url = "file:///" + readme_path.replace("\\", "/").lstrip("/")
+            webbrowser.open(url)
+        else:
+            messagebox.showinfo("README", "README.md not found in app folder.")
+
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v6.3
+ClearBlueSky Stock Scanner v6.4
 
 QUICK START:
-1. Select scan type (Trend or Swing) and index (S&P 500 or Russell 2000).
-2. Click Run Scan. PDF report (date/time stamped) opens when done.
-3. Use the PDF with your preferred AI (Claude, Gemini, ChatGPT) for analysis.
+1. Select scan type and index (N/A for Watchlist/Insider).
+2. Click Run Scan. You get: PDF report + JSON analysis package.
+3. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
+
+OUTPUTS (per run):
+• PDF – Report with Master Trading Report Directive + per-ticker data.
+• JSON – Same data + "instructions" field (use with any AI: "follow the instructions in this JSON").
+• *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
 
 SCANNERS:
-• Trend - Long-term: Uptrending stocks (MA stack, performance).
-  Best for: Longer holds (weeks/months). Run after market close.
-
-• Swing - Dips: Oversold dips with news/analyst check.
-  Best for: Quick trades (1-5 days). Run 2:30–4:00 PM.
+• Trend – Uptrending (S&P 500 / Russell 2000). Best: after close.
+• Swing – Oversold dips with news/analyst. Best: 2:30–4:00 PM.
+• Watchlist – Your tickers down 1–25% today. Config: % down slider.
+• Insider – Latest insider transactions (Finviz).
+• Emotional Dip – Late-day dip setup. Best: ~3:30 PM.
+• Pre-Market – Pre-market volume. Best: 7–9:25 AM.
 
 WATCHLIST:
-• Add tickers in Watchlist. When a watchlist stock appears in a scan,
-  you get 2 beeps and it appears at the top of the report (★ WATCHLIST).
-• Import from Finviz CSV: Watchlist → Import CSV (max 200 tickers).
+• Add tickers (max 200). When one appears in a scan: 2 beeps + ★ WATCHLIST in report.
+• Import from Finviz CSV: Watchlist → Import CSV.
 
-REPORTS:
-• PDF only, date/time stamped. Includes Master Trading Report Directive
-  for AI and per-ticker data. Charts: use Yahoo Finance for each symbol.
+SETTINGS (optional):
+• Finviz API key – Scanner data (or scraping).
+• OpenRouter API key + model – Enables AI analysis → *_ai.txt.
+• Alpha Vantage key – Sentiment + headlines per ticker.
+• RAG books folder – .txt/.pdf books; Build RAG index; include in AI prompt.
+• Include TA / SEC insider context / chart images – Toggle report and AI inputs.
 
-SCORES:
-  90-100 = Elite | 70-89 = Strong | 60-69 = Decent | Below 60 = Skip
-
-Settings: Optional Finviz API key (stored locally, never in code).
+See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v6.3
+Made with Claude AI · ClearBlueSky v6.4
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

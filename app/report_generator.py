@@ -6,7 +6,7 @@ Generates date/time-stamped PDF reports for uploads. No HTML.
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 import json
 
@@ -18,6 +18,20 @@ try:
     FINVIZ_AVAILABLE = True
 except ImportError:
     FINVIZ_AVAILABLE = False
+
+
+def _default_risk_checks():
+    """Default risk_checks when no Finviz data."""
+    return {
+        "earnings_date": None,
+        "days_until_earnings": None,
+        "earnings_timing": None,
+        "earnings_safe": True,
+        "ex_div_date": None,
+        "ex_div_safe": True,
+        "relative_volume": None,
+        "volume_unusual": False,
+    }
 
 # Master directive for any AI that receives this PDF (included in every report)
 MASTER_TRADING_REPORT_DIRECTIVE = r"""
@@ -176,7 +190,77 @@ class ReportGenerator:
                     data['news'] = []
                     break
         
+            data['risk_checks'] = self._parse_risk_checks(stock)
+        else:
+            data['risk_checks'] = _default_risk_checks()
         return data
+
+    def _parse_risk_checks(self, stock):
+        """Build risk_checks from Finviz stock dict: earnings, ex-dividend, relative volume."""
+        result = {
+            "earnings_date": None,
+            "days_until_earnings": None,
+            "earnings_timing": None,
+            "earnings_safe": True,
+            "ex_div_date": None,
+            "ex_div_safe": True,
+            "relative_volume": None,
+            "volume_unusual": False,
+        }
+        if not stock:
+            return result
+        # Earnings: Finviz often "Feb 06 AMC" or "Feb 06 BMO" or "-"
+        earnings_str = (stock.get("Earnings") or stock.get("Earnings Date") or "").strip()
+        if earnings_str and earnings_str != "-":
+            timing = None
+            if "AMC" in earnings_str.upper():
+                timing = "AMC"
+                earnings_str = earnings_str.upper().replace("AMC", "").strip()
+            elif "BMO" in earnings_str.upper():
+                timing = "BMO"
+                earnings_str = earnings_str.upper().replace("BMO", "").strip()
+            try:
+                # "Feb 06" or "Mon Feb 06" -> assume current year
+                parts = [p for p in earnings_str.split() if p]
+                if len(parts) >= 2:
+                    # Use last two tokens as month + day (e.g. "Feb 06" or "Mon Feb 06" -> "Feb 06")
+                    month_day = f"{parts[-2]} {parts[-1]}"
+                else:
+                    month_day = earnings_str
+                earnings_date = datetime.strptime(f"{month_day} {date.today().year}", "%b %d %Y").date()
+                if earnings_date < date.today():
+                    earnings_date = earnings_date.replace(year=earnings_date.year + 1)
+                days_until = (earnings_date - date.today()).days
+                result["earnings_date"] = earnings_date.isoformat()
+                result["days_until_earnings"] = days_until
+                result["earnings_timing"] = timing
+                result["earnings_safe"] = days_until > 5
+            except Exception:
+                result["earnings_date"] = earnings_str
+                result["earnings_safe"] = False
+        # Ex-dividend: Finviz "Ex-Dividend Date" or "Ex-Div Date"
+        ex_div_str = (stock.get("Ex-Dividend Date") or stock.get("Ex-Div Date") or "").strip()
+        if ex_div_str and ex_div_str not in ("-", "N/A", ""):
+            try:
+                # "Mar 15" or similar
+                ex_date = datetime.strptime(f"{ex_div_str} {date.today().year}", "%b %d %Y").date()
+                if ex_date < date.today():
+                    ex_date = ex_date.replace(year=ex_date.year + 1)
+                result["ex_div_date"] = ex_date.isoformat()
+                result["ex_div_safe"] = (ex_date - date.today()).days > 3
+            except Exception:
+                result["ex_div_date"] = ex_div_str
+                result["ex_div_safe"] = False
+        # Relative volume: "1.23" or "1.23x"
+        rel_vol_raw = stock.get("Rel Volume") or stock.get("Relative Volume") or ""
+        if rel_vol_raw not in (None, "", "N/A", "-"):
+            try:
+                rv = float(str(rel_vol_raw).replace("x", "").strip())
+                result["relative_volume"] = round(rv, 2)
+                result["volume_unusual"] = rv > 1.5
+            except Exception:
+                pass
+        return result
 
     def _load_leveraged_mapping(self):
         """Load underlying -> leveraged ticker mapping from leveraged_tickers.json. Returns dict (e.g. {'MU': 'MUU'})."""
@@ -205,8 +289,74 @@ class ReportGenerator:
                 lines.append(raw)
         return lines
 
-    def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None):
-        """Generate ONE PDF report."""
+    def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None):
+        """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py."""
+        stocks_json = []
+        for s in stocks_data:
+            news_list = s.get('news') or []
+            headlines = []
+            for item in news_list[:10]:
+                if isinstance(item, (list, tuple)) and len(item) >= 2:
+                    headlines.append({"url": str(item[0]) if item[0] else "", "title": str(item[1]).strip()})
+                elif isinstance(item, dict):
+                    headlines.append({"url": str(item.get("url", "")), "title": str(item.get("title") or item.get("headline", "")).strip()})
+                else:
+                    headlines.append({"url": "", "title": str(item).strip()})
+            row = {
+                "ticker": s.get("ticker", ""),
+                "score": s.get("score", 0),
+                "on_watchlist": bool(s.get("on_watchlist")),
+                "price": s.get("price", "N/A"),
+                "change": s.get("change", "N/A"),
+                "company": s.get("company", s.get("ticker", "")),
+                "sector": s.get("sector", "N/A"),
+                "industry": s.get("industry", "N/A"),
+                "pe": s.get("pe", "N/A"),
+                "target": s.get("target", "N/A"),
+                "rsi": s.get("rsi", "N/A"),
+                "sma50": s.get("sma50", "N/A"),
+                "sma200": s.get("sma200", "N/A"),
+                "rel_volume": s.get("rel_volume", "N/A"),
+                "recom": s.get("recom", "N/A"),
+                "news": headlines,
+                "ta": s.get("ta") or {},
+                "sentiment_score": s.get("sentiment_score"),
+                "sentiment_label": s.get("sentiment_label"),
+                "earnings_in_topics": bool(s.get("earnings_in_topics")),
+                "relevance_avg": s.get("relevance_avg"),
+                "av_headlines": (s.get("av_headlines") or [])[:5],
+                "insider_10b5_1_plan": s.get("insider_10b5_1_plan"),
+                "insider_context": s.get("insider_context"),
+                "risk_checks": s.get("risk_checks") or _default_risk_checks(),
+            }
+            for k in ("Owner", "Relationship", "Date", "Transaction", "Cost", "Shares", "Value"):
+                if s.get(k) not in (None, "", "N/A"):
+                    row[k.lower()] = s.get(k)
+            leveraged = self._load_leveraged_mapping()
+            if s.get("score", 0) >= 60 and s.get("ticker") in leveraged:
+                row["leveraged_play"] = leveraged[s["ticker"]]
+            stocks_json.append(row)
+        backtest_stats = None
+        try:
+            from backtest_db import get_stats_for_scan_type
+            backtest_stats = get_stats_for_scan_type(scan_type, min_signals=5)
+        except Exception:
+            pass
+        out = {
+            "scan_type": scan_type,
+            "timestamp": timestamp_display,
+            "watchlist_matches": list(watchlist_matches) if watchlist_matches else [],
+            "backtest_stats": backtest_stats,
+            "stocks": stocks_json,
+        }
+        if market_breadth is not None and "error" not in (market_breadth or {}):
+            out["market_breadth"] = market_breadth
+        if instructions not in (None, ""):
+            out["instructions"] = instructions.strip()
+        return out
+
+    def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None, index=None):
+        """Generate ONE PDF report. index='sp500' or 'russell2000' to include market breadth (full index fetch)."""
         def progress(msg):
             print(msg)
             if progress_callback:
@@ -227,7 +377,7 @@ class ReportGenerator:
 
         if not qualifying:
             progress(f"No stocks scored above {min_score}")
-            return None
+            return None, None, None
 
         qualifying.sort(key=lambda x: (not x.get('on_watchlist'), -x['score']))
         qualifying = qualifying[:15]
@@ -252,6 +402,45 @@ class ReportGenerator:
             for k in insider_keys:
                 if k in r and r[k] not in (None, '', 'N/A'):
                     row[k] = r[k]
+            try:
+                if (config or {}).get("include_ta_in_report", True):
+                    from ta_engine import get_ta_for_ticker
+                    row['ta'] = get_ta_for_ticker(ticker)
+                else:
+                    row['ta'] = {}
+            except Exception:
+                row['ta'] = {}
+            try:
+                av_key = (config or {}).get("alpha_vantage_api_key") or ""
+                if av_key.strip():
+                    from news_sentiment import get_sentiment_for_ticker
+                    sent = get_sentiment_for_ticker(ticker, av_key, limit=10)
+                    row["sentiment_score"] = sent.get("sentiment_score")
+                    row["sentiment_label"] = sent.get("sentiment_label")
+                    row["earnings_in_topics"] = sent.get("earnings_in_topics", False)
+                    row["relevance_avg"] = sent.get("relevance_avg")
+                    row["av_headlines"] = sent.get("headlines", [])[:5]
+                else:
+                    row["sentiment_score"] = row["sentiment_label"] = row["relevance_avg"] = None
+                    row["earnings_in_topics"] = False
+                    row["av_headlines"] = []
+            except Exception:
+                row["sentiment_score"] = row["sentiment_label"] = row["relevance_avg"] = None
+                row["earnings_in_topics"] = False
+                row["av_headlines"] = []
+            if (config or {}).get("use_sec_insider_context") and any(row.get(k) for k in ("Owner", "Transaction", "Date", "Value")):
+                try:
+                    from sec_edgar import get_insider_10b5_1_context
+                    ctx = get_insider_10b5_1_context(ticker)
+                    row["insider_10b5_1_plan"] = ctx.get("is_10b5_1_plan")
+                    row["insider_context"] = ctx.get("insider_context", "Unknown")
+                    time.sleep(0.25)
+                except Exception:
+                    row["insider_10b5_1_plan"] = None
+                    row["insider_context"] = "Unknown"
+            else:
+                row["insider_10b5_1_plan"] = None
+                row["insider_context"] = None
             stocks_data.append(row)
             time.sleep(0.2)
 
@@ -260,10 +449,31 @@ class ReportGenerator:
         data_lines = []
         for s in stocks_data:
             line = f"- {s['ticker']}: Scanner Score {s['score']}, Price ${s.get('price','N/A')}, Today {s.get('change','N/A')}, RSI {s.get('rsi','N/A')}, Target ${s.get('target','N/A')}, P/E {s.get('pe','N/A')}, RelVol {s.get('rel_volume','N/A')}x"
+            rc = s.get("risk_checks") or _default_risk_checks()
+            if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
+                line += f" | EARNINGS IN {rc.get('days_until_earnings')} DAYS (avoid swing)"
+            elif rc.get("earnings_safe") is True:
+                line += " | Earnings safe"
+            if s.get("insider_context") not in (None, ""):
+                line += f" | Insider: {s.get('insider_context', 'Unknown')}"
             data_lines.append(line)
 
+        market_breadth = None
+        if index and index in ("sp500", "russell2000"):
+            try:
+                from breadth import fetch_full_index_for_breadth, calculate_market_breadth
+                all_stocks = fetch_full_index_for_breadth(index, progress)
+                if all_stocks:
+                    market_breadth = calculate_market_breadth(all_stocks)
+            except Exception:
+                pass
+
         watchlist_line = f"\nWATCHLIST MATCHES (prioritize these): {', '.join(watchlist_matches)}\n" if watchlist_matches else ""
-        ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.
+        breadth_line_prompt = ""
+        if market_breadth and "error" not in market_breadth:
+            regime = market_breadth.get("market_regime", "N/A")
+            breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {market_breadth.get('sp500_above_sma50_pct')}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
+        ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
 
 IMPORTANT: For each stock:
 1. Use the technical data (chart data and scanner data) in this report to assess setup
@@ -345,19 +555,47 @@ RISK MANAGEMENT:
             "═══════════════════════════════════════════════════",
             ""
         ]
+        if market_breadth and "error" not in market_breadth:
+            regime = market_breadth.get("market_regime", "N/A")
+            sma50 = market_breadth.get("sp500_above_sma50_pct")
+            sma200 = market_breadth.get("sp500_above_sma200_pct")
+            ad = market_breadth.get("advance_decline")
+            rsi = market_breadth.get("avg_rsi_sp500")
+            body_lines.append(f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}")
+            body_lines.append("")
         for s in stocks_data:
             ticker = s['ticker']
             score = s.get('score', 0)
             body_lines.append(f"——— {ticker} ———")
             body_lines.append(f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x")
+            rc = s.get("risk_checks") or _default_risk_checks()
+            if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
+                body_lines.append(f"EARNINGS IN {rc.get('days_until_earnings')} DAYS - avoid for swing")
+            elif rc.get("earnings_date") and rc.get("earnings_safe") is True:
+                body_lines.append("Earnings safe (>5 days out)")
+            if rc.get("ex_div_safe") is False and rc.get("ex_div_date"):
+                body_lines.append(f"Ex-div {rc.get('ex_div_date')} - price drop expected")
+            if rc.get("volume_unusual") and rc.get("relative_volume") is not None:
+                body_lines.append(f"RelVol {rc.get('relative_volume')}x (unusual)")
             if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
                 body_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
+                if s.get("insider_context") not in (None, ""):
+                    body_lines.append(f"Insider context: {s.get('insider_context', 'Unknown')} (from SEC Form 4)")
             if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
                 lev = leveraged_mapping[ticker]
                 body_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
                 body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")
             body_lines.append(f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}")
             body_lines.append(f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}")
+            ta_dict = s.get('ta') or {}
+            if ta_dict:
+                from ta_engine import format_ta_for_report
+                body_lines.append(format_ta_for_report(ta_dict))
+            if s.get("sentiment_label") is not None or s.get("sentiment_score") is not None:
+                sent_line = f"Sentiment: {s.get('sentiment_label', 'N/A')} (score {s.get('sentiment_score', 'N/A')})"
+                if s.get("earnings_in_topics"):
+                    sent_line += " | Earnings in recent news"
+                body_lines.append(sent_line)
             news_list = s.get('news') or []
             if news_list:
                 body_lines.append("Headlines:")
@@ -371,6 +609,23 @@ RISK MANAGEMENT:
                     body_lines.append(f"  {i+1}. {str(head).strip()}")
             body_lines.append("")
         full_text_txt = MASTER_TRADING_REPORT_DIRECTIVE.strip() + "\n\n" + ai_prompt + "\n".join(body_lines)
+        instructions_for_json = MASTER_TRADING_REPORT_DIRECTIVE.strip() + "\n\n" + ai_prompt
+
+        # Log signals for backtest feedback loop
+        try:
+            from backtest_db import log_signals_from_report
+            log_signals_from_report(stocks_data, scan_type)
+        except Exception:
+            pass
+        # Build and save JSON analysis package (for API + future use)
+        analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth)
+        filepath_json = self.save_dir / f"{base_name}.json"
+        try:
+            with open(filepath_json, 'w', encoding='utf-8') as f:
+                json.dump(analysis_package, f, indent=2)
+            progress(f"JSON saved: {filepath_json}")
+        except Exception:
+            pass
 
         try:
             from reportlab.lib.pagesizes import letter
@@ -412,7 +667,22 @@ RISK MANAGEMENT:
                 c.drawString(x, y, draw_line)
                 y -= line_height
 
-            # 2) Per-ticker technicals
+            # 2) Market breadth (if present)
+            if market_breadth and "error" not in market_breadth:
+                regime = market_breadth.get("market_regime", "N/A")
+                sma50 = market_breadth.get("sp500_above_sma50_pct")
+                sma200 = market_breadth.get("sp500_above_sma200_pct")
+                ad = market_breadth.get("advance_decline")
+                rsi = market_breadth.get("avg_rsi_sp500")
+                breadth_line = f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}"
+                if y < margin + line_height:
+                    c.showPage()
+                    c.setFont("Helvetica", 9)
+                    y = height - margin
+                draw_line = breadth_line[:max_width_ch] if len(breadth_line) > max_width_ch else breadth_line
+                c.drawString(x, y, draw_line)
+                y -= line_height * 2
+            # 3) Per-ticker technicals
             for s in stocks_data:
                 ticker = s['ticker']
                 score = s.get('score', 0)
@@ -432,8 +702,19 @@ RISK MANAGEMENT:
                 tech_lines = [
                     f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x",
                 ]
+                rc = s.get("risk_checks") or _default_risk_checks()
+                if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
+                    tech_lines.append(f"EARNINGS IN {rc.get('days_until_earnings')} DAYS - avoid for swing")
+                elif rc.get("earnings_date") or rc.get("earnings_safe") is True:
+                    tech_lines.append("Earnings safe (>5 days out)" if rc.get("earnings_safe") else "Earnings: no date")
+                if rc.get("ex_div_safe") is False and rc.get("ex_div_date"):
+                    tech_lines.append(f"Ex-div {rc.get('ex_div_date')} - price drop expected")
+                if rc.get("volume_unusual") and rc.get("relative_volume") is not None:
+                    tech_lines.append(f"RelVol {rc.get('relative_volume')}x (unusual)")
                 if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
                     tech_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
+                    if s.get("insider_context") not in (None, ""):
+                        tech_lines.append(f"Insider context: {s.get('insider_context', 'Unknown')} (from SEC Form 4)")
                 if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
                     lev = leveraged_mapping[ticker]
                     tech_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
@@ -442,6 +723,15 @@ RISK MANAGEMENT:
                     f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}",
                     f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}",
                 ])
+                ta_dict = s.get('ta') or {}
+                if ta_dict:
+                    from ta_engine import format_ta_for_report
+                    tech_lines.append(format_ta_for_report(ta_dict))
+                if s.get("sentiment_label") is not None or s.get("sentiment_score") is not None:
+                    sent_line = f"Sentiment: {s.get('sentiment_label', 'N/A')} (score {s.get('sentiment_score', 'N/A')})"
+                    if s.get("earnings_in_topics"):
+                        sent_line += " | Earnings in recent news"
+                    tech_lines.append(sent_line)
                 news_list = s.get('news') or []
                 if news_list:
                     tech_lines.append("Headlines:")
@@ -466,27 +756,28 @@ RISK MANAGEMENT:
 
             c.save()
             progress(f"PDF saved: {filepath_pdf}")
-            return str(filepath_pdf)
+            return str(filepath_pdf), full_text_txt, analysis_package
         except ImportError:
             with open(filepath_txt, 'w', encoding='utf-8') as f:
                 f.write(full_text_txt)
             progress(f"Report saved as TXT (install reportlab for PDF): {filepath_txt}")
-            return str(filepath_txt)
+            return str(filepath_txt), full_text_txt, analysis_package
         except Exception as e:
             with open(filepath_txt, 'w', encoding='utf-8') as f:
                 f.write(full_text_txt)
             progress(f"PDF failed, saved as TXT: {filepath_txt}")
-            return str(filepath_txt)
+            return str(filepath_txt), full_text_txt, analysis_package
 
 # Backward compatibility: app may still import HTMLReportGenerator
 HTMLReportGenerator = ReportGenerator
 
 
 def generate_report(ticker, scan_type="Analysis", score=None):
-    """Quick single-ticker PDF report."""
+    """Quick single-ticker PDF report. Returns path."""
     gen = ReportGenerator()
     results = [{'ticker': ticker, 'score': score or 75}]
-    return gen.generate_combined_report_pdf(results, scan_type, min_score=0)
+    path, _, _ = gen.generate_combined_report_pdf(results, scan_type, min_score=0)
+    return path
 
 
 if __name__ == "__main__":
@@ -494,5 +785,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         gen = ReportGenerator()
         results = [{'ticker': t, 'score': 80} for t in sys.argv[1:]]
-        path = gen.generate_combined_report_pdf(results, "Test", min_score=0)
+        path, _, _ = gen.generate_combined_report_pdf(results, "Test", min_score=0)
         print(f"Report: {path}")

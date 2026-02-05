@@ -1,6 +1,9 @@
 # Release zip (upload as GitHub Release asset instead of committing)
 ClearBlueSky-*.zip
 
+# Sample/user report PDFs in project root (do not commit)
+/Trend_Scan_Report_*.pdf
+
 # User data – never commit (contains optional API key and preferences)
 app/user_config.json
 
@@ -14,6 +17,10 @@ app/__pycache__/
 # Reports and scan outputs (user-generated)
 app/reports/
 app/scans/
+
+# RAG index and backtest DB (user-generated; do not ship)
+app/rag_store/
+app/backtest_signals.db
 
 # Optional: local preset exports (may contain user choices)
 # app/scan_presets.json

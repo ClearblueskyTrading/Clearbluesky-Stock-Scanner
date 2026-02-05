@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v6.3 - Complete Build Guide
+# ClearBlueSky Stock Scanner v6.4 - Complete Build Guide
 
 ## For Claude AI (or any AI assistant)
 
@@ -9,19 +9,18 @@ This document contains everything needed to understand, modify, or rebuild the C
 ## PROJECT OVERVIEW
 
 **Name:** ClearBlueSky Stock Scanner  
-**Version:** 6.3  
-**Purpose:** Scan stocks for trading opportunities and generate AI-ready PDF reports  
-**Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), PDF (reports)  
+**Version:** 6.4  
+**Purpose:** Scan stocks for trading opportunities and generate PDF + JSON reports with optional AI analysis (OpenRouter), RAG, TA, sentiment, market breadth, and risk checks  
+**Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), reportlab (PDF), OpenRouter (AI), ChromaDB (RAG), yfinance/pandas-ta (TA)  
 **License:** MIT (free and open source)
 
 ### Key Features
-- Trend Scanner: Finds stocks with strong momentum (90+ day holds)
-- Swing Scanner: Finds dip-buying opportunities (1-5 day trades)
-- PDF Reports: Date/time stamped, with Master Trading Report Directive for AI
-- Multi-AI Support: Claude, Gemini, ChatGPT, or any AI
-- Progress Timers: Shows elapsed time during scans
-- Stop Buttons: Cancel scans mid-progress
-- Update notice: Checks for new version on startup with download link
+- Scanners: Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000)
+- PDF + JSON reports with Master Trading Report Directive and optional `instructions` field for any AI
+- Optional OpenRouter AI analysis → `*_ai.txt`; optional RAG (.txt/.pdf books), TA, Alpha Vantage sentiment, SEC insider context, vision charts
+- Market breadth (SMA %, A/D, sector rotation, regime) for index-based scans
+- Risk checks per ticker: earnings date, ex-dividend, relative volume (earnings_safe, etc.)
+- Progress timers, stop buttons, update notice on startup
 
 ---
 
@@ -369,7 +368,8 @@ print(df.head())
 
 ## VERSION HISTORY
 
-- **v6.3** (Current): Insider scanner, leveraged play suggestions (bull only), 5 headlines per ticker, reliability/quality improvements
+- **v6.4** (Current): JSON + instructions, OpenRouter AI, RAG (.txt/.pdf), TA, sentiment, SEC insider, market breadth, risk checks (earnings/ex-div/rel vol), progress for AI phase, Settings window sizing
+- **v6.3**: Insider scanner, leveraged play suggestions (bull only), 5 headlines per ticker
 - **v6.2**: Update notice, Docker/cross-platform, cross-platform sound
 - **v6.1**: Docker, Linux/macOS support, cross-platform beeps
 - **v6.0**: PDF-only reports, watchlist, Master Trading Report Directive
@@ -399,5 +399,5 @@ print(df.head())
 
 ---
 
-*This guide was generated for ClearBlueSky Stock Scanner v6.3*
+*This guide was generated for ClearBlueSky Stock Scanner v6.4*
 *Made with Claude AI - Free and Open Source*
