@@ -32,10 +32,11 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 
 ## Requirements
 
-- **Windows:** Windows 10 or 11; **Python 3.10+** (INSTALL.bat can install it).  
-- **Linux / macOS:** Python 3.10+ and tkinter (see above).  
-- **Docker:** Any OS with Docker and X11 (see DOCKER.md).  
+- **Windows:** Windows 10 or 11; **Python 3.10+** (INSTALL.bat can install it and installs all dependencies from `app/requirements.txt`).  
+- **Linux / macOS:** Python 3.10+ and tkinter; `app/run.sh` uses a venv and `pip install -r requirements.txt`.  
+- **Docker:** Any OS with Docker and X11; Dockerfile installs from `requirements.txt`. See **[DOCKER.md](DOCKER.md)**.  
 - Internet connection for Finviz data.  
+- **Update check:** On startup the app checks GitHub for a newer release and shows a download link if one is available.  
 
 ---
 

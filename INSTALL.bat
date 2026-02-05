@@ -83,15 +83,22 @@ if %errorLevel% neq 0 (
     echo  Python found!
 )
 
-:: Install dependencies
+:: Install dependencies (from requirements.txt so all deps including yfinance, chromadb, PyMuPDF are installed)
 echo  [3/5] Installing required packages...
 echo         This may take 1-2 minutes...
 python -m pip install --upgrade pip --quiet 2>nul
-python -m pip install finviz finvizfinance pandas requests pygame reportlab --quiet 2>nul
-
+if exist "%INSTALL_PATH%\requirements.txt" (
+    python -m pip install -r "%INSTALL_PATH%\requirements.txt" --quiet 2>nul
+) else (
+    python -m pip install finviz finvizfinance pandas requests pygame reportlab yfinance pandas-ta chromadb PyMuPDF --quiet 2>nul
+)
 if %errorLevel% neq 0 (
     echo  [!] Package install had warnings, retrying...
-    pip install finviz finvizfinance pandas requests pygame reportlab 2>nul
+    if exist "%INSTALL_PATH%\requirements.txt" (
+        pip install -r "%INSTALL_PATH%\requirements.txt" 2>nul
+    ) else (
+        pip install finviz finvizfinance pandas requests pygame reportlab yfinance pandas-ta chromadb PyMuPDF 2>nul
+    )
 )
 
 :: Create desktop shortcut
