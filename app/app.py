@@ -2249,21 +2249,31 @@ QUICK START:
 4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
 
 OUTPUTS (per run):
-• PDF – Report with Master Trading Report Directive + per-ticker data.
+• PDF – Report with Elite Swing Trader System Prompt + per-ticker data.
 • JSON – Same data + "instructions" field (use with any AI: "follow the instructions in this JSON").
 • *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
 
 SCANNERS:
 • Trend – Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close.
-• Swing – Dips – Emotional-only dips. Best: 2:30–4:00 PM.
+• Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
 • Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers. Config: Min % down, Filter.
 • Velocity Barbell – Sector signals → Foundation + Runner (or Single Shot). Config: min sector %, theme.
 • Insider – Latest insider transactions (Finviz).
 • Pre-Market – Pre-market volume. Best: 7–9:25 AM.
+• Velocity Pre-Market Hunter – Pre-market setups (gap recovery, accumulation, breakout, gap-and-go); grades A+–F.
+
+QUICK LOOKUP:
+• Enter 1-5 ticker symbols (comma or space separated) in Quick Lookup box.
+• Click Report for instant analysis of those tickers.
 
 WATCHLIST:
 • Add tickers (max 200). When one appears in a scan: 2 beeps + WATCHLIST in report.
 • Import from Finviz CSV: Watchlist → Import CSV.
+
+IMPORT/EXPORT CONFIG:
+• Click 💾 Config to export your full config (all settings + API keys) for backup.
+• Import on a new PC or fresh install to restore all settings.
+• ⚠️ Backup includes API keys - keep it secure!
 
 SETTINGS (optional):
 • Finviz API key – Scanner data (or scraping).
@@ -2272,9 +2282,14 @@ SETTINGS (optional):
 • RAG books folder – .txt/.pdf books; Build RAG index; include in AI prompt.
 • Include TA / SEC insider context / chart images – Toggle report and AI inputs.
 
+AI STRATEGY:
+• Elite Swing Trader methodology: 1-5 day max hold (optimal 1-2 days).
+• Focus: S&P 500 stocks + leveraged ETFs, specific entry/exit windows, T+1 settlement.
+
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v7.0
+AI Stock Research Tool · works best with Claude AI
+ClearBlueSky v7.0
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

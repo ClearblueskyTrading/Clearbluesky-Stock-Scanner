@@ -26,6 +26,10 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 
 **Watchlist:** Click **Watchlist** to add symbols (max 200). Config: **Filter** = Down X% today (min % in 1–25%) or All tickers. You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it's listed at the top of the report with a WATCHLIST label.
 
+**Quick Lookup:** Enter 1-5 ticker symbols (comma or space separated) in the Quick Lookup box and click **Report** for an instant analysis report.
+
+**Import/Export Config:** Click **💾 Config** to export your full config (all settings + API keys) for backup or transfer to a new PC. Import to restore on a fresh install.
+
 ---
 
 ## Run on any OS (no Windows installer)
