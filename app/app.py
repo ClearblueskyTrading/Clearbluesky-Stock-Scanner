@@ -395,7 +395,7 @@ class TradeBotApp:
         header.pack_propagate(False)
         tk.Label(header, text=f"☁️ ClearBlueSky Stock Scanner v{VERSION}", font=("Arial", 12, "bold"),
                 fg="white", bg=BG_DARK).pack(pady=(6, 0))
-        tk.Label(header, text="AI Research Tool · made with Claude", font=("Arial", 8),
+        tk.Label(header, text="AI Stock Research Tool · works best with Claude AI", font=("Arial", 8),
                 fg="#aaaaaa", bg=BG_DARK).pack(pady=(0, 4))
         
         # === MAIN CONTENT ===
