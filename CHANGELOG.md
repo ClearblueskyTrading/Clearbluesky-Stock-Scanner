@@ -4,6 +4,26 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.0] – February 2026
+
+### Added
+- **Queue-based scans** – Scans run in a background thread; GUI stays responsive (no hanging).
+- **Run all scans** – Checkbox under Run Scan runs all six scanners in sequence with 60-second delays (may take 20+ minutes; rate-limited).
+- **Rate-limit safeguard** – 60-second delay between scans when "Run all scans" is used.
+
+### Changed
+- **Swing** – Always uses emotional-only dip logic (emotional_dip_scanner). Separate "Emotional Dip" scan type removed.
+- **Watchlist** – Single scanner with **Filter**: "Down X% today" (min % in 1–25%) or "All tickers". Config: Min % down (range 1–25%), Filter.
+- **Scan types** – Reduced to 6: Trend – Long-term, Swing – Dips, Watchlist, Velocity Barbell, Insider – Latest, Pre-Market.
+- **CLI** – Scan types: trend, swing, watchlist, velocity, insider, premarket (no emotional_dip, no watchlist_tickers). Watchlist uses config `watchlist_filter`.
+- **Pre-Market** – Removed emoji from "Outside optimal pre-market window" message for Windows encoding.
+- **INSTALL.bat** – Updated to v7.0.
+
+### Docs
+- README.md, README.txt (root and app), RELEASE_v7.0.md, app/CHANGELOG.md, app/RELEASE.md, app/CLI_FOR_CLAUDE.md, app/SCANNER_NAMING_AUDIT.md.
+
+---
+
 ## [6.5] – February 2026
 
 ### Added

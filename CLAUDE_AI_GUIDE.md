@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v6.4 - Complete Build Guide
+# ClearBlueSky Stock Scanner v7.0 - Complete Build Guide
 
 ## For Claude AI (or any AI assistant)
 
@@ -9,18 +9,20 @@ This document contains everything needed to understand, modify, or rebuild the C
 ## PROJECT OVERVIEW
 
 **Name:** ClearBlueSky Stock Scanner  
-**Version:** 6.4  
+**Version:** 7.0  
 **Purpose:** Scan stocks for trading opportunities and generate PDF + JSON reports with optional AI analysis (OpenRouter), RAG, TA, sentiment, market breadth, and risk checks  
 **Tech Stack:** Python 3.10+, Tkinter (GUI), Finviz (data), reportlab (PDF), OpenRouter (AI), ChromaDB (RAG), yfinance/pandas-ta (TA)  
 **License:** MIT (free and open source)
 
 ### Key Features
-- Scanners: Trend, Swing, Watchlist, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000)
+- Scanners: Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market (S&P 500 / Russell 2000 / ETFs)
+- Run all scans: optional checkbox runs all six scanners in sequence (rate-limited; may take 20+ minutes)
+- Queue-based scans: background thread keeps GUI responsive (no hanging)
 - PDF + JSON reports with Master Trading Report Directive and optional `instructions` field for any AI
 - Optional OpenRouter AI analysis → `*_ai.txt`; optional RAG (.txt/.pdf books), TA, Alpha Vantage sentiment, SEC insider context, vision charts
 - Market breadth (SMA %, A/D, sector rotation, regime) for index-based scans
 - Risk checks per ticker: earnings date, ex-dividend, relative volume (earnings_safe, etc.)
-- Progress timers, stop buttons, update notice on startup
+- Progress timers, stop button, update notice on startup
 
 ---
 
@@ -32,6 +34,8 @@ ClearBlueSky/
 ├── README.txt               # User documentation
 ├── README.md                # GitHub / markdown readme
 ├── LICENSE.txt              # MIT license
+├── CHANGELOG.md             # Version history
+├── RELEASE_v7.0.md          # v7.0 release notes
 ├── DOCKER.md                # Run with Docker on any OS
 ├── Dockerfile, docker-compose.yml
 ├── CLAUDE_AI_GUIDE.md       # This file - for AI rebuilding
@@ -39,16 +43,19 @@ ClearBlueSky/
 └── app/
     ├── app.py               # Main GUI application
     ├── trend_scan_v2.py     # Trend momentum scanner
-    ├── enhanced_dip_scanner.py  # Swing/dip scanner
+    ├── emotional_dip_scanner.py  # Swing (emotional dips)
+    ├── watchlist_scanner.py # Watchlist (Down X% or All)
+    ├── velocity_leveraged_scanner.py  # Velocity Barbell
     ├── report_generator.py  # PDF report builder
     ├── scan_settings.py     # Settings dialog manager
     ├── sound_utils.py       # Scan-complete & watchlist beeps
-    ├── user_config.json     # User preferences (API key, etc)
+    ├── scanner_cli.py       # CLI for automation (no GUI)
+    ├── user_config.json.example  # Blank config template
     ├── START.bat            # Launch shortcut (Windows)
     ├── RUN.bat              # Direct Python launcher (Windows)
     ├── run.sh               # Run on Linux/macOS
-    ├── reports/             # Generated PDF reports
-    └── scans/               # Saved scan data
+    ├── reports/             # Generated PDF reports (runtime)
+    └── scans/               # Saved scan data (runtime)
 ```
 
 ---
@@ -59,7 +66,7 @@ ClearBlueSky/
 ```
 User clicks "Run Scan"
     ↓
-Scanner (trend_scan_v2.py or enhanced_dip_scanner.py)
+Scanner (trend_scan_v2.py, emotional_dip_scanner.py, watchlist_scanner.py, etc.)
     ↓
 Fetches data from Finviz (free scraping or Elite API)
     ↓
@@ -90,12 +97,16 @@ User copies prompt to AI for analysis
 - Calculates momentum score
 - Returns DataFrame of top candidates
 
-**enhanced_dip_scanner.py** - Swing Scanner
-- Fetches stocks with recent price drops
-- Analyzes dip percentage and volume
-- Checks for news catalysts (optional)
+**emotional_dip_scanner.py** - Swing Scanner (emotional dips)
+- Fetches stocks with recent price drops (index-based)
+- Analyzes dip percentage, volume, emotional triggers
 - Calculates recovery potential score
 - Returns list of dip opportunities
+
+**watchlist_scanner.py** - Watchlist Scanner
+- Filter: Down X% today (min % in 1–25%) or All tickers
+- Scans only tickers in user watchlist
+- Returns list for report
 
 **report_generator.py** - Report Builder
 - Takes scanner results
