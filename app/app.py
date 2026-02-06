@@ -533,7 +533,8 @@ class TradeBotApp:
         row1.pack(fill="x", pady=(0, 3))
         for text, cmd in [("💼 Broker", self.open_broker),
                           ("📁 Reports", self.open_reports),
-                          ("📋 Logs", self.view_logs)]:
+                          ("📋 Logs", self.view_logs),
+                          ("💾 Config", self.import_export_config)]:
             tk.Button(row1, text=text, command=cmd, bg="#e9ecef", fg="#333",
                      font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
         
@@ -2145,6 +2146,88 @@ class TradeBotApp:
     def view_logs(self):
         if os.path.exists(LOG_FILE):
             os.startfile(LOG_FILE)
+    
+    def import_export_config(self):
+        """Import/Export full config (all settings + API keys) for backup or transfer to new PC."""
+        win = tk.Toplevel(self.root)
+        win.title("Import/Export Config")
+        win.geometry("420x180")
+        win.transient(self.root)
+        win.grab_set()
+        win.configure(bg="white")
+        win.resizable(False, False)
+        
+        f = tk.Frame(win, bg="white", padx=20, pady=16)
+        f.pack(fill="both", expand=True)
+        
+        tk.Label(
+            f, text="💾 Import/Export Full Config", 
+            font=("Arial", 11, "bold"), bg="white", fg="#333"
+        ).pack(anchor="w", pady=(0, 8))
+        
+        tk.Label(
+            f, text="Backup or transfer all settings (including API keys)\nto a new PC or fresh install.",
+            font=("Arial", 9), bg="white", fg="#666", justify="left"
+        ).pack(anchor="w", pady=(0, 12))
+        
+        btn_f = tk.Frame(f, bg="white")
+        btn_f.pack(fill="x", pady=(4, 0))
+        
+        def do_export():
+            dest = filedialog.asksaveasfilename(
+                parent=win,
+                title="Export Config",
+                defaultextension=".json",
+                initialfile="clearbluesky_config.json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+            )
+            if not dest:
+                return
+            try:
+                import shutil
+                shutil.copyfile(CONFIG_FILE, dest)
+                messagebox.showinfo("Export", f"Config exported to:\n{dest}", parent=win)
+            except Exception as e:
+                messagebox.showerror("Export Failed", str(e), parent=win)
+        
+        def do_import():
+            src = filedialog.askopenfilename(
+                parent=win,
+                title="Import Config",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+            )
+            if not src:
+                return
+            if not messagebox.askyesno("Import Config", 
+                "This will replace your current config (all settings and API keys).\n\nContinue?", 
+                parent=win):
+                return
+            try:
+                import shutil
+                shutil.copyfile(src, CONFIG_FILE)
+                # Reload config
+                self.config = self.load_config()
+                messagebox.showinfo("Import", "Config imported. Restart the app to apply all settings.", parent=win)
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("Import Failed", str(e), parent=win)
+        
+        tk.Button(
+            btn_f, text="📤 Export (Backup)", command=do_export,
+            bg="#28a745", fg="white", font=("Arial", 9, "bold"),
+            width=18, relief="flat", cursor="hand2", padx=8, pady=6
+        ).pack(side="left", padx=(0, 8))
+        
+        tk.Button(
+            btn_f, text="📥 Import (Restore)", command=do_import,
+            bg="#007bff", fg="white", font=("Arial", 9, "bold"),
+            width=18, relief="flat", cursor="hand2", padx=8, pady=6
+        ).pack(side="left")
+        
+        tk.Label(
+            f, text="⚠️ Backup includes API keys - keep it secure!",
+            font=("Arial", 8), bg="white", fg="#dc3545"
+        ).pack(anchor="w", pady=(12, 0))
     
     def open_readme(self):
         """Open README.md from the app folder (browser or default app)."""
