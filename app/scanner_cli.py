@@ -22,14 +22,12 @@ SCAN_DISPLAY_NAMES = {
     "swing": "Swing",
     "velocity": "Velocity Barbell",
     "premarket": "Premarket",
-    "emotional_dip": "Emotional",
     "insider": "Insider",
-    "watchlist": "Watchlist 3pm",
-    "watchlist_tickers": "Watchlist - All tickers",
+    "watchlist": "Watchlist",
 }
 
 # Scan types that use index (sp500 / russell2000 / etfs)
-INDEX_SCANS = {"trend", "swing", "emotional_dip", "premarket"}
+INDEX_SCANS = {"trend", "swing", "premarket"}
 
 
 def _progress(msg: str) -> None:
@@ -124,10 +122,8 @@ def main() -> int:
             "swing",
             "velocity",
             "premarket",
-            "emotional_dip",
             "insider",
             "watchlist",
-            "watchlist_tickers",
         ],
         help="Scan type to run",
     )
@@ -135,7 +131,7 @@ def main() -> int:
         "--index",
         choices=["sp500", "russell2000", "etfs"],
         default="sp500",
-        help="Index for trend/swing/emotional_dip/premarket (default: sp500)",
+        help="Index for trend/swing/premarket (default: sp500)",
     )
     parser.add_argument(
         "--watchlist-file",
@@ -176,8 +172,8 @@ def main() -> int:
             results = df.to_dict("records") if df is not None and len(df) > 0 else None
 
         elif scan_key == "swing":
-            from enhanced_dip_scanner import run_enhanced_dip_scan
-            results = run_enhanced_dip_scan(progress_callback=_progress, index=index)
+            from emotional_dip_scanner import run_emotional_dip_scan
+            results = run_emotional_dip_scan(progress_callback=_progress, index=index)
 
         elif scan_key == "velocity":
             from velocity_leveraged_scanner import run_velocity_leveraged_scan
@@ -187,21 +183,14 @@ def main() -> int:
             from premarket_volume_scanner import run_premarket_volume_scan
             results = run_premarket_volume_scan(progress_callback=_progress, index=index)
 
-        elif scan_key == "emotional_dip":
-            from emotional_dip_scanner import run_emotional_dip_scan
-            results = run_emotional_dip_scan(progress_callback=_progress, index=index)
-
         elif scan_key == "insider":
             from insider_scanner import run_insider_scan
             results = run_insider_scan(progress_callback=_progress, config=config)
 
         elif scan_key == "watchlist":
-            from watchlist_scanner import run_watchlist_scan
-            results = run_watchlist_scan(progress_callback=_progress, config=config)
-
-        elif scan_key == "watchlist_tickers":
-            from watchlist_scanner import run_watchlist_tickers_scan
-            results = run_watchlist_tickers_scan(progress_callback=_progress, config=config)
+            from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
+            use_all = (config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
+            results = run_watchlist_tickers_scan(progress_callback=_progress, config=config) if use_all else run_watchlist_scan(progress_callback=_progress, config=config)
 
         if not results or len(results) == 0:
             print(f"   No results from {display_name} scan.", flush=True)

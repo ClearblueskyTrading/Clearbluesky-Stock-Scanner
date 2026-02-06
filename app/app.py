@@ -1,13 +1,14 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v6.5
+# ClearBlueSky Stock Scanner v7.0
 # ============================================================
 
 import tkinter as tk
-VERSION = "6.5"
+VERSION = "7.0"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
 import csv
+import queue
 import webbrowser
 import traceback
 import time
@@ -41,6 +42,9 @@ BLUE = "#007bff"
 ORANGE = "#fd7e14"
 PURPLE = "#6f42c1"
 GRAY = "#6c757d"
+
+# Delay between scans when "Run all" is used (seconds) to respect API rate limits
+RATE_LIMIT_DELAY_SEC = 60
 
 def log(msg, level="INFO"):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -114,6 +118,103 @@ def _check_for_updates(root):
             root.after(0, lambda t=tag, u=url: _show_update_notice(root, t, u))
     except Exception:
         pass
+
+
+def _scan_worker_loop(app):
+    """Background thread: run scan jobs from job queue; post progress/done/error to result queue."""
+    SCANNER_TO_REPORT_LABEL = {
+        "trend": "Trend",
+        "swing": "Swing",
+        "watchlist": "Watchlist",
+        "velocity_leveraged": "Velocity Barbell",
+        "insider": "Insider",
+        "premarket": "Premarket",
+    }
+    while True:
+        if getattr(app, "scan_cancelled", False):
+            try:
+                app.scan_result_queue.put(("cancelled",))
+            except Exception:
+                pass
+            break
+        try:
+            job = app.scan_job_queue.get(timeout=0.5)
+        except queue.Empty:
+            try:
+                app.scan_result_queue.put(("idle",))
+            except Exception:
+                pass
+            break
+        if job[0] == "delay":
+            _, secs = job
+            try:
+                app.scan_result_queue.put(("progress", f"Waiting {secs}s for rate limit..."))
+            except Exception:
+                pass
+            time.sleep(secs)
+            continue
+        if job[0] != "scan":
+            continue
+        _, scan_def, index = job
+        scanner_kind = (scan_def or {}).get("scanner", "")
+        label = (scan_def or {}).get("label", "Scan")
+        short_label = SCANNER_TO_REPORT_LABEL.get(scanner_kind, label)
+        if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+            continue
+        try:
+            app.scan_result_queue.put(("start", label))
+        except Exception:
+            pass
+        start_time = time.time()
+        config = getattr(app, "config", None) or {}
+
+        def progress_put(msg):
+            if getattr(app, "scan_cancelled", False):
+                return
+            try:
+                app.scan_result_queue.put(("progress", msg))
+            except Exception:
+                pass
+
+        results = None
+        try:
+            if scanner_kind == "trend":
+                from trend_scan_v2 import trend_scan
+                df = trend_scan(progress_callback=progress_put, index=index)
+                results = df.to_dict("records") if df is not None and len(df) > 0 else None
+            elif scanner_kind == "swing":
+                from emotional_dip_scanner import run_emotional_dip_scan
+                results = run_emotional_dip_scan(progress_put, index=index)
+            elif scanner_kind == "watchlist":
+                from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
+                use_all = (config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
+                results = run_watchlist_tickers_scan(progress_callback=progress_put, config=config) if use_all else run_watchlist_scan(progress_callback=progress_put, config=config)
+            elif scanner_kind == "velocity_leveraged":
+                from velocity_leveraged_scanner import run_velocity_leveraged_scan
+                results = run_velocity_leveraged_scan(progress_callback=progress_put, config=config)
+            elif scanner_kind == "insider":
+                from insider_scanner import run_insider_scan
+                results = run_insider_scan(progress_callback=progress_put, config=config)
+            elif scanner_kind == "premarket":
+                from premarket_volume_scanner import run_premarket_volume_scan
+                results = run_premarket_volume_scan(progress_put, index=index)
+            elapsed = int(time.time() - start_time)
+            if getattr(app, "scan_cancelled", False):
+                try:
+                    app.scan_result_queue.put(("cancelled",))
+                except Exception:
+                    pass
+            else:
+                try:
+                    app.scan_result_queue.put(("done", results, short_label, index, elapsed))
+                except Exception:
+                    pass
+        except Exception as e:
+            log_error(e, f"Scan worker {scanner_kind}")
+            try:
+                app.scan_result_queue.put(("error", str(e), short_label))
+            except Exception:
+                pass
 
 
 class AnimatedMoneyPrinter(tk.Canvas):
@@ -246,9 +347,10 @@ class TradeBotApp:
             self.scan_types = [
                 {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
-                {"id": "watchlist_open", "label": "Watchlist 3pm", "scanner": "watchlist"},
-                {"id": "watchlist_tickers", "label": "Watchlist - All tickers", "scanner": "watchlist_tickers"},
+                {"id": "watchlist", "label": "Watchlist", "scanner": "watchlist"},
                 {"id": "velocity_leveraged", "label": "Velocity Barbell", "scanner": "velocity_leveraged"},
+                {"id": "insider", "label": "Insider - Latest", "scanner": "insider"},
+                {"id": "premarket", "label": "Pre-Market", "scanner": "premarket"},
             ]
         self.build_ui()
         log("UI ready")
@@ -359,7 +461,28 @@ class TradeBotApp:
         self.scan_progress = ProgressBar(scan_frame, width=260, height=14, color=GREEN)
         self.scan_progress.pack(padx=6, pady=(0, 2))
         self.scan_status = tk.Label(scan_frame, text="", font=("Arial", 8), bg="white", fg="#666")
-        self.scan_status.pack(anchor="w", padx=6, pady=(0, 4))
+        self.scan_status.pack(anchor="w", padx=6, pady=(0, 2))
+        run_all_row = tk.Frame(scan_frame, bg="white")
+        run_all_row.pack(fill="x", padx=6, pady=(0, 4))
+        self.run_all_scans_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(
+            run_all_row,
+            text="Run all scans",
+            variable=self.run_all_scans_var,
+            font=("Arial", 9),
+            bg="white",
+            fg="#333",
+            activebackground="white",
+            activeforeground="#333",
+            selectcolor="white",
+        ).pack(side="left")
+        tk.Label(
+            run_all_row,
+            text="May take 20+ minutes due to API rate limits.",
+            font=("Arial", 8),
+            bg="white",
+            fg="#666",
+        ).pack(side="left", padx=(8, 0))
         
         # --- QUICK TICKER ---
         ticker_label = tk.Label(main, text="🔍 Quick Lookup", font=("Arial", 9, "bold"),
@@ -415,6 +538,10 @@ class TradeBotApp:
         self.scan_start_time = 0
         self.last_scan_type = None
         self.last_scan_time = None
+        self.scan_job_queue = queue.Queue()
+        self.scan_result_queue = queue.Queue()
+        self.scan_worker = None
+        self._process_result_queue_scheduled = False
     
     def _on_scan_types_changed(self):
         """Reload scan types after an import, updating the dropdown."""
@@ -663,6 +790,99 @@ class TradeBotApp:
         """Stop the currently running scan (any scan type)."""
         self.scan_cancelled = True
         self.scan_status.config(text="Stopping...")
+
+    def _start_scan_worker(self):
+        """Start the background scan worker thread if not already running."""
+        if self.scan_worker is not None and self.scan_worker.is_alive():
+            return
+        self.scan_worker = threading.Thread(target=_scan_worker_loop, args=(self,), daemon=True)
+        self.scan_worker.start()
+
+    def _schedule_process_result_queue(self):
+        """Schedule processing of scan result queue on the main thread."""
+        if getattr(self, "_process_result_queue_scheduled", False):
+            return
+        self._process_result_queue_scheduled = True
+        self.root.after(150, self._process_scan_result_queue)
+
+    def _process_scan_result_queue(self):
+        """Process messages from the scan worker (progress, done, error, idle). Run on main thread only."""
+        self._process_result_queue_scheduled = False
+        try:
+            while True:
+                try:
+                    msg = self.scan_result_queue.get_nowait()
+                except queue.Empty:
+                    break
+                kind = msg[0] if isinstance(msg, (list, tuple)) and msg else None
+                if kind == "start":
+                    label = msg[1] if len(msg) > 1 else "Scan"
+                    self.scan_progress.set(5, "Starting...")
+                    self.scan_status.config(text=label[:50])
+                    self.scan_start_time = time.time()
+                    self.root.update()
+                elif kind == "progress":
+                    text = msg[1] if len(msg) > 1 else ""
+                    self.scan_status.config(text=(text[:50] if text else ""))
+                    if "(" in text and "/" in text:
+                        try:
+                            parts = text.split("(")[1].split(")")[0].split("/")
+                            cur, tot = int(parts[0]), int(parts[1])
+                            pct = 10 + int((cur / tot) * 75) if tot else 50
+                            elapsed = int(time.time() - self.scan_start_time)
+                            self.scan_progress.set(pct, f"{pct}% ({elapsed}s)")
+                        except Exception:
+                            pass
+                    self.root.update()
+                elif kind == "done":
+                    results, short_label, index, elapsed = (msg[1], msg[2], msg[3], msg[4]) if len(msg) >= 5 else (None, "Scan", None, 0)
+                    if results and len(results) > 0:
+                        self.generate_report_from_results(
+                            results, short_label,
+                            self.scan_progress, self.scan_status, self.scan_printer,
+                            self.scan_btn, self.scan_stop_btn, elapsed, index=index,
+                        )
+                    else:
+                        no_result_msg = "No results"
+                        if short_label == "Swing":
+                            no_result_msg = "No emotional dips today"
+                        elif short_label == "Watchlist":
+                            no_result_msg = "No watchlist results"
+                        elif short_label == "Velocity Barbell":
+                            no_result_msg = "No recommendations"
+                        elif short_label == "Insider":
+                            no_result_msg = "No insider transactions"
+                        elif short_label == "Premarket":
+                            no_result_msg = "No pre-market activity"
+                        self.scan_complete(
+                            self.scan_progress, self.scan_status, self.scan_printer,
+                            self.scan_btn, no_result_msg, self.scan_stop_btn,
+                        )
+                elif kind == "error":
+                    err_text = msg[1] if len(msg) > 1 else "Error"
+                    self.scan_complete(
+                        self.scan_progress, self.scan_status, self.scan_printer,
+                        self.scan_btn, "Error!", self.scan_stop_btn,
+                    )
+                    try:
+                        messagebox.showerror("Error", err_text)
+                    except Exception:
+                        pass
+                elif kind == "cancelled":
+                    self.scan_complete(
+                        self.scan_progress, self.scan_status, self.scan_printer,
+                        self.scan_btn, "Cancelled", self.scan_stop_btn,
+                    )
+                elif kind == "idle":
+                    self.scan_btn.config(state="normal")
+                    self.scan_stop_btn.config(state="disabled")
+                    self.scan_printer.stop()
+                    self.scan_status.config(text="Ready")
+                    self._update_status_ready()
+                    return
+        except Exception as e:
+            log_error(e, "Process scan result queue")
+        self.root.after(150, self._process_scan_result_queue)
     
     def _get_current_scan_def(self):
         """Return the scan-type definition for the currently selected label."""
@@ -675,11 +895,11 @@ class TradeBotApp:
             return {"id": "trend_fallback", "label": label, "scanner": "trend"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
-        if "Watchlist" in label and "All tickers" in label:
-            return {"id": "watchlist_tickers_fallback", "label": label, "scanner": "watchlist_tickers"}
+        if "Pre-Market" in label or ("Pre" in label and "Market" in label):
+            return {"id": "premarket_fallback", "label": label, "scanner": "premarket"}
         if "Watchlist" in label:
             return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
-        if "Velocity" in label and "Leveraged" in label:
+        if "Velocity" in label or "Barbell" in label:
             return {"id": "velocity_leveraged_fallback", "label": label, "scanner": "velocity_leveraged"}
         if "insider" in label.lower():
             return {"id": "insider_fallback", "label": label, "scanner": "insider"}
@@ -785,7 +1005,7 @@ class TradeBotApp:
         self.root.update()
         
         try:
-            from enhanced_dip_scanner import run_enhanced_dip_scan
+            from emotional_dip_scanner import run_emotional_dip_scan
             
             def progress(msg):
                 if self.scan_cancelled:
@@ -809,7 +1029,7 @@ class TradeBotApp:
                     self.scan_progress.set(90, f"90% ({time_str})")
                 self.root.update()
             
-            results = run_enhanced_dip_scan(progress, index=index)
+            results = run_emotional_dip_scan(progress, index=index)
             
             if self.scan_cancelled:
                 self.scan_complete(
@@ -841,7 +1061,7 @@ class TradeBotApp:
                     self.scan_status,
                     self.scan_printer,
                     self.scan_btn,
-                    "No dips today",
+                    "No emotional dips today",
                     self.scan_stop_btn,
                 )
         except Exception as e:
@@ -857,8 +1077,9 @@ class TradeBotApp:
             messagebox.showerror("Error", str(e))
     
     def _run_watchlist_scan(self):
-        """Internal helper to run the Watchlist 3pm scan (watchlist tickers down X%, slider 1–25%)."""
-        log("=== WATCHLIST 3PM SCAN ===")
+        """Run Watchlist scan: Filter = Down X% today or All tickers (from watchlist_filter)."""
+        use_all = (self.config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
+        log("=== WATCHLIST SCAN ===" if not use_all else "=== WATCHLIST (ALL TICKERS) SCAN ===")
         self.scan_cancelled = False
         self.scan_start_time = time.time()
         self.scan_progress.set(5, "Starting...")
@@ -868,7 +1089,7 @@ class TradeBotApp:
         self.scan_stop_btn.config(state="normal")
         self.root.update()
         try:
-            from watchlist_scanner import run_watchlist_scan
+            from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
             def progress(msg):
                 if self.scan_cancelled:
                     return
@@ -887,7 +1108,7 @@ class TradeBotApp:
                 elif "Found" in msg:
                     self.scan_progress.set(90, f"90% ({time_str})")
                 self.root.update()
-            results = run_watchlist_scan(progress_callback=progress, config=self.config)
+            results = run_watchlist_tickers_scan(progress_callback=progress, config=self.config) if use_all else run_watchlist_scan(progress_callback=progress, config=self.config)
             if self.scan_cancelled:
                 self.scan_complete(
                     self.scan_progress,
@@ -900,7 +1121,7 @@ class TradeBotApp:
                 return
             if results and len(results) > 0:
                 elapsed = int(time.time() - self.scan_start_time)
-                scan_label = (self._get_current_scan_def() or {}).get("label", "Watchlist 3pm")
+                scan_label = (self._get_current_scan_def() or {}).get("label", "Watchlist")
                 self.generate_report_from_results(
                     results,
                     scan_label,
@@ -917,86 +1138,11 @@ class TradeBotApp:
                     self.scan_status,
                     self.scan_printer,
                     self.scan_btn,
-                    "No watchlist tickers down in range",
+                    "No watchlist results",
                     self.scan_stop_btn,
                 )
         except Exception as e:
             log_error(e, "Watchlist scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_watchlist_tickers_scan(self):
-        """Internal helper to run the Watchlist - All tickers scan (no parameters)."""
-        log("=== WATCHLIST - ALL TICKERS SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        try:
-            from watchlist_scanner import run_watchlist_tickers_scan
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Watchlist tickers: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                if "(" in msg and "/" in msg:
-                    try:
-                        parts = msg.split("(")[1].split(")")[0].split("/")
-                        cur, tot = int(parts[0]), int(parts[1])
-                        pct = 10 + int((cur / tot) * 75) if tot else 50
-                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "Found" in msg:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            results = run_watchlist_tickers_scan(progress_callback=progress, config=self.config)
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Watchlist - All tickers",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No watchlist tickers found",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Watchlist tickers scan failed")
             self.scan_complete(
                 self.scan_progress,
                 self.scan_status,
@@ -1149,90 +1295,6 @@ class TradeBotApp:
             )
             messagebox.showerror("Error", str(e))
     
-    def _run_emotional_scan(self, index: str):
-        """Internal helper to run the Emotional Dip scan using the unified UI."""
-        log("=== EMOTIONAL DIP SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        
-        try:
-            from emotional_dip_scanner import run_emotional_dip_scan
-            
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Emotional: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                
-                lower = msg.lower()
-                if "analyzing" in lower:
-                    try:
-                        if "(" in msg and "/" in msg:
-                            parts = msg.split("(")[1].split(")")[0].split("/")
-                            cur, tot = int(parts[0]), int(parts[1])
-                            pct = 10 + int((cur / tot) * 75)
-                            self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "complete" in lower:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            
-            results = run_emotional_dip_scan(progress, index=index)
-            
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Emotional",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                    index=index,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No emotional dips found",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Emotional scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
     def _run_premarket_scan(self, index: str):
         """Internal helper to run the Pre-Market Volume scan using the unified UI."""
         log("=== PRE-MARKET VOLUME SCAN ===")
@@ -1318,39 +1380,54 @@ class TradeBotApp:
             messagebox.showerror("Error", str(e))
     
     def run_scan(self):
-        """Entry point for the unified Scan button."""
-        # Determine index
+        """Entry point for the unified Scan button. Queues job(s) and runs them in a background thread."""
+        if self.scan_worker is not None and self.scan_worker.is_alive():
+            messagebox.showinfo("Scan", "A scan is already running.")
+            return
         idx_text = self.scan_index.get()
         index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else "russell2000")
-        
-        # Route based on selected scan-type definition
-        scan_def = self._get_current_scan_def()
-        scanner_kind = (scan_def or {}).get("scanner", "")
-        if scanner_kind == "trend":
-            self._run_trend_scan(index)
-        elif scanner_kind == "swing":
-            self._run_swing_scan(index)
-        elif scanner_kind == "watchlist":
-            self._run_watchlist_scan()
-        elif scanner_kind == "watchlist_tickers":
-            self._run_watchlist_tickers_scan()
-        elif scanner_kind == "velocity_leveraged":
-            self._run_velocity_leveraged_scan()
-        elif scanner_kind == "insider":
-            self._run_insider_scan()
-        elif scanner_kind == "emotional":
-            self._run_emotional_scan(index)
-        elif scanner_kind == "premarket":
-            self._run_premarket_scan(index)
+        self.scan_cancelled = False
+        # Clear any stale jobs
+        try:
+            while True:
+                self.scan_job_queue.get_nowait()
+        except queue.Empty:
+            pass
+        if self.run_all_scans_var.get():
+            types_list = getattr(self, "scan_types", []) or []
+            for i, scan_def in enumerate(types_list):
+                scanner_kind = (scan_def or {}).get("scanner", "")
+                if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+                    continue
+                self.scan_job_queue.put(("scan", scan_def, index))
+                if i < len(types_list) - 1:
+                    self.scan_job_queue.put(("delay", RATE_LIMIT_DELAY_SEC))
         else:
-            messagebox.showwarning("Scan Type", "Please select a valid scan type.")
+            scan_def = self._get_current_scan_def()
+            scanner_kind = (scan_def or {}).get("scanner", "")
+            if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+                messagebox.showwarning("Scan Type", "Please select a valid scan type.")
+                return
+            self.scan_job_queue.put(("scan", scan_def, index))
+        self.scan_btn.config(state="disabled")
+        self.scan_stop_btn.config(state="normal")
+        self.scan_printer.start()
+        self.scan_progress.set(5, "Starting...")
+        self.scan_status.config(text="Preparing...")
+        self.scan_start_time = time.time()
+        self._start_scan_worker()
+        self._schedule_process_result_queue()
     
     def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, index=None):
         """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500', 'russell2000', or 'etfs' to include market breadth."""
         try:
             from report_generator import HTMLReportGenerator
 
-            min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell") else 65))
+            # Swing uses emotional logic -> emotional_min_score
+            if scan_type == "Swing":
+                min_score = int(self.config.get("emotional_min_score", 65))
+            else:
+                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell") else 65))
             reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -1967,12 +2044,13 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v6.5
+ClearBlueSky Stock Scanner v7.0
 
 QUICK START:
 1. Select scan type and index (N/A for Watchlist / Velocity Barbell / Insider).
 2. Click Run Scan. You get: PDF report + JSON analysis package.
-3. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
+3. Optional: Check "Run all scans" (may take 20+ min; rate-limited).
+4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
 
 OUTPUTS (per run):
 • PDF – Report with Master Trading Report Directive + per-ticker data.
@@ -1981,16 +2059,14 @@ OUTPUTS (per run):
 
 SCANNERS:
 • Trend – Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close.
-• Swing – Oversold dips with news/analyst. Best: 2:30–4:00 PM.
-• Watchlist 3pm – Watchlist tickers down X% today (slider 1–25%). Best: ~3 PM.
-• Watchlist – All tickers – Scan all watchlist tickers, no filters.
-• Velocity Barbell – Foundation + Runner (or Single Shot) from sector signals. Config: min sector %, theme.
+• Swing – Dips – Emotional-only dips. Best: 2:30–4:00 PM.
+• Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers. Config: Min % down, Filter.
+• Velocity Barbell – Sector signals → Foundation + Runner (or Single Shot). Config: min sector %, theme.
 • Insider – Latest insider transactions (Finviz).
-• Emotional Dip – Late-day dip setup. Best: ~3:30 PM.
 • Pre-Market – Pre-market volume. Best: 7–9:25 AM.
 
 WATCHLIST:
-• Add tickers (max 200). When one appears in a scan: 2 beeps + ★ WATCHLIST in report.
+• Add tickers (max 200). When one appears in a scan: 2 beeps + WATCHLIST in report.
 • Import from Finviz CSV: Watchlist → Import CSV.
 
 SETTINGS (optional):
@@ -2002,7 +2078,7 @@ SETTINGS (optional):
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
-Made with Claude AI · ClearBlueSky v6.5
+Made with Claude AI · ClearBlueSky v7.0
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)

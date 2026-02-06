@@ -60,7 +60,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
     # Warn if outside optimal window (7:00 AM - 9:25 AM)
     if current_hour < 7 or (current_hour == 9 and current_minute > 25) or current_hour >= 10:
         if progress_callback:
-            progress_callback("⚠️ Outside optimal pre-market window (7:00 AM - 9:25 AM)")
+            progress_callback("Outside optimal pre-market window (7:00 AM - 9:25 AM)")
     
     # Base filters
     min_price = float(config.get('min_price', 5.0))

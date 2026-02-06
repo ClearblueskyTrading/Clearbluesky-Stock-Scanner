@@ -27,17 +27,12 @@ DEFAULT_SCAN_TYPES = [
     {
         "id": "swing_dips",
         "label": "Swing - Dips",
-        "scanner": "swing",  # uses enhanced_dip_scanner.run_enhanced_dip_scan
+        "scanner": "swing",  # uses emotional_dip_scanner (emotional-only dips, always on)
     },
     {
-        "id": "watchlist_open",
-        "label": "Watchlist 3pm",
-        "scanner": "watchlist",  # watchlist tickers down X% (slider 1–25%)
-    },
-    {
-        "id": "watchlist_tickers",
-        "label": "Watchlist - All tickers",
-        "scanner": "watchlist_tickers",  # uses watchlist_scanner.run_watchlist_tickers_scan, no params
+        "id": "watchlist",
+        "label": "Watchlist",
+        "scanner": "watchlist",  # Filter: Down X% today or All tickers
     },
     {
         "id": "velocity_leveraged",
@@ -48,6 +43,11 @@ DEFAULT_SCAN_TYPES = [
         "id": "insider",
         "label": "Insider - Latest",
         "scanner": "insider",  # uses insider_scanner.run_insider_scan
+    },
+    {
+        "id": "premarket",
+        "label": "Pre-Market",
+        "scanner": "premarket",  # uses premarket_volume_scanner.run_premarket_volume_scan
     },
 ]
 
@@ -62,13 +62,6 @@ SCAN_PARAM_SPECS = {
         {"key": "trend_require_ma_stack", "label": "Require MA Stack", "default": True, "type": "bool"},
     ],
     "swing": [
-        {"key": "swing_min_score", "label": "Min Score", "min": 40, "max": 90, "default": 60, "type": "int"},
-        {"key": "dip_min_percent", "label": "Min Dip %", "min": 0, "max": 10, "default": 1.0, "type": "float"},
-        {"key": "dip_max_percent", "label": "Max Dip %", "min": 0, "max": 15, "default": 5.0, "type": "float"},
-        {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
-        {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
-    ],
-    "emotional": [
         {"key": "emotional_min_score", "label": "Min Score", "min": 50, "max": 90, "default": 65, "type": "int"},
         {"key": "emotional_dip_min_percent", "label": "Min Dip %", "min": 0, "max": 5, "default": 1.5, "type": "float"},
         {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 4.0, "type": "float"},
@@ -76,6 +69,8 @@ SCAN_PARAM_SPECS = {
         {"key": "emotional_min_upside_to_target", "label": "Min Upside %", "min": 5, "max": 30, "default": 10.0, "type": "float"},
         {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": True, "type": "bool"},
         {"key": "emotional_require_buy_rating", "label": "Require Buy rating", "default": True, "type": "bool"},
+        {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
+        {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
     ],
     "premarket": [
         {"key": "premarket_min_score", "label": "Min Score", "min": 50, "max": 95, "default": 70, "type": "int"},
@@ -88,9 +83,9 @@ SCAN_PARAM_SPECS = {
         {"key": "premarket_track_sector_heat", "label": "Track sector heat", "default": True, "type": "bool"},
     ],
     "watchlist": [
-        {"key": "watchlist_pct_down_from_open", "label": "% down (1–25%)", "min": 1, "max": 25, "default": 5, "type": "float"},
+        {"key": "watchlist_filter", "label": "Filter", "type": "choice", "default": "down_pct", "options": ["down_pct", "all"]},
+        {"key": "watchlist_pct_down_from_open", "label": "Min % down (range 1–25%)", "min": 1, "max": 25, "default": 5, "type": "float"},
     ],
-    "watchlist_tickers": [],  # no parameters — just scans all watchlist tickers
     "velocity_leveraged": [
         {"key": "velocity_min_sector_pct", "label": "Min sector % (up or down)", "min": -5, "max": 5, "default": 0, "type": "float"},
         {"key": "velocity_barbell_theme", "label": "Theme", "type": "choice", "default": "auto", "options": ["auto", "barbell", "single_shot"]},
