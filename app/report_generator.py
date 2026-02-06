@@ -39,6 +39,12 @@ MASTER_TRADING_REPORT_DIRECTIVE = r"""
 INSTRUCTIONS FOR AI: Follow this directive when analyzing this report.
 ═══════════════════════════════════════════════════════════════════════════════
 
+EXECUTIVE SUMMARY: Your response must start with a brief executive summary: explain
+context, market/sector backdrop, scan rationale, and key findings in plain language—
+not only trade recommendations. Then provide per-ticker analysis and actionable trades.
+This applies whether you receive this file alone or together with the matching PDF,
+JSON, or _ai.txt.
+
 To fulfill your role as a lead stock analyst at a major investment bank, you must
 ensure your data requests are exhaustive, technical, and grounded in proven market
 mechanics. Based on the methodologies of Farley, Bassal, Murphy, and other experts,

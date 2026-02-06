@@ -55,3 +55,11 @@ See [CHANGELOG.md](CHANGELOG.md) in the `app` folder.
 - [ ] Tag `v7.0` created and pushed.
 - [ ] GitHub Release created with title and description above.
 - [ ] Optional: attach a zip of the `app` folder (or built executable) as release asset.
+
+---
+
+## Next release (planned)
+
+- **No duplicates in watchlist** – Ensure watchlist (config + UI) stores and displays each ticker only once (dedupe on add/import/save).
+- **No duplicates in reports** – Ensure scan results and report output contain no duplicate tickers (dedupe before generating report / writing PDF).
+- **Executive summary when all 3 files go to AI** – When all 3 report files (PDF, JSON, _ai.txt) are sent to an AI, the output should include a clear executive summary of all the info—not just what trades to make. Explain context, market/sector backdrop, scan rationale, and key findings in plain language; then include trade recommendations.

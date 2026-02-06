@@ -1483,7 +1483,7 @@ class TradeBotApp:
                         status.config(text="Building prompt...")
                         self.root.update()
                         from openrouter_client import analyze_with_config
-                        system_prompt = "You are a professional stock analyst. You are receiving a structured JSON analysis package (scan results, technical indicators, news). For each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
+                        system_prompt = "You are a professional stock analyst. You are receiving a structured JSON analysis package (scan results, technical indicators, news). Your response must start with a brief executive summary: explain context, market/sector backdrop, scan rationale, and key findings in plain language—not only trade recommendations. Then for each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
                         if self.config.get("rag_enabled") and self.config.get("rag_books_folder"):
                             try:
                                 from rag_engine import get_rag_context_for_scan
@@ -1513,9 +1513,10 @@ class TradeBotApp:
                         self.root.update()
                         base = path[:-4] if path.lower().endswith(".pdf") else path
                         ai_path = base + "_ai.txt"
+                        _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Include a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language, then trade recommendations.\n\n---\n\n"
                         if ai_response:
                             with open(ai_path, "w", encoding="utf-8") as f:
-                                f.write(ai_response)
+                                f.write(_ai_header + ai_response)
                             webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
                             progress.set(100, f"Done! ({elapsed}s)")
                             status.config(text="AI analysis saved and opened")

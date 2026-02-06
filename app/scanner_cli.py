@@ -77,7 +77,9 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
             progress_fn("Sending to OpenRouter for AI analysis...")
             system_prompt = (
                 "You are a professional stock analyst. You are receiving a structured JSON analysis package. "
-                "For each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), "
+                "Your response must start with a brief executive summary: explain context, market/sector backdrop, "
+                "scan rationale, and key findings in plain language—not only trade recommendations. "
+                "Then for each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), "
                 "and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
             )
             if config.get("rag_enabled") and config.get("rag_books_folder"):
@@ -91,9 +93,10 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
             content = __import__("json").dumps(analysis_package, indent=2)
             ai_response = analyze_with_config(config, system_prompt, content, image_base64_list=None)
             ai_path = base + "_ai.txt"
+            _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Include a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language, then trade recommendations.\n\n---\n\n"
             if ai_response:
                 with open(ai_path, "w", encoding="utf-8") as f:
-                    f.write(ai_response)
+                    f.write(_ai_header + ai_response)
                 progress_fn("AI analysis saved to " + ai_path)
             else:
                 fallback = (analysis_package.get("instructions") or "") if isinstance(analysis_package, dict) else ""
