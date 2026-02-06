@@ -25,6 +25,10 @@ app/scans/
 app/rag_store/
 app/backtest_signals.db
 
+# Updater backup and manifest (local; user-specific)
+app/update_backups/
+app/update_backup_manifest.json
+
 # Optional: local preset exports (may contain user choices)
 # app/scan_presets.json
 # app/scanner_presets_export.json

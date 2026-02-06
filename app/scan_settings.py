@@ -49,6 +49,11 @@ DEFAULT_SCAN_TYPES = [
         "label": "Pre-Market",
         "scanner": "premarket",  # uses premarket_volume_scanner.run_premarket_volume_scan
     },
+    {
+        "id": "velocity_premarket",
+        "label": "Velocity Pre-Market Hunter",
+        "scanner": "velocity_premarket",  # uses velocity_scanner.run_premarket_scan (GUI only; no CLI)
+    },
 ]
 
 # Slider/param specs per scanner (core params only; strict institutional gates removed so scans pass)
@@ -98,6 +103,7 @@ SCAN_PARAM_SPECS = {
         ]},
         {"key": "insider_min_score", "label": "Min Score (report)", "min": 0, "max": 100, "default": 0, "type": "int"},
     ],
+    "velocity_premarket": [],  # fixed universe, no GUI params
 }
 
 

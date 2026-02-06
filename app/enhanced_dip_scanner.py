@@ -105,6 +105,53 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
         return []
 
 
+def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict]:
+    """
+    Get dip candidates from a fixed ticker list (e.g. Velocity high-conviction universe).
+    For each ticker, fetches quote via Finviz; keeps those down within configured dip range.
+    Returns same structure as get_sp500_dips for use by emotional_dip_scanner.
+    """
+    min_dip = float(config.get('dip_min_percent', 1.0))
+    max_dip = float(config.get('dip_max_percent', 5.0))
+    min_price = float(config.get('min_price', 5.0))
+    max_price = float(config.get('max_price', 500.0))
+    min_volume = int(float(config.get('min_avg_volume', 500000)))
+    results = []
+    for ticker in (ticker_list or []):
+        ticker = (ticker or "").strip().upper()
+        if not ticker:
+            continue
+        try:
+            stock = finviz.get_stock(ticker)
+            if not stock:
+                continue
+            change_str = (stock.get('Change') or '0%').replace('%', '').strip()
+            change = float(change_str)
+            price = float(stock.get('Price') or 0)
+            vol_str = (stock.get('Volume') or '0').replace(',', '').replace('K', 'e3').replace('M', 'e6')
+            try:
+                vol = int(float(vol_str))
+            except (TypeError, ValueError):
+                vol = 0
+            if -max_dip > change or change > -min_dip:
+                continue
+            if price < min_price or price > max_price or vol < min_volume:
+                continue
+            results.append({
+                'ticker': stock.get('Ticker') or ticker,
+                'company': stock.get('Company') or ticker,
+                'price': price,
+                'change': change,
+                'volume': stock.get('Volume'),
+                'rel_volume': stock.get('Rel Volume'),
+                'sector': stock.get('Sector') or '',
+                'industry': stock.get('Industry') or '',
+            })
+        except Exception:
+            continue
+    return results
+
+
 def analyze_dip_quality(ticker: str) -> Dict:
     """
     Deep analysis of a dip candidate.

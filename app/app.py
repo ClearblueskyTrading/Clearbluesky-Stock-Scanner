@@ -24,6 +24,14 @@ from scan_settings import (
 )
 from sound_utils import play_scan_complete_alarm, play_watchlist_alert
 
+# Updater: backup, update (preserve user config), rollback
+try:
+    from updater import get_backup_info, run_update_flow, rollback as updater_rollback
+except Exception:
+    get_backup_info = lambda: None
+    run_update_flow = lambda *a, **k: "Updater not available"
+    updater_rollback = lambda *a, **k: "Updater not available"
+
 # Use app folder for config and logs (portable)
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(APP_DIR, "user_config.json")
@@ -139,6 +147,7 @@ def _scan_worker_loop(app):
         "velocity_leveraged": "Velocity Barbell",
         "insider": "Insider",
         "premarket": "Premarket",
+        "velocity_premarket": "Velocity Pre-Market Hunter",
     }
     while True:
         if getattr(app, "scan_cancelled", False):
@@ -169,7 +178,7 @@ def _scan_worker_loop(app):
         scanner_kind = (scan_def or {}).get("scanner", "")
         label = (scan_def or {}).get("label", "Scan")
         short_label = SCANNER_TO_REPORT_LABEL.get(scanner_kind, label)
-        if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+        if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket"):
             continue
         try:
             app.scan_result_queue.put(("start", label))
@@ -208,6 +217,11 @@ def _scan_worker_loop(app):
             elif scanner_kind == "premarket":
                 from premarket_volume_scanner import run_premarket_volume_scan
                 results = run_premarket_volume_scan(progress_put, index=index)
+            elif scanner_kind == "velocity_premarket":
+                from velocity_scanner import run_premarket_scan, write_pdf
+                report = run_premarket_scan(progress_callback=progress_put, index=index)
+                write_pdf(report)
+                results = report.get("tickers") or []
             elapsed = int(time.time() - start_time)
             if getattr(app, "scan_cancelled", False):
                 try:
@@ -416,7 +430,7 @@ class TradeBotApp:
         ttk.Combobox(
             type_row,
             textvariable=self.scan_index,
-            values=["S&P 500", "Russell 2000", "ETFs"],
+            values=["S&P 500", "Russell 2000", "ETFs", "Velocity (high-conviction)"],
             state="readonly",
             width=10,
             font=("Arial", 9),
@@ -532,6 +546,17 @@ class TradeBotApp:
             tk.Button(row2, text=text, command=cmd, bg="#e9ecef", fg="#333",
                      font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
         
+        # Update / Rollback (update keeps existing user config; rollback restores code, keeps config)
+        row2b = tk.Frame(btn_frame, bg="#f8f9fa")
+        row2b.pack(fill="x", pady=(0, 3))
+        tk.Button(row2b, text="🔄 Update", command=self._do_update, bg="#17a2b8", fg="white",
+                 font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
+        self.rollback_btn = tk.Button(row2b, text="↩️ Rollback", command=self._do_rollback, bg="#6c757d", fg="white",
+                                     font=("Arial", 9), width=10, relief="flat", cursor="hand2")
+        self.rollback_btn.pack(side="left", padx=3)
+        if not get_backup_info():
+            self.rollback_btn.config(state="disabled")
+        
         row3 = tk.Frame(btn_frame, bg="#f8f9fa")
         row3.pack(fill="x")
         btn_width = 18
@@ -595,7 +620,7 @@ class TradeBotApp:
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
         tk.Label(main_f, text="Index:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
         idx_var = tk.StringVar(value=self.scan_index.get())
-        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
+        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs", "Velocity (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -864,6 +889,8 @@ class TradeBotApp:
                             no_result_msg = "No insider transactions"
                         elif short_label == "Premarket":
                             no_result_msg = "No pre-market activity"
+                        elif short_label == "Velocity Pre-Market Hunter":
+                            no_result_msg = "No A+ setups"
                         self.scan_complete(
                             self.scan_progress, self.scan_status, self.scan_printer,
                             self.scan_btn, no_result_msg, self.scan_stop_btn,
@@ -906,6 +933,8 @@ class TradeBotApp:
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
         if "Pre-Market" in label or ("Pre" in label and "Market" in label):
+            if "Hunter" in label:
+                return {"id": "velocity_premarket_fallback", "label": label, "scanner": "velocity_premarket"}
             return {"id": "premarket_fallback", "label": label, "scanner": "premarket"}
         if "Watchlist" in label:
             return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
@@ -1395,7 +1424,7 @@ class TradeBotApp:
             messagebox.showinfo("Scan", "A scan is already running.")
             return
         idx_text = self.scan_index.get()
-        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else "russell2000")
+        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Velocity" in idx_text else "russell2000"))
         self.scan_cancelled = False
         # Clear any stale jobs
         try:
@@ -1405,7 +1434,7 @@ class TradeBotApp:
             pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
-            allowed = ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket")
+            allowed = ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket")
             enqueued = 0
             for i, scan_def in enumerate(types_list):
                 scanner_kind = (scan_def or {}).get("scanner", "")
@@ -1419,7 +1448,7 @@ class TradeBotApp:
         else:
             scan_def = self._get_current_scan_def()
             scanner_kind = (scan_def or {}).get("scanner", "")
-            if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+            if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket"):
                 messagebox.showwarning("Scan Type", "Please select a valid scan type.")
                 return
             self.scan_job_queue.put(("scan", scan_def, index))
@@ -1616,6 +1645,60 @@ class TradeBotApp:
         except Exception as e:
             self.status.config(text="Error")
             messagebox.showerror("Error", str(e))
+    
+    # === UPDATE / ROLLBACK (preserve user config) ===
+    
+    def _do_update(self):
+        """Update from GitHub: backup first, then apply update. Keeps existing user_config.json."""
+        if not messagebox.askyesno("Update", "Update now? This will backup your current version, then download and apply the latest release.\n\nYour user_config.json will be kept."):
+            return
+        self.status.config(text="Backing up...")
+        self.root.update()
+        def run():
+            def progress(msg):
+                try:
+                    self.root.after(0, lambda: self.status.config(text=msg))
+                    self.root.update_idletasks()
+                except Exception:
+                    pass
+            err = run_update_flow(VERSION, progress_callback=progress)
+            def done():
+                self.status.config(text="Ready")
+                if err:
+                    messagebox.showerror("Update failed", err)
+                else:
+                    messagebox.showinfo("Update", "Update complete. Restart the app to use the new version.")
+                    if getattr(self, "rollback_btn", None):
+                        self.rollback_btn.config(state="normal")
+            self.root.after(0, done)
+        threading.Thread(target=run, daemon=True).start()
+    
+    def _do_rollback(self):
+        """Restore from last backup. Keeps current user_config.json."""
+        info = get_backup_info()
+        if not info:
+            messagebox.showinfo("Rollback", "No backup found. Run an update first to create a backup.")
+            return
+        if not messagebox.askyesno("Rollback", f"Restore from backup (version {info.get('version', '?')})?\n\nYour current user_config.json will be kept."):
+            return
+        self.status.config(text="Rolling back...")
+        self.root.update()
+        def run():
+            def progress(msg):
+                try:
+                    self.root.after(0, lambda: self.status.config(text=msg))
+                    self.root.update_idletasks()
+                except Exception:
+                    pass
+            err = updater_rollback(progress_callback=progress)
+            def done():
+                self.status.config(text="Ready")
+                if err:
+                    messagebox.showerror("Rollback failed", err)
+                else:
+                    messagebox.showinfo("Rollback", "Rollback complete. Restart the app to use the previous version.")
+            self.root.after(0, done)
+        threading.Thread(target=run, daemon=True).start()
     
     # === SETTINGS ===
 

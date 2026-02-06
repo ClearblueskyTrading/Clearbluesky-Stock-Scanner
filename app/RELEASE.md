@@ -22,20 +22,23 @@ Use this as the **Release notes** when creating a new release on GitHub.
 ### Highlights
 
 - **Queue-based scans** – Scans run in a background thread so the GUI stays responsive (no more hanging).
-- **Run all scans** – New checkbox runs all six scanners in sequence with 60-second delays to respect API rate limits. Note: may take 20+ minutes.
-- **Simplified scanners** – Swing is always emotional-only dips; Watchlist is one scanner with Filter: "Down X% today" or "All tickers".
+- **Run all scans** – New checkbox runs all seven scanners in sequence with 60-second delays to respect API rate limits. Note: may take 20+ minutes.
+- **In-app Update & Rollback** – **Update** backs up your version and applies the latest release; **Rollback** restores the previous version. **Your `user_config.json` is never overwritten.** See root **UPDATE.md**. Versioning from v7.0: **7.1, 7.2**, etc.
+- **Simplified scanners** – Swing is always emotional-only dips (Index: S&P 500 / Russell / ETFs or **Velocity (high-conviction)**); Watchlist is one scanner with Filter: "Down X% today" or "All tickers".
+- **Velocity Pre-Market Hunter** – New scan type: pre-market setups (gap recovery, accumulation, breakout, gap-and-go) with grades A+–F. Index: S&P 500 / Russell / ETFs (not ticker-restricted) or Velocity universe.
 - **Pre-Market** – Fixed Windows encoding when outside the optimal scan window.
 
-### Scanners (6)
+### Scanners (7)
 
 | Scanner | Description |
 |---------|-------------|
 | **Trend – Long-term** | Uptrending (S&P 500 / Russell 2000 / ETFs). |
-| **Swing – Dips** | Emotional-only dips (1–5 days). |
+| **Swing – Dips** | Emotional-only dips (1–5 days). Index: S&P 500 / Russell / ETFs / Velocity (high-conviction). |
 | **Watchlist** | Filter: Down X% today (min % in 1–25%) or All tickers. |
 | **Velocity Barbell** | Sector signals → leveraged ideas. |
 | **Insider – Latest** | Latest insider transactions (Finviz). |
 | **Pre-Market** | Pre-market volume (7–9:25 AM). |
+| **Velocity Pre-Market Hunter** | Pre-market setups (gap recovery, accumulation, breakout, gap-and-go); grades A+–F. Index: S&P 500 / Russell / ETFs or Velocity universe. |
 
 ### Requirements
 

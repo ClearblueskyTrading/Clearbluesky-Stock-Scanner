@@ -2,12 +2,13 @@
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market (S&P 500 / Russell 2000 / ETFs where applicable)
-- **Run all scans** – Optional checkbox runs all six scanners in sequence (rate-limited; may take 20+ minutes)
+- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market, **Velocity Pre-Market Hunter** (S&P 500 / Russell 2000 / ETFs or Velocity universe where applicable)
+- **Run all scans** – Optional checkbox runs all seven scanners in sequence (rate-limited; may take 20+ minutes)
 - **CLI** – Run scans from the command line for automation (e.g. Claude, Desktop Commander): `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
 - **Outputs** – PDF report (with per-stock SMA200 status), JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter
 - **Optional AI pipeline** – OpenRouter API key → AI analysis saved as `*_ai.txt`; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context, chart images
+- **In-app Update & Rollback** – **Update** backs up your version and applies the latest release from GitHub; **Rollback** restores the previous version. **Your `user_config.json` is never overwritten.** See **UPDATE.md**. From v7.0 onward, versioning is strict: **7.1, 7.2**, etc.
 - **Update notice** – On startup, checks for a newer version and shows a link to download
 
 No API key required for the scanners. Optional keys in **Settings**: Finviz, OpenRouter, Alpha Vantage (all stored only in local `user_config.json`). **Releases and the repo never include API keys or user config** – `user_config.json` is gitignored and is not copied on install; the app creates a blank config on first run.
@@ -18,7 +19,7 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).
-3. **Scan** – Choose scan type (Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market); pick index (S&P 500 / Russell 2000 / ETFs) where applicable; click **Run Scan**. Optional: check **Run all scans** (rate-limited).
+3. **Scan** – Choose scan type (Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market, **Velocity Pre-Market Hunter**); pick index (S&P 500 / Russell 2000 / ETFs / Velocity (high-conviction)) where applicable; click **Run Scan**. Optional: check **Run all scans** (rate-limited).
 4. **Report** – PDF + JSON open when done (reports show per-stock SMA200 status: Above/Below/At/N/A). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
 
 **CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity` (or trend, swing, watchlist, insider, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
@@ -57,6 +58,7 @@ ClearBlueSky/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── RELEASE_v7.0.md     ← v7.0 release notes
+├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
     ├── run.sh          ← Run on Linux/macOS (no Docker)
     ├── app.py                  ← Main app
@@ -89,6 +91,7 @@ ClearBlueSky/
 | **Velocity Barbell** | Sector signals → leveraged ideas | Config: min sector %, theme |
 | **Insider**    | Latest insider transactions (Finviz) | Anytime |
 | **Pre-Market** | Pre-market volume | 7–9:25 AM |
+| **Velocity Pre-Market Hunter** | Pre-market setups (gap recovery, accumulation, breakout, gap-and-go) | 7–9:25 AM; Index: S&P 500 / Russell / ETFs or Velocity universe |
 
 Reports: PDF (date/time stamped, Master Trading Report Directive + per-ticker data), JSON (same data + `instructions` for any AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: "Follow the instructions in the `instructions` field." See **app/WORKFLOW.md** for the full pipeline.
 
