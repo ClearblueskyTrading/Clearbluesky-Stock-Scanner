@@ -20,6 +20,7 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ### Fixed
 - Pre-Market scanner encoding on Windows (`'charmap' codec` when printing Unicode).
+- **Reports folder** – Reports path is always resolved relative to the app folder (not cwd). Prevents wrong or duplicate reports folders when config has a relative path; GUI and CLI use the same logic. Settings save the resolved absolute path.
 
 ---
 

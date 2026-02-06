@@ -18,6 +18,7 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 - **CLI** – Scan types: trend, swing, watchlist, velocity, insider, premarket (no emotional_dip, no watchlist_tickers). Watchlist uses config `watchlist_filter`.
 - **Pre-Market** – Removed emoji from "Outside optimal pre-market window" message for Windows encoding.
 - **INSTALL.bat** – Updated to v7.0.
+- **Reports folder** – Reports path resolved relative to app folder (not cwd); prevents wrong or duplicate reports folders. Settings persist absolute path.
 
 ### Docs
 - README.md, README.txt (root and app), RELEASE_v7.0.md, app/CHANGELOG.md, app/RELEASE.md, app/CLI_FOR_CLAUDE.md, app/SCANNER_NAMING_AUDIT.md.

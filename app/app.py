@@ -31,6 +31,16 @@ LOG_FILE = os.path.join(APP_DIR, "error_log.txt")
 DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
 WATCHLIST_MAX = 200
 
+
+def _resolve_reports_dir(path):
+    """Resolve reports folder to absolute path. Relative paths are relative to APP_DIR (app folder)."""
+    if not path or not str(path).strip():
+        return os.path.abspath(DEFAULT_REPORTS_DIR)
+    path = str(path).strip()
+    if not os.path.isabs(path):
+        path = os.path.join(APP_DIR, path)
+    return os.path.abspath(path)
+
 # GitHub: check for new releases
 GITHUB_RELEASES_API = "https://api.github.com/repos/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
 GITHUB_RELEASES_PAGE = "https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
@@ -1395,13 +1405,17 @@ class TradeBotApp:
             pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
+            allowed = ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket")
+            enqueued = 0
             for i, scan_def in enumerate(types_list):
                 scanner_kind = (scan_def or {}).get("scanner", "")
-                if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket"):
+                if scanner_kind not in allowed:
                     continue
                 self.scan_job_queue.put(("scan", scan_def, index))
+                enqueued += 1
                 if i < len(types_list) - 1:
                     self.scan_job_queue.put(("delay", RATE_LIMIT_DELAY_SEC))
+            log(f"Run all scans: enqueued {enqueued} scan(s)")
         else:
             scan_def = self._get_current_scan_def()
             scanner_kind = (scan_def or {}).get("scanner", "")
@@ -1428,7 +1442,7 @@ class TradeBotApp:
                 min_score = int(self.config.get("emotional_min_score", 65))
             else:
                 min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell") else 65))
-            reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
+            reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
             watchlist_set = set(str(t).upper().strip() for t in watchlist if t)
@@ -1591,7 +1605,7 @@ class TradeBotApp:
 
         try:
             from report_generator import HTMLReportGenerator
-            reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
+            reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
             path, _, _ = gen.generate_combined_report_pdf([{'ticker': symbol, 'score': 80}], "Analysis", 0)
             if path:
@@ -1822,7 +1836,7 @@ class TradeBotApp:
         tk.Checkbutton(reports_f, text="Include TA in report (SMAs, RSI, MACD, BB, ATR, Fib)", variable=include_ta_var,
                       bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w", pady=(0, 6))
         tk.Label(reports_f, text="Output folder:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
-        reports_folder_var = tk.StringVar(value=self.config.get("reports_folder", "") or DEFAULT_REPORTS_DIR)
+        reports_folder_var = tk.StringVar(value=_resolve_reports_dir(self.config.get("reports_folder", "") or DEFAULT_REPORTS_DIR))
         reports_row = tk.Frame(reports_f, bg="white")
         reports_row.pack(fill="x", pady=(2, 4))
         tk.Entry(reports_row, textvariable=reports_folder_var, width=42).pack(side="left")
@@ -1869,7 +1883,7 @@ class TradeBotApp:
             self.config['rag_books_folder'] = rag_folder_var.get().strip()
             self.config['rag_enabled'] = rag_enabled_var.get()
             raw_reports = reports_folder_var.get().strip()
-            self.config['reports_folder'] = raw_reports if raw_reports else DEFAULT_REPORTS_DIR
+            self.config['reports_folder'] = _resolve_reports_dir(raw_reports or DEFAULT_REPORTS_DIR)
             self.config['include_ta_in_report'] = include_ta_var.get()
             self.config['play_alarm_on_complete'] = play_alarm_var.get()
             c = alarm_choice_var.get().strip().lower()
@@ -2025,7 +2039,7 @@ class TradeBotApp:
         webbrowser.open(self.config.get('broker_url', 'https://www.schwab.com'))
     
     def open_reports(self):
-        reports_dir = self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR
+        reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
         os.makedirs(reports_dir, exist_ok=True)
         os.startfile(reports_dir)
     

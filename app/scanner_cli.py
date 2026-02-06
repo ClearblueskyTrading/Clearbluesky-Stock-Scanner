@@ -47,6 +47,8 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
     default_min = 0 if scan_type_display in zero_min else 65
     min_score = int(config.get(f"{scan_type_display.lower()}_min_score", default_min))
     reports_dir = config.get("reports_folder") or DEFAULT_REPORTS_DIR
+    if not os.path.isabs(reports_dir):
+        reports_dir = os.path.join(APP_DIR, reports_dir)
     reports_dir = os.path.abspath(reports_dir)
     os.makedirs(reports_dir, exist_ok=True)
 
