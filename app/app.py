@@ -518,8 +518,8 @@ class TradeBotApp:
         
         ticker_row = tk.Frame(ticker_frame, bg="white")
         ticker_row.pack(pady=4, padx=6)
-        tk.Label(ticker_row, text="Symbol:", font=("Arial", 9), bg="white", fg="#333").pack(side="left", padx=(0, 4))
-        self.symbol_entry = tk.Entry(ticker_row, width=7, font=("Arial", 11), relief="solid", bd=1)
+        tk.Label(ticker_row, text="Symbols (1-5):", font=("Arial", 9), bg="white", fg="#333").pack(side="left", padx=(0, 4))
+        self.symbol_entry = tk.Entry(ticker_row, width=20, font=("Arial", 11), relief="solid", bd=1)
         self.symbol_entry.pack(side="left")
         tk.Button(ticker_row, text="📄 Report", command=self.generate_report,
                   bg=ORANGE, fg="white", font=("Arial", 9, "bold"), width=8,
@@ -1626,18 +1626,33 @@ class TradeBotApp:
     # === SINGLE TICKER ===
     
     def generate_report(self):
-        symbol = self.symbol_entry.get().strip().upper()
-        if not symbol:
+        symbols_input = self.symbol_entry.get().strip().upper()
+        if not symbols_input:
             return
         
-        self.status.config(text=f"Loading {symbol}...")
+        # Parse up to 5 tickers (comma or space separated)
+        symbols_raw = symbols_input.replace(",", " ").split()
+        symbols = [s.strip() for s in symbols_raw if s.strip()][:5]
+        
+        if not symbols:
+            return
+        
+        if len(symbols) > 5:
+            messagebox.showwarning("Too many symbols", "Maximum 5 symbols allowed. Using first 5.")
+            symbols = symbols[:5]
+        
+        self.status.config(text=f"Loading {', '.join(symbols)}...")
         self.root.update()
 
         try:
             from report_generator import HTMLReportGenerator
             reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
-            path, _, _ = gen.generate_combined_report_pdf([{'ticker': symbol, 'score': 80}], "Analysis", 0)
+            
+            # Build ticker list for report (each gets score 80 for quick lookup)
+            ticker_data = [{'ticker': sym, 'score': 80} for sym in symbols]
+            
+            path, _, _ = gen.generate_combined_report_pdf(ticker_data, "Quick Lookup", 0)
             if path:
                 file_url = "file:///" + path.replace("\\", "/").lstrip("/")
                 webbrowser.open(file_url)
