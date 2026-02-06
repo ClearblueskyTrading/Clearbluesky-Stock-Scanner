@@ -1,9 +1,9 @@
-# ClearBlueSky Stock Scanner v7.0
+# ClearBlueSky Stock Scanner v7.1
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market (S&P 500 / Russell 2000 / ETFs where applicable)
-- **Run all scans** – Optional checkbox runs all six scans in sequence (rate-limited; may take 20+ minutes)
+- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market, Velocity Pre-Market Hunter (S&P 500 / Russell 2000 / ETFs / Velocity where applicable)
+- **Run all scans** – Optional checkbox runs all seven scans in sequence (rate-limited; may take 20+ minutes)
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
 - **Outputs** – PDF report, JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter
 - **Optional AI pipeline** – OpenRouter API key → AI analysis saved as `*_ai.txt`; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context, chart images

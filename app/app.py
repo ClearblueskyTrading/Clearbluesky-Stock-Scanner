@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.0
+# ClearBlueSky Stock Scanner v7.1
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.0"
+VERSION = "7.1"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -2240,7 +2240,7 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.0
+ClearBlueSky Stock Scanner v7.1
 
 QUICK START:
 1. Select scan type and index (N/A for Watchlist / Velocity Barbell / Insider).
@@ -2289,7 +2289,7 @@ AI STRATEGY:
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.0
+ClearBlueSky v7.1
 ─────────────────────────────────
         """
         messagebox.showinfo("Help", help_text)
