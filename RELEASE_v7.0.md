@@ -13,6 +13,7 @@
 - **Pre-Market** – Fixed Windows encoding when outside optimal scan window.
 - **CLI** – Scan types: trend, swing, watchlist, velocity, insider, premarket (no emotional_dip or watchlist_tickers). Watchlist uses config `watchlist_filter`.
 - **Reports folder** – Path always resolved relative to app folder; no duplicate or wrong folder. Settings save absolute path.
+- **Executive summary in PDF, JSON, and _ai.txt** – All three report outputs now include a short prompt so any AI (used alone or together) produces a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language, then trade recommendations.
 
 See **app/CHANGELOG.md** for full details.
 
@@ -23,7 +24,7 @@ See **app/CHANGELOG.md** for full details.
 - **File:** `ClearBlueSky-v7.0.zip` (tag `v7.0` on GitHub).
 
 **Included (clean):**
-- **Root:** INSTALL.bat, README.md, README.txt, LICENSE.txt, CHANGELOG.md, RELEASE_v7.0.md, DOCKER.md, docker-compose.yml, Dockerfile, CLAUDE_AI_GUIDE.md.
+- **Root:** INSTALL.bat, README.md, README.txt, LICENSE.txt, CHANGELOG.md, RELEASE_v7.0.md, NEXT_RELEASE.md, DOCKER.md, docker-compose.yml, Dockerfile, CLAUDE_AI_GUIDE.md.
 - **app/:** All app code (.py), README.md, CHANGELOG.md, RELEASE.md, CLI_FOR_CLAUDE.md, WORKFLOW.md, SCANNER_*.md, requirements.txt, RUN.bat, run.sh, START.bat, scan_types.json, scan_presets.json, scan_settings (via code), user_config.json.example, leveraged_tickers.json, velocity_leveraged_arsenal.json, and other docs/data needed to run. No user data.
 
 **Excluded (never in zip):**

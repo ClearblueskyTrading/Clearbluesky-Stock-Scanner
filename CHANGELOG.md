@@ -20,8 +20,11 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 - **INSTALL.bat** – Updated to v7.0.
 - **Reports folder** – Reports path resolved relative to app folder (not cwd); prevents wrong or duplicate reports folders. Settings persist absolute path.
 
+### Added
+- **Executive summary in all 3 report outputs** – PDF, JSON instructions, and _ai.txt (OpenRouter prompt + file header) now specify: start with a brief executive summary (context, rationale, key findings) in plain language, then trade recommendations. Same prompt in each file so they work alone or together.
+
 ### Docs
-- README.md, README.txt (root and app), RELEASE_v7.0.md, app/CHANGELOG.md, app/RELEASE.md, app/CLI_FOR_CLAUDE.md, app/SCANNER_NAMING_AUDIT.md.
+- README.md, README.txt (root and app), RELEASE_v7.0.md, NEXT_RELEASE.md, app/CHANGELOG.md, app/RELEASE.md, app/CLI_FOR_CLAUDE.md, app/SCANNER_NAMING_AUDIT.md.
 
 ---
 

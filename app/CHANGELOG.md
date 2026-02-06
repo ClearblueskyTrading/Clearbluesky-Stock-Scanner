@@ -18,6 +18,9 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 - **CLI** – `--scan` choices: trend, swing, watchlist, velocity, premarket, insider (no emotional_dip, no watchlist_tickers). Watchlist uses config `watchlist_filter` (all vs down_pct).
 - **Pre-Market** – Removed emoji from "Outside optimal pre-market window" message for Windows console encoding.
 
+### Added
+- **Executive summary in all 3 report outputs** – PDF directive, JSON `instructions`, and _ai.txt (system prompt + file header) now tell any AI to start with a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language—not only trade recommendations. Applies whether each file is used alone or together.
+
 ### Fixed
 - Pre-Market scanner encoding on Windows (`'charmap' codec` when printing Unicode).
 - **Reports folder** – Reports path is always resolved relative to the app folder (not cwd). Prevents wrong or duplicate reports folders when config has a relative path; GUI and CLI use the same logic. Settings save the resolved absolute path.
