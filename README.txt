@@ -14,8 +14,9 @@ Gemini, ChatGPT, or your own private AI.
    WHAT'S IN v6.5
 ════════════════════════════════════════════════════════════════════════════
 
-• Scanners: Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market
-• PDF + JSON reports – date/time stamped; JSON includes “instructions” for any AI
+• Scanners: Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000 / ETFs)
+• CLI – Run scans from command line: python app/scanner_cli.py --scan <type>. See app/CLI_FOR_CLAUDE.md for automation.
+• PDF + JSON reports – date/time stamped; per-stock SMA200 status (Above/Below/N/A); JSON includes “instructions” for any AI
 • Optional OpenRouter AI – set API key in Settings; AI analysis saved as *_ai.txt
 • Optional: RAG (.txt/.pdf books), TA in report, Alpha Vantage sentiment, SEC insider context, chart images
 • Watchlist – up to 200 tickers; 2 beeps + ★ WATCHLIST when one appears in a scan
@@ -55,7 +56,7 @@ OTHER WAYS TO RUN (no Windows installer):
 
 2. Select scan type: Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, etc.
 
-3. Select index: S&P 500 or Russell 2000 (N/A for Watchlist / Velocity Barbell / Insider)
+3. Select index: S&P 500, Russell 2000, or ETFs (N/A for Watchlist / Velocity Barbell / Insider)
 
 4. Click "Run Scan". When done, the PDF report opens.
 

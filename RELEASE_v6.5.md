@@ -25,10 +25,18 @@
 
 - **ETFs** – The index dropdown (S&P 500 / Russell 2000) now includes **ETFs**. When you select **ETFs**, all index-based scanners (Trend, Swing – Dips, Emotional Dip, Pre-Market) and report market breadth use the **Finviz Exchange Traded Fund** universe.
 
+### CLI for Claude / automation
+
+- **Command-line scanner** – Run scans without the GUI: `python scanner_cli.py --scan <type> [--index sp500|russell2000|etfs] [--watchlist-file PATH]`. Scan types: trend, swing, velocity, premarket, emotional_dip, insider, watchlist, watchlist_tickers. Exit 0 on success, 1 on failure; output uses `[OK]` / `[FAIL]` (no emoji) so it works on Windows console. See **app/CLI_FOR_CLAUDE.md** for full usage.
+
+### Reports – SMA200 status
+
+- **Per-stock SMA200 status** – Reports now show **SMA200 status** (Above / Below / At / N/A) for each ticker. SMA50 and SMA200 no longer show "null"; missing values display as N/A. Status is derived from TA (price vs SMA200) or from Finviz when available.
+
 ### Docs & Help
 
-- **In-app Help (❓)** – Updated for Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, and ETFs index. N/A index note for Velocity Barbell and watchlist scans.
-- **README / README.txt** – Version 6.5, full scanner list, and quick start updated.
+- **In-app Help (❓)** – Updated for Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, ETFs index, and CLI. N/A index note for Velocity Barbell and watchlist scans.
+- **README / README.txt** – Version 6.5, full scanner list, CLI, and quick start updated.
 
 ---
 
@@ -64,6 +72,10 @@
 3. **Velocity Barbell** uses **velocity_leveraged_arsenal.json** and **velocity_leveraged_scanner.py** in `app/`. No extra setup.
 
 ---
+
+## CLI (optional)
+
+- From the app folder: `python scanner_cli.py --scan velocity` (or trend, swing, premarket, emotional_dip, insider, watchlist, watchlist_tickers). Use `--index etfs` for ETF universe where applicable. See **app/CLI_FOR_CLAUDE.md** for automation and Claude.
 
 ## Release package
 

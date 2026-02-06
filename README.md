@@ -2,9 +2,10 @@
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **Scanners** – Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000 where applicable)  
+- **Scanners** – Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market (S&P 500 / Russell 2000 / ETFs where applicable)  
+- **CLI** – Run scans from the command line for automation (e.g. Claude, Desktop Commander): `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.  
 - **Watchlist** – 2 beeps + ★ WATCHLIST when a watchlist ticker appears in any scan  
-- **Outputs** – PDF report, JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter  
+- **Outputs** – PDF report (with per-stock SMA200 status), JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter  
 - **Optional AI pipeline** – OpenRouter API key → AI analysis saved as `*_ai.txt`; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context, chart images  
 - **Update notice** – On startup, checks for a newer version and shows a link to download  
 
@@ -16,8 +17,10 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).  
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).  
-3. **Scan** – Choose scan type (Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market); pick index where applicable; click **Run Scan**.  
-4. **Report** – PDF + JSON open when done. If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.  
+3. **Scan** – Choose scan type (Trend, Swing, Watchlist 3pm, Watchlist – All tickers, Velocity Barbell, Insider, Emotional Dip, Pre-Market); pick index (S&P 500 / Russell 2000 / ETFs) where applicable; click **Run Scan**.  
+4. **Report** – PDF + JSON open when done (reports show per-stock SMA200 status: Above/Below/At/N/A). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.  
+
+**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity` (or trend, swing, premarket, emotional_dip, insider, watchlist, watchlist_tickers). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.  
 
 **Watchlist:** Click **Watchlist** to add symbols (max 200). You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it’s listed at the top of the report with a ★ WATCHLIST label.
 
@@ -64,7 +67,9 @@ ClearBlueSky/
     ├── requirements.txt
     ├── START.bat / RUN.bat
     ├── scan_types.json         ← Scan types (Trend, Swing, Watchlist 3pm, Velocity Barbell, Insider, …)
-├── insider_scanner.py      ← Insider trading scan (Finviz)
+    ├── scanner_cli.py          ← CLI for Claude/automation (no GUI)
+    ├── CLI_FOR_CLAUDE.md       ← CLI usage for automation
+    ├── insider_scanner.py      ← Insider trading scan (Finviz)
     └── reports/                ← PDFs (created at runtime)
 ```
 
