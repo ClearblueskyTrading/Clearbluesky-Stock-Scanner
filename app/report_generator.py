@@ -158,6 +158,9 @@ class ReportGenerator:
         
         stock = self._finviz_get_stock_with_retry(ticker)
         if stock:
+            # Normalize SMA so we never store None (avoids "null" in JSON/report)
+            sma50_raw = stock.get('SMA50') or stock.get('SMA 50') or stock.get('50-Day SMA')
+            sma200_raw = stock.get('SMA200') or stock.get('SMA 200') or stock.get('200-Day SMA')
             data.update({
                 'price': stock.get('Price', 'N/A'),
                 'change': stock.get('Change', 'N/A'),
@@ -169,8 +172,8 @@ class ReportGenerator:
                 'pe': stock.get('P/E', 'N/A'),
                 'target': stock.get('Target Price', 'N/A'),
                 'rsi': stock.get('RSI (14)', 'N/A'),
-                'sma50': stock.get('SMA50', 'N/A'),
-                'sma200': stock.get('SMA200', 'N/A'),
+                'sma50': sma50_raw if sma50_raw not in (None, '') else 'N/A',
+                'sma200': sma200_raw if sma200_raw not in (None, '') else 'N/A',
                 'perf_week': stock.get('Perf Week', 'N/A'),
                 'perf_month': stock.get('Perf Month', 'N/A'),
                 'perf_quarter': stock.get('Perf Quarter', 'N/A'),
@@ -194,6 +197,24 @@ class ReportGenerator:
         else:
             data['risk_checks'] = _default_risk_checks()
         return data
+
+    def _derive_sma200_status(self, row):
+        """Return 'Above', 'Below', or 'N/A' for 200 SMA. Uses TA price_vs_sma200 if available, else parses Finviz SMA200."""
+        ta_dict = row.get('ta') or {}
+        pct = ta_dict.get('price_vs_sma200')
+        if pct is not None:
+            return 'Above' if float(pct) > 0 else 'Below'
+        raw = row.get('sma200') or row.get('SMA200')
+        if raw in (None, '', 'N/A'):
+            return 'N/A'
+        try:
+            s = str(raw).replace('%', '').strip()
+            if not s:
+                return 'N/A'
+            val = float(s)
+            return 'Above' if val > 0 else 'Below' if val < 0 else 'At'
+        except (TypeError, ValueError):
+            return 'N/A'
 
     def _parse_risk_checks(self, stock):
         """Build risk_checks from Finviz stock dict: earnings, ex-dividend, relative volume."""
@@ -314,8 +335,9 @@ class ReportGenerator:
                 "pe": s.get("pe", "N/A"),
                 "target": s.get("target", "N/A"),
                 "rsi": s.get("rsi", "N/A"),
-                "sma50": s.get("sma50", "N/A"),
-                "sma200": s.get("sma200", "N/A"),
+                "sma50": s.get("sma50") or "N/A",
+                "sma200": s.get("sma200") or "N/A",
+                "sma200_status": s.get("sma200_status", "N/A"),
                 "rel_volume": s.get("rel_volume", "N/A"),
                 "recom": s.get("recom", "N/A"),
                 "news": headlines,
@@ -410,6 +432,10 @@ class ReportGenerator:
                     row['ta'] = {}
             except Exception:
                 row['ta'] = {}
+            # Never leave SMA null; flag 200 SMA status for report
+            row['sma50'] = row.get('sma50') or 'N/A'
+            row['sma200'] = row.get('sma200') or 'N/A'
+            row['sma200_status'] = self._derive_sma200_status(row)
             try:
                 av_key = (config or {}).get("alpha_vantage_api_key") or ""
                 if av_key.strip():
@@ -472,7 +498,9 @@ class ReportGenerator:
         breadth_line_prompt = ""
         if market_breadth and "error" not in market_breadth:
             regime = market_breadth.get("market_regime", "N/A")
-            breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {market_breadth.get('sp500_above_sma50_pct')}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
+            sma50_pct = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
+            sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
+            breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
         ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
 
 IMPORTANT: For each stock:
@@ -557,8 +585,8 @@ RISK MANAGEMENT:
         ]
         if market_breadth and "error" not in market_breadth:
             regime = market_breadth.get("market_regime", "N/A")
-            sma50 = market_breadth.get("sp500_above_sma50_pct")
-            sma200 = market_breadth.get("sp500_above_sma200_pct")
+            sma50 = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
+            sma200 = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             ad = market_breadth.get("advance_decline")
             rsi = market_breadth.get("avg_rsi_sp500")
             body_lines.append(f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}")
@@ -586,7 +614,7 @@ RISK MANAGEMENT:
                 body_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
                 body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")
             body_lines.append(f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}")
-            body_lines.append(f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}")
+            body_lines.append(f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | SMA200 status: {s.get('sma200_status','N/A')}  | Recom: {s.get('recom','N/A')}")
             ta_dict = s.get('ta') or {}
             if ta_dict:
                 from ta_engine import format_ta_for_report
@@ -670,8 +698,8 @@ RISK MANAGEMENT:
             # 2) Market breadth (if present)
             if market_breadth and "error" not in market_breadth:
                 regime = market_breadth.get("market_regime", "N/A")
-                sma50 = market_breadth.get("sp500_above_sma50_pct")
-                sma200 = market_breadth.get("sp500_above_sma200_pct")
+                sma50 = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
+                sma200 = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
                 ad = market_breadth.get("advance_decline")
                 rsi = market_breadth.get("avg_rsi_sp500")
                 breadth_line = f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}"
@@ -721,7 +749,7 @@ RISK MANAGEMENT:
                     tech_lines.append("  Leveraged ETFs are high-risk; not for long-term buy-and-hold (volatility decay).")
                 tech_lines.extend([
                     f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}",
-                    f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | Recom: {s.get('recom','N/A')}",
+                    f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | SMA200 status: {s.get('sma200_status','N/A')}  | Recom: {s.get('recom','N/A')}",
                 ])
                 ta_dict = s.get('ta') or {}
                 if ta_dict:
