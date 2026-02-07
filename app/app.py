@@ -380,8 +380,8 @@ class TradeBotApp:
         log("App starting...")
         self.root = root
         self.root.title(f"ClearBlueSky Stock Scanner v{VERSION}")
-        self.root.geometry("420x460")
-        self.root.minsize(380, 420)
+        self.root.geometry("420x520")
+        self.root.minsize(380, 480)
         self.root.resizable(True, True)
         self.root.configure(bg="#f8f9fa")
         
@@ -562,46 +562,50 @@ class TradeBotApp:
                   bg=ORANGE, fg="white", font=("Arial", 9, "bold"), width=8,
                   cursor="hand2", relief="flat").pack(side="left", padx=(8, 0))
         
-        # --- BOTTOM BUTTONS (3 rows for more room) ---
+        # --- BOTTOM BUTTONS (grid layout for equal spacing) ---
         btn_frame = tk.Frame(main, bg="#f8f9fa")
         btn_frame.pack(fill="x", pady=(6, 2))
-        
-        row1 = tk.Frame(btn_frame, bg="#f8f9fa")
-        row1.pack(fill="x", pady=(0, 3))
-        for text, cmd in [("💼 Broker", self.open_broker),
-                          ("📁 Reports", self.open_reports),
-                          ("📋 Logs", self.view_logs),
-                          ("💾 Config", self.import_export_config)]:
-            tk.Button(row1, text=text, command=cmd, bg="#e9ecef", fg="#333",
-                     font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
-        
-        row2 = tk.Frame(btn_frame, bg="#f8f9fa")
-        row2.pack(fill="x", pady=(0, 3))
-        for text, cmd in [("⭐ Watchlist", self.open_watchlist),
-                          ("⚙️ Settings", self.api_settings),
-                          ("❓ Help", self.show_help),
-                          ("📄 README", self.open_readme)]:
-            tk.Button(row2, text=text, command=cmd, bg="#e9ecef", fg="#333",
-                     font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
-        
-        # Update / Rollback (update keeps existing user config; rollback restores code, keeps config)
-        row2b = tk.Frame(btn_frame, bg="#f8f9fa")
-        row2b.pack(fill="x", pady=(0, 3))
-        tk.Button(row2b, text="🔄 Update", command=self._do_update, bg="#17a2b8", fg="white",
-                 font=("Arial", 9), width=10, relief="flat", cursor="hand2").pack(side="left", padx=3)
-        self.rollback_btn = tk.Button(row2b, text="↩️ Rollback", command=self._do_rollback, bg="#6c757d", fg="white",
-                                     font=("Arial", 9), width=10, relief="flat", cursor="hand2")
-        self.rollback_btn.pack(side="left", padx=3)
+
+        # Row 1: Broker, Reports, Logs, Config
+        grid1 = tk.Frame(btn_frame, bg="#f8f9fa")
+        grid1.pack(fill="x", padx=3, pady=(0, 2))
+        for i in range(4):
+            grid1.columnconfigure(i, weight=1)
+        for i, (text, cmd) in enumerate([("Broker", self.open_broker),
+                                          ("Reports", self.open_reports),
+                                          ("Logs", self.view_logs),
+                                          ("Config", self.import_export_config)]):
+            tk.Button(grid1, text=text, command=cmd, bg="#e9ecef", fg="#333",
+                     font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=i, sticky="ew", padx=2)
+
+        # Row 2: Watchlist, Settings, Help, Manual
+        grid2 = tk.Frame(btn_frame, bg="#f8f9fa")
+        grid2.pack(fill="x", padx=3, pady=(0, 2))
+        for i in range(4):
+            grid2.columnconfigure(i, weight=1)
+        for i, (text, cmd) in enumerate([("Watchlist", self.open_watchlist),
+                                          ("Settings", self.api_settings),
+                                          ("Help", self.show_help),
+                                          ("Manual", self.open_readme)]):
+            tk.Button(grid2, text=text, command=cmd, bg="#e9ecef", fg="#333",
+                     font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=i, sticky="ew", padx=2)
+
+        # Row 3: Update, Rollback
+        grid3 = tk.Frame(btn_frame, bg="#f8f9fa")
+        grid3.pack(fill="x", padx=3, pady=(0, 2))
+        for i in range(4):
+            grid3.columnconfigure(i, weight=1)
+        tk.Button(grid3, text="Update", command=self._do_update, bg="#17a2b8", fg="white",
+                 font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=0, sticky="ew", padx=2)
+        self.rollback_btn = tk.Button(grid3, text="Rollback", command=self._do_rollback, bg="#6c757d", fg="white",
+                                     font=("Arial", 9), relief="flat", cursor="hand2")
+        self.rollback_btn.grid(row=0, column=1, sticky="ew", padx=2)
         if not get_backup_info():
             self.rollback_btn.config(state="disabled")
-        
-        row3 = tk.Frame(btn_frame, bg="#f8f9fa")
-        row3.pack(fill="x")
-        btn_width = 18
-        tk.Button(row3, text="❤️ Donate to Direct Relief", command=lambda: webbrowser.open("https://www.directrelief.org/"),
-                 bg="#E91E63", fg="white", font=("Arial", 9), width=btn_width, relief="flat", cursor="hand2").pack(side="left", padx=3, fill="x", expand=True)
-        tk.Button(row3, text="❌ Exit", command=self.root.quit, bg="#dc3545", fg="white",
-                 font=("Arial", 9), width=btn_width, relief="flat", cursor="hand2").pack(side="left", padx=3, fill="x", expand=True)
+        tk.Button(grid3, text="Donate", command=lambda: webbrowser.open("https://www.directrelief.org/"),
+                 bg="#E91E63", fg="white", font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=2, sticky="ew", padx=2)
+        tk.Button(grid3, text="Exit", command=self.root.quit, bg="#dc3545", fg="white",
+                 font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=3, sticky="ew", padx=2)
         
         self.status = tk.Label(main, text="Ready", font=("Arial", 8), bg="#f8f9fa", fg="#666")
         self.status.pack(pady=(4, 0))
@@ -1891,13 +1895,21 @@ class TradeBotApp:
         ).pack(anchor="w", pady=(12, 0))
     
     def open_readme(self):
-        """Open README.md from the app folder (browser or default app)."""
-        readme_path = os.path.join(APP_DIR, "README.md")
-        if os.path.isfile(readme_path):
-            url = "file:///" + readme_path.replace("\\", "/").lstrip("/")
-            webbrowser.open(url)
-        else:
-            messagebox.showinfo("README", "README.md not found in app folder.")
+        """Open USER_MANUAL.md (or README.md as fallback) in browser."""
+        # Try USER_MANUAL.md in root first, then app folder, then README.md
+        root_dir = os.path.dirname(APP_DIR)
+        candidates = [
+            os.path.join(root_dir, "USER_MANUAL.md"),
+            os.path.join(APP_DIR, "USER_MANUAL.md"),
+            os.path.join(root_dir, "README.md"),
+            os.path.join(APP_DIR, "README.md"),
+        ]
+        for path in candidates:
+            if os.path.isfile(path):
+                url = "file:///" + path.replace("\\", "/").lstrip("/")
+                webbrowser.open(url)
+                return
+        messagebox.showinfo("Manual", "USER_MANUAL.md not found.")
 
     def show_help(self):
         help_text = """
