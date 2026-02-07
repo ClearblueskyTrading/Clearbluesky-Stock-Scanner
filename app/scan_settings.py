@@ -177,7 +177,8 @@ def delete_scan_preset(name):
 def load_config():
     """Load user configuration"""
     defaults = {
-        # Dip Scan Parameters
+        # Legacy Dip Scan Parameters (used by enhanced_dip_scanner standalone GUI)
+        # Active emotional dip params are emotional_* keys below
         "dip_min_percent": 1.0,
         "dip_max_percent": 5.0,
         "dip_min_volume_ratio": 1.5,
@@ -239,7 +240,7 @@ def load_config():
         "finviz_api_key": "",
         # OpenRouter API (for AI analysis; one key for all models)
         "openrouter_api_key": "",
-        "openrouter_model": "google/gemini-3-pro-preview",  # or anthropic/claude-sonnet-4.5 (credits), tngtech/deepseek-r1t2-chimera:free (free)
+        "openrouter_model": "google/gemini-3-pro-preview",  # or tngtech/deepseek-r1t2-chimera:free (free)
         "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
         # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
         "alpha_vantage_api_key": "",
@@ -264,6 +265,9 @@ def load_config():
                 gm = saved.get("gemini_model")
                 if gm and not saved.get("openrouter_model"):
                     defaults["openrouter_model"] = "google/gemini-3-pro-preview" if gm == "gemini-3-pro-preview" else "tngtech/deepseek-r1t2-chimera:free"
+                # v7.2 migration: Claude removed — switch to Gemini
+                if "claude" in (defaults.get("openrouter_model") or "").lower():
+                    defaults["openrouter_model"] = "google/gemini-3-pro-preview"
         except Exception:
             pass
 

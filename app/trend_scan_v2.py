@@ -102,8 +102,9 @@ def calculate_scores(df):
             try:
                 if isinstance(val, str):
                     return float(val.replace('%', ''))
-                return float(val) * 100 if abs(float(val)) < 1 else float(val)
-            except:
+                # finvizfinance returns decimals (0.05 = 5%); always convert
+                return float(val) * 100
+            except Exception:
                 return None
         
         def get_num(val):
@@ -113,7 +114,7 @@ def calculate_scores(df):
                 if isinstance(val, str):
                     val = val.replace(',', '')
                 return float(val)
-            except:
+            except Exception:
                 return None
         
         # QUARTER PERFORMANCE (25 points)

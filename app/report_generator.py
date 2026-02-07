@@ -383,7 +383,10 @@ class ReportGenerator:
         ta_dict = row.get('ta') or {}
         pct = ta_dict.get('price_vs_sma200')
         if pct is not None:
-            return 'Above' if float(pct) > 0 else 'Below'
+            try:
+                return 'Above' if float(pct) > 0 else 'Below'
+            except (ValueError, TypeError):
+                pass  # Fall through to raw SMA200 parsing
         raw = row.get('sma200') or row.get('SMA200')
         if raw in (None, '', 'N/A'):
             return 'N/A'
@@ -492,6 +495,7 @@ class ReportGenerator:
 
     def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None):
         """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py."""
+        leveraged_map = self._load_leveraged_mapping()  # Load once, not per-ticker
         stocks_json = []
         for s in stocks_data:
             news_list = s.get('news') or []
@@ -534,9 +538,8 @@ class ReportGenerator:
             for k in ("Owner", "Relationship", "Date", "Transaction", "Cost", "Shares", "Value"):
                 if s.get(k) not in (None, "", "N/A"):
                     row[k.lower()] = s.get(k)
-            leveraged = self._load_leveraged_mapping()
-            if s.get("score", 0) >= 60 and s.get("ticker") in leveraged:
-                row["leveraged_play"] = leveraged[s["ticker"]]
+            if s.get("score", 0) >= 60 and s.get("ticker") in leveraged_map:
+                row["leveraged_play"] = leveraged_map[s["ticker"]]
             stocks_json.append(row)
         backtest_stats = None
         try:

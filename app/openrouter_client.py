@@ -44,7 +44,7 @@ def analyze(api_key, model_id, system_prompt, user_content, max_tokens=8192, tem
 
     Args:
         api_key: OpenRouter API key (required).
-        model_id: OpenRouter model id (e.g. google/gemini-3-pro-preview, anthropic/claude-sonnet-4.5, tngtech/deepseek-r1t2-chimera:free).
+        model_id: OpenRouter model id (e.g. google/gemini-3-pro-preview, tngtech/deepseek-r1t2-chimera:free).
         system_prompt: System message (analyst instructions).
         user_content: User message – report text or JSON string (the analysis package).
         max_tokens: Max tokens to generate (default 8192).
@@ -82,21 +82,56 @@ def analyze(api_key, model_id, system_prompt, user_content, max_tokens=8192, tem
         "temperature": temperature,
     }
 
-    resp = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=180)
-    resp.raise_for_status()
-    data = resp.json()
+    # Retry on transient failures (network errors, 429 rate limit, 5xx server errors)
+    MAX_RETRIES = 3
+    last_exc = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=180)
+            # Parse body for detailed errors before raise_for_status
+            try:
+                data = resp.json()
+            except Exception:
+                data = {}
+            if resp.status_code >= 400:
+                api_err = data.get("error")
+                detail = api_err.get("message", api_err) if isinstance(api_err, dict) else str(api_err) if api_err else resp.text[:200]
+                if resp.status_code in (429, 500, 502, 503) and attempt < MAX_RETRIES - 1:
+                    import time
+                    wait = (attempt + 1) * 5  # 5s, 10s backoff
+                    time.sleep(wait)
+                    continue
+                raise RuntimeError(f"OpenRouter HTTP {resp.status_code}: {detail}")
 
-    # OpenRouter returns OpenAI-shaped response: choices[0].message.content
-    err = data.get("error")
-    if err:
-        msg = err.get("message", err) if isinstance(err, dict) else str(err)
-        raise RuntimeError(f"OpenRouter error: {msg}")
+            # Check for error in response body (200 with error)
+            err = data.get("error")
+            if err:
+                msg_text = err.get("message", err) if isinstance(err, dict) else str(err)
+                raise RuntimeError(f"OpenRouter error: {msg_text}")
 
-    choices = data.get("choices") or []
-    if not choices:
-        return ""
-    msg = choices[0].get("message") or {}
-    return (msg.get("content") or "").strip()
+            # Log usage/cost info from response (OpenRouter includes this)
+            usage = data.get("usage") or {}
+            if usage:
+                prompt_tokens = usage.get("prompt_tokens", 0)
+                completion_tokens = usage.get("completion_tokens", 0)
+                total_tokens = usage.get("total_tokens", prompt_tokens + completion_tokens)
+                print(f"[OpenRouter] Model: {model_id} | Tokens: {total_tokens} (prompt: {prompt_tokens}, completion: {completion_tokens})")
+
+            choices = data.get("choices") or []
+            if not choices:
+                return ""
+            msg = choices[0].get("message") or {}
+            return (msg.get("content") or "").strip()
+
+        except (requests.ConnectionError, requests.Timeout) as e:
+            last_exc = e
+            if attempt < MAX_RETRIES - 1:
+                import time
+                time.sleep((attempt + 1) * 5)
+                continue
+            raise RuntimeError(f"OpenRouter connection failed after {MAX_RETRIES} attempts: {e}")
+
+    raise RuntimeError(f"OpenRouter failed after {MAX_RETRIES} attempts: {last_exc}")
 
 
 def analyze_with_config(config, system_prompt, user_content, max_tokens=8192, temperature=0.3, image_base64_list=None):

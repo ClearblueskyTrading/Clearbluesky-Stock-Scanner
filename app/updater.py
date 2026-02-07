@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(BASE_DIR, "user_config.json")
 MANIFEST_FILE = os.path.join(BASE_DIR, "update_backup_manifest.json")
 BACKUP_DIR = os.path.join(BASE_DIR, "update_backups")
+import hashlib
 
 # Paths we never overwrite (relative to app dir) - keep existing user config
 PRESERVE_ON_UPDATE_AND_ROLLBACK = [
@@ -26,6 +27,16 @@ PRESERVE_ON_UPDATE_AND_ROLLBACK = [
 
 GITHUB_RELEASES_API = "https://api.github.com/repos/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
 GITHUB_RELEASES_API_TAG = "https://api.github.com/repos/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/tags/{tag}"
+
+
+def _safe_extractall(zf: zipfile.ZipFile, target_dir: str) -> None:
+    """Extract zip contents after validating no path traversal (Zip Slip protection)."""
+    target_real = os.path.realpath(target_dir)
+    for member in zf.namelist():
+        member_path = os.path.realpath(os.path.join(target_dir, member))
+        if not member_path.startswith(target_real + os.sep) and member_path != target_real:
+            raise ValueError(f"Zip path traversal blocked: {member}")
+    zf.extractall(target_dir)
 
 
 def _parse_version(s: str) -> tuple:
@@ -140,7 +151,7 @@ def rollback(progress_callback=None) -> Optional[str]:
             progress_callback("Extracting backup...")
         with tempfile.TemporaryDirectory() as tmp:
             with zipfile.ZipFile(backup_path, "r") as zf:
-                zf.extractall(tmp)
+                _safe_extractall(zf, tmp)
             # Our backup: flat files in tmp. GitHub zip: one root folder, maybe with app/ subdir.
             entries = os.listdir(tmp)
             if len(entries) == 1 and os.path.isdir(os.path.join(tmp, entries[0])):
@@ -198,8 +209,14 @@ def apply_update(version_before: str, tag: Optional[str] = None, progress_callba
             zip_path = os.path.join(tmp, "update.zip")
             with open(zip_path, "wb") as f:
                 f.write(zip_data)
+            # Integrity check: verify download is a valid zip before applying
+            if not zipfile.is_zipfile(zip_path):
+                return "Downloaded file is not a valid zip (corrupted download?)."
             with zipfile.ZipFile(zip_path, "r") as zf:
-                zf.extractall(tmp)
+                bad = zf.testzip()
+                if bad is not None:
+                    return f"Zip integrity check failed on: {bad} (corrupted download?)."
+                _safe_extractall(zf, tmp)
             # GitHub zip has one root dir; repo has app/ subfolder
             entries = [e for e in os.listdir(tmp) if e != "update.zip"]
             if len(entries) == 1 and os.path.isdir(os.path.join(tmp, entries[0])):
@@ -208,14 +225,32 @@ def apply_update(version_before: str, tag: Optional[str] = None, progress_callba
                 src_root = app_sub if os.path.isdir(app_sub) else single
             else:
                 src_root = tmp
+            # Stage update in a temporary copy first, then apply (atomic-ish)
             if progress_callback:
-                progress_callback("Applying files (keeping your config)...")
-            _copy_tree_skip_preserve(src_root, BASE_DIR, progress_callback)
+                progress_callback("Staging update files...")
+            staging_dir = os.path.join(tmp, "_staging")
+            os.makedirs(staging_dir, exist_ok=True)
+            # Copy current app to staging
+            for root_d, dirs_d, files_d in os.walk(BASE_DIR):
+                if "update_backups" in root_d or "__pycache__" in root_d:
+                    continue
+                rel = os.path.relpath(root_d, BASE_DIR)
+                for fd in files_d:
+                    src_file = os.path.join(root_d, fd)
+                    dst_file = os.path.join(staging_dir, rel, fd) if rel != "." else os.path.join(staging_dir, fd)
+                    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+                    shutil.copy2(src_file, dst_file)
+            # Apply new files over staging (skipping preserved)
+            _copy_tree_skip_preserve(src_root, staging_dir, progress_callback)
+            # Staging succeeded — now apply staged files to real app dir
+            if progress_callback:
+                progress_callback("Applying update (keeping your config)...")
+            _copy_tree_skip_preserve(staging_dir, BASE_DIR, progress_callback)
         if progress_callback:
             progress_callback("Update complete.")
         return None
     except Exception as e:
-        return str(e)
+        return f"Update failed: {e}. Your backup is intact — use Rollback to restore."
 
 
 def run_update_flow(version_before: str, tag: Optional[str] = None, progress_callback=None) -> Optional[str]:

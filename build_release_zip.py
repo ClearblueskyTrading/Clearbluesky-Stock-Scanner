@@ -34,6 +34,7 @@ EXCLUDE_FILES = {
     "release_notes_v7.md",
     "backtest_signals.db",
     "GITHUB_PUSH.md",
+    "TESTING_v7.0.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

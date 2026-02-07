@@ -4,6 +4,55 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.2] – 2026-02-06
+
+### Fixed (CRITICAL)
+- **Zip Slip vulnerability** in updater.py — path traversal protection on all zip extractions.
+- **Download integrity** — update zips validated with `is_zipfile()` + `testzip()` before applying.
+
+### Fixed (HIGH — Scanner Accuracy)
+- **ATR calculation** (velocity_scanner) — correct True Range formula using `pd.concat().max(axis=1)`.
+- **Gap Recovery scoring** — was always 0 due to circular math; now uses `prior_low` + ATR floor.
+- **Market context SMA50/200** — period changed from "5d" to "1y" so SMAs have enough data.
+- **Trend scoring `get_pct()`** — removed broken `< 1` heuristic; finvizfinance decimals always *100.
+- **Gap-and-Go retention** — was hardcoded 100; now computed from `prior_high` vs `pm_price`.
+
+### Fixed (HIGH — Performance)
+- **Quick Lookup threaded** — no longer freezes GUI during report generation.
+- **462 lines dead code removed** — six unused `_run_*_scan` methods.
+- **Velocity scanner parallelized** — `ThreadPoolExecutor(8)` for tickers, `(4)` for market context.
+- **Emotional dip scanner** — 3 Finviz calls per ticker → 1 (reuses cached quote).
+- **Report generator** — leveraged mapping loaded once instead of per-ticker.
+
+### Fixed (MEDIUM)
+- **Race conditions** — `threading.Event` for cancellation, result queue cleared, update/rollback concurrency guard.
+- **OpenRouter retry** — 3 retries with backoff on connection errors, 429, 5xx. Better error messages.
+- **Bare `except:` replaced** — 10 instances → `except Exception:` across 4 files.
+- **Transactional updates** — staging directory before applying; real app untouched if staging fails.
+- **`_derive_sma200_status`** — non-numeric values no longer crash report generation.
+
+### Changed
+- **INSTALL.bat** updated to v7.2.
+- **scan_presets.json** cleaned: removed stale "Emotional Dip - Bounce", added "Velocity Pre-Market Hunter", updated Swing to `emotional_*` keys.
+- **requirements.txt** tightened: `pandas>=2.0,<3.0`, `yfinance>=0.2.36`, `pandas-ta>=0.3.14b0`, `chromadb>=0.4,<1.0`.
+- **Legacy config keys** commented for clarity (`dip_*` vs `emotional_*`).
+
+### Added
+- **USER_MANUAL.md** — Comprehensive user manual covering all scanners, settings, config options, scoring system, and troubleshooting.
+- **OpenRouter credit display** — Shows remaining balance and model name below scan button.
+- **Claude model removed** — Only Gemini 3 Pro Preview (credits) and DeepSeek R1 T2 Chimera (free). Auto-migrates existing Claude users to Gemini.
+- **Keyboard shortcuts** — Enter = Run Scan, Escape = Stop, F1 = Help.
+- **Scrollable Help window** — replaced messagebox with Toplevel + Text widget.
+- **Cross-platform file open** — `_open_path()` helper for Windows/macOS/Linux.
+- **Auto report cleanup** — reports older than 30 days removed on startup.
+- **OpenRouter usage tracking** — token counts logged after each API call.
+
+### Removed
+- Orphaned `fundamentals_helper.py` (never imported).
+- `ClearBlueSkyWin/` added to .gitignore.
+
+---
+
 ## [7.1] – 2026-02-06
 
 ### Added

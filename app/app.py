@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.1
+# ClearBlueSky Stock Scanner v7.2
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.1"
+VERSION = "7.2"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -71,7 +71,7 @@ def log(msg, level="INFO"):
     try:
         with open(LOG_FILE, 'a') as f:
             f.write(line + "\n")
-    except:
+    except Exception:
         pass
 
 def log_error(e, context=""):
@@ -119,6 +119,29 @@ def _show_update_notice(root, tag, url):
     ).pack(side="left")
     win.update_idletasks()
     win.grab_set()
+
+
+def _cleanup_old_reports(config, max_age_days=30):
+    """Remove reports older than max_age_days from the reports directory."""
+    try:
+        reports_dir = _resolve_reports_dir(config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
+        if not os.path.isdir(reports_dir):
+            return
+        import glob
+        cutoff = time.time() - max_age_days * 86400
+        removed = 0
+        for pattern in ("*.pdf", "*.json", "*_ai.txt"):
+            for f in glob.glob(os.path.join(reports_dir, pattern)):
+                try:
+                    if os.path.getmtime(f) < cutoff:
+                        os.remove(f)
+                        removed += 1
+                except Exception:
+                    pass
+        if removed:
+            log(f"Cleaned up {removed} report(s) older than {max_age_days} days")
+    except Exception:
+        pass
 
 
 def _check_for_updates(root):
@@ -378,6 +401,8 @@ class TradeBotApp:
             ]
         self.build_ui()
         log("UI ready")
+        # Clean up old reports (>30 days) on startup
+        threading.Thread(target=_cleanup_old_reports, args=(self.config,), daemon=True).start()
         # Check for new version after a short delay (non-blocking)
         root.after(1500, lambda: threading.Thread(target=_check_for_updates, args=(root,), daemon=True).start())
     
@@ -385,10 +410,15 @@ class TradeBotApp:
         try:
             with open(CONFIG_FILE, 'r') as f:
                 return json.load(f)
-        except:
+        except Exception:
             return {}
 
     def build_ui(self):
+        # === KEYBOARD SHORTCUTS ===
+        self.root.bind("<Return>", lambda e: self.run_scan())
+        self.root.bind("<Escape>", lambda e: self.stop_scan())
+        self.root.bind("<F1>", lambda e: self.show_help())
+
         # === HEADER ===
         header = tk.Frame(self.root, bg=BG_DARK, height=44)
         header.pack(fill="x")
@@ -508,6 +538,13 @@ class TradeBotApp:
             fg="#666",
         ).pack(side="left", padx=(8, 0))
         
+        # --- OpenRouter credit display ---
+        self.openrouter_credit_label = tk.Label(
+            scan_frame, text="", font=("Arial", 8), bg="white", fg="#888",
+        )
+        self.openrouter_credit_label.pack(anchor="w", padx=6, pady=(0, 2))
+        self._refresh_openrouter_credit()
+        
         # --- QUICK TICKER ---
         ticker_label = tk.Label(main, text="🔍 Quick Lookup", font=("Arial", 9, "bold"),
                                bg="#f8f9fa", fg="#333")
@@ -570,7 +607,7 @@ class TradeBotApp:
         self.status.pack(pady=(4, 0))
         
         # Scan state
-        self.scan_cancelled = False
+        self._scan_cancel_event = threading.Event()
         self.scan_start_time = 0
         self.last_scan_type = None
         self.last_scan_time = None
@@ -578,7 +615,19 @@ class TradeBotApp:
         self.scan_result_queue = queue.Queue()
         self.scan_worker = None
         self._process_result_queue_scheduled = False
+        self._update_in_progress = False  # Guard for update/rollback concurrency
     
+    @property
+    def scan_cancelled(self):
+        return self._scan_cancel_event.is_set()
+
+    @scan_cancelled.setter
+    def scan_cancelled(self, value):
+        if value:
+            self._scan_cancel_event.set()
+        else:
+            self._scan_cancel_event.clear()
+
     def _on_scan_types_changed(self):
         """Reload scan types after an import, updating the dropdown."""
         try:
@@ -945,479 +994,15 @@ class TradeBotApp:
             return {"id": "insider_fallback", "label": label, "scanner": "insider"}
         return None
     
-    def _run_trend_scan(self, index: str):
-        """Internal helper to run the Trend scan using the unified UI."""
-        log("=== TREND SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        
-        try:
-            from trend_scan_v2 import trend_scan
-            
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Trend: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                
-                lower = msg.lower()
-                if "overview" in lower:
-                    self.scan_progress.set(25, f"25% ({time_str})")
-                    self.scan_status.config(text="Getting stock data from Finviz...")
-                elif "performance" in lower:
-                    self.scan_progress.set(50, f"50% ({time_str})")
-                    self.scan_status.config(text="Getting performance metrics...")
-                elif "merging" in lower:
-                    self.scan_progress.set(65, f"65% ({time_str})")
-                    self.scan_status.config(text="Combining data...")
-                elif "scoring" in lower:
-                    self.scan_progress.set(80, f"80% ({time_str})")
-                    self.scan_status.config(text="Ranking candidates...")
-                elif "done" in lower:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                    self.scan_status.config(text="Building report...")
-                self.root.update()
-            
-            df = trend_scan(progress_callback=progress, index=index)
-            
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            
-            if df is not None and len(df) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    df.to_dict("records"),
-                    "Trend",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                    index=index,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No results",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Trend failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_swing_scan(self, index: str):
-        """Internal helper to run the Swing/Dip scan using the unified UI."""
-        log("=== SWING SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        
-        try:
-            from emotional_dip_scanner import run_emotional_dip_scan
-            
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Swing: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                
-                lower = msg.lower()
-                if "analyzing" in lower:
-                    try:
-                        if "(" in msg and "/" in msg:
-                            parts = msg.split("(")[1].split(")")[0].split("/")
-                            cur, tot = int(parts[0]), int(parts[1])
-                            pct = 10 + int((cur / tot) * 75)
-                            self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "complete" in lower:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            
-            results = run_emotional_dip_scan(progress, index=index)
-            
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Swing",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                    index=index,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No emotional dips today",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Swing failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_watchlist_scan(self):
-        """Run Watchlist scan: Filter = Down X% today or All tickers (from watchlist_filter)."""
-        use_all = (self.config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
-        log("=== WATCHLIST SCAN ===" if not use_all else "=== WATCHLIST (ALL TICKERS) SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        try:
-            from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Watchlist: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                if "(" in msg and "/" in msg:
-                    try:
-                        parts = msg.split("(")[1].split(")")[0].split("/")
-                        cur, tot = int(parts[0]), int(parts[1])
-                        pct = 10 + int((cur / tot) * 75) if tot else 50
-                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "Found" in msg:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            results = run_watchlist_tickers_scan(progress_callback=progress, config=self.config) if use_all else run_watchlist_scan(progress_callback=progress, config=self.config)
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                scan_label = (self._get_current_scan_def() or {}).get("label", "Watchlist")
-                self.generate_report_from_results(
-                    results,
-                    scan_label,
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No watchlist results",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Watchlist scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_velocity_leveraged_scan(self):
-        """Internal helper to run the Velocity Leveraged ETF scan (sector proxies → recommended vehicles)."""
-        log("=== VELOCITY LEVERAGED ETF SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        try:
-            from velocity_leveraged_scanner import run_velocity_leveraged_scan
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Velocity Leveraged: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                if "(" in msg and "/" in msg:
-                    try:
-                        parts = msg.split("(")[1].split(")")[0].split("/")
-                        cur, tot = int(parts[0]), int(parts[1])
-                        pct = 10 + int((cur / tot) * 75) if tot else 50
-                        self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "Leading:" in msg:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            results = run_velocity_leveraged_scan(progress_callback=progress, config=self.config)
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Velocity Barbell",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No recommendations",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Velocity Leveraged scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_insider_scan(self):
-        """Internal helper to run the Insider trading scan using the unified UI."""
-        log("=== INSIDER SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Fetching insider data...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        try:
-            from insider_scanner import run_insider_scan
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Insider: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                if "Found" in msg:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            results = run_insider_scan(progress_callback=progress, config=self.config)
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Insider",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No insider transactions",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Insider scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
-    
-    def _run_premarket_scan(self, index: str):
-        """Internal helper to run the Pre-Market Volume scan using the unified UI."""
-        log("=== PRE-MARKET VOLUME SCAN ===")
-        self.scan_cancelled = False
-        self.scan_start_time = time.time()
-        self.scan_progress.set(5, "Starting...")
-        self.scan_status.config(text="Connecting...")
-        self.scan_printer.start()
-        self.scan_btn.config(state="disabled")
-        self.scan_stop_btn.config(state="normal")
-        self.root.update()
-        
-        try:
-            from premarket_volume_scanner import run_premarket_volume_scan
-            
-            def progress(msg):
-                if self.scan_cancelled:
-                    return
-                log(f"Premarket: {msg}")
-                elapsed = int(time.time() - self.scan_start_time)
-                time_str = f"{elapsed}s"
-                self.scan_status.config(text=msg[:50])
-                
-                lower = msg.lower()
-                if "analyzing" in lower:
-                    try:
-                        if "(" in msg and "/" in msg:
-                            parts = msg.split("(")[1].split(")")[0].split("/")
-                            cur, tot = int(parts[0]), int(parts[1])
-                            pct = 10 + int((cur / tot) * 75)
-                            self.scan_progress.set(pct, f"{pct}% ({time_str})")
-                    except Exception:
-                        pass
-                elif "complete" in lower:
-                    self.scan_progress.set(90, f"90% ({time_str})")
-                self.root.update()
-            
-            results = run_premarket_volume_scan(progress, index=index)
-            
-            if self.scan_cancelled:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "Cancelled",
-                    self.scan_stop_btn,
-                )
-                return
-            
-            if results and len(results) > 0:
-                elapsed = int(time.time() - self.scan_start_time)
-                self.generate_report_from_results(
-                    results,
-                    "Premarket",
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    self.scan_stop_btn,
-                    elapsed,
-                    index=index,
-                )
-            else:
-                self.scan_complete(
-                    self.scan_progress,
-                    self.scan_status,
-                    self.scan_printer,
-                    self.scan_btn,
-                    "No pre-market activity",
-                    self.scan_stop_btn,
-                )
-        except Exception as e:
-            log_error(e, "Premarket scan failed")
-            self.scan_complete(
-                self.scan_progress,
-                self.scan_status,
-                self.scan_printer,
-                self.scan_btn,
-                "Error!",
-                self.scan_stop_btn,
-            )
-            messagebox.showerror("Error", str(e))
+    # NOTE: Legacy _run_*_scan methods removed in v7.2 (dead code).
+    # All scans are now handled by _scan_worker_loop via scan_job_queue.
+
+    def _DEAD_CODE_REMOVED(self):
+        """Placeholder – the ~470 lines of _run_trend_scan, _run_swing_scan,
+        _run_watchlist_scan, _run_velocity_leveraged_scan, _run_insider_scan,
+        _run_premarket_scan were removed. All scan execution goes through
+        _scan_worker_loop (queue-based)."""
+        pass
     
     def run_scan(self):
         """Entry point for the unified Scan button. Queues job(s) and runs them in a background thread."""
@@ -1427,12 +1012,13 @@ class TradeBotApp:
         idx_text = self.scan_index.get()
         index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Velocity" in idx_text else "russell2000"))
         self.scan_cancelled = False
-        # Clear any stale jobs
-        try:
-            while True:
-                self.scan_job_queue.get_nowait()
-        except queue.Empty:
-            pass
+        # Clear any stale jobs and results from previous cancelled scans
+        for q in (self.scan_job_queue, self.scan_result_queue):
+            try:
+                while True:
+                    q.get_nowait()
+            except queue.Empty:
+                pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
             allowed = ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket")
@@ -1645,29 +1231,85 @@ class TradeBotApp:
         self.status.config(text=f"Loading {', '.join(symbols)}...")
         self.root.update()
 
-        try:
-            from report_generator import HTMLReportGenerator
-            reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
-            gen = HTMLReportGenerator(save_dir=reports_dir)
-            
-            # Build ticker list for report (each gets score 80 for quick lookup)
-            ticker_data = [{'ticker': sym, 'score': 80} for sym in symbols]
-            
-            path, _, _ = gen.generate_combined_report_pdf(ticker_data, "Quick Lookup", 0)
-            if path:
-                file_url = "file:///" + path.replace("\\", "/").lstrip("/")
-                webbrowser.open(file_url)
-            self.status.config(text="PDF report opened")
-        except Exception as e:
-            self.status.config(text="Error")
-            messagebox.showerror("Error", str(e))
+        def _run_report():
+            try:
+                from report_generator import HTMLReportGenerator
+                reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
+                gen = HTMLReportGenerator(save_dir=reports_dir)
+                
+                # Build ticker list for report (each gets score 80 for quick lookup)
+                ticker_data = [{'ticker': sym, 'score': 80} for sym in symbols]
+                
+                path, _, _ = gen.generate_combined_report_pdf(ticker_data, "Quick Lookup", 0)
+                def _done():
+                    if path:
+                        file_url = "file:///" + path.replace("\\", "/").lstrip("/")
+                        webbrowser.open(file_url)
+                    self.status.config(text="PDF report opened")
+                self.root.after(0, _done)
+            except Exception as e:
+                self.root.after(0, lambda: (self.status.config(text="Error"), messagebox.showerror("Error", str(e))))
+        threading.Thread(target=_run_report, daemon=True).start()
     
+    # === OPENROUTER CREDIT DISPLAY ===
+
+    def _refresh_openrouter_credit(self):
+        """Check OpenRouter key status and display model info."""
+        api_key = (self.config.get("openrouter_api_key") or "").strip()
+        model = self.config.get("openrouter_model", "google/gemini-3-pro-preview")
+        model_short = model.split("/")[-1] if "/" in model else model
+        if not api_key:
+            self.openrouter_credit_label.config(text=f"AI: No API key set · Model: {model_short}", fg="#888")
+            return
+        # Show immediately while checking
+        self.openrouter_credit_label.config(text=f"AI: Checking key... · Model: {model_short}", fg="#888")
+        def _fetch():
+            txt = ""
+            color = "#2a7ae2"
+            try:
+                import requests
+                # Try /credits endpoint (management keys)
+                resp = requests.get(
+                    "https://openrouter.ai/api/v1/credits",
+                    headers={"Authorization": f"Bearer {api_key}"},
+                    timeout=8,
+                )
+                if resp.status_code == 200:
+                    data = resp.json().get("data", {})
+                    total = data.get("total_credits", 0)
+                    used = data.get("total_usage", 0)
+                    remaining = total - used
+                    txt = f"AI: ${remaining:.2f} credit · Model: {model_short}"
+                elif resp.status_code == 401:
+                    # 401 = key invalid/expired OR regular key (can't check credits)
+                    # Try a zero-cost models list call to verify key works at all
+                    r2 = requests.get(
+                        "https://openrouter.ai/api/v1/models",
+                        headers={"Authorization": f"Bearer {api_key}"},
+                        timeout=8,
+                    )
+                    if r2.status_code == 200:
+                        txt = f"AI: Key active · Model: {model_short}"
+                    else:
+                        txt = f"AI: Key invalid or expired · Model: {model_short}"
+                        color = "#c44"
+                else:
+                    txt = f"AI: Key set · Model: {model_short}"
+            except Exception:
+                txt = f"AI: Key set · Model: {model_short}"
+            self.root.after(0, lambda: self.openrouter_credit_label.config(text=txt, fg=color))
+        threading.Thread(target=_fetch, daemon=True).start()
+
     # === UPDATE / ROLLBACK (preserve user config) ===
     
     def _do_update(self):
         """Update from GitHub: backup first, then apply update. Keeps existing user_config.json."""
+        if self._update_in_progress:
+            messagebox.showinfo("Update", "An update or rollback is already in progress.")
+            return
         if not messagebox.askyesno("Update", "Update now? This will backup your current version, then download and apply the latest release.\n\nYour user_config.json will be kept."):
             return
+        self._update_in_progress = True
         self.status.config(text="Backing up...")
         self.root.update()
         def run():
@@ -1679,6 +1321,7 @@ class TradeBotApp:
                     pass
             err = run_update_flow(VERSION, progress_callback=progress)
             def done():
+                self._update_in_progress = False
                 self.status.config(text="Ready")
                 if err:
                     messagebox.showerror("Update failed", err)
@@ -1691,12 +1334,16 @@ class TradeBotApp:
     
     def _do_rollback(self):
         """Restore from last backup. Keeps current user_config.json."""
+        if self._update_in_progress:
+            messagebox.showinfo("Rollback", "An update or rollback is already in progress.")
+            return
         info = get_backup_info()
         if not info:
             messagebox.showinfo("Rollback", "No backup found. Run an update first to create a backup.")
             return
         if not messagebox.askyesno("Rollback", f"Restore from backup (version {info.get('version', '?')})?\n\nYour current user_config.json will be kept."):
             return
+        self._update_in_progress = True
         self.status.config(text="Rolling back...")
         self.root.update()
         def run():
@@ -1708,6 +1355,7 @@ class TradeBotApp:
                     pass
             err = updater_rollback(progress_callback=progress)
             def done():
+                self._update_in_progress = False
                 self.status.config(text="Ready")
                 if err:
                     messagebox.showerror("Rollback failed", err)
@@ -1780,7 +1428,7 @@ class TradeBotApp:
         sep_openrouter.pack(fill="x", padx=20, pady=8)
         tk.Label(scroll_frame, text="OpenRouter API (AI analysis)", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="Used when sending the analysis package to AI. One key for all models. Use credits for Gemini/Sonnet, or free model when no credits.",
+        tk.Label(scroll_frame, text="Used when sending the analysis package to AI. One key for all models. Use credits for Gemini, or free model (DeepSeek) when no credits.",
                 font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         openrouter_f = tk.Frame(scroll_frame, bg="white", padx=20)
         openrouter_f.pack(fill="x")
@@ -1798,7 +1446,6 @@ class TradeBotApp:
         tk.Label(openrouter_f, text="Model:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(8, 0))
         OPENROUTER_MODELS = [
             ("Gemini 3 Pro Preview (credits)", "google/gemini-3-pro-preview"),
-            ("Claude Sonnet 4.5 (credits)", "anthropic/claude-sonnet-4.5"),
             ("DeepSeek R1 T2 Chimera (free)", "tngtech/deepseek-r1t2-chimera:free"),
         ]
         current_openrouter_id = self.config.get("openrouter_model", "google/gemini-3-pro-preview") or "google/gemini-3-pro-preview"
@@ -1990,6 +1637,7 @@ class TradeBotApp:
             self.config['alarm_sound_choice'] = c if c in ("beep", "asterisk", "exclamation") else "beep"
             with open(CONFIG_FILE, 'w') as f:
                 json.dump(self.config, f, indent=2)
+            self._refresh_openrouter_credit()  # Refresh credit display after settings save
             win.destroy()
         
         btn_frame = tk.Frame(scroll_frame, bg="white")
@@ -2138,14 +1786,27 @@ class TradeBotApp:
     def open_broker(self):
         webbrowser.open(self.config.get('broker_url', 'https://www.schwab.com'))
     
+    def _open_path(self, path):
+        """Cross-platform file/folder open."""
+        import subprocess, platform
+        try:
+            if platform.system() == "Windows":
+                os.startfile(path)
+            elif platform.system() == "Darwin":
+                subprocess.Popen(["open", path])
+            else:
+                subprocess.Popen(["xdg-open", path])
+        except Exception:
+            webbrowser.open(path)
+
     def open_reports(self):
         reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
         os.makedirs(reports_dir, exist_ok=True)
-        os.startfile(reports_dir)
+        self._open_path(reports_dir)
     
     def view_logs(self):
         if os.path.exists(LOG_FILE):
-            os.startfile(LOG_FILE)
+            self._open_path(LOG_FILE)
     
     def import_export_config(self):
         """Import/Export full config (all settings + API keys) for backup or transfer to new PC."""
@@ -2240,7 +1901,7 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.1
+ClearBlueSky Stock Scanner v7.2
 
 QUICK START:
 1. Select scan type and index (N/A for Watchlist / Velocity Barbell / Insider).
@@ -2289,10 +1950,23 @@ AI STRATEGY:
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.1
+ClearBlueSky v7.2
 ─────────────────────────────────
         """
-        messagebox.showinfo("Help", help_text)
+        # Scrollable Help window (instead of messagebox which overflows on small screens)
+        win = tk.Toplevel(self.root)
+        win.title("Help – ClearBlueSky Stock Scanner")
+        win.geometry("520x480")
+        win.configure(bg="white")
+        txt = tk.Text(win, wrap="word", font=("Consolas", 9), padx=12, pady=12, bg="white", fg="#222", relief="flat")
+        scrollbar = ttk.Scrollbar(win, orient="vertical", command=txt.yview)
+        txt.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        txt.pack(fill="both", expand=True)
+        txt.insert("1.0", help_text.strip())
+        txt.configure(state="disabled")
+        win.transient(self.root)
+        win.grab_set()
 
 
 def main():

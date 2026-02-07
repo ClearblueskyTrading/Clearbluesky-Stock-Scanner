@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.1
+# ClearBlueSky Stock Scanner v7.2
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
@@ -62,7 +62,9 @@ ClearBlueSky/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── RELEASE_v7.0.md     ← v7.0 release notes
-├── RELEASE_v7.1.md     ← v7.1 release notes (current)
+├── RELEASE_v7.1.md     ← v7.1 release notes
+├── RELEASE_v7.2.md     ← v7.2 release notes (current)
+├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
     ├── run.sh          ← Run on Linux/macOS (no Docker)
@@ -110,8 +112,9 @@ Reports: PDF (date/time stamped, Master Trading Report Directive + per-ticker da
 
 ---
 
-*ClearBlueSky v7.1 – made with Claude AI*
+*ClearBlueSky v7.2 – made with Claude AI*
 
+**v7.2:** 28 bug fixes and improvements: security (Zip Slip, download integrity), scanner accuracy (ATR, gap recovery, trend scoring), performance (parallel scanning, threaded Quick Lookup), 462 lines dead code removed, OpenRouter retry, keyboard shortcuts, cross-platform support, auto report cleanup.  
 **v7.1:** Elite Swing Trader AI prompt (1-5 day focus), Quick Lookup 1-5 tickers, Import/Export Config, GitHub attribution in reports.  
-**v7.0:** Queue-based scans, Run all scans, Velocity Pre-Market Hunter, in-app Update & Rollback, strict versioning (7.1, 7.2).  
-See **app/CHANGELOG.md** and **RELEASE_v7.1.md**.
+**v7.0:** Queue-based scans, Run all scans, Velocity Pre-Market Hunter, in-app Update & Rollback, strict versioning.  
+See **app/CHANGELOG.md** and **RELEASE_v7.2.md**.

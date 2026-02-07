@@ -95,7 +95,7 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
                         'sector': sector,
                         'industry': stock.get('Industry'),
                     })
-            except:
+            except Exception:
                 continue
         
         return results
@@ -223,7 +223,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                     result['analyst_score'] = 1
                     result['red_flags'].append('Analysts rate Sell')
                     result['score'] -= 20
-            except:
+            except Exception:
                 pass
 
         # === PRICE TARGET ===
@@ -248,7 +248,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                 elif upside < 0:
                     result['red_flags'].append(f'Below price target by {abs(upside):.0f}%')
                     result['score'] -= 10
-            except:
+            except Exception:
                 pass
         
         # === NEWS ANALYSIS === (with one retry on failure)
@@ -291,7 +291,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                 else:
                     result['dip_type'] = 'unclear'
                     result['news_sentiment'] = 'neutral'
-        except:
+        except Exception:
             pass
 
         # === TECHNICAL FACTORS ===
@@ -309,7 +309,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                 elif rsi_val > 70:
                     result['red_flags'].append(f'Overbought RSI: {rsi_val:.0f}')
                     result['score'] -= 5
-            except:
+            except Exception:
                 pass
         
         # Check if above key MAs (healthy stock in a dip)
@@ -330,7 +330,7 @@ def analyze_dip_quality(ticker: str) -> Dict:
                 elif sma200_pct < -10:
                     result['red_flags'].append('Well below SMA200')
                     result['score'] -= 10
-            except:
+            except Exception:
                 pass
         
         # === FINAL RECOMMENDATION ===

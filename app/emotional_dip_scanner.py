@@ -86,10 +86,10 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
         if progress_callback:
             progress_callback(f"Analyzing {ticker} ({i+1}/{len(candidates)})...")
         
-        # Deep analysis
+        # Deep analysis (reuse cached Finviz quote to avoid redundant API calls)
         analysis = analyze_dip_quality(ticker)
+        cached_quote = analysis.pop('_quote', None)
         candidate.update(analysis)
-        candidate.pop('_quote', None)
         
         # === STRICT FILTERING FOR EMOTIONAL DIPS ===
         
@@ -101,16 +101,15 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
         if any('fundamental' in flag.lower() for flag in candidate.get('red_flags', [])):
             continue
         
-        # 3. MUST be above SMA200 if required
+        # 3. MUST be above SMA200 if required (use cached quote from analyze_dip_quality)
         if require_above_sma200:
             sma200_pct = None
             try:
-                quote = finviz.get_stock(ticker)
-                if quote:
-                    sma200_str = quote.get('SMA200', '')
-                    if sma200_str:
-                        sma200_pct = float(sma200_str.replace('%', ''))
-            except:
+                quote = cached_quote or {}
+                sma200_str = quote.get('SMA200', '')
+                if sma200_str:
+                    sma200_pct = float(sma200_str.replace('%', ''))
+            except Exception:
                 pass
             
             if sma200_pct is None or sma200_pct < 0:
@@ -134,7 +133,7 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
                 rel_vol = float(rel_vol.replace('x', ''))
             if rel_vol < min_vol_ratio:
                 continue
-        except:
+        except Exception:
             continue
         
         # === SCORE CALCULATION (emotional-specific) ===
@@ -165,18 +164,17 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
         elif rel_vol >= 2.0:
             score += 5
         
-        # RSI oversold boost
+        # RSI oversold boost (use cached quote)
         try:
-            quote = finviz.get_stock(ticker)
-            if quote:
-                rsi_str = quote.get('RSI (14)', '')
-                if rsi_str:
-                    rsi = float(rsi_str)
-                    if rsi < 30:
-                        score += 10
-                    elif rsi < 40:
-                        score += 5
-        except:
+            quote = cached_quote or {}
+            rsi_str = quote.get('RSI (14)', '')
+            if rsi_str:
+                rsi = float(rsi_str)
+                if rsi < 30:
+                    score += 10
+                elif rsi < 40:
+                    score += 5
+        except Exception:
             pass
         
         # Green flags boost

@@ -4,6 +4,9 @@ ClearBlueSky-*.zip
 # Local backup (v6.4 before C# port)
 backup-v6.4/
 
+# .NET/WPF build artifacts (ClearBlueSkyWin desktop prototype)
+ClearBlueSkyWin/
+
 # Sample/user report PDFs in project root (do not commit)
 /Trend_Scan_Report_*.pdf
 

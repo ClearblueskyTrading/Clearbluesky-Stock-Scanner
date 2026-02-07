@@ -7,6 +7,7 @@ Scans fixed universe, scores 4 signal types, grades A+ to F, outputs terminal + 
 import argparse
 import os
 import sys
+import pandas as pd
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional, Any
@@ -77,28 +78,38 @@ def fetch_market_context() -> Dict[str, Any]:
     if not YF:
         return out
     try:
-        for sym, key in [("SPY", "spy"), ("QQQ", "qqq"), ("SMH", "smh"), ("^VIX", "vix")]:
+        def _fetch_index(sym, key):
             t = yf.Ticker(sym)
-            df = t.history(period="5d", interval="1d")
+            info = {}
+            df = t.history(period="1y", interval="1d")
             if df is not None and not df.empty:
                 close = _last(df["Close"])
-                out[key]["close"] = close
-                out[key]["above_50"] = out[key]["above_200"] = None
+                info["close"] = close
+                info["above_50"] = info["above_200"] = None
                 if close and len(df) >= 50:
                     sma50 = _last(df["Close"].rolling(50).mean())
-                    out[key]["above_50"] = close > sma50 if sma50 else None
+                    info["above_50"] = close > sma50 if sma50 else None
                 if close and len(df) >= 200:
                     sma200 = _last(df["Close"].rolling(200).mean())
-                    out[key]["above_200"] = close > sma200 if sma200 else None
-            # Pre-market for indices (optional)
+                    info["above_200"] = close > sma200 if sma200 else None
+            # Pre-market (optional)
             try:
                 pm = t.history(period="1d", interval="5m", prepost=True)
                 if pm is not None and not pm.empty:
-                    out[key]["pm_close"] = _last(pm["Close"])
-                    out[key]["pm_pct"] = ((out[key].get("pm_close") or close) - close) / close * 100 if close else None
+                    info["pm_close"] = _last(pm["Close"])
+                    c = info.get("close") or 0
+                    info["pm_pct"] = ((info.get("pm_close") or c) - c) / c * 100 if c else None
             except Exception:
-                out[key]["pm_close"] = out[key].get("close")
-                out[key]["pm_pct"] = 0.0
+                info["pm_close"] = info.get("close")
+                info["pm_pct"] = 0.0
+            return key, info
+
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            futures = [pool.submit(_fetch_index, sym, key) for sym, key in [("SPY", "spy"), ("QQQ", "qqq"), ("SMH", "smh"), ("^VIX", "vix")]]
+            for future in as_completed(futures):
+                key, info = future.result()
+                out[key] = info
         vix = out.get("vix", {}).get("close") or 0
         if vix < 15:
             out["regime"] = "LOW FEAR"
@@ -147,10 +158,10 @@ def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
             d["rsi"] = _last(100 - (100 / (1 + rs)))
         except Exception:
             d["rsi"] = None
-        # ATR(14)
+        # ATR(14) — True Range = max(H-L, |H-prevC|, |L-prevC|)
         high, low = df["High"], df["Low"]
-        tr = high - low
-        tr = tr.combine((high - close.shift(1)).abs(), max).combine((low - close.shift(1)).abs(), max)
+        prev_close = close.shift(1)
+        tr = pd.concat([high - low, (high - prev_close).abs(), (low - prev_close).abs()], axis=1).max(axis=1)
         d["atr"] = _last(tr.rolling(14).mean())
         # BB
         mid = close.rolling(20).mean()
@@ -188,9 +199,11 @@ def score_gap_recovery(d: Dict) -> float:
     gap_size = abs(gap_pct)
     if gap_size < 1.0 or gap_size > 6.0:
         return max(0, 40 - abs(gap_size - 2.5) * 10)
-    gap_low = d["prior_close"] * (1 + gap_pct / 100)
-    gap_range = d["prior_close"] - gap_low
-    recovery = ((d["pm_price"] - gap_low) / gap_range * 100) if gap_range and gap_range > 0 else 0
+    # Gap bottom estimate: use prior day's low or ATR-based floor (whichever is lower)
+    atr = d.get("atr") or d["prior_close"] * 0.02
+    gap_floor = min(d.get("prior_low") or d["prior_close"], d["prior_close"] - atr * 1.5)
+    gap_range = d["prior_close"] - gap_floor
+    recovery = ((d["pm_price"] - gap_floor) / gap_range * 100) if gap_range and gap_range > 0 else 0
     recovery = max(0, min(100, recovery))
     pm_vol = d.get("pm_volume") or 0
     avg_vol = d.get("prior_volume") or 1
@@ -247,7 +260,12 @@ def score_gap_go(d: Dict) -> float:
     gap_pct = (d["pm_price"] - d["prior_close"]) / d["prior_close"] * 100
     if gap_pct < 1.5:
         return 0.0
-    retention = 100
+    # Gap retention: how well pm_price holds above prior_high (gap sustainability)
+    prior_high = d.get("prior_high") or d["prior_close"]
+    if prior_high > d["prior_close"]:
+        retention = min(100, max(0, (d["pm_price"] - d["prior_close"]) / (prior_high - d["prior_close"]) * 100))
+    else:
+        retention = min(100, gap_pct / 4.0 * 100)  # scale: 4% gap = 100% retention
     pm_vol = d.get("pm_volume") or 0
     avg_vol = d.get("prior_volume") or 1
     pm_vol_ratio = min(100, (pm_vol / (avg_vol / 2)) * 100) if avg_vol else 0
@@ -352,9 +370,8 @@ def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> D
     ctx = fetch_market_context()
     results = []
     n = len(universe)
-    for i, ticker in enumerate(universe):
-        if progress_callback:
-            progress_callback(f"Scanning {ticker} ({i+1}/{n})...")
+
+    def _scan_one(ticker):
         d = fetch_ticker_data(ticker)
         signal_name, raw_score = primary_signal(d)
         final_score = apply_risk_penalties(d, raw_score, signal_name)
@@ -367,7 +384,21 @@ def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> D
             d["entry"] = entry_plan(d, grade, signal_name)
         else:
             d["entry"] = None
-        results.append(d)
+        return d
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(_scan_one, t): t for t in universe}
+        done_count = 0
+        for future in as_completed(futures):
+            done_count += 1
+            ticker = futures[future]
+            if progress_callback:
+                progress_callback(f"Scanned {ticker} ({done_count}/{n})...")
+            try:
+                results.append(future.result())
+            except Exception:
+                pass  # skip tickers that fail (network/API errors)
     results.sort(key=lambda x: ({"A+": 0, "A": 1, "B": 2, "C": 3, "F": 4}.get(x["grade"], 5), -x["score"]))
     elapsed = (datetime.now() - start).total_seconds()
     ts = datetime.now().strftime("%Y%m%d_%H%M")

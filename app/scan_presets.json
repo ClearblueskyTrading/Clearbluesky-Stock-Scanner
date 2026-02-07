@@ -13,19 +13,6 @@
   },
   "Swing - Dips": {
     "config": {
-      "swing_min_score": 60,
-      "dip_min_percent": 1.0,
-      "dip_max_percent": 5.0,
-      "min_price": 5,
-      "max_price": 500,
-      "dip_require_news_check": true,
-      "dip_require_analyst_check": true
-    },
-    "scan_type": "Swing - Dips",
-    "scan_index": "S&P 500"
-  },
-  "Emotional Dip - Bounce": {
-    "config": {
       "emotional_min_score": 65,
       "emotional_dip_min_percent": 1.5,
       "emotional_dip_max_percent": 4.0,
@@ -34,7 +21,7 @@
       "emotional_require_above_sma200": true,
       "emotional_require_buy_rating": true
     },
-    "scan_type": "Emotional Dip - Bounce",
+    "scan_type": "Swing - Dips",
     "scan_index": "S&P 500"
   },
   "Pre-Market Volume": {
@@ -49,6 +36,11 @@
       "premarket_track_sector_heat": true
     },
     "scan_type": "Pre-Market Volume",
+    "scan_index": "S&P 500"
+  },
+  "Velocity Pre-Market Hunter": {
+    "config": {},
+    "scan_type": "Velocity Pre-Market Hunter",
     "scan_index": "S&P 500"
   }
 }
