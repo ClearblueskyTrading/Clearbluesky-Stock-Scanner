@@ -4,6 +4,23 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.5] – 2026-02-08
+
+### Added
+- **30-Day Price History** — New `price_history.py` module fetches fresh 30-day OHLCV data (via yfinance, 8 parallel workers) for all scan tickers + 17 core leveraged/market ETFs every scan run. Injected into AI prompt as "sanity check" table, JSON report (`price_history_30d`), and text report. AI instructions updated to verify entries/targets against recent highs/lows.
+- **Scan History (long-term log)** — Every scan appends a slim record to `reports/scan_history.json`: ticker, score, price, change, sector, RSI, SMA200 status, smart money, market breadth, and 30-day price summary. No instructions blob or daily rows — keeps file size manageable.
+- **History Report** — New `history_analyzer.py` module + **History** button in GUI. Auto-backfills from all existing JSON report files on first run. Generates comprehensive report: scans by type, score distribution, top 15 most flagged tickers, repeat tickers (3+ appearances), price trends (first scan vs latest), top 20 highest scores ever, sector frequency, market regime history, leveraged plays, smart money overlap, watchlist hit rate.
+- **Accuracy Tracker** — New `accuracy_tracker.py` module. Compares past scan picks (1-7 days old) against current prices. Calculates hits (price up), misses (price down), and accuracy %. Breaks down by scan type. Lists best hits and worst misses.
+- **Metrics Bar on GUI** — Dark bar below header showing: Accuracy %, Hits, Misses, Picks count. Color coded (green 60%+, amber 40-60%, red <40%). Refreshes on startup (with auto-backfill) and after every scan.
+- **History button** — Added to Row 1 of bottom buttons (Broker, Reports, History, Logs, Config). Opens scrollable history report window with Open File / Open Folder buttons.
+
+### Changed
+- **Window height** increased from 520→550 to accommodate metrics bar.
+- **AI prompt** — Instruction #3 added: "Use the 30-day price history as a SANITY CHECK — verify entries/targets make sense vs recent highs/lows."
+- **Release zip** — Only includes last 2 version release notes (v7.4, v7.5). Old RELEASE_v6.x–v7.3.md excluded.
+
+---
+
 ## [7.4] – 2026-02-08
 
 ### Added

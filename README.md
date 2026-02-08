@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.4
+# ClearBlueSky Stock Scanner v7.5
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
@@ -63,10 +63,9 @@ ClearBlueSky/
 ├── CLAUDE_AI_GUIDE.md  ← Guide for modifying/rebuilding with AI
 ├── Dockerfile
 ├── docker-compose.yml
-├── RELEASE_v7.0.md     ← v7.0 release notes
-├── RELEASE_v7.1.md     ← v7.1 release notes
-├── RELEASE_v7.2.md     ← v7.2 release notes
-├── RELEASE_v7.3.md     ← v7.3 release notes
+├── RELEASE_v7.4.md     ← v7.4 release notes
+├── RELEASE_v7.5.md     ← v7.5 release notes (current)
+├── RELEASE_v7.4.md     ← v7.4 release notes
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
@@ -78,6 +77,12 @@ ClearBlueSky/
     ├── watchlist_scanner.py    ← Watchlist (Down X% or All)
     ├── market_intel.py         ← Market Intelligence (news, sectors, snapshot)
     ├── smart_money.py          ← Smart Money signals (WSB, 13F, SEC insider)
+    ├── price_history.py        ← 30-day price history (sanity check for AI)
+    ├── history_analyzer.py     ← Scan history report generator
+    ├── accuracy_tracker.py     ← Accuracy tracking (hits/misses vs current prices)
+    ├── price_history.py        ← 30-day price history (fresh each scan)
+    ├── accuracy_tracker.py     ← Accuracy rating (hits/misses vs current prices)
+    ├── history_analyzer.py     ← Scan history report & backfill from old reports
     ├── scan_settings.py        ← Config & scan types
     ├── sound_utils.py          ← Scan-complete & watchlist beeps
     ├── requirements.txt
@@ -117,11 +122,10 @@ Reports: PDF (date/time stamped, Elite Swing Trader prompt + per-ticker data), J
 
 ---
 
-*ClearBlueSky v7.4 – made with Claude AI*
+*ClearBlueSky v7.5 – made with Claude AI*
 
-**v7.4:** Smart Money signals (WSB sentiment, 13F institutional holders, SEC insider filings). Emotional Dip scanner fixed (was too strict, 0 results). Config auto-migration for loosened defaults.  
-**v7.3:** Market Intelligence (Google News RSS, Finviz news, sector performance, market snapshot fed to AI). Renamed Velocity → Leveraged in UI. RunPod/multi-LLM guide in manual. Button layout fix.  
+**v7.5:** Accuracy tracker + metrics bar (hits/misses/%), scan history log, history report, 30-day price history sanity check in AI prompt.  
+**v7.4:** Smart Money signals (WSB sentiment, 13F institutional holders, SEC insider filings). Emotional Dip scanner fix.  
+**v7.3:** Market Intelligence (Google News RSS, Finviz news, sector performance, market snapshot fed to AI). Leveraged rename. Button layout fix.  
 **v7.2:** 28 bug fixes — security, scanner accuracy, performance, keyboard shortcuts, cross-platform support.  
-**v7.1:** Elite Swing Trader AI prompt (1-5 day focus), Quick Lookup 1-5 tickers, Import/Export Config.  
-**v7.0:** Queue-based scans, Run all scans, Pre-Market Hunter, in-app Update & Rollback.  
-See **app/CHANGELOG.md** and **RELEASE_v7.4.md**.
+See **app/CHANGELOG.md** and **RELEASE_v7.5.md**.

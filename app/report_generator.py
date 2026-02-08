@@ -493,8 +493,8 @@ class ReportGenerator:
                 lines.append(raw)
         return lines
 
-    def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None, market_intel=None):
-        """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py; market_intel = optional dict from market_intel.py."""
+    def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None, market_intel=None, price_history=None):
+        """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py; market_intel = optional dict from market_intel.py; price_history = optional 30-day summary dict."""
         leveraged_map = self._load_leveraged_mapping()  # Load once, not per-ticker
         stocks_json = []
         for s in stocks_data:
@@ -559,6 +559,8 @@ class ReportGenerator:
             out["market_breadth"] = market_breadth
         if market_intel is not None:
             out["market_intel"] = market_intel
+        if price_history:
+            out["price_history_30d"] = price_history
         if instructions not in (None, ""):
             out["instructions"] = instructions.strip()
         return out
@@ -718,6 +720,17 @@ class ReportGenerator:
         except Exception:
             pass
 
+        # 30-day price history (fresh download every scan run — sanity check)
+        price_history = {}
+        price_history_prompt = ""
+        try:
+            from price_history import fetch_price_history, format_price_history_for_prompt, price_history_for_json
+            ph_tickers = [s['ticker'] for s in stocks_data]
+            price_history = fetch_price_history(scan_tickers=ph_tickers, progress_callback=progress)
+            price_history_prompt = format_price_history_for_prompt(price_history)
+        except Exception:
+            pass
+
         watchlist_line = f"\nWATCHLIST MATCHES (prioritize these): {', '.join(watchlist_matches)}\n" if watchlist_matches else ""
         breadth_line_prompt = ""
         if market_breadth and "error" not in market_breadth:
@@ -726,11 +739,12 @@ class ReportGenerator:
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
         ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
-{market_intel_prompt}{smart_money_prompt}
+{market_intel_prompt}{smart_money_prompt}{price_history_prompt}
 IMPORTANT: For each stock:
 1. Use the technical data (chart data and scanner data) in this report to assess setup
-2. Use the MARKET INTELLIGENCE and SMART MONEY SIGNALS above to understand market context, institutional positioning, and social sentiment
-3. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
+2. Use the MARKET INTELLIGENCE, SMART MONEY SIGNALS, and 30-DAY PRICE HISTORY above to understand market context, institutional positioning, social sentiment, and recent price action
+3. Use the 30-day price history as a SANITY CHECK — verify entries/targets make sense vs recent highs/lows
+4. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
 
 ═══════════════════════════════════════════════════
 STOCKS TO ANALYZE: {tickers_list}
@@ -823,6 +837,10 @@ RISK MANAGEMENT:
         if smart_money_prompt:
             body_lines.append(smart_money_prompt)
             body_lines.append("")
+        # Add 30-day price history to text report
+        if price_history_prompt:
+            body_lines.append(price_history_prompt)
+            body_lines.append("")
         for s in stocks_data:
             ticker = s['ticker']
             score = s.get('score', 0)
@@ -878,12 +896,59 @@ RISK MANAGEMENT:
         except Exception:
             pass
         # Build and save JSON analysis package (for API + future use)
-        analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth, market_intel=market_intel)
+        # Build JSON-safe price history summary (no daily rows)
+        ph_json = {}
+        try:
+            if price_history:
+                from price_history import price_history_for_json
+                ph_json = price_history_for_json(price_history)
+        except Exception:
+            pass
+        analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth, market_intel=market_intel, price_history=ph_json)
         filepath_json = self.save_dir / f"{base_name}.json"
         try:
             with open(filepath_json, 'w', encoding='utf-8') as f:
                 json.dump(analysis_package, f, indent=2)
             progress(f"JSON saved: {filepath_json}")
+        except Exception:
+            pass
+
+        # Append slim record to long-term scan history (scan_history.json)
+        try:
+            history_path = self.save_dir / "scan_history.json"
+            # Slim record: no instructions blob, no daily price rows
+            slim_stocks = []
+            for s in analysis_package.get("stocks", []):
+                slim = {k: s[k] for k in ("ticker", "score", "price", "change", "sector",
+                                           "rsi", "sma200_status", "rel_volume", "recom",
+                                           "on_watchlist") if k in s}
+                if s.get("leveraged_play"):
+                    slim["leveraged_play"] = s["leveraged_play"]
+                if s.get("smart_money"):
+                    slim["smart_money"] = s["smart_money"]
+                slim_stocks.append(slim)
+            history_entry = {
+                "scan_type": scan_type,
+                "timestamp": timestamp_display,
+                "stocks": slim_stocks,
+            }
+            if analysis_package.get("market_breadth"):
+                history_entry["market_breadth"] = analysis_package["market_breadth"]
+            if analysis_package.get("price_history_30d"):
+                history_entry["price_history_30d"] = analysis_package["price_history_30d"]
+            # Load existing history, append, save
+            history = []
+            if history_path.exists():
+                try:
+                    with open(history_path, 'r', encoding='utf-8') as f:
+                        history = json.load(f)
+                    if not isinstance(history, list):
+                        history = [history]
+                except Exception:
+                    history = []
+            history.append(history_entry)
+            with open(history_path, 'w', encoding='utf-8') as f:
+                json.dump(history, f, indent=2)
         except Exception:
             pass
 

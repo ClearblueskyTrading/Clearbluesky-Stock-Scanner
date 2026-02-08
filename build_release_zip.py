@@ -36,6 +36,15 @@ EXCLUDE_FILES = {
     "GITHUB_PUSH.md",
     "TESTING_v7.0.md",
     "NEXT_RELEASE.md",
+    # Old release notes (keep only last 2 versions in zip)
+    "RELEASE_v6.2.md",
+    "RELEASE_v6.3.md",
+    "RELEASE_v6.4.md",
+    "RELEASE_v6.5.md",
+    "RELEASE_v7.0.md",
+    "RELEASE_v7.1.md",
+    "RELEASE_v7.2.md",
+    "RELEASE_v7.3.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

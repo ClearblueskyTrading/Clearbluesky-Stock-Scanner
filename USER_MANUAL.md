@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.4 — User Manual
+# ClearBlueSky Stock Scanner v7.5 — User Manual
 
 ---
 
@@ -617,5 +617,5 @@ Read the output files from each model and look for:
 
 ---
 
-*ClearBlueSky Stock Scanner v7.4 — Made with Claude AI*
+*ClearBlueSky Stock Scanner v7.5 — Made with Claude AI*
 *https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases*

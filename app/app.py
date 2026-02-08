@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.4
+# ClearBlueSky Stock Scanner v7.5
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.4"
+VERSION = "7.5"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -380,8 +380,8 @@ class TradeBotApp:
         log("App starting...")
         self.root = root
         self.root.title(f"ClearBlueSky Stock Scanner v{VERSION}")
-        self.root.geometry("420x520")
-        self.root.minsize(380, 480)
+        self.root.geometry("420x550")
+        self.root.minsize(380, 510)
         self.root.resizable(True, True)
         self.root.configure(bg="#f8f9fa")
         
@@ -405,6 +405,8 @@ class TradeBotApp:
         threading.Thread(target=_cleanup_old_reports, args=(self.config,), daemon=True).start()
         # Check for new version after a short delay (non-blocking)
         root.after(1500, lambda: threading.Thread(target=_check_for_updates, args=(root,), daemon=True).start())
+        # Refresh accuracy rating on startup (background, non-blocking)
+        root.after(3000, lambda: threading.Thread(target=self._refresh_accuracy, daemon=True).start())
     
     def load_config(self):
         try:
@@ -428,12 +430,31 @@ class TradeBotApp:
         tk.Label(header, text="AI Stock Research Tool · works best with Claude AI", font=("Arial", 8),
                 fg="#aaaaaa", bg=BG_DARK).pack(pady=(0, 4))
         
+        # === METRICS BAR (accuracy, hits, misses) ===
+        metrics_bar = tk.Frame(self.root, bg="#1a1a2e", height=28)
+        metrics_bar.pack(fill="x")
+        metrics_bar.pack_propagate(False)
+        metrics_inner = tk.Frame(metrics_bar, bg="#1a1a2e")
+        metrics_inner.pack(expand=True)
+        self.metric_accuracy = tk.Label(metrics_inner, text="Accuracy: --", font=("Consolas", 9, "bold"),
+                                        bg="#1a1a2e", fg="#17a2b8")
+        self.metric_accuracy.pack(side="left", padx=(10, 16))
+        self.metric_hits = tk.Label(metrics_inner, text="Hits: --", font=("Consolas", 9, "bold"),
+                                    bg="#1a1a2e", fg="#28a745")
+        self.metric_hits.pack(side="left", padx=(0, 16))
+        self.metric_misses = tk.Label(metrics_inner, text="Misses: --", font=("Consolas", 9, "bold"),
+                                      bg="#1a1a2e", fg="#dc3545")
+        self.metric_misses.pack(side="left", padx=(0, 16))
+        self.metric_total = tk.Label(metrics_inner, text="Picks: --", font=("Consolas", 9),
+                                     bg="#1a1a2e", fg="#aaaaaa")
+        self.metric_total.pack(side="left", padx=(0, 10))
+
         # === MAIN CONTENT ===
         main = tk.Frame(self.root, bg="#f8f9fa", padx=14, pady=10)
         main.pack(fill="x")
         
         # --- SCANNERS ---
-        scan_label = tk.Label(main, text="📊 Stock Scanner", font=("Arial", 9, "bold"),
+        scan_label = tk.Label(main, text="Stock Scanner", font=("Arial", 9, "bold"),
                              bg="#f8f9fa", fg="#333")
         scan_label.pack(anchor="w", pady=(4, 2))
         
@@ -566,13 +587,14 @@ class TradeBotApp:
         btn_frame = tk.Frame(main, bg="#f8f9fa")
         btn_frame.pack(fill="x", pady=(6, 2))
 
-        # Row 1: Broker, Reports, Logs, Config
+        # Row 1: Broker, Reports, History, Logs, Config
         grid1 = tk.Frame(btn_frame, bg="#f8f9fa")
         grid1.pack(fill="x", padx=3, pady=(0, 2))
-        for i in range(4):
+        for i in range(5):
             grid1.columnconfigure(i, weight=1)
         for i, (text, cmd) in enumerate([("Broker", self.open_broker),
                                           ("Reports", self.open_reports),
+                                          ("History", self.show_history_report),
                                           ("Logs", self.view_logs),
                                           ("Config", self.import_export_config)]):
             tk.Button(grid1, text=text, command=cmd, bg="#e9ecef", fg="#333",
@@ -970,6 +992,8 @@ class TradeBotApp:
                     self.scan_printer.stop()
                     self.scan_status.config(text="Ready")
                     self._update_status_ready()
+                    # Refresh accuracy rating after scan completes
+                    threading.Thread(target=self._refresh_accuracy, daemon=True).start()
                     return
         except Exception as e:
             log_error(e, "Process scan result queue")
@@ -1256,6 +1280,53 @@ class TradeBotApp:
         threading.Thread(target=_run_report, daemon=True).start()
     
     # === OPENROUTER CREDIT DISPLAY ===
+
+    def _refresh_accuracy(self):
+        """Refresh accuracy metrics bar from scan history (background thread safe)."""
+        try:
+            # Auto-backfill from old reports on first run
+            from history_analyzer import backfill_from_reports
+            reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
+            try:
+                backfill_from_reports(reports_dir=reports_dir)
+            except Exception:
+                pass
+
+            from accuracy_tracker import calculate_accuracy
+            acc = calculate_accuracy(reports_dir=reports_dir)
+            pct = acc.get("accuracy_pct", 0)
+            hits = acc.get("hits", 0)
+            misses = acc.get("misses", 0)
+            total = acc.get("total_evaluated", 0)
+            status = acc.get("status", "")
+
+            if status != "ok" or total == 0:
+                def _update_no_data():
+                    self.metric_accuracy.config(text="Accuracy: --", fg="#17a2b8")
+                    self.metric_hits.config(text="Hits: --")
+                    self.metric_misses.config(text="Misses: --")
+                    self.metric_total.config(text="Picks: 0")
+                self.root.after(0, _update_no_data)
+                return
+
+            # Color code accuracy
+            if pct >= 60:
+                acc_color = "#28a745"  # green
+            elif pct >= 40:
+                acc_color = "#ffc107"  # amber
+            else:
+                acc_color = "#dc3545"  # red
+
+            days = acc.get("lookback_days", 7)
+
+            def _update():
+                self.metric_accuracy.config(text=f"Accuracy: {pct}%", fg=acc_color)
+                self.metric_hits.config(text=f"Hits: {hits}")
+                self.metric_misses.config(text=f"Misses: {misses}")
+                self.metric_total.config(text=f"Picks: {total} ({days}d)")
+            self.root.after(0, _update)
+        except Exception:
+            pass
 
     def _refresh_openrouter_credit(self):
         """Check OpenRouter key status and display model info."""
@@ -1819,7 +1890,45 @@ class TradeBotApp:
         reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
         os.makedirs(reports_dir, exist_ok=True)
         self._open_path(reports_dir)
-    
+
+    def show_history_report(self):
+        """Generate and display the scan history report in a scrollable window."""
+        reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
+        try:
+            from history_analyzer import generate_history_report
+            report_text, filepath = generate_history_report(
+                reports_dir=reports_dir,
+                progress_callback=lambda msg: self.status.config(text=msg)
+            )
+        except Exception as e:
+            report_text = f"Error generating history report: {e}"
+            filepath = ""
+
+        # Show in scrollable window
+        win = tk.Toplevel(self.root)
+        win.title("Scan History Report — ClearBlueSky")
+        win.geometry("720x600")
+        win.configure(bg="white")
+        txt = tk.Text(win, wrap="word", font=("Consolas", 9), bg="white", fg="#333",
+                     padx=12, pady=12, relief="flat")
+        scrollbar = tk.Scrollbar(win, command=txt.yview)
+        txt.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        txt.pack(fill="both", expand=True)
+        txt.insert("1.0", report_text)
+        txt.config(state="disabled")
+
+        # Bottom bar with buttons
+        bar = tk.Frame(win, bg="#f0f0f0", padx=8, pady=6)
+        bar.pack(fill="x")
+        if filepath:
+            tk.Button(bar, text="Open File", command=lambda: self._open_path(filepath),
+                     bg="#28a745", fg="white", font=("Arial", 9), relief="flat", cursor="hand2").pack(side="left", padx=4)
+            tk.Button(bar, text="Open Folder", command=lambda: self._open_path(reports_dir),
+                     bg="#6c757d", fg="white", font=("Arial", 9), relief="flat", cursor="hand2").pack(side="left", padx=4)
+        tk.Button(bar, text="Close", command=win.destroy,
+                 bg="#dc3545", fg="white", font=("Arial", 9), relief="flat", cursor="hand2").pack(side="right", padx=4)
+
     def view_logs(self):
         if os.path.exists(LOG_FILE):
             self._open_path(LOG_FILE)
@@ -1925,7 +2034,7 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.4
+ClearBlueSky Stock Scanner v7.5
 
 QUICK START:
 1. Select scan type and index (N/A for Watchlist / Insider).
@@ -1974,7 +2083,7 @@ AI STRATEGY:
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.4
+ClearBlueSky v7.5
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)
