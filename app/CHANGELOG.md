@@ -4,6 +4,29 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.4] – 2026-02-08
+
+### Added
+- **Smart Money Signals** — New `smart_money.py` module provides three layers of institutional/social data:
+  - **WSB/Reddit sentiment** (apewisdom.io) — top trending tickers with mention count, upvotes, and trend direction. Applied to all scanners.
+  - **Institutional 13F holders** (yfinance) — identifies notable funds (Berkshire, BlackRock, Vanguard, etc.) and flags increasing positions. Trend scanner only.
+  - **SEC EDGAR Form 4 insider filings** — counts recent insider transactions per ticker via SEC full-text search. Trend scanner only.
+- Smart Money data injected into AI prompt, JSON report, and text report alongside Market Intelligence.
+- `use_smart_money_signals` toggle in Settings (on by default).
+
+### Fixed
+- **Emotional Dip scanner returned 0 results** — Six stacked filters were too strict:
+  - SMA200 requirement disabled by default (stocks that just dipped are naturally below SMA200).
+  - Buy/Strong Buy rating requirement disabled by default (still boosts score).
+  - Min relative volume lowered from 1.8x → 1.2x; handles `None` gracefully (Finviz doesn't always return it).
+  - Min upside lowered from 10% → 5%.
+  - Dip range widened from 1.5–4% → 1–5%.
+  - "Unclear" dip type now passes (only "fundamental" is blocked). No news ≠ fundamental problem.
+  - Scanner now returns ~30 candidates vs 0 previously.
+- **Config auto-migration** — Existing `user_config.json` with old strict emotional dip values auto-migrates to loosened defaults on load.
+
+---
+
 ## [7.3] – 2026-02-08
 
 ### Added

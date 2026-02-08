@@ -35,11 +35,13 @@ EXCLUDE_FILES = {
     "backtest_signals.db",
     "GITHUB_PUSH.md",
     "TESTING_v7.0.md",
+    "NEXT_RELEASE.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [
     re.compile(r"ClearBlueSky-\d+\.\d+\.zip", re.I),
     re.compile(r"Trend_Scan_Report_.*\.pdf", re.I),
+    re.compile(r"^_test_", re.I),
 ]
 
 

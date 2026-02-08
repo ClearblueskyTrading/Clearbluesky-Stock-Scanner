@@ -75,10 +75,10 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
     
     # Deep analysis - filter for EMOTIONAL ONLY
     results = []
-    require_above_sma200 = config.get('emotional_require_above_sma200', True)
-    min_upside = float(config.get('emotional_min_upside_to_target', 10.0))
-    require_buy_rating = config.get('emotional_require_buy_rating', True)
-    min_vol_ratio = float(config.get('emotional_min_volume_ratio', 1.8))
+    require_above_sma200 = config.get('emotional_require_above_sma200', False)
+    min_upside = float(config.get('emotional_min_upside_to_target', 5.0))
+    require_buy_rating = config.get('emotional_require_buy_rating', False)
+    min_vol_ratio = float(config.get('emotional_min_volume_ratio', 1.2))
     
     for i, candidate in enumerate(candidates):
         ticker = candidate['ticker']
@@ -91,10 +91,11 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
         cached_quote = analysis.pop('_quote', None)
         candidate.update(analysis)
         
-        # === STRICT FILTERING FOR EMOTIONAL DIPS ===
+        # === FILTERING FOR EMOTIONAL DIPS ===
         
-        # 1. MUST be emotional dip (not fundamental)
-        if candidate.get('dip_type') != 'emotional':
+        # 1. MUST NOT be a fundamental dip (emotional or unclear are OK)
+        dip_type = candidate.get('dip_type', 'unclear')
+        if dip_type == 'fundamental':
             continue
         
         # 2. MUST have no fundamental red flags
@@ -126,22 +127,27 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
         if upside is None or upside < min_upside:
             continue
         
-        # 6. MUST have high relative volume (conviction)
-        rel_vol = candidate.get('rel_volume', 0)
+        # 6. Relative volume check (skip if not available)
+        rel_vol = candidate.get('rel_volume') or 0
         try:
             if isinstance(rel_vol, str):
-                rel_vol = float(rel_vol.replace('x', ''))
-            if rel_vol < min_vol_ratio:
-                continue
+                rel_vol = float(rel_vol.replace('x', '').replace(',', ''))
+            else:
+                rel_vol = float(rel_vol)
         except Exception:
+            rel_vol = 0
+        # Only filter on rel_vol if we have a valid reading
+        if rel_vol > 0 and rel_vol < min_vol_ratio:
             continue
         
         # === SCORE CALCULATION (emotional-specific) ===
         score = 50  # Base
         
-        # Emotional news boost
-        if candidate.get('dip_type') == 'emotional':
+        # Dip type boost (emotional = confirmed buyable, unclear = no bad news found)
+        if dip_type == 'emotional':
             score += 20
+        elif dip_type == 'unclear':
+            score += 10  # No news = probably not fundamental
         
         # Analyst rating boost
         analyst_score = candidate.get('analyst_score', 0)

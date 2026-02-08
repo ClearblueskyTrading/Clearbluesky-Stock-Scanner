@@ -1,9 +1,10 @@
-# ClearBlueSky Stock Scanner v7.3
+# ClearBlueSky Stock Scanner v7.4
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
 - **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Leveraged Barbell, Insider, Pre-Market, **Pre-Market Hunter** (S&P 500 / Russell 2000 / ETFs or Leveraged universe where applicable)
 - **Market Intelligence** – Google News RSS headlines, Finviz news, sector performance, and market snapshot (SPY, QQQ, VIX, etc.) automatically gathered and fed to the AI alongside your scan data
+- **Smart Money Signals** – WSB/Reddit sentiment (all scanners), institutional 13F holders and SEC Form 4 insider filings (Trend scanner) fed to AI for confirmation
 - **Run all scans** – Optional checkbox runs all seven scanners in sequence (rate-limited; may take 20+ minutes)
 - **CLI** – Run scans from the command line for automation (e.g. Claude, Desktop Commander): `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
@@ -64,7 +65,8 @@ ClearBlueSky/
 ├── docker-compose.yml
 ├── RELEASE_v7.0.md     ← v7.0 release notes
 ├── RELEASE_v7.1.md     ← v7.1 release notes
-├── RELEASE_v7.2.md     ← v7.2 release notes (current)
+├── RELEASE_v7.2.md     ← v7.2 release notes
+├── RELEASE_v7.3.md     ← v7.3 release notes
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
@@ -75,6 +77,7 @@ ClearBlueSky/
     ├── report_generator.py     ← PDF reports
     ├── watchlist_scanner.py    ← Watchlist (Down X% or All)
     ├── market_intel.py         ← Market Intelligence (news, sectors, snapshot)
+    ├── smart_money.py          ← Smart Money signals (WSB, 13F, SEC insider)
     ├── scan_settings.py        ← Config & scan types
     ├── sound_utils.py          ← Scan-complete & watchlist beeps
     ├── requirements.txt
@@ -114,10 +117,11 @@ Reports: PDF (date/time stamped, Elite Swing Trader prompt + per-ticker data), J
 
 ---
 
-*ClearBlueSky v7.3 – made with Claude AI*
+*ClearBlueSky v7.4 – made with Claude AI*
 
+**v7.4:** Smart Money signals (WSB sentiment, 13F institutional holders, SEC insider filings). Emotional Dip scanner fixed (was too strict, 0 results). Config auto-migration for loosened defaults.  
 **v7.3:** Market Intelligence (Google News RSS, Finviz news, sector performance, market snapshot fed to AI). Renamed Velocity → Leveraged in UI. RunPod/multi-LLM guide in manual. Button layout fix.  
 **v7.2:** 28 bug fixes — security, scanner accuracy, performance, keyboard shortcuts, cross-platform support.  
 **v7.1:** Elite Swing Trader AI prompt (1-5 day focus), Quick Lookup 1-5 tickers, Import/Export Config.  
 **v7.0:** Queue-based scans, Run all scans, Pre-Market Hunter, in-app Update & Rollback.  
-See **app/CHANGELOG.md** and **RELEASE_v7.3.md**.
+See **app/CHANGELOG.md** and **RELEASE_v7.4.md**.

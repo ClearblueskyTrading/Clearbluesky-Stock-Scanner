@@ -1,10 +1,10 @@
 @echo off
-title ClearBlueSky Stock Scanner v7.3 - Installer
+title ClearBlueSky Stock Scanner v7.4 - Installer
 color 0A
 
 echo.
 echo  ============================================
-echo    ClearBlueSky Stock Scanner v7.3
+echo    ClearBlueSky Stock Scanner v7.4
 echo    Free and Open Source - Made with Claude AI
 echo  ============================================
 echo.

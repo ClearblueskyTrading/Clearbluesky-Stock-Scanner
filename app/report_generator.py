@@ -534,6 +534,7 @@ class ReportGenerator:
                 "insider_10b5_1_plan": s.get("insider_10b5_1_plan"),
                 "insider_context": s.get("insider_context"),
                 "risk_checks": s.get("risk_checks") or _default_risk_checks(),
+                "smart_money": s.get("smart_money") or {},
             }
             for k in ("Owner", "Relationship", "Date", "Transaction", "Cost", "Shares", "Value"):
                 if s.get(k) not in (None, "", "N/A"):
@@ -691,6 +692,32 @@ class ReportGenerator:
         else:
             market_intel_prompt = ""
 
+        # Smart Money signals (WSB for all scanners; full package for Trend)
+        smart_money_data = {}
+        smart_money_prompt = ""
+        try:
+            from smart_money import get_smart_money_batch, format_smart_money_for_prompt
+            ticker_list = [s['ticker'] for s in stocks_data]
+            is_trend = "trend" in scan_type.lower()
+            smart_money_data = get_smart_money_batch(ticker_list, full=is_trend, progress_callback=progress)
+            # Attach to each stock row for JSON output
+            for s in stocks_data:
+                t = s['ticker'].upper()
+                if t in smart_money_data and smart_money_data[t]:
+                    s['smart_money'] = smart_money_data[t]
+            # Build prompt lines
+            sm_lines = []
+            for s in stocks_data:
+                t = s['ticker'].upper()
+                sm = smart_money_data.get(t, {})
+                line = format_smart_money_for_prompt(t, sm)
+                if line:
+                    sm_lines.append(line)
+            if sm_lines:
+                smart_money_prompt = "\n\nSMART MONEY SIGNALS:\n" + "\n".join(sm_lines) + "\n"
+        except Exception:
+            pass
+
         watchlist_line = f"\nWATCHLIST MATCHES (prioritize these): {', '.join(watchlist_matches)}\n" if watchlist_matches else ""
         breadth_line_prompt = ""
         if market_breadth and "error" not in market_breadth:
@@ -699,10 +726,10 @@ class ReportGenerator:
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
         ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
-{market_intel_prompt}
+{market_intel_prompt}{smart_money_prompt}
 IMPORTANT: For each stock:
 1. Use the technical data (chart data and scanner data) in this report to assess setup
-2. Use the MARKET INTELLIGENCE above to understand today's market context, sector rotation, and breaking news
+2. Use the MARKET INTELLIGENCE and SMART MONEY SIGNALS above to understand market context, institutional positioning, and social sentiment
 3. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
 
 ═══════════════════════════════════════════════════
@@ -791,6 +818,10 @@ RISK MANAGEMENT:
         # Add market intelligence to text report
         if market_intel_prompt:
             body_lines.append(market_intel_prompt)
+            body_lines.append("")
+        # Add smart money signals to text report
+        if smart_money_prompt:
+            body_lines.append(smart_money_prompt)
             body_lines.append("")
         for s in stocks_data:
             ticker = s['ticker']

@@ -68,12 +68,12 @@ SCAN_PARAM_SPECS = {
     ],
     "swing": [
         {"key": "emotional_min_score", "label": "Min Score", "min": 50, "max": 90, "default": 65, "type": "int"},
-        {"key": "emotional_dip_min_percent", "label": "Min Dip %", "min": 0, "max": 5, "default": 1.5, "type": "float"},
-        {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 4.0, "type": "float"},
-        {"key": "emotional_min_volume_ratio", "label": "Min Rel Vol", "min": 1.0, "max": 5.0, "default": 1.8, "type": "float"},
-        {"key": "emotional_min_upside_to_target", "label": "Min Upside %", "min": 5, "max": 30, "default": 10.0, "type": "float"},
-        {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": True, "type": "bool"},
-        {"key": "emotional_require_buy_rating", "label": "Require Buy rating", "default": True, "type": "bool"},
+        {"key": "emotional_dip_min_percent", "label": "Min Dip %", "min": 0, "max": 5, "default": 1.0, "type": "float"},
+        {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 5.0, "type": "float"},
+        {"key": "emotional_min_volume_ratio", "label": "Min Rel Vol", "min": 1.0, "max": 5.0, "default": 1.2, "type": "float"},
+        {"key": "emotional_min_upside_to_target", "label": "Min Upside %", "min": 0, "max": 30, "default": 5.0, "type": "float"},
+        {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": False, "type": "bool"},
+        {"key": "emotional_require_buy_rating", "label": "Require Buy rating", "default": False, "type": "bool"},
         {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
         {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
     ],
@@ -206,13 +206,13 @@ def load_config():
         "min_avg_volume": 500000,
         
         # Emotional Dip Scanner (runs ~3:30 PM, buy by 4 PM)
-        "emotional_min_score": 65,
-        "emotional_dip_min_percent": 1.5,
-        "emotional_dip_max_percent": 4.0,
-        "emotional_min_volume_ratio": 1.8,
-        "emotional_require_above_sma200": True,
-        "emotional_min_upside_to_target": 10.0,
-        "emotional_require_buy_rating": True,
+        "emotional_min_score": 60,
+        "emotional_dip_min_percent": 1.0,
+        "emotional_dip_max_percent": 5.0,
+        "emotional_min_volume_ratio": 1.2,
+        "emotional_require_above_sma200": False,
+        "emotional_min_upside_to_target": 5.0,
+        "emotional_require_buy_rating": False,
         
         # Pre-Market Volume Scanner (7:00 AM - 9:25 AM)
         "premarket_min_score": 70,
@@ -270,6 +270,14 @@ def load_config():
                 # v7.2 migration: Claude removed — switch to Gemini
                 if "claude" in (defaults.get("openrouter_model") or "").lower():
                     defaults["openrouter_model"] = "google/gemini-3-pro-preview"
+                # v7.4 migration: Loosen emotional dip defaults (was too strict, 0 results)
+                if saved.get("emotional_require_above_sma200") is True and saved.get("emotional_min_volume_ratio", 0) >= 1.8:
+                    defaults["emotional_require_above_sma200"] = False
+                    defaults["emotional_require_buy_rating"] = False
+                    defaults["emotional_min_volume_ratio"] = 1.2
+                    defaults["emotional_min_upside_to_target"] = 5.0
+                    defaults["emotional_dip_min_percent"] = 1.0
+                    defaults["emotional_dip_max_percent"] = 5.0
         except Exception:
             pass
 
