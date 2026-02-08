@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.2
+# ClearBlueSky Stock Scanner v7.3
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
@@ -87,6 +87,6 @@ See **WORKFLOW.md** in this folder for the full pipeline.
 
 ---
 
-*ClearBlueSky v7.2 – made with Claude AI*
+*ClearBlueSky v7.3 – made with Claude AI*
 
-**v7.2:** 28 bug fixes + improvements (security, scanner accuracy, performance, UX). See **CHANGELOG.md** for full history.
+**v7.3:** Market Intelligence, renamed Velocity → Leveraged in UI, RunPod/multi-LLM guide. See **CHANGELOG.md** for full history.

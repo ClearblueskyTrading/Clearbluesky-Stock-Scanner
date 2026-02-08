@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.2
+# ClearBlueSky Stock Scanner v7.3
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.2"
+VERSION = "7.3"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -460,7 +460,7 @@ class TradeBotApp:
         ttk.Combobox(
             type_row,
             textvariable=self.scan_index,
-            values=["S&P 500", "Russell 2000", "ETFs", "Velocity (high-conviction)"],
+            values=["S&P 500", "Russell 2000", "ETFs", "Leveraged (high-conviction)"],
             state="readonly",
             width=10,
             font=("Arial", 9),
@@ -674,7 +674,7 @@ class TradeBotApp:
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
         tk.Label(main_f, text="Index:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
         idx_var = tk.StringVar(value=self.scan_index.get())
-        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs", "Velocity (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
+        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs", "Leveraged (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -1014,7 +1014,7 @@ class TradeBotApp:
             messagebox.showinfo("Scan", "A scan is already running.")
             return
         idx_text = self.scan_index.get()
-        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Velocity" in idx_text else "russell2000"))
+        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Leveraged" in idx_text else "russell2000"))
         self.scan_cancelled = False
         # Clear any stale jobs and results from previous cancelled scans
         for q in (self.scan_job_queue, self.scan_result_queue):
@@ -1491,6 +1491,17 @@ class TradeBotApp:
         av_var.trace("w", av_mask)
         av_mask()
 
+        # --- Market Intelligence (Google News + Finviz + sectors + market snapshot) ---
+        sep_mi = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_mi.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="Market Intelligence", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Gather live market context before AI analysis: Google News headlines, Finviz news, sector performance, and market snapshot (SPY, QQQ, VIX, etc.). No API key needed.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        market_intel_var = tk.BooleanVar(value=self.config.get("use_market_intel", True))
+        tk.Checkbutton(scroll_frame, text="Enable Market Intelligence (adds ~5 sec to AI reports)", variable=market_intel_var,
+                      bg="white", font=("Arial", 9)).pack(anchor="w", padx=20, pady=(4, 0))
+
         # --- SEC insider context (10b5-1 vs discretionary) ---
         sec_insider_var = tk.BooleanVar(value=self.config.get("use_sec_insider_context", False))
         tk.Checkbutton(scroll_frame, text="Add SEC insider context for tickers with insider data (10b5-1 plan vs discretionary from Form 4)", variable=sec_insider_var,
@@ -1630,6 +1641,7 @@ class TradeBotApp:
             self.config['openrouter_model'] = openrouter_model_from_display()
             self.config['use_vision_charts'] = use_vision_var.get()
             self.config['alpha_vantage_api_key'] = av_var.get().strip()
+            self.config['use_market_intel'] = market_intel_var.get()
             self.config['use_sec_insider_context'] = sec_insider_var.get()
             self.config['rag_books_folder'] = rag_folder_var.get().strip()
             self.config['rag_enabled'] = rag_enabled_var.get()
@@ -1913,10 +1925,10 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.2
+ClearBlueSky Stock Scanner v7.3
 
 QUICK START:
-1. Select scan type and index (N/A for Watchlist / Velocity Barbell / Insider).
+1. Select scan type and index (N/A for Watchlist / Insider).
 2. Click Run Scan. You get: PDF report + JSON analysis package.
 3. Optional: Check "Run all scans" (may take 20+ min; rate-limited).
 4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
@@ -1930,10 +1942,10 @@ SCANNERS:
 • Trend – Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close.
 • Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
 • Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers. Config: Min % down, Filter.
-• Velocity Barbell – Sector signals → Foundation + Runner (or Single Shot). Config: min sector %, theme.
+• Leveraged Barbell – Sector signals → Foundation + Runner leveraged ETF pairs. Config: min sector %, theme.
 • Insider – Latest insider transactions (Finviz).
 • Pre-Market – Pre-market volume. Best: 7–9:25 AM.
-• Velocity Pre-Market Hunter – Pre-market setups (gap recovery, accumulation, breakout, gap-and-go); grades A+–F.
+• Pre-Market Hunter – Pre-market setups (gap recovery, accumulation, breakout, gap-and-go); grades A+–F.
 
 QUICK LOOKUP:
 • Enter 1-5 ticker symbols (comma or space separated) in Quick Lookup box.
@@ -1962,7 +1974,7 @@ AI STRATEGY:
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.2
+ClearBlueSky v7.3
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

@@ -8,3 +8,4 @@ yfinance>=0.2.36
 pandas-ta>=0.3.14b0
 chromadb>=0.4,<1.0
 PyMuPDF>=1.23
+feedparser>=6.0

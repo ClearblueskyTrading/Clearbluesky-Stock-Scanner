@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.2 — User Manual
+# ClearBlueSky Stock Scanner v7.3 — User Manual
 
 ---
 
@@ -12,11 +12,13 @@
 6. [Watchlist](#6-watchlist)
 7. [Settings (API Keys and Options)](#7-settings)
 8. [Reports and AI Analysis](#8-reports-and-ai-analysis)
-9. [Import / Export Config](#9-import--export-config)
-10. [Update and Rollback](#10-update-and-rollback)
-11. [Keyboard Shortcuts](#11-keyboard-shortcuts)
-12. [Scoring System](#12-scoring-system)
-13. [Troubleshooting](#13-troubleshooting)
+9. [Market Intelligence](#9-market-intelligence)
+10. [Import / Export Config](#10-import--export-config)
+11. [Update and Rollback](#11-update-and-rollback)
+12. [Keyboard Shortcuts](#12-keyboard-shortcuts)
+13. [Scoring System](#13-scoring-system)
+14. [Running on RunPod / Multi-LLM Deployment](#14-running-on-runpod--multi-llm-deployment)
+15. [Troubleshooting](#15-troubleshooting)
 
 ---
 
@@ -54,7 +56,7 @@ Every scan produces up to 3 files in the `reports/` folder:
   - **S&P 500** — ~500 large-cap stocks
   - **Russell 2000** — ~2000 small-cap stocks
   - **ETFs** — Exchange-traded funds
-  - **Velocity (high-conviction)** — Fixed list of 17 high-volume tickers (TQQQ, NVDA, TSLA, etc.)
+  - **Leveraged (high-conviction)** — Fixed list of 17 high-volume leveraged tickers (TQQQ, SOXL, SPXL, NVDA, TSLA, etc.)
 - **Run Scan** — Starts the selected scan in the background. The GUI stays responsive.
 - **Stop** — Cancels a running scan.
 - **Config** — Opens per-scanner settings (sliders/toggles specific to the selected scanner).
@@ -94,7 +96,7 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 **Best time to run:** 2:30–4:00 PM ET (emotional selling peaks in the last 90 minutes).
 
-**Index options:** S&P 500, Russell 2000, ETFs, Velocity (high-conviction).
+**Index options:** S&P 500, Russell 2000, ETFs, Leveraged (high-conviction).
 
 **Use case:** Buying 1–5 day bounce plays on quality stocks that dipped on emotion, not fundamentals.
 
@@ -114,7 +116,7 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ---
 
-### Velocity Barbell
+### Leveraged Barbell
 
 **What it does:** Sector-based momentum scanner. Identifies the hottest sector, then suggests a "barbell" pair: a Foundation stock (solid underlying) and a Runner (leveraged ETF for that sector). Also has a "Single Shot" mode for one leveraged idea.
 
@@ -150,7 +152,7 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ---
 
-### Velocity Pre-Market Hunter
+### Pre-Market Hunter
 
 **What it does:** Advanced pre-market scanner that scores 4 specific signal types:
 - **Gap Recovery** — Stock gapped down 1.5–4%, showing recovery in pre-market
@@ -162,7 +164,7 @@ Each ticker is graded A+ through F. Only A+, A, and B grades get entry plans wit
 
 **Best time to run:** 7:00–9:25 AM ET.
 
-**Index options:** S&P 500, Russell 2000, ETFs, Velocity (high-conviction).
+**Index options:** S&P 500, Russell 2000, ETFs, Leveraged (high-conviction).
 
 **Use case:** Pre-market setup identification with specific trade plans.
 
@@ -212,7 +214,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Filter | Down X% | "down_pct" = only show stocks down X% today; "all" = show everything |
 | Min % down | 5 | Minimum percentage down from open (when filter = down_pct) |
 
-### Velocity Barbell Config
+### Leveraged Barbell Config
 | Setting | Default | Description |
 |---------|---------|-------------|
 | Min sector % | 0.0 | Minimum sector move (up or down) to trigger |
@@ -224,7 +226,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Insider view | latest | Which insider data to pull (latest, latest buys, latest sales, top week, etc.) |
 | Min Score | 0 | Minimum score for the report (0 = include all) |
 
-### Velocity Pre-Market Hunter
+### Pre-Market Hunter
 No configurable parameters — uses a fixed scoring algorithm. Select the stock universe via the Index dropdown.
 
 ---
@@ -281,6 +283,12 @@ Click **Settings** to configure API keys and app options.
 - **Required?** No — reports work without it. Adds extra headline data when available.
 - **Get one:** https://www.alphavantage.co/support/#api-key (free tier available)
 
+### Market Intelligence
+- **What:** Automatically gathers Google News headlines, Finviz financial news, sector performance, and market snapshot (SPY, QQQ, VIX, etc.) before AI analysis.
+- **Required?** No API key needed — all sources are free.
+- **Toggle:** Enable/disable in Settings. On by default. Adds ~5 seconds to AI report generation.
+- **See:** [Section 9: Market Intelligence](#9-market-intelligence) for details.
+
 ### RAG Books
 - **What:** Folder containing .txt or .pdf files (trading books, strategies, etc.)
 - **How it works:** Click "Build RAG Index" to create a vector database. When enabled, relevant passages from your books are included in the AI prompt for context.
@@ -328,7 +336,38 @@ https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases
 
 ---
 
-## 9. Import / Export Config
+## 9. Market Intelligence
+
+When Market Intelligence is enabled (Settings toggle, on by default), the app automatically gathers live market context before sending data to the AI. This data is also saved in the JSON analysis package.
+
+### What's Gathered
+
+| Source | Data | API Key Needed? |
+|--------|------|----------------|
+| **Google News RSS** | ~24 headlines across Stock Market, Economy, and Earnings topics | No |
+| **Finviz News** | ~24 curated financial news + blog headlines | No |
+| **Sector Performance** | All 11 sectors with today/week/month/quarter/YTD changes | No |
+| **Market Snapshot** | SPY, QQQ, DIA, IWM, GLD, USO, TLT, VIX — price + daily change | No |
+
+### How It's Used
+
+1. **AI Prompt** — The market intel is injected as a "MARKET INTELLIGENCE" section at the top of the AI prompt, before the per-stock data. The AI uses this to understand:
+   - Overall market direction (is SPY up or down? Is VIX elevated?)
+   - Which sectors are leading/lagging (sector rotation)
+   - Breaking news that could affect trades
+   - Economic/earnings headlines
+
+2. **JSON Package** — The full market intel data is included in the `market_intel` field of the JSON file, so you can feed it to any AI or use it in your own analysis.
+
+3. **Text Report** — Market snapshot, sector table, and headlines appear in the text body of the report.
+
+### Performance
+
+All 4 sources are fetched in parallel (~3–5 seconds total). If any source fails, the others still work.
+
+---
+
+## 10. Import / Export Config
 
 Click **Config** (bottom button row) to back up or restore your full configuration.
 
@@ -344,7 +383,7 @@ Click **Config** (bottom button row) to back up or restore your full configurati
 
 ---
 
-## 10. Update and Rollback
+## 11. Update and Rollback
 
 ### Update
 
@@ -365,7 +404,7 @@ Click **Rollback** to restore from the last backup if an update causes issues.
 
 ---
 
-## 11. Keyboard Shortcuts
+## 12. Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
@@ -375,7 +414,7 @@ Click **Rollback** to restore from the last backup if an update causes issues.
 
 ---
 
-## 12. Scoring System
+## 13. Scoring System
 
 All scanners use a 0–100 scoring system:
 
@@ -386,7 +425,7 @@ All scanners use a 0–100 scoring system:
 | 60–69 | Decent | Meets minimum criteria, lower conviction |
 | Below 60 | Skip | Does not meet quality threshold |
 
-### Velocity Pre-Market Hunter Grades
+### Pre-Market Hunter Grades
 
 | Grade | Score | Position Size |
 |-------|-------|--------------|
@@ -398,7 +437,139 @@ All scanners use a 0–100 scoring system:
 
 ---
 
-## 13. Troubleshooting
+## 14. Running on RunPod / Multi-LLM Deployment
+
+The ClearBlueSky scanner is designed as a desktop app, but its JSON output is model-agnostic. You can use the generated analysis packages with **any LLM** — including self-hosted models on RunPod, together.ai, or your own GPU servers. This section explains how to scale the AI analysis beyond the built-in OpenRouter integration.
+
+### Why Use RunPod / Self-Hosted LLMs?
+
+- **Run multiple models in parallel** — Send the same JSON package to 3–5 different LLMs simultaneously and compare their analysis. One model might catch a risk another misses.
+- **No per-token costs** — Pay for GPU time instead of per-token API pricing. Especially useful for large analysis packages.
+- **Custom fine-tuned models** — Use models fine-tuned on financial data or your own trading history.
+- **Privacy** — Your analysis data stays on your infrastructure.
+- **No rate limits** — Run as many analyses as your GPUs can handle.
+
+### Architecture
+
+```
+ClearBlueSky Scanner (desktop)
+     │
+     ├── Generates *.json analysis package (with market intel + instructions)
+     │
+     ▼
+RunPod / GPU Server
+     │
+     ├── LLM #1 (e.g. Llama 3.3 70B) ──→ analysis_llama.txt
+     ├── LLM #2 (e.g. Qwen 2.5 72B)  ──→ analysis_qwen.txt
+     ├── LLM #3 (e.g. Mixtral 8x22B)  ──→ analysis_mixtral.txt
+     └── LLM #4 (e.g. DeepSeek V3)    ──→ analysis_deepseek.txt
+     │
+     ▼
+Consensus / Comparison
+     │
+     └── Combine results: majority vote on BUY/PASS, average scores,
+         flag disagreements as "needs manual review"
+```
+
+### Step-by-Step Setup
+
+**1. Generate the JSON package**
+
+Run any scan in ClearBlueSky. The `*.json` file in `app/reports/` contains everything the AI needs: the `instructions` field (Elite Swing Trader System Prompt), per-ticker data, market intelligence, technical analysis, and news.
+
+**2. Set up RunPod**
+
+1. Create an account at [runpod.io](https://www.runpod.io/)
+2. Deploy a GPU pod (A100 80GB or H100 recommended for 70B+ models)
+3. Choose a template with vLLM, text-generation-inference (TGI), or Ollama pre-installed
+4. Start the pod — it exposes an OpenAI-compatible API endpoint
+
+**3. Deploy models**
+
+With vLLM (recommended for throughput):
+
+```bash
+# On your RunPod pod
+python -m vllm.entrypoints.openai.api_server \
+  --model meta-llama/Llama-3.3-70B-Instruct \
+  --port 8000 \
+  --tensor-parallel-size 2
+```
+
+Or with Ollama (easier setup):
+
+```bash
+ollama pull llama3.3:70b
+ollama pull qwen2.5:72b
+ollama serve  # Exposes API on port 11434
+```
+
+**4. Send the JSON package to your models**
+
+Write a simple Python script that reads the JSON and sends it to each model:
+
+```python
+import json
+import requests
+
+# Load the ClearBlueSky analysis package
+with open("reports/Trend_Scan_20260208_160000.json") as f:
+    package = json.load(f)
+
+system_prompt = package.get("instructions", "Analyze these stocks.")
+user_content = json.dumps(package, indent=2)
+
+# List of your RunPod endpoints (or local Ollama)
+endpoints = [
+    {"name": "Llama-3.3-70B", "url": "https://your-pod-id-8000.proxy.runpod.net/v1/chat/completions", "model": "meta-llama/Llama-3.3-70B-Instruct"},
+    {"name": "Qwen-2.5-72B", "url": "https://your-pod-id-8001.proxy.runpod.net/v1/chat/completions", "model": "Qwen/Qwen2.5-72B-Instruct"},
+]
+
+for ep in endpoints:
+    resp = requests.post(ep["url"], json={
+        "model": ep["model"],
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ],
+        "max_tokens": 8192,
+        "temperature": 0.3,
+    })
+    result = resp.json()["choices"][0]["message"]["content"]
+    with open(f"analysis_{ep['name']}.txt", "w") as f:
+        f.write(result)
+    print(f"{ep['name']}: done")
+```
+
+**5. Compare results**
+
+Read the output files from each model and look for:
+- **Consensus picks** — Stocks that all models agree are BUY
+- **Disagreements** — Where one model says BUY and another says PASS (investigate further)
+- **Score spread** — If all models give 85+ on a stock, that's high conviction
+- **Unique insights** — Each model may catch different news or technical patterns
+
+### Cost Comparison
+
+| Approach | Cost per scan (15 tickers) | Speed |
+|----------|---------------------------|-------|
+| OpenRouter (Gemini 3 Pro) | ~$0.03 | ~30 sec |
+| OpenRouter (DeepSeek free) | $0.00 | ~45 sec |
+| RunPod A100 (Llama 70B) | ~$0.02 (GPU time) | ~20 sec |
+| RunPod H100 (4 models parallel) | ~$0.10 (GPU time) | ~25 sec for ALL 4 |
+| Local RTX 4090 (Ollama) | $0.00 (electricity only) | ~60 sec |
+
+### Tips
+
+- **Start with OpenRouter** — The built-in integration is the easiest way to get AI analysis. Only move to RunPod if you need multi-model consensus or have high volume.
+- **Use the JSON `instructions` field** — It contains the full Elite Swing Trader System Prompt. Any LLM that follows instructions well will produce structured analysis.
+- **70B+ models recommended** — Smaller models (7B, 13B) often miss nuance in financial analysis. 70B+ models perform comparably to GPT-4/Claude for this task.
+- **Batch processing** — If running multiple scans (e.g., all 7 scanners), collect all JSON files and send them to RunPod in one batch to minimize GPU idle time.
+- **Serverless RunPod** — Use RunPod's serverless endpoints to avoid paying for idle GPUs. You're charged only when processing requests.
+
+---
+
+## 15. Troubleshooting
 
 ### "No results found"
 - Normal — not every scan finds qualifying stocks. The filters are intentionally strict.
@@ -409,7 +580,7 @@ All scanners use a 0–100 scoring system:
 ### Scan takes a long time
 - Some scanners make many API calls (one per ticker). Russell 2000 scans take longer.
 - "Run all scans" adds 60-second delays between scanners to avoid rate limits.
-- The Velocity Pre-Market Hunter uses parallel scanning (8 threads) for speed.
+- The Pre-Market Hunter uses parallel scanning (8 threads) for speed.
 
 ### OpenRouter / AI analysis fails
 - Check your API key in Settings
@@ -440,10 +611,11 @@ All scanners use a 0–100 scoring system:
 | `app/user_config.json` | Your settings and API keys (never shared or overwritten by updates) |
 | `app/scan_types.json` | Scanner definitions (which scanners appear in dropdown) |
 | `app/scan_presets.json` | Named presets for quick config switching |
+| `app/market_intel.py` | Market Intelligence module (Google News, Finviz, sectors, market snapshot) |
 | `app/reports/` | Generated PDF, JSON, and AI analysis files |
 | `app/requirements.txt` | Python dependencies |
 
 ---
 
-*ClearBlueSky Stock Scanner v7.2 — Made with Claude AI*
+*ClearBlueSky Stock Scanner v7.3 — Made with Claude AI*
 *https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases*

@@ -493,8 +493,8 @@ class ReportGenerator:
                 lines.append(raw)
         return lines
 
-    def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None):
-        """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py."""
+    def _build_analysis_package(self, stocks_data, scan_type, timestamp_display, watchlist_matches, config=None, instructions=None, market_breadth=None, market_intel=None):
+        """Build JSON-serializable analysis package for API and file save. instructions = full AI prompt; market_breadth = optional breadth dict from breadth.py; market_intel = optional dict from market_intel.py."""
         leveraged_map = self._load_leveraged_mapping()  # Load once, not per-ticker
         stocks_json = []
         for s in stocks_data:
@@ -556,6 +556,8 @@ class ReportGenerator:
         }
         if market_breadth is not None and "error" not in (market_breadth or {}):
             out["market_breadth"] = market_breadth
+        if market_intel is not None:
+            out["market_intel"] = market_intel
         if instructions not in (None, ""):
             out["instructions"] = instructions.strip()
         return out
@@ -677,6 +679,18 @@ class ReportGenerator:
             except Exception:
                 pass
 
+        # Market Intelligence (Google News, Finviz news, sectors, market snapshot)
+        market_intel = None
+        if (config or {}).get("use_market_intel", True):
+            try:
+                from market_intel import gather_market_intel, format_intel_for_prompt
+                market_intel = gather_market_intel(progress_callback=progress)
+                market_intel_prompt = format_intel_for_prompt(market_intel)
+            except Exception:
+                market_intel_prompt = ""
+        else:
+            market_intel_prompt = ""
+
         watchlist_line = f"\nWATCHLIST MATCHES (prioritize these): {', '.join(watchlist_matches)}\n" if watchlist_matches else ""
         breadth_line_prompt = ""
         if market_breadth and "error" not in market_breadth:
@@ -685,10 +699,10 @@ class ReportGenerator:
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
         ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
-
+{market_intel_prompt}
 IMPORTANT: For each stock:
 1. Use the technical data (chart data and scanner data) in this report to assess setup
-2. Search for recent news on each ticker to check for catalysts or red flags
+2. Use the MARKET INTELLIGENCE above to understand today's market context, sector rotation, and breaking news
 3. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
 
 ═══════════════════════════════════════════════════
@@ -774,6 +788,10 @@ RISK MANAGEMENT:
             rsi = market_breadth.get("avg_rsi_sp500")
             body_lines.append(f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}")
             body_lines.append("")
+        # Add market intelligence to text report
+        if market_intel_prompt:
+            body_lines.append(market_intel_prompt)
+            body_lines.append("")
         for s in stocks_data:
             ticker = s['ticker']
             score = s.get('score', 0)
@@ -829,7 +847,7 @@ RISK MANAGEMENT:
         except Exception:
             pass
         # Build and save JSON analysis package (for API + future use)
-        analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth)
+        analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth, market_intel=market_intel)
         filepath_json = self.save_dir / f"{base_name}.json"
         try:
             with open(filepath_json, 'w', encoding='utf-8') as f:

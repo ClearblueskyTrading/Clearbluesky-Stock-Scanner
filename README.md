@@ -1,8 +1,9 @@
-# ClearBlueSky Stock Scanner v7.2
+# ClearBlueSky Stock Scanner v7.3
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market, **Velocity Pre-Market Hunter** (S&P 500 / Russell 2000 / ETFs or Velocity universe where applicable)
+- **Scanners** – Trend, Swing (emotional dips), Watchlist (Down X% or All), Leveraged Barbell, Insider, Pre-Market, **Pre-Market Hunter** (S&P 500 / Russell 2000 / ETFs or Leveraged universe where applicable)
+- **Market Intelligence** – Google News RSS headlines, Finviz news, sector performance, and market snapshot (SPY, QQQ, VIX, etc.) automatically gathered and fed to the AI alongside your scan data
 - **Run all scans** – Optional checkbox runs all seven scanners in sequence (rate-limited; may take 20+ minutes)
 - **CLI** – Run scans from the command line for automation (e.g. Claude, Desktop Commander): `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
@@ -19,16 +20,16 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).
-3. **Scan** – Choose scan type (Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market, **Velocity Pre-Market Hunter**); pick index (S&P 500 / Russell 2000 / ETFs / Velocity (high-conviction)) where applicable; click **Run Scan**. Optional: check **Run all scans** (rate-limited).
+3. **Scan** – Choose scan type and index (S&P 500 / Russell 2000 / ETFs / Leveraged); click **Run Scan**. Optional: check **Run all scans** (rate-limited).
 4. **Report** – PDF + JSON open when done (reports show per-stock SMA200 status: Above/Below/At/N/A). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
 
-**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity` (or trend, swing, watchlist, insider, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
+**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan trend` (or swing, watchlist, velocity, insider, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
 
 **Watchlist:** Click **Watchlist** to add symbols (max 200). Config: **Filter** = Down X% today (min % in 1–25%) or All tickers. You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it's listed at the top of the report with a WATCHLIST label.
 
 **Quick Lookup:** Enter 1-5 ticker symbols (comma or space separated) in the Quick Lookup box and click **Report** for an instant analysis report.
 
-**Import/Export Config:** Click **💾 Config** to export your full config (all settings + API keys) for backup or transfer to a new PC. Import to restore on a fresh install.
+**Import/Export Config:** Click **Config** to export your full config (all settings + API keys) for backup or transfer to a new PC. Import to restore on a fresh install.
 
 ---
 
@@ -73,11 +74,12 @@ ClearBlueSky/
     ├── emotional_dip_scanner.py← Swing (emotional dips)
     ├── report_generator.py     ← PDF reports
     ├── watchlist_scanner.py    ← Watchlist (Down X% or All)
+    ├── market_intel.py         ← Market Intelligence (news, sectors, snapshot)
     ├── scan_settings.py        ← Config & scan types
     ├── sound_utils.py          ← Scan-complete & watchlist beeps
     ├── requirements.txt
     ├── START.bat / RUN.bat
-    ├── scan_types.json         ← Scan types (Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market)
+    ├── scan_types.json         ← Scan types (7 scanners)
     ├── scanner_cli.py          ← CLI for Claude/automation (no GUI)
     ├── CLI_FOR_CLAUDE.md       ← CLI usage for automation
     ├── insider_scanner.py      ← Insider trading scan (Finviz)
@@ -95,12 +97,12 @@ ClearBlueSky/
 | **Trend**      | Longer holds (weeks–months) | After market close |
 | **Swing – Dips** | Emotional dips (1–5 days) | 2:30–4:00 PM       |
 | **Watchlist**  | Filter: Down X% today (1–25%) or All tickers | Anytime; Config: Min % down, Filter |
-| **Velocity Barbell** | Sector signals → leveraged ideas | Config: min sector %, theme |
+| **Leveraged Barbell** | Sector signals → leveraged ETF pairs | Config: min sector %, theme |
 | **Insider**    | Latest insider transactions (Finviz) | Anytime |
 | **Pre-Market** | Pre-market volume | 7–9:25 AM |
-| **Velocity Pre-Market Hunter** | Pre-market setups (gap recovery, accumulation, breakout, gap-and-go) | 7–9:25 AM; Index: S&P 500 / Russell / ETFs or Velocity universe |
+| **Pre-Market Hunter** | Pre-market setups (gap recovery, accumulation, breakout, gap-and-go) | 7–9:25 AM |
 
-Reports: PDF (date/time stamped, Master Trading Report Directive + per-ticker data), JSON (same data + `instructions` for any AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: "Follow the instructions in the `instructions` field." See **app/WORKFLOW.md** for the full pipeline.
+Reports: PDF (date/time stamped, Elite Swing Trader prompt + per-ticker data), JSON (same data + `instructions` for any AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: "Follow the instructions in the `instructions` field." See **app/WORKFLOW.md** for the full pipeline.
 
 ---
 
@@ -112,9 +114,10 @@ Reports: PDF (date/time stamped, Master Trading Report Directive + per-ticker da
 
 ---
 
-*ClearBlueSky v7.2 – made with Claude AI*
+*ClearBlueSky v7.3 – made with Claude AI*
 
-**v7.2:** 28 bug fixes and improvements: security (Zip Slip, download integrity), scanner accuracy (ATR, gap recovery, trend scoring), performance (parallel scanning, threaded Quick Lookup), 462 lines dead code removed, OpenRouter retry, keyboard shortcuts, cross-platform support, auto report cleanup.  
-**v7.1:** Elite Swing Trader AI prompt (1-5 day focus), Quick Lookup 1-5 tickers, Import/Export Config, GitHub attribution in reports.  
-**v7.0:** Queue-based scans, Run all scans, Velocity Pre-Market Hunter, in-app Update & Rollback, strict versioning.  
-See **app/CHANGELOG.md** and **RELEASE_v7.2.md**.
+**v7.3:** Market Intelligence (Google News RSS, Finviz news, sector performance, market snapshot fed to AI). Renamed Velocity → Leveraged in UI. RunPod/multi-LLM guide in manual. Button layout fix.  
+**v7.2:** 28 bug fixes — security, scanner accuracy, performance, keyboard shortcuts, cross-platform support.  
+**v7.1:** Elite Swing Trader AI prompt (1-5 day focus), Quick Lookup 1-5 tickers, Import/Export Config.  
+**v7.0:** Queue-based scans, Run all scans, Pre-Market Hunter, in-app Update & Rollback.  
+See **app/CHANGELOG.md** and **RELEASE_v7.3.md**.

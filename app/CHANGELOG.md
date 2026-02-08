@@ -4,6 +4,23 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.3] – 2026-02-08
+
+### Added
+- **Market Intelligence** — New `market_intel.py` module gathers live market context before AI analysis: Google News RSS headlines (~24), Finviz curated news (~24), sector performance table (11 sectors, today/week/month/quarter/YTD), market snapshot (SPY, QQQ, DIA, IWM, GLD, USO, TLT, VIX with daily change). All fetched in parallel (~3-5 sec). Injected into AI prompt, JSON package, and text report. Toggle in Settings (on by default). No API key needed.
+- **RunPod / Multi-LLM deployment guide** — USER_MANUAL.md now includes a full section on running ClearBlueSky JSON output through self-hosted LLMs on RunPod, with architecture diagram, vLLM/Ollama setup, Python script for multi-model consensus, and cost comparison.
+- **`feedparser` dependency** — Added to requirements.txt for Google News RSS parsing.
+
+### Changed
+- **"Velocity" → "Leveraged" in UI** — Index dropdown renamed from "Velocity (high-conviction)" to "Leveraged (high-conviction)". Help text and docs updated. Scanner internal IDs unchanged.
+- **Button layout overhaul** — Bottom buttons reorganized into equal-width grid (3 rows × 4 columns). Window height increased from 460→520 to prevent cutoff. Emoji clutter removed from button labels.
+- **Manual button** — Renamed from "README" to "Manual"; now opens USER_MANUAL.md (with fallback to README.md).
+- **AI prompt updated** — Instruction #2 changed from "Search for recent news" to "Use the MARKET INTELLIGENCE above to understand today's market context, sector rotation, and breaking news."
+- **README.md** — Rewritten: added Market Intelligence bullet, cleaned up velocity references, added `market_intel.py` to project layout.
+- **USER_MANUAL.md** — Added Market Intelligence section (§9), RunPod/multi-LLM section (§14), updated all scanner descriptions and config tables.
+
+---
+
 ## [7.2] – 2026-02-06
 
 ### Fixed (CRITICAL)

@@ -107,7 +107,7 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
 
 def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict]:
     """
-    Get dip candidates from a fixed ticker list (e.g. Velocity high-conviction universe).
+    Get dip candidates from a fixed ticker list (e.g. Leveraged high-conviction universe).
     For each ticker, fetches quote via Finviz; keeps those down within configured dip range.
     Returns same structure as get_sp500_dips for use by emotional_dip_scanner.
     """
