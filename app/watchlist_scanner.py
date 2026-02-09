@@ -9,6 +9,7 @@ from typing import List, Dict, Optional, Callable
 
 import finviz
 from scan_settings import load_config
+from finviz_safe import get_stock_safe
 
 
 def _parse_num(s, default=0.0) -> float:
@@ -79,18 +80,7 @@ def run_watchlist_scan(
         if progress_callback:
             progress(f"Checking ({i+1}/{total}): {ticker}")
         try:
-            stock = None
-            for attempt in range(3):
-                try:
-                    stock = finviz.get_stock(ticker)
-                    if stock is not None:
-                        break
-                except Exception as e:
-                    err_str = str(e).lower()
-                    if attempt < 2 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
-                        time.sleep(1.5 * (attempt + 1))
-                        continue
-                    break
+            stock = get_stock_safe(ticker, timeout=30.0, max_attempts=3)
             if not stock:
                 continue
             price = _parse_num(stock.get("Price", 0))
@@ -155,18 +145,7 @@ def run_watchlist_tickers_scan(
         if progress_callback:
             progress(f"Checking ({i+1}/{total}): {ticker}")
         try:
-            stock = None
-            for attempt in range(3):
-                try:
-                    stock = finviz.get_stock(ticker)
-                    if stock is not None:
-                        break
-                except Exception as e:
-                    err_str = str(e).lower()
-                    if attempt < 2 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
-                        time.sleep(1.5 * (attempt + 1))
-                        continue
-                    break
+            stock = get_stock_safe(ticker, timeout=30.0, max_attempts=3)
             if not stock:
                 continue
             price = _parse_num(stock.get("Price", 0))

@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.5
+# ClearBlueSky Stock Scanner v7.6
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.5"
+VERSION = "7.6"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -77,6 +77,16 @@ def log(msg, level="INFO"):
 def log_error(e, context=""):
     log(f"{context}: {str(e)}", "ERROR")
     log(traceback.format_exc(), "TRACE")
+
+
+def _safe_widget(widget, method, *args, **kwargs):
+    """Safely call a method on a tkinter widget. Silently ignores destroyed widgets."""
+    try:
+        if widget and widget.winfo_exists():
+            return getattr(widget, method)(*args, **kwargs)
+    except (tk.TclError, AttributeError):
+        pass
+    return None
 
 
 def _parse_version(s):
@@ -239,7 +249,8 @@ def _scan_worker_loop(app):
                 results = run_insider_scan(progress_callback=progress_put, config=config)
             elif scanner_kind == "premarket":
                 from premarket_volume_scanner import run_premarket_volume_scan
-                results = run_premarket_volume_scan(progress_put, index=index)
+                cancel_evt = getattr(app, "_scan_cancel_event", None)
+                results = run_premarket_volume_scan(progress_put, index=index, cancel_event=cancel_evt)
             elif scanner_kind == "velocity_premarket":
                 from velocity_scanner import run_premarket_scan, write_pdf
                 report = run_premarket_scan(progress_callback=progress_put, index=index)
@@ -358,21 +369,30 @@ class ProgressBar(tk.Canvas):
         self.draw()
     
     def draw(self):
-        self.delete("all")
-        # Background
-        self.create_rectangle(0, 0, self.w, self.h, fill="#e9ecef", outline="#dee2e6")
-        # Fill
-        if self.progress > 0:
-            fw = int(self.w * self.progress / 100)
-            self.create_rectangle(0, 0, fw, self.h, fill=self.color, outline="")
-        # Text
-        self.create_text(self.w//2, self.h//2, text=self.text, fill="#333", font=("Arial", 8, "bold"))
+        try:
+            if not self.winfo_exists():
+                return
+            self.delete("all")
+            # Background
+            self.create_rectangle(0, 0, self.w, self.h, fill="#e9ecef", outline="#dee2e6")
+            # Fill
+            if self.progress > 0:
+                fw = int(self.w * self.progress / 100)
+                self.create_rectangle(0, 0, fw, self.h, fill=self.color, outline="")
+            # Text
+            self.create_text(self.w//2, self.h//2, text=self.text, fill="#333", font=("Arial", 8, "bold"))
+        except tk.TclError:
+            pass  # Widget was destroyed
     
     def set(self, value, text=""):
         self.progress = max(0, min(100, value))
         self.text = text if text else f"{int(self.progress)}%"
-        self.draw()
-        self.update()
+        try:
+            if self.winfo_exists():
+                self.draw()
+                self.update()
+        except tk.TclError:
+            pass  # Widget was destroyed
 
 
 class TradeBotApp:
@@ -900,7 +920,7 @@ class TradeBotApp:
     def stop_scan(self):
         """Stop the currently running scan (any scan type)."""
         self.scan_cancelled = True
-        self.scan_status.config(text="Stopping...")
+        _safe_widget(self.scan_status, "config", text="Stopping...")
 
     def _start_scan_worker(self):
         """Start the background scan worker thread if not already running."""
@@ -929,12 +949,13 @@ class TradeBotApp:
                 if kind == "start":
                     label = msg[1] if len(msg) > 1 else "Scan"
                     self.scan_progress.set(5, "Starting...")
-                    self.scan_status.config(text=label[:50])
+                    _safe_widget(self.scan_status, "config", text=label[:50])
                     self.scan_start_time = time.time()
-                    self.root.update()
+                    try: self.root.update()
+                    except tk.TclError: pass
                 elif kind == "progress":
                     text = msg[1] if len(msg) > 1 else ""
-                    self.scan_status.config(text=(text[:50] if text else ""))
+                    _safe_widget(self.scan_status, "config", text=(text[:50] if text else ""))
                     if "(" in text and "/" in text:
                         try:
                             parts = text.split("(")[1].split(")")[0].split("/")
@@ -944,7 +965,8 @@ class TradeBotApp:
                             self.scan_progress.set(pct, f"{pct}% ({elapsed}s)")
                         except Exception:
                             pass
-                    self.root.update()
+                    try: self.root.update()
+                    except tk.TclError: pass
                 elif kind == "done":
                     results, short_label, index, elapsed = (msg[1], msg[2], msg[3], msg[4]) if len(msg) >= 5 else (None, "Scan", None, 0)
                     if results and len(results) > 0:
@@ -987,10 +1009,10 @@ class TradeBotApp:
                         self.scan_btn, "Cancelled", self.scan_stop_btn,
                     )
                 elif kind == "idle":
-                    self.scan_btn.config(state="normal")
-                    self.scan_stop_btn.config(state="disabled")
+                    _safe_widget(self.scan_btn, "config", state="normal")
+                    _safe_widget(self.scan_stop_btn, "config", state="disabled")
                     self.scan_printer.stop()
-                    self.scan_status.config(text="Ready")
+                    _safe_widget(self.scan_status, "config", text="Ready")
                     self._update_status_ready()
                     # Refresh accuracy rating after scan completes
                     threading.Thread(target=self._refresh_accuracy, daemon=True).start()
@@ -1085,7 +1107,7 @@ class TradeBotApp:
             if scan_type == "Swing":
                 min_score = int(self.config.get("emotional_min_score", 65))
             else:
-                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell") else 65))
+                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell", "Premarket", "Velocity Pre-Market Hunter") else 65))
             reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -1097,17 +1119,20 @@ class TradeBotApp:
             watchlist_matches = [t for t in qualifying_tickers if t in watchlist_set]
             if watchlist_matches:
                 play_watchlist_alert()
-                status.config(text=f"Watchlist match: {', '.join(watchlist_matches)}")
+                _safe_widget(status, "config", text=f"Watchlist match: {', '.join(watchlist_matches)}")
 
             def rpt_progress(msg):
                 if "Processing" in msg:
                     try:
                         ticker = msg.split(":")[-1].strip()
                         progress.set(92, ticker)
-                        status.config(text=f"Getting {ticker} data...")
+                        _safe_widget(status, "config", text=f"Getting {ticker} data...")
                     except Exception:
                         pass
-                self.root.update()
+                try:
+                    self.root.update()
+                except tk.TclError:
+                    pass
 
             path, analysis_text, analysis_package = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config, index=index)
 
@@ -1119,13 +1144,15 @@ class TradeBotApp:
                 # If we're going to call OpenRouter, keep progress bar moving through AI phase
                 if self.config.get("openrouter_api_key") and content_to_send:
                     progress.set(92, "Report saved")
-                    status.config(text="Opening PDF...")
-                    self.root.update()
+                    _safe_widget(status, "config", text="Opening PDF...")
+                    try: self.root.update()
+                    except tk.TclError: pass
                     webbrowser.open(file_url)
                     try:
                         progress.set(94, "Preparing AI...")
-                        status.config(text="Building prompt...")
-                        self.root.update()
+                        _safe_widget(status, "config", text="Building prompt...")
+                        try: self.root.update()
+                        except tk.TclError: pass
                         from openrouter_client import analyze_with_config
                         system_prompt = "You are a professional stock analyst. You are receiving a structured JSON analysis package (scan results, technical indicators, news). Your response must start with a brief executive summary: explain context, market/sector backdrop, scan rationale, and key findings in plain language—not only trade recommendations. Then for each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
                         if self.config.get("rag_enabled") and self.config.get("rag_books_folder"):
@@ -1142,19 +1169,26 @@ class TradeBotApp:
                             try:
                                 from chart_engine import get_charts_for_tickers
                                 tickers = [s.get("ticker") for s in analysis_package["stocks"] if s.get("ticker")]
-                                status.config(text="Generating chart images...")
-                                self.root.update()
-                                charts = get_charts_for_tickers(tickers, max_charts=5, progress_callback=lambda t: (status.config(text=f"Chart {t}..."), self.root.update()))
+                                _safe_widget(status, "config", text="Generating chart images...")
+                                try: self.root.update()
+                                except tk.TclError: pass
+                                def _chart_cb(t):
+                                    _safe_widget(status, "config", text=f"Chart {t}...")
+                                    try: self.root.update()
+                                    except tk.TclError: pass
+                                charts = get_charts_for_tickers(tickers, max_charts=5, progress_callback=_chart_cb)
                                 image_list = [b64 for _, b64 in charts] if charts else None
                             except Exception:
                                 image_list = None
                         progress.set(97, "Sending to AI...")
-                        status.config(text="Sending to AI (OpenRouter) – may take a minute...")
-                        self.root.update()
+                        _safe_widget(status, "config", text="Sending to AI (OpenRouter) - may take a minute...")
+                        try: self.root.update()
+                        except tk.TclError: pass
                         ai_response = analyze_with_config(self.config, system_prompt, content_to_send, image_base64_list=image_list)
                         progress.set(99, "Received")
-                        status.config(text="Saving AI response...")
-                        self.root.update()
+                        _safe_widget(status, "config", text="Saving AI response...")
+                        try: self.root.update()
+                        except tk.TclError: pass
                         base = path[:-4] if path.lower().endswith(".pdf") else path
                         ai_path = base + "_ai.txt"
                         _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Include a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language, then trade recommendations.\n\n---\n\n"
@@ -1163,7 +1197,7 @@ class TradeBotApp:
                                 f.write(_ai_header + ai_response)
                             webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
                             progress.set(100, f"Done! ({elapsed}s)")
-                            status.config(text="AI analysis saved and opened")
+                            _safe_widget(status, "config", text="AI analysis saved and opened")
                         else:
                             fallback = "AI returned no response (empty). You can paste the instructions below into another AI.\n\n--- Instructions ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
                             try:
@@ -1172,13 +1206,13 @@ class TradeBotApp:
                             except Exception:
                                 pass
                             progress.set(100, f"Done ({elapsed}s)")
-                            status.config(text="AI response empty; see _ai.txt for instructions")
+                            _safe_widget(status, "config", text="AI response empty; see _ai.txt for instructions")
                         self._update_status_ready()
                     except Exception as e:
                         log_error(e, "OpenRouter analysis")
                         progress.set(100, f"Done ({elapsed}s)")
                         err_short = str(e).strip()[:80]
-                        status.config(text=f"AI failed: {err_short}")
+                        _safe_widget(status, "config", text=f"AI failed: {err_short}")
                         base = path[:-4] if path.lower().endswith(".pdf") else path
                         ai_path = base + "_ai.txt"
                         fallback = f"AI analysis failed: {e}\n\nDetails in: {LOG_FILE}\n\n--- Instructions (paste into another AI if needed) ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
@@ -1188,33 +1222,40 @@ class TradeBotApp:
                             webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
                         except Exception:
                             pass
-                        messagebox.showwarning("AI analysis failed", f"{e}\n\nSee error_log.txt for details.\nA fallback _ai.txt was saved with instructions you can paste elsewhere.")
+                        try:
+                            messagebox.showwarning("AI analysis failed", f"{e}\n\nSee error_log.txt for details.\nA fallback _ai.txt was saved with instructions you can paste elsewhere.")
+                        except Exception:
+                            pass
                         self._update_status_ready()
                 else:
                     progress.set(100, f"Done! ({elapsed}s)")
-                    status.config(text="Opening PDF report...")
-                    self.root.update()
+                    _safe_widget(status, "config", text="Opening PDF report...")
+                    try: self.root.update()
+                    except tk.TclError: pass
                     webbrowser.open(file_url)
                     self._update_status_ready()
             else:
-                status.config(text=f"No stocks above score {min_score}")
+                progress.set(100, "No qualifying stocks")
+                _safe_widget(status, "config", text=f"No stocks above score {min_score}")
+                log(f"Report: no stocks above min_score {min_score} for {scan_type}")
         except Exception as e:
             log_error(e, "Report failed")
-            status.config(text="Report error")
+            progress.set(100, "Error")
+            _safe_widget(status, "config", text="Report error")
         
         printer.stop()
-        btn.config(state="normal")
+        _safe_widget(btn, "config", state="normal")
         if stop_btn:
-            stop_btn.config(state="disabled")
+            _safe_widget(stop_btn, "config", state="disabled")
         self._play_scan_alarm()
     
     def scan_complete(self, progress, status, printer, btn, msg, stop_btn=None):
         progress.set(0, msg)
-        status.config(text="")
+        _safe_widget(status, "config", text="")
         printer.stop()
-        btn.config(state="normal")
+        _safe_widget(btn, "config", state="normal")
         if stop_btn:
-            stop_btn.config(state="disabled")
+            _safe_widget(stop_btn, "config", state="disabled")
         self._play_scan_alarm()
         self._update_status_ready()
 
@@ -1223,11 +1264,14 @@ class TradeBotApp:
         try:
             if self.last_scan_type and self.last_scan_time:
                 time_str = self.last_scan_time.strftime("%I:%M %p").lstrip("0") if hasattr(self.last_scan_time, "strftime") else str(self.last_scan_time)
-                self.status.config(text=f"Ready | Last scan: {self.last_scan_type}, {time_str}")
+                _safe_widget(self.status, "config", text=f"Ready | Last scan: {self.last_scan_type}, {time_str}")
             else:
-                self.status.config(text="Ready")
+                _safe_widget(self.status, "config", text="Ready")
         except Exception:
-            self.status.config(text="Ready")
+            try:
+                _safe_widget(self.status, "config", text="Ready")
+            except Exception:
+                pass
     
     def _play_scan_alarm(self):
         """Play alarm sound when a scan finishes (if enabled)."""
@@ -1302,11 +1346,14 @@ class TradeBotApp:
 
             if status != "ok" or total == 0:
                 def _update_no_data():
-                    self.metric_accuracy.config(text="Accuracy: --", fg="#17a2b8")
-                    self.metric_hits.config(text="Hits: --")
-                    self.metric_misses.config(text="Misses: --")
-                    self.metric_total.config(text="Picks: 0")
-                self.root.after(0, _update_no_data)
+                    _safe_widget(self.metric_accuracy, "config", text="Accuracy: --", fg="#17a2b8")
+                    _safe_widget(self.metric_hits, "config", text="Hits: --")
+                    _safe_widget(self.metric_misses, "config", text="Misses: --")
+                    _safe_widget(self.metric_total, "config", text="Picks: 0")
+                try:
+                    self.root.after(0, _update_no_data)
+                except Exception:
+                    pass
                 return
 
             # Color code accuracy
@@ -1320,11 +1367,14 @@ class TradeBotApp:
             days = acc.get("lookback_days", 7)
 
             def _update():
-                self.metric_accuracy.config(text=f"Accuracy: {pct}%", fg=acc_color)
-                self.metric_hits.config(text=f"Hits: {hits}")
-                self.metric_misses.config(text=f"Misses: {misses}")
-                self.metric_total.config(text=f"Picks: {total} ({days}d)")
-            self.root.after(0, _update)
+                _safe_widget(self.metric_accuracy, "config", text=f"Accuracy: {pct}%", fg=acc_color)
+                _safe_widget(self.metric_hits, "config", text=f"Hits: {hits}")
+                _safe_widget(self.metric_misses, "config", text=f"Misses: {misses}")
+                _safe_widget(self.metric_total, "config", text=f"Picks: {total} ({days}d)")
+            try:
+                self.root.after(0, _update)
+            except Exception:
+                pass
         except Exception:
             pass
 

@@ -4,6 +4,25 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.6] – 2026-02-09
+
+### Fixed — Stability & QA Release
+- **Premarket scanner hanging**: `finviz.get_stock()` calls now wrapped with 30-second timeout via new `finviz_safe.py` module; prevents indefinite hangs across ALL scanners
+- **All scanners patched**: enhanced_dip_scanner, velocity_leveraged_scanner, watchlist_scanner, report_generator all use `get_stock_safe()` with timeout + retry
+- **Progress bar stuck at 85%**: Fixed — progress now properly resets to 100% when no qualifying stocks found
+- **TclError crashes**: All widget updates in scan pipeline protected with `_safe_widget()` helper; closing the window mid-scan no longer crashes
+- **Premarket min_score**: Added "Premarket" and "Velocity Pre-Market Hunter" to the zero-default min_score list (scanner has its own internal scoring)
+- **Division by zero**: Fixed in history_analyzer (price trends), accuracy_tracker (flagged price=0), market_intel (prev price=0)
+- **future.result() hangs**: Added 60-second timeout to all `ThreadPoolExecutor` futures in price_history, smart_money, market_intel
+- **yfinance timeouts**: Added `timeout=30` to all `yf.download()` and `yf.Ticker().history()` calls across price_history, accuracy_tracker, market_intel, backtest_db
+- **Cancel button**: Premarket scanner now respects cancel event with abort checks throughout the scan loop; stops early after 10 consecutive fetch failures
+
+### Changed
+- **AI prompt slimmed**: Reduced MASTER_TRADING_REPORT_DIRECTIVE from 260 lines to 35 lines; removed detailed trading playbook (entry timing, exit framework, mantras) that the AI doesn't need — kept only output format and required sections
+- **New module: `finviz_safe.py`**: Shared timeout wrapper for `finviz.get_stock()` used by all scanners
+
+---
+
 ## [7.5] – 2026-02-08
 
 ### Added

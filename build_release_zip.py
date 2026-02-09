@@ -45,6 +45,7 @@ EXCLUDE_FILES = {
     "RELEASE_v7.1.md",
     "RELEASE_v7.2.md",
     "RELEASE_v7.3.md",
+    "RELEASE_v7.4.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

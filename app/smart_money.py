@@ -251,7 +251,7 @@ def get_smart_money_batch(tickers: List[str], full: bool = False,
         for future in as_completed(futures):
             ticker = futures[future]
             try:
-                results[ticker.upper()] = future.result()
+                results[ticker.upper()] = future.result(timeout=60)
             except Exception:
                 results[ticker.upper()] = {}
             # Rate limit SEC EDGAR (10 req/sec max)

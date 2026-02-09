@@ -149,7 +149,7 @@ def update_outcomes(progress_callback=None):
         sid, ticker, signal_date, price_at_signal = row["id"], row["ticker"], row["signal_date"], row["price_at_signal"]
         try:
             sym = yf.Ticker(ticker)
-            hist = sym.history(period="1mo", interval="1d")
+            hist = sym.history(period="1mo", interval="1d", timeout=30)
             if hist is None or hist.empty or len(hist) < 2:
                 continue
             hist = hist.sort_index()

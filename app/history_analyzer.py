@@ -294,7 +294,7 @@ def analyze_history(history: List[Dict]) -> Dict:
             try:
                 p1 = float(first["price"]) if first["price"] != "N/A" else None
                 p2 = float(last["price"]) if last["price"] != "N/A" else None
-                if p1 and p2:
+                if p1 and p2 and p1 != 0:
                     pct = round(((p2 - p1) / p1) * 100, 1)
                     stats["price_trends"][ticker] = {
                         "first_price": p1, "first_date": first["timestamp"][:10],

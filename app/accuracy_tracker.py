@@ -31,7 +31,7 @@ def _get_current_prices(tickers: List[str]) -> Dict[str, float]:
         return prices
     try:
         # yfinance batch download is faster than individual
-        data = yf.download(tickers, period="1d", interval="1d", progress=False, auto_adjust=True)
+        data = yf.download(tickers, period="1d", interval="1d", progress=False, auto_adjust=True, timeout=30)
         if data is not None and not data.empty:
             if len(tickers) == 1:
                 # Single ticker: columns are just Open/High/Low/Close/Volume
@@ -154,6 +154,8 @@ def calculate_accuracy(reports_dir: str = None, lookback_days: int = 7) -> Dict:
             continue  # Skip if we can't get current price
         
         flagged = pick["flagged_price"]
+        if not flagged or flagged == 0:
+            continue
         change_pct = round(((current - flagged) / flagged) * 100, 2)
         
         if current > flagged:

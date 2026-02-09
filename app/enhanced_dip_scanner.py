@@ -11,6 +11,7 @@ from finviz.screener import Screener
 import finviz
 
 from scan_settings import load_config
+from finviz_safe import get_stock_safe
 
 # News keywords that suggest EMOTIONAL dip (buyable)
 EMOTIONAL_KEYWORDS = [
@@ -122,7 +123,7 @@ def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict
         if not ticker:
             continue
         try:
-            stock = finviz.get_stock(ticker)
+            stock = get_stock_safe(ticker)
             if not stock:
                 continue
             change_str = (stock.get('Change') or '0%').replace('%', '').strip()
@@ -173,19 +174,8 @@ def analyze_dip_quality(ticker: str) -> Dict:
     }
     
     try:
-        # Get detailed quote data (with retry on transient errors)
-        quote = None
-        for attempt in range(3):
-            try:
-                quote = finviz.get_stock(ticker)
-                if quote is not None:
-                    break
-            except Exception as e:
-                err_str = str(e).lower()
-                if attempt < 2 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
-                    time.sleep(1.5 * (attempt + 1))
-                    continue
-                break
+        # Get detailed quote data (with timeout + retry protection)
+        quote = get_stock_safe(ticker, timeout=30.0, max_attempts=3)
         
         if not quote:
             return result

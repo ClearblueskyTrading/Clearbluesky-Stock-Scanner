@@ -6,12 +6,22 @@
 # Focuses on Semiconductors, Precious Metals, and high-conviction moves
 
 import time
+import threading
 from datetime import datetime
 from typing import List, Dict, Optional
 from finviz.screener import Screener
 import finviz
 
 from scan_settings import load_config
+from finviz_safe import get_stock_safe
+
+# Global cancel event - set by caller to abort scan
+_cancel_event: Optional[threading.Event] = None
+
+
+def _is_cancelled() -> bool:
+    """Check if scan should be cancelled."""
+    return _cancel_event is not None and _cancel_event.is_set()
 
 
 def get_float_category(float_size: float) -> str:
@@ -24,7 +34,7 @@ def get_float_category(float_size: float) -> str:
         return "High"
 
 
-def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> List[Dict]:
+def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", cancel_event: threading.Event = None) -> List[Dict]:
     """
     Run Pre-Market Volume scan - finds unusual activity before market open.
     
@@ -41,10 +51,13 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
     Args:
         progress_callback: function(msg) for status updates
         index: 'sp500', 'russell2000', or 'etfs'
+        cancel_event: threading.Event to signal cancellation
     
     Returns:
         List of pre-market volume candidates sorted by score
     """
+    global _cancel_event
+    _cancel_event = cancel_event
     config = load_config()
     
     index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
@@ -94,10 +107,16 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
     ]
     
     try:
+        print(f"[PREMARKET] Screener filters: {filters}")
         screener = Screener(filters=filters, order='change')
+        print(f"[PREMARKET] Screener returned {len(screener)} raw results")
         candidates = []
         
         for stock in screener:
+            if _is_cancelled():
+                if progress_callback:
+                    progress_callback("Scan cancelled.")
+                return []
             try:
                 ticker = stock.get('Ticker')
                 if not ticker:
@@ -126,29 +145,47 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
             except Exception as e:
                 continue
         
+        if _is_cancelled():
+            return []
+        
+        print(f"[PREMARKET] After gap filter ({min_gap}%-{max_gap}%): {len(candidates)} candidates")
         if not candidates:
             if progress_callback:
                 progress_callback("No pre-market candidates found.")
             return []
         
+        print(f"[PREMARKET] Candidates: {[c['ticker'] for c in candidates]}")
         if progress_callback:
             progress_callback(f"Found {len(candidates)} candidates. Analyzing volume patterns...")
         
         # Deep analysis
         results = []
         sector_volumes = {}  # Track sector heat
+        failed_fetches = 0
+        max_failures = 10  # Abort if too many consecutive failures (Finviz likely blocking)
         
         for i, candidate in enumerate(candidates):
+            if _is_cancelled():
+                if progress_callback:
+                    progress_callback("Scan cancelled.")
+                return []
+            
             ticker = candidate['ticker']
             
             if progress_callback:
                 progress_callback(f"Analyzing {ticker} ({i+1}/{len(candidates)})...")
             
             try:
-                # Get detailed quote
-                quote = finviz.get_stock(ticker)
+                # Get detailed quote with timeout protection
+                quote = get_stock_safe(ticker, timeout=30.0)
                 if not quote:
+                    failed_fetches += 1
+                    if failed_fetches >= max_failures:
+                        if progress_callback:
+                            progress_callback(f"Too many fetch failures ({failed_fetches}), stopping early.")
+                        break
                     continue
+                failed_fetches = 0  # Reset on success
                 
                 # Extract key metrics
                 volume_str = candidate.get('volume', '0')
@@ -272,6 +309,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500") -> L
             if i < len(candidates) - 1:
                 time.sleep(0.3)
         
+        print(f"[PREMARKET] Deep analysis done: {len(results)} passed, {failed_fetches} total fetch failures")
         # Sort by score
         results.sort(key=lambda x: x.get('score', 0), reverse=True)
         

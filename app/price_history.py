@@ -29,7 +29,7 @@ CORE_TICKERS = [
 def _fetch_one(ticker: str, period: str = "1mo") -> Optional[Dict]:
     """Fetch 30-day daily OHLCV for a single ticker. Returns dict or None."""
     try:
-        df = yf.download(ticker, period=period, interval="1d", progress=False, auto_adjust=True)
+        df = yf.download(ticker, period=period, interval="1d", progress=False, auto_adjust=True, timeout=30)
         if df is None or df.empty:
             return None
         # Handle MultiIndex columns from yfinance
@@ -89,7 +89,7 @@ def fetch_price_history(scan_tickers: List[str] = None, progress_callback=None) 
             ticker = futures[future]
             done += 1
             try:
-                data = future.result()
+                data = future.result(timeout=60)
                 if data:
                     results[ticker] = data
             except Exception:

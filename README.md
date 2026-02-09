@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.5
+# ClearBlueSky Stock Scanner v7.6
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
@@ -63,9 +63,8 @@ ClearBlueSky/
 ├── CLAUDE_AI_GUIDE.md  ← Guide for modifying/rebuilding with AI
 ├── Dockerfile
 ├── docker-compose.yml
-├── RELEASE_v7.4.md     ← v7.4 release notes
-├── RELEASE_v7.5.md     ← v7.5 release notes (current)
-├── RELEASE_v7.4.md     ← v7.4 release notes
+├── RELEASE_v7.5.md     ← v7.5 release notes
+├── RELEASE_v7.6.md     ← v7.6 release notes (current)
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
@@ -77,6 +76,7 @@ ClearBlueSky/
     ├── watchlist_scanner.py    ← Watchlist (Down X% or All)
     ├── market_intel.py         ← Market Intelligence (news, sectors, snapshot)
     ├── smart_money.py          ← Smart Money signals (WSB, 13F, SEC insider)
+    ├── finviz_safe.py          ← Timeout-protected Finviz wrapper (all scanners)
     ├── price_history.py        ← 30-day price history (sanity check for AI)
     ├── history_analyzer.py     ← Scan history report generator
     ├── accuracy_tracker.py     ← Accuracy tracking (hits/misses vs current prices)
@@ -122,10 +122,8 @@ Reports: PDF (date/time stamped, Elite Swing Trader prompt + per-ticker data), J
 
 ---
 
-*ClearBlueSky v7.5 – made with Claude AI*
+*ClearBlueSky v7.6 – made with Claude AI*
 
+**v7.6:** Stability & QA release — timeout protection on all Finviz/yfinance calls, TclError crash fixes, progress bar fixes, AI prompt slimmed from 260 to 35 lines.  
 **v7.5:** Accuracy tracker + metrics bar (hits/misses/%), scan history log, history report, 30-day price history sanity check in AI prompt.  
-**v7.4:** Smart Money signals (WSB sentiment, 13F institutional holders, SEC insider filings). Emotional Dip scanner fix.  
-**v7.3:** Market Intelligence (Google News RSS, Finviz news, sector performance, market snapshot fed to AI). Leveraged rename. Button layout fix.  
-**v7.2:** 28 bug fixes — security, scanner accuracy, performance, keyboard shortcuts, cross-platform support.  
-See **app/CHANGELOG.md** and **RELEASE_v7.5.md**.
+See **app/CHANGELOG.md** and **RELEASE_v7.6.md**.

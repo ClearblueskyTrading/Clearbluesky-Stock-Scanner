@@ -14,6 +14,7 @@ from typing import List, Dict, Optional, Callable
 
 import finviz
 from scan_settings import load_config
+from finviz_safe import get_stock_safe
 
 ARSENAL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "velocity_leveraged_arsenal.json")
 
@@ -55,7 +56,7 @@ def _get_rsi_for_ticker(ticker: str) -> Optional[float]:
     if not ticker or ticker == "CASH":
         return None
     try:
-        stock = finviz.get_stock(ticker)
+        stock = get_stock_safe(ticker)
         if not stock:
             return None
         val = stock.get("RSI (14)") or stock.get("RSI") or stock.get("rsi")
@@ -137,7 +138,7 @@ def run_velocity_leveraged_scan(
         if progress_callback:
             progress(f"Checking ({i+1}/{total}): {ticker} ({name})...")
         try:
-            stock = finviz.get_stock(ticker)
+            stock = get_stock_safe(ticker)
             change = _parse_change_pct(stock) if stock else None
             if change is not None:
                 sector_changes.append({"ticker": ticker, "signal": signal, "name": name, "change_pct": change})

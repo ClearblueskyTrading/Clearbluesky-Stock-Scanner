@@ -166,7 +166,7 @@ def _fetch_market_snapshot():
     try:
         import yfinance as yf
         symbols = list(MARKET_SYMBOLS.keys())
-        data = yf.download(symbols, period="5d", progress=False, group_by="ticker")
+        data = yf.download(symbols, period="5d", progress=False, group_by="ticker", timeout=30)
         for sym, label in MARKET_SYMBOLS.items():
             try:
                 if len(MARKET_SYMBOLS) > 1:
@@ -236,7 +236,7 @@ def gather_market_intel(progress_callback=None):
         for future in as_completed(futures):
             key = futures[future]
             try:
-                result[key] = future.result()
+                result[key] = future.result(timeout=60)
             except Exception:
                 result[key] = []
 
