@@ -1,0 +1,36 @@
+---
+description: Session continuity protocol — persist context across sessions for any project
+alwaysApply: true
+---
+
+# Session Continuity Protocol
+
+## At Session End (When Significant Work Was Done)
+
+Write a session log to the shared memory so the next session picks up seamlessly:
+
+```
+D:\scanner\velocity_memory\session_logs\session_YYYYMMDD_brief_topic.md
+```
+
+Include:
+- What was worked on (project, files, features)
+- Key decisions made and why
+- Current state (what's done, what's pending)
+- Any blockers or open questions
+- File paths that were modified
+
+## At Session Start (When Resuming Work)
+
+If context seems missing or the user asks to resume something:
+1. Query RAG: `python "D:\scanner\velocity_memory\velocity_rag.py" --query "recent session" --filter sessions`
+2. Check the conversation summary if available
+3. Read recent session logs from `D:\scanner\velocity_memory\session_logs\`
+
+## "Check Your Brain" Protocol
+
+When the user says "check your brain" or similar:
+1. Query RAG for recent sessions and current state
+2. Read `D:\scanner\velocity_memory\market_context\current_regime.md` if trading-related
+3. List recent files in `D:\scanner\velocity_memory\session_logs\`
+4. Summarize what you know and what's current

@@ -244,18 +244,15 @@ def get_smart_money_batch(tickers: List[str], full: bool = False,
         # WSB only — instant from cache
         return get_wsb_sentiment(tickers)
 
-    # Full smart money — parallelize institutional + EDGAR lookups
+    # Full smart money — sequential to respect SEC EDGAR + yfinance rate limits
     results = {}
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        futures = {pool.submit(get_smart_money_for_ticker, t): t for t in tickers}
-        for future in as_completed(futures):
-            ticker = futures[future]
-            try:
-                results[ticker.upper()] = future.result(timeout=60)
-            except Exception:
-                results[ticker.upper()] = {}
-            # Rate limit SEC EDGAR (10 req/sec max)
-            time.sleep(0.15)
+    for i, t in enumerate(tickers):
+        try:
+            results[t.upper()] = get_smart_money_for_ticker(t)
+        except Exception:
+            results[t.upper()] = {}
+        # Polite delay — SEC EDGAR recommends max 10 req/sec, yfinance similar
+        time.sleep(0.5)
 
     if progress_callback:
         wsb_hits = sum(1 for v in results.values() if v.get("wsb_rank"))

@@ -35,24 +35,9 @@ DEFAULT_SCAN_TYPES = [
         "scanner": "watchlist",  # Filter: Down X% today or All tickers
     },
     {
-        "id": "velocity_leveraged",
-        "label": "Velocity Barbell",
-        "scanner": "velocity_leveraged",  # uses velocity_leveraged_scanner.run_velocity_leveraged_scan
-    },
-    {
-        "id": "insider",
-        "label": "Insider - Latest",
-        "scanner": "insider",  # uses insider_scanner.run_insider_scan
-    },
-    {
         "id": "premarket",
         "label": "Pre-Market",
-        "scanner": "premarket",  # uses premarket_volume_scanner.run_premarket_volume_scan
-    },
-    {
-        "id": "velocity_premarket",
-        "label": "Velocity Pre-Market Hunter",
-        "scanner": "velocity_premarket",  # uses velocity_scanner.run_premarket_scan (GUI only; no CLI)
+        "scanner": "premarket",  # combined: premarket_volume_scanner + velocity_scanner premarket
     },
 ]
 
@@ -91,19 +76,8 @@ SCAN_PARAM_SPECS = {
         {"key": "watchlist_filter", "label": "Filter", "type": "choice", "default": "down_pct", "options": ["down_pct", "all"]},
         {"key": "watchlist_pct_down_from_open", "label": "Min % down (range 1–25%)", "min": 1, "max": 25, "default": 5, "type": "float"},
     ],
-    "velocity_leveraged": [
-        {"key": "velocity_min_sector_pct", "label": "Min sector % (up or down)", "min": -5, "max": 5, "default": 0, "type": "float"},
-        {"key": "velocity_barbell_theme", "label": "Theme", "type": "choice", "default": "auto", "options": ["auto", "barbell", "single_shot"]},
-    ],
-    "insider": [
-        {"key": "insider_option", "label": "Insider view", "type": "choice", "default": "latest", "options": [
-            "latest", "latest buys", "latest sales",
-            "top week", "top week buys", "top week sales",
-            "top owner trade", "top owner buys", "top owner sales",
-        ]},
-        {"key": "insider_min_score", "label": "Min Score (report)", "min": 0, "max": 100, "default": 0, "type": "int"},
-    ],
-    "velocity_premarket": [],  # fixed universe, no GUI params
+    # Legacy scanner params kept for backward compat with user_config.json
+    # velocity_leveraged, insider, velocity_premarket removed from UI in v7.7
 }
 
 

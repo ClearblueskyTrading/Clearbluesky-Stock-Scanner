@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.6 — User Manual
+# ClearBlueSky Stock Scanner v7.7 — User Manual
 
 ---
 
@@ -13,12 +13,13 @@
 7. [Settings (API Keys and Options)](#7-settings)
 8. [Reports and AI Analysis](#8-reports-and-ai-analysis)
 9. [Market Intelligence](#9-market-intelligence)
-10. [Import / Export Config](#10-import--export-config)
-11. [Update and Rollback](#11-update-and-rollback)
-12. [Keyboard Shortcuts](#12-keyboard-shortcuts)
-13. [Scoring System](#13-scoring-system)
-14. [Running on RunPod / Multi-LLM Deployment](#14-running-on-runpod--multi-llm-deployment)
-15. [Troubleshooting](#15-troubleshooting)
+10. [Ticker Enrichment (v7.7)](#10-ticker-enrichment)
+11. [Import / Export Config](#11-import--export-config)
+12. [Update and Rollback](#12-update-and-rollback)
+13. [Keyboard Shortcuts](#13-keyboard-shortcuts)
+14. [Scoring System](#14-scoring-system)
+15. [Running on RunPod / Multi-LLM Deployment](#15-running-on-runpod--multi-llm-deployment)
+16. [Troubleshooting](#16-troubleshooting)
 
 ---
 
@@ -51,16 +52,14 @@ Every scan produces up to 3 files in the `reports/` folder:
 
 ### Stock Scanner Section
 
-- **Scan dropdown** — Select which scanner to run (7 options).
+- **Scan dropdown** — Select which scanner to run (4 options: Trend, Swing, Watchlist, Pre-Market).
 - **Index dropdown** — Choose the stock universe:
   - **S&P 500** — ~500 large-cap stocks
-  - **Russell 2000** — ~2000 small-cap stocks
   - **ETFs** — Exchange-traded funds
-  - **Leveraged (high-conviction)** — Fixed list of 17 high-volume leveraged tickers (TQQQ, SOXL, SPXL, NVDA, TSLA, etc.)
 - **Run Scan** — Starts the selected scan in the background. The GUI stays responsive.
 - **Stop** — Cancels a running scan.
 - **Config** — Opens per-scanner settings (sliders/toggles specific to the selected scanner).
-- **Run all scans** — Checkbox that runs all 7 scanners in sequence with 60-second delays between them to respect API rate limits. May take 20+ minutes.
+- **Run all scans** — Checkbox that runs all 4 scanners in sequence with 60-second delays between them to respect API rate limits. Takes ~15 minutes.
 
 ### OpenRouter Status Line
 
@@ -80,25 +79,25 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ### Trend — Long-term
 
-**What it does:** Finds stocks in strong uptrends using moving average stacking (SMA20 > SMA50 > SMA200), quarterly/monthly/weekly performance, and relative volume.
+**What it does:** Finds stocks in strong long-term uptrends using moving average stacking (SMA20 > SMA50 > SMA200), yearly/quarterly/monthly performance, and relative volume. Reweighted in v7.7 to prioritize sustained multi-month sector momentum over short-term pops. Includes SEC insider data (Form 4 filings) as a confirmation signal.
 
 **Best time to run:** After market close (4:00 PM ET) or anytime — uses daily data.
 
-**Index options:** S&P 500, Russell 2000, ETFs.
+**Index options:** S&P 500, ETFs.
 
-**Use case:** Finding stocks with institutional momentum for swing or position trades.
+**Use case:** Finding stocks with institutional momentum and sector rotation for long-term position trades (weeks to months). Insider buying activity adds conviction.
 
 ---
 
 ### Swing — Dips
 
-**What it does:** Finds emotional (non-fundamental) dip candidates — stocks down 1.5–4% on high relative volume with no fundamental red flags. Checks analyst ratings, upside to price target, SMA200 position, and RSI.
+**What it does:** Finds emotional (non-fundamental) dip candidates — stocks down 1–5% on high relative volume with no fundamental red flags. Checks analyst ratings, upside to price target, SMA200 position, and RSI. Enriched with earnings date warnings, news sentiment flags, live price, and leveraged ETF suggestions. Includes SEC insider data for confirmation.
 
 **Best time to run:** 2:30–4:00 PM ET (emotional selling peaks in the last 90 minutes).
 
-**Index options:** S&P 500, Russell 2000, ETFs, Leveraged (high-conviction).
+**Index options:** S&P 500, ETFs.
 
-**Use case:** Buying 1–5 day bounce plays on quality stocks that dipped on emotion, not fundamentals.
+**Use case:** Buying 1–5 day bounce plays on quality stocks that dipped on emotion, not fundamentals. Earnings warnings prevent entries before risky catalysts.
 
 ---
 
@@ -116,57 +115,15 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ---
 
-### Leveraged Barbell
-
-**What it does:** Sector-based momentum scanner. Identifies the hottest sector, then suggests a "barbell" pair: a Foundation stock (solid underlying) and a Runner (leveraged ETF for that sector). Also has a "Single Shot" mode for one leveraged idea.
-
-**Best time to run:** 10:00 AM – 2:00 PM ET (after initial volatility settles, sector trends are clearer).
-
-**Index options:** N/A (sector-based, auto-selects universe).
-
-**Use case:** Leveraged intraday or 1–3 day sector momentum plays.
-
----
-
-### Insider — Latest
-
-**What it does:** Pulls the latest SEC insider transactions from Finviz. Can filter by: latest buys, latest sales, top of the week, or top owner trades.
-
-**Best time to run:** Anytime — uses filed SEC data (not real-time).
-
-**Index options:** N/A.
-
-**Use case:** Finding stocks where insiders are buying heavily — a long-term bullish signal.
-
----
-
 ### Pre-Market
 
-**What it does:** Scans for stocks with unusual pre-market volume, gap percentage, and dollar volume. Tracks sector heat.
+**What it does:** Combined pre-market scanner that runs both volume analysis and velocity gap analysis in a single pass. Scans for unusual pre-market volume, gap percentage, dollar volume, and sector heat. Also scores 4 velocity signal types: Gap Recovery, Institutional Accumulation, Breakout, and Gap-and-Go. Enriched with earnings warnings, news flags, and leveraged ETF suggestions.
 
 **Best time to run:** 7:00–9:25 AM ET (pre-market session).
 
-**Index options:** S&P 500, Russell 2000, ETFs.
+**Index options:** S&P 500, ETFs.
 
-**Use case:** Identifying stocks likely to move at the open based on pre-market activity.
-
----
-
-### Pre-Market Hunter
-
-**What it does:** Advanced pre-market scanner that scores 4 specific signal types:
-- **Gap Recovery** — Stock gapped down 1.5–4%, showing recovery in pre-market
-- **Institutional Accumulation** — Small gap, high PM volume, strong prior close
-- **Breakout** — Price above Bollinger upper band with volume
-- **Gap-and-Go** — Gap up 2%+, holding the gap with volume
-
-Each ticker is graded A+ through F. Only A+, A, and B grades get entry plans with specific entry zones, targets, and stop-losses.
-
-**Best time to run:** 7:00–9:25 AM ET.
-
-**Index options:** S&P 500, Russell 2000, ETFs, Leveraged (high-conviction).
-
-**Use case:** Pre-market setup identification with specific trade plans.
+**Use case:** Identifying stocks likely to move at the open based on pre-market activity, with specific setup grades and leveraged alternatives.
 
 ---
 
@@ -214,20 +171,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Filter | Down X% | "down_pct" = only show stocks down X% today; "all" = show everything |
 | Min % down | 5 | Minimum percentage down from open (when filter = down_pct) |
 
-### Leveraged Barbell Config
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Min sector % | 0.0 | Minimum sector move (up or down) to trigger |
-| Theme | auto | "auto" picks barbell or single shot; "barbell" = Foundation + Runner; "single_shot" = one leveraged idea |
-
-### Insider Config
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Insider view | latest | Which insider data to pull (latest, latest buys, latest sales, top week, etc.) |
-| Min Score | 0 | Minimum score for the report (0 = include all) |
-
-### Pre-Market Hunter
-No configurable parameters — uses a fixed scoring algorithm. Select the stock universe via the Index dropdown.
+*Note: Velocity Barbell, Insider, and Pre-Market Hunter were standalone scanners in v7.6 and earlier. In v7.7, their functionality is folded into the remaining 4 scanners (insider data in Trend & Swing, leveraged suggestions in Swing & Pre-Market, velocity gap analysis in Pre-Market).*
 
 ---
 
@@ -347,27 +291,56 @@ When Market Intelligence is enabled (Settings toggle, on by default), the app au
 | **Google News RSS** | ~24 headlines across Stock Market, Economy, and Earnings topics | No |
 | **Finviz News** | ~24 curated financial news + blog headlines | No |
 | **Sector Performance** | All 11 sectors with today/week/month/quarter/YTD changes | No |
-| **Market Snapshot** | SPY, QQQ, DIA, IWM, GLD, USO, TLT, VIX — price + daily change | No |
+| **Market Snapshot** | SPY, QQQ, DIA, GLD, USO, TLT, VIX — price + daily change | No |
+| **Overnight Markets** | EWJ (Japan), FXI (China), EWZ (Brazil), EFA (Europe), EWG (Germany), EWU (UK), INDA (India), EWT (Taiwan), EWY (S. Korea) — price + daily change | No |
 
 ### How It's Used
 
 1. **AI Prompt** — The market intel is injected as a "MARKET INTELLIGENCE" section at the top of the AI prompt, before the per-stock data. The AI uses this to understand:
    - Overall market direction (is SPY up or down? Is VIX elevated?)
    - Which sectors are leading/lagging (sector rotation)
+   - Overnight/overseas market impact (gap risk from Asia/Europe sessions)
    - Breaking news that could affect trades
    - Economic/earnings headlines
 
 2. **JSON Package** — The full market intel data is included in the `market_intel` field of the JSON file, so you can feed it to any AI or use it in your own analysis.
 
-3. **Text Report** — Market snapshot, sector table, and headlines appear in the text body of the report.
+3. **Text Report** — Market snapshot, overnight markets, sector table, and headlines appear in the text body of the report.
 
 ### Performance
 
-All 4 sources are fetched in parallel (~3–5 seconds total). If any source fails, the others still work.
+All 5 sources (news, Finviz, sectors, US markets, overnight markets) are fetched in parallel (~3–5 seconds total). If any source fails, the others still work.
 
 ---
 
-## 10. Import / Export Config
+## 10. Ticker Enrichment
+
+New in v7.7 — after the initial scan data is gathered, each ticker is enriched with additional context before report generation and AI analysis.
+
+### What's Added Per Ticker
+
+| Enrichment | Description | Which Scanners |
+|-----------|-------------|----------------|
+| **Earnings Date Warning** | Flags like "EARNINGS TOMORROW", "EARNINGS THIS WEEK", "EARNINGS NEXT WEEK" | All scanners |
+| **News Sentiment** | DANGER / NEGATIVE / POSITIVE / NEUTRAL from recent headlines | All scanners |
+| **Live Price** | Current price stamped at report generation time | All scanners |
+| **Leveraged Suggestion** | Matching leveraged ETF (e.g., TQQQ for QQQ-tracking stocks) | Swing & Pre-Market only |
+| **Insider Activity** | Recent SEC Form 4 insider buys/sales (owner, transaction type, value) | Trend & Swing only |
+
+### How It's Used
+
+- **AI Prompt** — Earnings warnings and news sentiment are appended to each ticker's data line. The AI is instructed to avoid entries before earnings and flag news risks.
+- **Reports** — Enrichment data appears in both PDF and JSON outputs.
+- **Leveraged Suggestions** — When a stock on the Swing or Pre-Market scan has a leveraged ETF equivalent, the AI can suggest the leveraged play for higher-conviction entries.
+- **Insider Data** — Heavy insider buying on a Trend or Swing pick adds conviction. The AI references insider activity in its analysis.
+
+### Performance
+
+Enrichment runs in parallel with 4 workers after the main scan. Adds ~5–10 seconds depending on ticker count.
+
+---
+
+## 11. Import / Export Config
 
 Click **Config** (bottom button row) to back up or restore your full configuration.
 
@@ -383,7 +356,7 @@ Click **Config** (bottom button row) to back up or restore your full configurati
 
 ---
 
-## 11. Update and Rollback
+## 12. Update and Rollback
 
 ### Update
 
@@ -404,7 +377,7 @@ Click **Rollback** to restore from the last backup if an update causes issues.
 
 ---
 
-## 12. Keyboard Shortcuts
+## 13. Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
@@ -414,7 +387,7 @@ Click **Rollback** to restore from the last backup if an update causes issues.
 
 ---
 
-## 13. Scoring System
+## 14. Scoring System
 
 All scanners use a 0–100 scoring system:
 
@@ -425,7 +398,9 @@ All scanners use a 0–100 scoring system:
 | 60–69 | Decent | Meets minimum criteria, lower conviction |
 | Below 60 | Skip | Does not meet quality threshold |
 
-### Pre-Market Hunter Grades
+### Pre-Market Velocity Grades
+
+The velocity gap analysis portion of the Pre-Market scanner grades each signal:
 
 | Grade | Score | Position Size |
 |-------|-------|--------------|
@@ -437,7 +412,7 @@ All scanners use a 0–100 scoring system:
 
 ---
 
-## 14. Running on RunPod / Multi-LLM Deployment
+## 15. Running on RunPod / Multi-LLM Deployment
 
 The ClearBlueSky scanner is designed as a desktop app, but its JSON output is model-agnostic. You can use the generated analysis packages with **any LLM** — including self-hosted models on RunPod, together.ai, or your own GPU servers. This section explains how to scale the AI analysis beyond the built-in OpenRouter integration.
 
@@ -564,23 +539,23 @@ Read the output files from each model and look for:
 - **Start with OpenRouter** — The built-in integration is the easiest way to get AI analysis. Only move to RunPod if you need multi-model consensus or have high volume.
 - **Use the JSON `instructions` field** — It contains the full Elite Swing Trader System Prompt. Any LLM that follows instructions well will produce structured analysis.
 - **70B+ models recommended** — Smaller models (7B, 13B) often miss nuance in financial analysis. 70B+ models perform comparably to GPT-4/Claude for this task.
-- **Batch processing** — If running multiple scans (e.g., all 7 scanners), collect all JSON files and send them to RunPod in one batch to minimize GPU idle time.
+- **Batch processing** — If running multiple scans (e.g., all 4 scanners), collect all JSON files and send them to RunPod in one batch to minimize GPU idle time.
 - **Serverless RunPod** — Use RunPod's serverless endpoints to avoid paying for idle GPUs. You're charged only when processing requests.
 
 ---
 
-## 15. Troubleshooting
+## 16. Troubleshooting
 
 ### "No results found"
 - Normal — not every scan finds qualifying stocks. The filters are intentionally strict.
-- Try a broader index (Russell 2000 has more stocks than S&P 500).
+- Try ETFs index (broader universe than S&P 500).
 - Lower the Min Score in Config.
 - For Swing, try running at 2:30–4:00 PM when emotional selling peaks.
 
 ### Scan takes a long time
-- Some scanners make many API calls (one per ticker). Russell 2000 scans take longer.
+- Some scanners make many API calls (one per ticker). S&P 500 scans take longer than ETFs.
 - "Run all scans" adds 60-second delays between scanners to avoid rate limits.
-- The Pre-Market Hunter uses parallel scanning (8 threads) for speed.
+- The Pre-Market scanner uses parallel scanning (8 threads) for speed.
 
 ### OpenRouter / AI analysis fails
 - Check your API key in Settings
@@ -609,13 +584,17 @@ Read the output files from each model and look for:
 |------|---------|
 | `app/app.py` | Main GUI application |
 | `app/user_config.json` | Your settings and API keys (never shared or overwritten by updates) |
-| `app/scan_types.json` | Scanner definitions (which scanners appear in dropdown) |
-| `app/scan_presets.json` | Named presets for quick config switching |
-| `app/market_intel.py` | Market Intelligence module (Google News, Finviz, sectors, market snapshot) |
+| `app/scan_types.json` | Scanner definitions (4 scanners in v7.7) |
+| `app/scan_settings.py` | Config specs, default values, and scan param definitions |
+| `app/market_intel.py` | Market Intelligence module (Google News, Finviz, sectors, market snapshot, overnight markets) |
+| `app/ticker_enrichment.py` | Earnings warnings, news sentiment, live price, leveraged suggestions |
+| `app/insider_scanner.py` | SEC insider data — standalone + enrichment for Trend & Swing |
+| `app/report_generator.py` | PDF/JSON report generation + AI prompt construction |
+| `app/finviz_safe.py` | Timeout-protected Finviz wrapper used by all scanners |
 | `app/reports/` | Generated PDF, JSON, and AI analysis files |
 | `app/requirements.txt` | Python dependencies |
 
 ---
 
-*ClearBlueSky Stock Scanner v7.6 — Made with Claude AI*
+*ClearBlueSky Stock Scanner v7.7 — Made with Claude AI*
 *https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases*

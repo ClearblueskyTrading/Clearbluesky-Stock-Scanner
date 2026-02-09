@@ -7,7 +7,7 @@ This document explains how to run ClearBlueSky scans from the command line so **
 ## Quick reference
 
 ```bash
-python scanner_cli.py --scan <TYPE> [--index sp500|russell2000|etfs] [--watchlist-file PATH]
+python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 ```
 
 - **Exit 0** = scan finished successfully (reports written if there were candidates).
@@ -19,11 +19,9 @@ python scanner_cli.py --scan <TYPE> [--index sp500|russell2000|etfs] [--watchlis
 
 | Value | Description |
 |-------|-------------|
-| `trend` | Uptrending stocks (S&P 500 / Russell 2000 / ETFs). Best after close. |
-| `swing` | Emotional-only dips (index-based). Best 2:30–4:00 PM. |
-| `velocity` | Velocity Barbell: sector proxies → Foundation + Runner. No index. |
-| `premarket` | Pre-market volume (index-based). Best 7–9:25 AM. |
-| `insider` | Latest insider transactions from Finviz. No index. |
+| `trend` | Long-term sector rotation stocks (S&P 500 / ETFs). Best after close. Includes insider data. |
+| `swing` | Emotional-only dips (index-based). Best 2:30–4:00 PM. Includes earnings/news/insider enrichment. |
+| `premarket` | Combined pre-market volume + velocity gap analysis (index-based). Best 7–9:25 AM. |
 | `watchlist` | Watchlist: Filter from config – Down X% today (1–25%) or All tickers. Uses config or `--watchlist-file`. |
 
 ---
@@ -31,11 +29,11 @@ python scanner_cli.py --scan <TYPE> [--index sp500|russell2000|etfs] [--watchlis
 ## Options
 
 - **`--scan`** (required)  
-  One of: `trend`, `swing`, `velocity`, `premarket`, `insider`, `watchlist`.
+  One of: `trend`, `swing`, `premarket`, `watchlist`.
 
 - **`--index`** (optional, default: `sp500`)  
   Only used for: `trend`, `swing`, `premarket`.  
-  Values: `sp500`, `russell2000`, `etfs`.
+  Values: `sp500`, `etfs`.
 
 - **`--watchlist-file PATH`** (optional)  
   Text file, **one ticker per line**. Overrides the watchlist from `user_config.json` for this run only.  
@@ -57,7 +55,7 @@ python scanner_cli.py --scan <TYPE> [--index sp500|russell2000|etfs] [--watchlis
 - Progress lines are prefixed with spaces (e.g. `   Fetching data from Finviz...`).
 - On success with a report, the last line is:  
   **`[OK] Scan complete: reports/<basename>.*`**  
-  Example: `[OK] Scan complete: reports/Velocity_Barbell_Scan_20260206_080015.*`
+  Example: `[OK] Scan complete: reports/Trend_Scan_20260209_160015.*`
 - On failure: **`[FAIL] Rate limit hit: ...`** or **`[FAIL] Scan failed: ...`** (to stderr).  
   (ASCII-only so Windows console works.)
 
@@ -71,48 +69,34 @@ python scanner_cli.py --scan <TYPE> [--index sp500|russell2000|etfs] [--watchlis
   - `{ScanType}_Scan_{YYYYMMDD_HHMMSS}.json`
   - `{ScanType}_Scan_{YYYYMMDD_HHMMSS}_ai.txt` (if OpenRouter is configured and ran)
 
-So after **`[OK] Scan complete: reports/Velocity_Barbell_Scan_20260206_080015.*`**, Claude can look for:
-- `reports/Velocity_Barbell_Scan_20260206_080015.pdf`
-- `reports/Velocity_Barbell_Scan_20260206_080015.json`
-- `reports/Velocity_Barbell_Scan_20260206_080015_ai.txt`
-
----
-
-## Velocity Pre-Market Hunter (separate script)
-
-For the **unified morning scanner** (fixed 17-ticker universe, 4 signal types, A+ to F grading, order tickets):
-
-```bash
-python D:\CBS65\app\velocity_scanner.py --scan premarket
-```
-
-Output: terminal summary + PDF in `app/scanner_output/`. See **app/VELOCITY_PREMARKET_README.md** for details.
+So after **`[OK] Scan complete: reports/Trend_Scan_20260209_160015.*`**, Claude can look for:
+- `reports/Trend_Scan_20260209_160015.pdf`
+- `reports/Trend_Scan_20260209_160015.json`
+- `reports/Trend_Scan_20260209_160015_ai.txt`
 
 ---
 
 ## Example commands (for Claude)
 
 ```bash
-# Velocity Barbell (no index)
-python D:\CBS65\app\scanner_cli.py --scan velocity
+# Trend scan on S&P 500 (default)
+python scanner_cli.py --scan trend
 
 # Trend scan on ETFs
-python D:\CBS65\app\scanner_cli.py --scan trend --index etfs
+python scanner_cli.py --scan trend --index etfs
 
 # Swing scan on S&P 500 (default)
-python D:\CBS65\app\scanner_cli.py --scan swing
+python scanner_cli.py --scan swing
 
-# Pre-market on Russell 2000
-python D:\CBS65\app\scanner_cli.py --scan premarket --index russell2000
+# Pre-market (S&P 500)
+python scanner_cli.py --scan premarket
 
-# Insider (no index)
-python D:\CBS65\app\scanner_cli.py --scan insider
+# Pre-market on ETFs
+python scanner_cli.py --scan premarket --index etfs
 
 # Watchlist (Filter from config: Down X% or All; override tickers with file)
-python D:\CBS65\app\scanner_cli.py --scan watchlist --watchlist-file C:\path\to\tickers.txt
+python scanner_cli.py --scan watchlist --watchlist-file C:\path\to\tickers.txt
 ```
-
-Replace `D:\CBS65\app` with the actual path to the ClearBlueSky app folder.
 
 ---
 

@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 7.0 | Free & Open Source | Made with Claude AI
+   Version 7.7 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,43 +11,43 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v7.0
+   WHAT'S IN v7.7
 ════════════════════════════════════════════════════════════════════════════
 
-• Scanners: Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market (S&P 500 / Russell 2000 / ETFs)
-• Run all scans – Optional checkbox runs all six scanners in sequence (rate-limited; may take 20+ minutes)
-• Queue-based scans – GUI stays responsive (no hanging)
-• CLI – Run scans from command line: python app/scanner_cli.py --scan <type>. See app/CLI_FOR_CLAUDE.md for automation.
-• PDF + JSON reports – date/time stamped; per-stock SMA200 status (Above/Below/N/A); JSON includes "instructions" for any AI
+• 4 Scanners: Trend (long-term), Swing (emotional dips), Watchlist, Pre-Market (S&P 500 / ETFs)
+• Ticker Enrichment: earnings date warnings, news sentiment flags, live price, leveraged ETF suggestions
+• Overnight/Overseas Markets: Japan, China, Europe, India, etc. tracked and fed to AI
+• Insider Data: SEC Form 4 insider buys/sales folded into Trend & Swing scans
+• Market Intelligence: Google News, Finviz news, sector performance, market snapshot
+• Smart Money: WSB/Reddit sentiment, institutional 13F holders
+• Run all scans – Optional checkbox runs all 4 scanners in sequence (~15 min)
+• CLI – Run scans from command line: python app/scanner_cli.py --scan <type>
+• PDF + JSON reports – per-stock SMA200 status; JSON includes "instructions" for any AI
 • Optional OpenRouter AI – set API key in Settings; AI analysis saved as *_ai.txt
-• Optional: RAG (.txt/.pdf books), TA in report, Alpha Vantage sentiment, SEC insider context, chart images
-• Watchlist – up to 200 tickers; Filter: Down X% today (1–25%) or All tickers; 2 beeps + WATCHLIST when one appears in a scan
-• Import watchlist from Finviz CSV (Ticker or Symbol column)
-• Scan Config – min score, Min % down (1–25%), Filter (Down X% / All), price, volume per scan type
-• Update notice – app checks for newer version on startup
-• Optional API keys in Settings (Finviz, OpenRouter, Alpha Vantage – stored only in user_config.json)
+• Watchlist – up to 200 tickers; 2 beeps + WATCHLIST when one appears in a scan
+• In-app Update & Rollback – backs up current version, downloads latest from GitHub
 
 
 ════════════════════════════════════════════════════════════════════════════
-   INSTALLATION (2–3 minutes)
+   INSTALLATION (2-3 minutes)
 ════════════════════════════════════════════════════════════════════════════
 
-1. Right-click "INSTALL.bat" → "Run as administrator"
+1. Right-click "INSTALL.bat" -> "Run as administrator"
 
 2. Choose where to install:
-   [1] C:\TradingBot        – Standard install (recommended)
-   [2] Current folder       – Portable mode (USB drive)
-   [3] Custom path           – You choose the location
+   [1] C:\TradingBot        - Standard install (recommended)
+   [2] Current folder       - Portable mode (USB drive)
+   [3] Custom path          - You choose the location
 
 3. Wait for installation to complete
-   – Python will be installed if not found
-   – Required packages will download automatically
+   - Python will be installed if not found
+   - Required packages will download automatically
 
 4. Done! Find "ClearBlueSky Scanner" shortcut on your Desktop
 
 OTHER WAYS TO RUN (no Windows installer):
-• Docker (any OS): From the project folder run "docker compose build" then "docker compose up". See DOCKER.md.
-• Linux / macOS: Install Python 3.10+ and tkinter, then run ./app/run.sh or "python3 app/app.py" from the app folder.
+  Docker (any OS): From the project folder run "docker compose build" then "docker compose up". See DOCKER.md.
+  Linux / macOS: Install Python 3.10+ and tkinter, then run ./app/run.sh or "python3 app/app.py" from the app folder.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -56,19 +56,17 @@ OTHER WAYS TO RUN (no Windows installer):
 
 1. Launch the app (Desktop shortcut or app/START.bat)
 
-2. Select scan type: Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market
+2. Select scan type: Trend, Swing, Watchlist, Pre-Market
 
-3. Select index: S&P 500, Russell 2000, or ETFs (N/A for Watchlist / Velocity Barbell / Insider)
+3. Select index: S&P 500 or ETFs (N/A for Watchlist)
 
-4. Click "Run Scan". Optional: check "Run all scans" (may take 20+ min; rate-limited).
+4. Click "Run Scan". Optional: check "Run all scans" (~15 min).
    When done, the PDF report opens.
 
 5. Use the PDF with your preferred AI (Claude, Gemini, ChatGPT) for analysis.
-   Reports tell the AI to use Yahoo Finance for charts (e.g. finance.yahoo.com/quote/AAPL/chart).
 
-6. Optional: Add tickers in Watchlist (max 200). Config: Filter = Down X% today or All tickers.
-   When a watchlist stock appears in a scan, you get 2 beeps and it's at the top of the report (WATCHLIST).
-   You can import from a Finviz CSV via Watchlist → Import CSV.
+6. Optional: Add tickers in Watchlist (max 200).
+   When a watchlist stock appears in a scan, you get 2 beeps and it's at the top of the report.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -76,57 +74,61 @@ OTHER WAYS TO RUN (no Windows installer):
 ════════════════════════════════════════════════════════════════════════════
 
 FREE (no API key required):
-• Trend, Swing (emotional dips), Watchlist (Down X% 1–25% or All), Velocity Barbell, Insider, Pre-Market
-• S&P 500, Russell 2000, ETFs
-• Run all scans (rate-limited)
-• PDF reports with AI-oriented prompts
-• Watchlist with 2-beep alert and report highlight
-• Import watchlist from Finviz CSV
-• Configurable scan parameters (Config button)
-• Scan-complete sound (Settings: beep / asterisk / exclamation)
+  Trend (long-term sector rotation), Swing (emotional dips), Watchlist, Pre-Market
+  S&P 500, ETFs
+  Ticker enrichment: earnings warnings, news sentiment, leveraged suggestions
+  Overnight/overseas market context
+  Insider data in Trend & Swing scans
+  Run all scans
+  PDF reports with AI-oriented prompts
+  Watchlist with 2-beep alert and report highlight
 
-OPTIONAL – Finviz Elite API key (e.g. from finviz.com):
-• Stored only in your local user_config.json (never in code or in the zip)
-• Can improve speed/reliability; not required for core features
-
+OPTIONAL API keys (Settings):
+  Finviz Elite – avoids rate limits
+  OpenRouter – AI analysis (*_ai.txt)
+  Alpha Vantage – news sentiment per ticker
 
 
 ════════════════════════════════════════════════════════════════════════════
    FILES INCLUDED
 ════════════════════════════════════════════════════════════════════════════
 
-INSTALL.bat          – Run this to install (Windows)
-README.txt           – This file
-README.md            – GitHub / markdown readme
-LICENSE.txt          – MIT license
-RELEASE_v7.0.md      – v7.0 release notes
-DOCKER.md            – Run with Docker on any OS
-Dockerfile, docker-compose.yml – Docker setup
-CLAUDE_AI_GUIDE.md   – Guide to rebuild/modify the app with AI
+INSTALL.bat          - Run this to install (Windows)
+README.txt           - This file
+README.md            - GitHub / markdown readme
+LICENSE.txt          - MIT license
+RELEASE_v7.7.md      - v7.7 release notes
+USER_MANUAL.md       - Full user manual
+DOCKER.md            - Run with Docker on any OS
+Dockerfile, docker-compose.yml - Docker setup
 
 app/
-├── app.py                  – Main application
-├── trend_scan_v2.py        – Trend scanner
-├── emotional_dip_scanner.py – Swing (emotional dips)
-├── watchlist_scanner.py    – Watchlist (Down X% or All)
-├── report_generator.py     – PDF report builder
-├── scan_settings.py        – Configuration
-├── sound_utils.py          – Scan-complete & watchlist beeps
-├── requirements.txt
-├── scan_types.json         – Scan types (Trend, Swing, Watchlist, Velocity Barbell, Insider, Pre-Market)
-├── START.bat / RUN.bat      – Start the app (Windows)
-├── run.sh                  – Start on Linux/macOS (no Docker)
-├── reports/                – Generated PDFs (created at runtime)
-└── user_config.json        – Created on first run; blank API keys. Your optional keys go here – never in repo or release
+  app.py                  - Main application
+  trend_scan_v2.py        - Trend scanner (long-term)
+  emotional_dip_scanner.py - Swing (emotional dips)
+  watchlist_scanner.py    - Watchlist (Down X% or All)
+  premarket_volume_scanner.py - Pre-Market volume scanner
+  ticker_enrichment.py    - Earnings, news, leveraged suggestions
+  insider_scanner.py      - SEC insider data
+  market_intel.py         - Market intelligence + overnight markets
+  report_generator.py     - PDF report builder
+  finviz_safe.py          - Timeout-protected Finviz wrapper
+  scan_settings.py        - Configuration
+  requirements.txt
+  scan_types.json         - Scan types (4 scanners)
+  scanner_cli.py          - CLI for automation
+  reports/                - Generated PDFs (created at runtime)
 
 
 ════════════════════════════════════════════════════════════════════════════
    GITHUB & RELEASES
 ════════════════════════════════════════════════════════════════════════════
 
-Source and release zip: see the GitHub repo.
+Source and release zip:
+https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases
+
 Your API keys (if you use any) are only in user_config.json on your machine;
-they are not in the source code or in the release package. Config is blank on first run.
+they are not in the source code or in the release package.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -134,9 +136,7 @@ they are not in the source code or in the release package. Config is blank on fi
 ════════════════════════════════════════════════════════════════════════════
 
 This app is FREE forever. If you find it useful, please consider
-donating to Direct Relief (https://www.directrelief.org/) – medical aid worldwide.
-
-Contact: Discord ID 340935763405570048
+donating to Direct Relief (https://www.directrelief.org/) - medical aid worldwide.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -148,5 +148,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v7.0 – made with Claude AI
+   ClearBlueSky v7.7 - made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

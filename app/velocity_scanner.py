@@ -7,6 +7,7 @@ Scans fixed universe, scores 4 signal types, grades A+ to F, outputs terminal + 
 import argparse
 import os
 import sys
+import time
 import pandas as pd
 from datetime import datetime, date, timedelta
 from pathlib import Path
@@ -31,7 +32,7 @@ ACCOUNT_SIZE = 20000
 MAX_RISK_PER_TRADE = 0.03
 OUTPUT_DIR = Path(BASE_DIR) / "scanner_output"
 CACHE_DIR = Path(BASE_DIR) / "cache"
-# Max tickers when using index (sp500/russell2000/etfs) to keep scan time reasonable
+# Max tickers when using index (sp500/etfs) to keep scan time reasonable
 INDEX_UNIVERSE_CAP = 200
 
 # -----------------------------------------------------------------------------
@@ -39,10 +40,10 @@ INDEX_UNIVERSE_CAP = 200
 # -----------------------------------------------------------------------------
 def get_universe_for_index(index: Optional[str]) -> List[str]:
     """
-    Return ticker list for the scan. When index is sp500/russell2000/etfs, fetch from
+    Return ticker list for the scan. When index is sp500/etfs, fetch from
     Finviz (not ticker restricted). Otherwise use fixed SCAN_UNIVERSE (e.g. index='velocity' or None).
     """
-    if index and index in ("sp500", "russell2000", "etfs"):
+    if index and index in ("sp500", "etfs"):
         try:
             from breadth import fetch_full_index_for_breadth
             rows = fetch_full_index_for_breadth(index, progress_callback=None)
@@ -105,11 +106,12 @@ def fetch_market_context() -> Dict[str, Any]:
             return key, info
 
         from concurrent.futures import ThreadPoolExecutor, as_completed
-        with ThreadPoolExecutor(max_workers=4) as pool:
+        with ThreadPoolExecutor(max_workers=2) as pool:
             futures = [pool.submit(_fetch_index, sym, key) for sym, key in [("SPY", "spy"), ("QQQ", "qqq"), ("SMH", "smh"), ("^VIX", "vix")]]
             for future in as_completed(futures):
-                key, info = future.result()
+                key, info = future.result(timeout=60)
                 out[key] = info
+                time.sleep(0.3)  # polite delay between yfinance calls
         vix = out.get("vix", {}).get("close") or 0
         if vix < 15:
             out["regime"] = "LOW FEAR"
@@ -361,7 +363,7 @@ def entry_plan(d: Dict, grade: str, signal_name: str) -> Dict[str, Any]:
 # -----------------------------------------------------------------------------
 def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> Dict[str, Any]:
     """Run full Velocity Pre-Market Hunter scan. Returns context, tickers, grades, output path.
-    index: None or 'velocity' = fixed SCAN_UNIVERSE; 'sp500'/'russell2000'/'etfs' = index universe (not ticker restricted)."""
+    index: None or 'velocity' = fixed SCAN_UNIVERSE; 'sp500'/'etfs' = index universe (not ticker restricted)."""
     start = datetime.now()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     universe = get_universe_for_index(index)
@@ -386,19 +388,15 @@ def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> D
             d["entry"] = None
         return d
 
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = {pool.submit(_scan_one, t): t for t in universe}
-        done_count = 0
-        for future in as_completed(futures):
-            done_count += 1
-            ticker = futures[future]
-            if progress_callback:
-                progress_callback(f"Scanned {ticker} ({done_count}/{n})...")
-            try:
-                results.append(future.result())
-            except Exception:
-                pass  # skip tickers that fail (network/API errors)
+    # Sequential scanning — one ticker at a time to respect yfinance rate limits
+    for i, t in enumerate(universe):
+        if progress_callback:
+            progress_callback(f"Scanning {t} ({i+1}/{n})...")
+        try:
+            results.append(_scan_one(t))
+        except Exception:
+            pass  # skip tickers that fail (network/API errors)
+        time.sleep(0.3)  # polite delay between yfinance calls
     results.sort(key=lambda x: ({"A+": 0, "A": 1, "B": 2, "C": 3, "F": 4}.get(x["grade"], 5), -x["score"]))
     elapsed = (datetime.now() - start).total_seconds()
     ts = datetime.now().strftime("%Y%m%d_%H%M")

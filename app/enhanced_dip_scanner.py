@@ -51,7 +51,7 @@ RATING_SCORES = {
 def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     """
     Scan index for stocks down within configured range.
-    index: 'sp500', 'russell2000', or 'etfs'
+    index: 'sp500' or 'etfs'
     Returns raw list before filtering.
     """
     min_dip = float(config.get('dip_min_percent', 1.0))
@@ -60,11 +60,11 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     max_price = float(config.get('max_price', 500.0))
     min_volume = int(float(config.get('min_avg_volume', 500000)))
     
-    # Index filter (Finviz: idx_sp500, idx_rut, ind_exchangetradedfund for ETFs)
+    # Index filter (Finviz: idx_sp500, ind_exchangetradedfund for ETFs)
     if index == 'etfs':
         idx_filter = 'ind_exchangetradedfund'
     else:
-        idx_filter = 'idx_sp500' if index == 'sp500' else 'idx_rut'
+        idx_filter = 'idx_sp500'
     
     filters = [
         idx_filter,
@@ -118,13 +118,14 @@ def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict
     max_price = float(config.get('max_price', 500.0))
     min_volume = int(float(config.get('min_avg_volume', 500000)))
     results = []
-    for ticker in (ticker_list or []):
+    for i, ticker in enumerate(ticker_list or []):
         ticker = (ticker or "").strip().upper()
         if not ticker:
             continue
         try:
             stock = get_stock_safe(ticker)
             if not stock:
+                time.sleep(0.5)
                 continue
             change_str = (stock.get('Change') or '0%').replace('%', '').strip()
             change = float(change_str)
@@ -149,7 +150,8 @@ def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict
                 'industry': stock.get('Industry') or '',
             })
         except Exception:
-            continue
+            pass
+        time.sleep(0.5)  # polite delay between Finviz calls
     return results
 
 
@@ -244,13 +246,13 @@ def analyze_dip_quality(ticker: str) -> Dict:
         # === NEWS ANALYSIS === (with one retry on failure)
         try:
             news = None
-            for _ in range(2):
+            for _attempt in range(2):
                 try:
                     news = finviz.get_news(ticker)
                     break
                 except Exception as e:
                     if '429' in str(e).lower() or 'timeout' in str(e).lower():
-                        time.sleep(2)
+                        time.sleep(4)  # longer backoff on Finviz rate limit
                         continue
                     break
             if news:
@@ -354,7 +356,7 @@ def run_enhanced_dip_scan(progress_callback=None, index: str = "sp500") -> List[
     
     Args:
         progress_callback: function(msg) for status updates
-        index: 'sp500', 'russell2000', or 'etfs'
+        index: 'sp500' or 'etfs'
     
     1. Get stocks down within range
     2. Analyze each for news/analyst/targets
@@ -363,7 +365,7 @@ def run_enhanced_dip_scan(progress_callback=None, index: str = "sp500") -> List[
     """
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
+    index_name = "S&P 500" if index == "sp500" else "ETFs"
     
     if progress_callback:
         progress_callback(f"Scanning {index_name} for dips...")
@@ -392,7 +394,7 @@ def run_enhanced_dip_scan(progress_callback=None, index: str = "sp500") -> List[
         
         # Rate limit - Finviz doesn't like rapid fire
         if i < len(candidates) - 1:
-            time.sleep(0.5)
+            time.sleep(0.8)
         
         results.append(candidate)
     

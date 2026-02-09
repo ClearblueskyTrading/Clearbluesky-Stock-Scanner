@@ -1,0 +1,45 @@
+---
+description: Shared persistent knowledge system — ChromaDB RAG database synced with Claude Desktop
+alwaysApply: true
+---
+
+# Shared Knowledge System
+
+You have access to a persistent knowledge database shared with Claude Desktop.
+Both systems read/write to the same ChromaDB vector store — anything indexed is available to both.
+
+## How to Query the Shared Brain
+
+Run from terminal when you need historical context, past decisions, or reference material:
+
+```bash
+python "D:\scanner\velocity_memory\velocity_rag.py" --query "your search query"
+python "D:\scanner\velocity_memory\velocity_rag.py" --query "your query" --filter trades
+```
+
+Filter options: `sessions`, `trades`, `regime`, `strategy`, `scans`, `knowledge`
+
+## How to Write to Shared Memory
+
+Write markdown files to these directories. The RAG watcher auto-indexes them:
+
+- `D:\scanner\velocity_memory\session_logs\` — Session summaries, decisions made, context
+- `D:\scanner\velocity_memory\trade_journal\` — Trade entries, exits, P/L
+- `D:\scanner\velocity_memory\market_context\` — Market regime, sector rotation notes
+- `D:\scanner\velocity_memory\strategy_updates\` — Rule changes, parameter tweaks
+
+Naming convention: `topic_YYYYMMDD.md` (e.g., `session_20260209_scanner_refactor.md`)
+
+After writing, run: `python "D:\scanner\velocity_memory\velocity_rag.py"` to index immediately.
+
+## Shared Knowledge Folder
+
+`C:\Users\EricR\OneDrive\Desktop\Claude AI Knowledge\` — Reference books, PDFs, scan reports, CSV data.
+Both Claude Desktop and Cursor can read from here. Files placed here get indexed into the RAG.
+
+## When to Use This
+
+- Starting a new session: query for recent context on the current project
+- Making architecture decisions: check if past decisions exist on this topic
+- User says "check your brain": query RAG for current state, recent sessions, open items
+- Completing work: write a session summary so the next session (yours or Claude's) has context

@@ -5,7 +5,8 @@ Collects broad market context from FREE, API-compliant sources:
   1. Google News RSS  – top stock-market / economy / earnings headlines (no key needed)
   2. Finvizfinance    – curated financial news + blog headlines (already a dependency)
   3. Finvizfinance    – sector performance table (week / month / quarter / YTD)
-  4. yfinance         – futures-proxy ETFs snapshot (SPY, QQQ, DIA, IWM, GLD, USO, TLT, ^VIX)
+  4. yfinance         – futures-proxy ETFs snapshot (SPY, QQQ, DIA, GLD, USO, TLT, ^VIX)
+  5. yfinance         – overnight/overseas markets (EWJ, FXI, EWZ, EFA, EWG, EWU, INDA, EWT, EWY)
 
 Everything is returned as a single dict suitable for:
   • Injecting into the OpenRouter AI prompt (as text)
@@ -152,11 +153,23 @@ MARKET_SYMBOLS = {
     "SPY": "S&P 500",
     "QQQ": "Nasdaq 100",
     "DIA": "Dow Jones",
-    "IWM": "Russell 2000",
     "GLD": "Gold",
     "USO": "Oil",
     "TLT": "20Y Treasuries",
     "^VIX": "VIX",
+}
+
+# Overnight / overseas markets (ETFs that track international indices)
+OVERNIGHT_SYMBOLS = {
+    "EWJ": "Japan (Nikkei proxy)",
+    "FXI": "China (Hang Seng proxy)",
+    "EWZ": "Brazil (Bovespa proxy)",
+    "EFA": "Europe/Asia Developed (EAFE)",
+    "EWG": "Germany (DAX proxy)",
+    "EWU": "UK (FTSE proxy)",
+    "INDA": "India (Nifty proxy)",
+    "EWT": "Taiwan (TSMC heavy)",
+    "EWY": "South Korea (KOSPI proxy)",
 }
 
 
@@ -180,6 +193,40 @@ def _fetch_market_snapshot():
                 if len(closes) >= 2:
                     prev = float(closes.iloc[-2])
                     if prev:
+                        change_pct = round((price - prev) / prev * 100, 2)
+                snapshot.append({
+                    "symbol": sym,
+                    "name": label,
+                    "price": price,
+                    "change_pct": change_pct,
+                })
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return snapshot
+
+
+def _fetch_overnight_markets():
+    """Fetch latest price + daily change for overseas/overnight market ETFs."""
+    snapshot = []
+    try:
+        import yfinance as yf
+        symbols = list(OVERNIGHT_SYMBOLS.keys())
+        data = yf.download(symbols, period="5d", progress=False, group_by="ticker", timeout=30)
+        for sym, label in OVERNIGHT_SYMBOLS.items():
+            try:
+                if len(OVERNIGHT_SYMBOLS) > 1:
+                    closes = data[sym]["Close"].dropna()
+                else:
+                    closes = data["Close"].dropna()
+                if len(closes) < 1:
+                    continue
+                price = round(float(closes.iloc[-1]), 2)
+                change_pct = None
+                if len(closes) >= 2:
+                    prev = float(closes.iloc[-2])
+                    if prev and prev != 0:
                         change_pct = round((price - prev) / prev * 100, 2)
                 snapshot.append({
                     "symbol": sym,
@@ -222,16 +269,18 @@ def gather_market_intel(progress_callback=None):
         "finviz_news": [],
         "sector_performance": [],
         "market_snapshot": [],
+        "overnight_markets": [],
     }
 
-    # Run all 4 fetches in parallel
+    # Run fetches in controlled parallel — max 2 workers to be polite to Finviz + yfinance
     tasks = {
         "google_news": _fetch_google_news,
         "finviz_news": _fetch_finviz_news,
         "sector_performance": _fetch_sector_performance,
         "market_snapshot": _fetch_market_snapshot,
+        "overnight_markets": _fetch_overnight_markets,
     }
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=2) as pool:
         futures = {pool.submit(fn): key for key, fn in tasks.items()}
         for future in as_completed(futures):
             key = futures[future]
@@ -239,12 +288,14 @@ def gather_market_intel(progress_callback=None):
                 result[key] = future.result(timeout=60)
             except Exception:
                 result[key] = []
+            time.sleep(0.3)  # polite delay between completing tasks
 
     counts = (
         f"{len(result['google_news'])} headlines, "
         f"{len(result['finviz_news'])} Finviz articles, "
         f"{len(result['sector_performance'])} sectors, "
-        f"{len(result['market_snapshot'])} market prices"
+        f"{len(result['market_snapshot'])} US markets, "
+        f"{len(result['overnight_markets'])} overseas"
     )
     progress(f"Market intel ready: {counts}")
     return result
@@ -271,6 +322,15 @@ def format_intel_for_prompt(intel):
         lines.append("")
         lines.append("MARKET SNAPSHOT:")
         for s in snap:
+            chg = f" ({s['change_pct']:+.2f}%)" if s.get("change_pct") is not None else ""
+            lines.append(f"  {s['name']}: ${s['price']}{chg}")
+
+    # Overnight / overseas markets
+    overnight = intel.get("overnight_markets", [])
+    if overnight:
+        lines.append("")
+        lines.append("OVERNIGHT / OVERSEAS MARKETS:")
+        for s in overnight:
             chg = f" ({s['change_pct']:+.2f}%)" if s.get("change_pct") is not None else ""
             lines.append(f"  {s['name']}: ${s['price']}{chg}")
 

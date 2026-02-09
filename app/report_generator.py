@@ -65,13 +65,22 @@ stocks + leveraged bull ETFs. Cash account, ~$20K portfolio.
 - **Setup Quality**: Score 90+ = A+, 80-89 = A, 70-79 = B+, <70 = pass
 - **Leveraged ETF note**: Max 3-day hold due to decay
 
+## Critical Data to Use
+
+- **EARNINGS WARNINGS**: If a ticker is flagged with "EARNINGS IN X DAYS", factor this heavily.
+  Tickers with earnings in 1-3 days should generally be PASS unless the setup is exceptional.
+- **NEWS SENTIMENT**: DANGER = likely skip. NEGATIVE = extra caution. POSITIVE = bullish catalyst.
+- **OVERNIGHT MARKETS**: Use overseas market data to assess gap risk and overnight sentiment.
+- **PRICE AT REPORT**: Compare scanner price vs live price for any drift since scan.
+
 ## Required Sections
 
-1. **Executive Summary** (market context, what this scan found)
-2. **Per-Ticker Analysis** (using format above)
-3. **TOP PICKS** (ranked by conviction)
-4. **AVOID LIST** (with reasons)
-5. **RISK MANAGEMENT** (current market conditions, position sizing advice)
+1. **Executive Summary** (market context, overnight markets impact, what this scan found)
+2. **Per-Ticker Analysis** (using format above — flag earnings/news risks prominently)
+3. **TOP PICKS** (minimum 5 picks, ranked by conviction — more is better)
+4. **AVOID LIST** (with reasons — earnings, news red flags, bad chart, etc.)
+5. **OVERNIGHT / OVERSEAS IMPACT** (how overseas markets affect today's US session)
+6. **RISK MANAGEMENT** (current market conditions, position sizing advice)
 
 ═══════════════════════════════════════════════════════════════════════════════
 END OF DIRECTIVE — Scan data follows below.
@@ -144,7 +153,8 @@ class ReportGenerator:
                 'rel_volume': stock.get('Rel Volume', 'N/A'),
                 'recom': stock.get('Recom', 'N/A'),
             })
-            # Get news (with one retry on failure)
+            # Get news (with one retry on failure + polite delay)
+            time.sleep(0.5)  # pause before news fetch — respect Finviz rate limits
             for _ in range(2):
                 try:
                     news = finviz.get_news(ticker)
@@ -152,7 +162,7 @@ class ReportGenerator:
                     break
                 except Exception as e:
                     if '429' in str(e).lower() or 'timeout' in str(e).lower():
-                        time.sleep(2)
+                        time.sleep(3)  # longer backoff on rate limit
                         continue
                     data['news'] = []
                     break
@@ -350,7 +360,7 @@ class ReportGenerator:
         return out
 
     def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None, index=None):
-        """Generate ONE PDF report. index='sp500', 'russell2000', or 'etfs' to include market breadth (full index fetch)."""
+        """Generate ONE PDF report. index='sp500' or 'etfs' to include market breadth (full index fetch)."""
         def progress(msg):
             print(msg)
             if progress_callback:
@@ -432,7 +442,7 @@ class ReportGenerator:
                     ctx = get_insider_10b5_1_context(ticker)
                     row["insider_10b5_1_plan"] = ctx.get("is_10b5_1_plan")
                     row["insider_context"] = ctx.get("insider_context", "Unknown")
-                    time.sleep(0.25)
+                    time.sleep(0.5)  # polite delay for SEC EDGAR
                 except Exception:
                     row["insider_10b5_1_plan"] = None
                     row["insider_context"] = "Unknown"
@@ -440,7 +450,23 @@ class ReportGenerator:
                 row["insider_10b5_1_plan"] = None
                 row["insider_context"] = None
             stocks_data.append(row)
-            time.sleep(0.2)
+            time.sleep(0.8)  # polite delay between Finviz + API calls per ticker
+
+        # ── Ticker enrichment (earnings, news flags, price stamp, leveraged) ──
+        try:
+            from ticker_enrichment import enrich_scan_results
+            is_swing = "swing" in scan_type.lower() or "dip" in scan_type.lower()
+            is_premarket = "premarket" in scan_type.lower() or "pre-market" in scan_type.lower() or "pre market" in scan_type.lower()
+            stocks_data = enrich_scan_results(
+                stocks_data,
+                include_earnings=True,
+                include_news_flags=True,
+                include_price_stamp=True,
+                include_leveraged=is_swing or is_premarket,  # leveraged suggestions on swing/premarket
+                progress_callback=progress,
+            )
+        except Exception as e:
+            print(f"[ENRICHMENT] Warning: ticker enrichment failed: {e}")
 
         tickers_list = ", ".join([s['ticker'] for s in stocks_data])
         watchlist_matches = [s['ticker'] for s in stocks_data if s.get('on_watchlist')]
@@ -454,10 +480,29 @@ class ReportGenerator:
                 line += " | Earnings safe"
             if s.get("insider_context") not in (None, ""):
                 line += f" | Insider: {s.get('insider_context', 'Unknown')}"
+            # Enrichment: earnings warning
+            earnings = s.get("earnings")
+            if earnings and earnings.get("warning"):
+                line += f" | {earnings['warning']}"
+            # Enrichment: news sentiment
+            ns = s.get("news_sentiment")
+            if ns and ns.get("sentiment") not in (None, "NEUTRAL"):
+                line += f" | News: {ns['sentiment']}"
+                if ns.get("red_flags"):
+                    line += f" ({ns['red_flags'][0][:40]})"
+                elif ns.get("green_flags"):
+                    line += f" ({ns['green_flags'][0][:40]})"
+            # Enrichment: price stamp
+            if s.get("price_at_report"):
+                line += f" | Live ${s['price_at_report']}"
+            # Enrichment: leveraged play
+            lp = s.get("leveraged_play")
+            if lp:
+                line += f" | Leveraged: {lp['leveraged_ticker']}"
             data_lines.append(line)
 
         market_breadth = None
-        if index and index in ("sp500", "russell2000", "etfs"):
+        if index and index in ("sp500", "etfs"):
             try:
                 from breadth import fetch_full_index_for_breadth, calculate_market_breadth
                 all_stocks = fetch_full_index_for_breadth(index, progress)
@@ -504,6 +549,29 @@ class ReportGenerator:
         except Exception:
             pass
 
+        # Insider data folded into Trend and Swing scans
+        insider_prompt = ""
+        if "trend" in scan_type.lower() or "swing" in scan_type.lower() or "dip" in scan_type.lower():
+            try:
+                from insider_scanner import get_insider_data_for_tickers
+                ticker_list_ins = [s['ticker'] for s in stocks_data]
+                insider_data = get_insider_data_for_tickers(ticker_list_ins, progress_callback=progress)
+                if insider_data:
+                    # Attach to stock rows for JSON
+                    for s in stocks_data:
+                        t = s['ticker'].upper()
+                        if t in insider_data:
+                            s['recent_insider'] = insider_data[t]
+                    # Build prompt
+                    ins_lines = []
+                    for t, trades in insider_data.items():
+                        for trade in trades[:2]:  # max 2 per ticker
+                            ins_lines.append(f"  {t}: {trade.get('Transaction','?')} by {trade.get('Owner','?')} | ${trade.get('Value','?')} | {trade.get('Date','?')}")
+                    if ins_lines:
+                        insider_prompt = "\n\nRECENT INSIDER ACTIVITY (for scan tickers):\n" + "\n".join(ins_lines) + "\n"
+            except Exception as e:
+                print(f"[INSIDER] Insider enrichment failed: {e}")
+
         # 30-day price history (fresh download every scan run — sanity check)
         price_history = {}
         price_history_prompt = ""
@@ -523,10 +591,10 @@ class ReportGenerator:
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
         ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
-{market_intel_prompt}{smart_money_prompt}{price_history_prompt}
+{market_intel_prompt}{smart_money_prompt}{insider_prompt}{price_history_prompt}
 IMPORTANT: For each stock:
 1. Use the technical data (chart data and scanner data) in this report to assess setup
-2. Use the MARKET INTELLIGENCE, SMART MONEY SIGNALS, and 30-DAY PRICE HISTORY above to understand market context, institutional positioning, social sentiment, and recent price action
+2. Use the MARKET INTELLIGENCE, SMART MONEY SIGNALS, INSIDER ACTIVITY, and 30-DAY PRICE HISTORY above to understand market context, institutional positioning, social sentiment, and recent price action
 3. Use the 30-day price history as a SANITY CHECK — verify entries/targets make sense vs recent highs/lows
 4. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
 
@@ -578,14 +646,18 @@ FOR EACH STOCK, PROVIDE:
 FINAL SUMMARY:
 ═══════════════════════════════════════════════════
 
-TOP 10 PICKS (ranked by your score):
+TOP PICKS (minimum 5, ranked by conviction):
 For each pick give: Ticker, Your Score, Entry, Stop, Target, Why
 
 AVOID LIST:
-Which stocks to skip and why (news red flags, bad chart, etc.)
+Which stocks to skip and why (news red flags, bad chart, earnings risk, etc.)
 
-NEWS ALERTS:
-Any breaking news or upcoming events (earnings dates, FDA decisions, etc.) that could affect these trades
+NEWS & EARNINGS ALERTS:
+Any breaking news, upcoming earnings, FDA decisions, or events that could affect these trades.
+PAY ATTENTION to tickers flagged with EARNINGS warnings or DANGER/NEGATIVE news sentiment above.
+
+OVERNIGHT / OVERSEAS IMPACT:
+How did overseas markets (Asia, Europe) perform overnight and what does it mean for US open?
 
 MARKET CONTEXT:
 Current market conditions affecting these trades
@@ -621,6 +693,10 @@ RISK MANAGEMENT:
         if smart_money_prompt:
             body_lines.append(smart_money_prompt)
             body_lines.append("")
+        # Add insider activity to text report
+        if insider_prompt:
+            body_lines.append(insider_prompt)
+            body_lines.append("")
         # Add 30-day price history to text report
         if price_history_prompt:
             body_lines.append(price_history_prompt)
@@ -629,7 +705,17 @@ RISK MANAGEMENT:
             ticker = s['ticker']
             score = s.get('score', 0)
             body_lines.append(f"——— {ticker} ———")
-            body_lines.append(f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x")
+            price_line = f"Score {s['score']}  | Price ${s.get('price','N/A')}"
+            if s.get("price_at_report"):
+                price_line += f"  (live ${s['price_at_report']} at {s.get('report_time','')})"
+            price_line += f"  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x"
+            body_lines.append(price_line)
+            # Enrichment: earnings warning
+            earnings = s.get("earnings")
+            if earnings and earnings.get("warning"):
+                body_lines.append(f"*** {earnings['warning']} *** (Earnings date: {earnings.get('earnings_date','N/A')})")
+            elif earnings and earnings.get("earnings_date"):
+                body_lines.append(f"Earnings date: {earnings['earnings_date']} ({earnings.get('days_away','?')} days away)")
             rc = s.get("risk_checks") or _default_risk_checks()
             if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
                 body_lines.append(f"EARNINGS IN {rc.get('days_until_earnings')} DAYS - avoid for swing")
@@ -639,11 +725,24 @@ RISK MANAGEMENT:
                 body_lines.append(f"Ex-div {rc.get('ex_div_date')} - price drop expected")
             if rc.get("volume_unusual") and rc.get("relative_volume") is not None:
                 body_lines.append(f"RelVol {rc.get('relative_volume')}x (unusual)")
+            # Enrichment: news sentiment
+            ns = s.get("news_sentiment")
+            if ns and ns.get("sentiment") != "NEUTRAL":
+                flag_line = f"News Sentiment: {ns['sentiment']}"
+                if ns.get("red_flags"):
+                    flag_line += " | Red flags: " + "; ".join(ns['red_flags'][:3])
+                if ns.get("green_flags"):
+                    flag_line += " | Green flags: " + "; ".join(ns['green_flags'][:3])
+                body_lines.append(flag_line)
             if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
                 body_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
                 if s.get("insider_context") not in (None, ""):
                     body_lines.append(f"Insider context: {s.get('insider_context', 'Unknown')} (from SEC Form 4)")
-            if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
+            # Leveraged play (enrichment-based or legacy mapping)
+            lp = s.get("leveraged_play")
+            if lp:
+                body_lines.append(f"Leveraged play: {lp['leveraged_ticker']} ({lp.get('match_type','direct')}) - NOT for long-term (volatility decay)")
+            elif score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
                 lev = leveraged_mapping[ticker]
                 body_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
                 body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")

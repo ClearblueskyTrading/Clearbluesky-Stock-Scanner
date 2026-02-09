@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.6
+# ClearBlueSky Stock Scanner v7.8
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.6"
+VERSION = "7.8"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -177,10 +177,7 @@ def _scan_worker_loop(app):
         "trend": "Trend",
         "swing": "Swing",
         "watchlist": "Watchlist",
-        "velocity_leveraged": "Velocity Barbell",
-        "insider": "Insider",
         "premarket": "Premarket",
-        "velocity_premarket": "Velocity Pre-Market Hunter",
     }
     while True:
         if getattr(app, "scan_cancelled", False):
@@ -211,7 +208,7 @@ def _scan_worker_loop(app):
         scanner_kind = (scan_def or {}).get("scanner", "")
         label = (scan_def or {}).get("label", "Scan")
         short_label = SCANNER_TO_REPORT_LABEL.get(scanner_kind, label)
-        if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket"):
+        if scanner_kind not in ("trend", "swing", "watchlist", "premarket"):
             continue
         try:
             app.scan_result_queue.put(("start", label))
@@ -240,22 +237,29 @@ def _scan_worker_loop(app):
             elif scanner_kind == "watchlist":
                 from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
                 use_all = (config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
-                results = run_watchlist_tickers_scan(progress_callback=progress_put, config=config) if use_all else run_watchlist_scan(progress_callback=progress_put, config=config)
-            elif scanner_kind == "velocity_leveraged":
-                from velocity_leveraged_scanner import run_velocity_leveraged_scan
-                results = run_velocity_leveraged_scan(progress_callback=progress_put, config=config)
-            elif scanner_kind == "insider":
-                from insider_scanner import run_insider_scan
-                results = run_insider_scan(progress_callback=progress_put, config=config)
+                cancel_evt = getattr(app, "_scan_cancel_event", None)
+                results = run_watchlist_tickers_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt) if use_all else run_watchlist_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt)
             elif scanner_kind == "premarket":
+                # Combined premarket: volume scan + velocity premarket hunter
                 from premarket_volume_scanner import run_premarket_volume_scan
                 cancel_evt = getattr(app, "_scan_cancel_event", None)
-                results = run_premarket_volume_scan(progress_put, index=index, cancel_event=cancel_evt)
-            elif scanner_kind == "velocity_premarket":
-                from velocity_scanner import run_premarket_scan, write_pdf
-                report = run_premarket_scan(progress_callback=progress_put, index=index)
-                write_pdf(report)
-                results = report.get("tickers") or []
+                pm_results = run_premarket_volume_scan(progress_put, index=index, cancel_event=cancel_evt) or []
+                # Also run velocity premarket for gap/signal analysis
+                try:
+                    from velocity_scanner import run_premarket_scan
+                    progress_put("Running velocity premarket analysis...")
+                    vpm_report = run_premarket_scan(progress_callback=progress_put, index=index)
+                    vpm_tickers = vpm_report.get("tickers") or []
+                    # Merge velocity results — add tickers not already in pm_results
+                    existing_tickers = {(r.get("ticker") or r.get("Ticker", "")).upper() for r in pm_results}
+                    for vt in vpm_tickers:
+                        vt_ticker = (vt.get("ticker") or vt.get("Ticker", "")).upper()
+                        if vt_ticker and vt_ticker not in existing_tickers:
+                            pm_results.append(vt)
+                            existing_tickers.add(vt_ticker)
+                except Exception as e:
+                    print(f"[PREMARKET] Velocity premarket add-on failed: {e}")
+                results = pm_results if pm_results else None
             elapsed = int(time.time() - start_time)
             if getattr(app, "scan_cancelled", False):
                 try:
@@ -415,8 +419,6 @@ class TradeBotApp:
                 {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
                 {"id": "watchlist", "label": "Watchlist", "scanner": "watchlist"},
-                {"id": "velocity_leveraged", "label": "Velocity Barbell", "scanner": "velocity_leveraged"},
-                {"id": "insider", "label": "Insider - Latest", "scanner": "insider"},
                 {"id": "premarket", "label": "Pre-Market", "scanner": "premarket"},
             ]
         self.build_ui()
@@ -501,7 +503,7 @@ class TradeBotApp:
         ttk.Combobox(
             type_row,
             textvariable=self.scan_index,
-            values=["S&P 500", "Russell 2000", "ETFs", "Leveraged (high-conviction)"],
+            values=["S&P 500", "ETFs", "Leveraged (high-conviction)"],
             state="readonly",
             width=10,
             font=("Arial", 9),
@@ -716,7 +718,7 @@ class TradeBotApp:
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
         tk.Label(main_f, text="Index:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
         idx_var = tk.StringVar(value=self.scan_index.get())
-        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "Russell 2000", "ETFs", "Leveraged (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
+        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "ETFs", "Leveraged (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -981,14 +983,8 @@ class TradeBotApp:
                             no_result_msg = "No emotional dips today"
                         elif short_label == "Watchlist":
                             no_result_msg = "No watchlist results"
-                        elif short_label == "Velocity Barbell":
-                            no_result_msg = "No recommendations"
-                        elif short_label == "Insider":
-                            no_result_msg = "No insider transactions"
                         elif short_label == "Premarket":
                             no_result_msg = "No pre-market activity"
-                        elif short_label == "Velocity Pre-Market Hunter":
-                            no_result_msg = "No A+ setups"
                         self.scan_complete(
                             self.scan_progress, self.scan_status, self.scan_printer,
                             self.scan_btn, no_result_msg, self.scan_stop_btn,
@@ -1032,26 +1028,18 @@ class TradeBotApp:
             return {"id": "trend_fallback", "label": label, "scanner": "trend"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
-        if "Pre-Market" in label or ("Pre" in label and "Market" in label):
-            if "Hunter" in label:
-                return {"id": "velocity_premarket_fallback", "label": label, "scanner": "velocity_premarket"}
+        if "Pre-Market" in label or "Pre" in label or "Premarket" in label:
             return {"id": "premarket_fallback", "label": label, "scanner": "premarket"}
         if "Watchlist" in label:
             return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
-        if "Velocity" in label or "Barbell" in label:
-            return {"id": "velocity_leveraged_fallback", "label": label, "scanner": "velocity_leveraged"}
-        if "insider" in label.lower():
-            return {"id": "insider_fallback", "label": label, "scanner": "insider"}
         return None
     
     # NOTE: Legacy _run_*_scan methods removed in v7.2 (dead code).
     # All scans are now handled by _scan_worker_loop via scan_job_queue.
 
     def _DEAD_CODE_REMOVED(self):
-        """Placeholder – the ~470 lines of _run_trend_scan, _run_swing_scan,
-        _run_watchlist_scan, _run_velocity_leveraged_scan, _run_insider_scan,
-        _run_premarket_scan were removed. All scan execution goes through
-        _scan_worker_loop (queue-based)."""
+        """Placeholder – legacy per-scan methods removed in v7.2.
+        All scan execution goes through _scan_worker_loop (queue-based)."""
         pass
     
     def run_scan(self):
@@ -1060,7 +1048,7 @@ class TradeBotApp:
             messagebox.showinfo("Scan", "A scan is already running.")
             return
         idx_text = self.scan_index.get()
-        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Leveraged" in idx_text else "russell2000"))
+        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Leveraged" in idx_text else "sp500"))
         self.scan_cancelled = False
         # Clear any stale jobs and results from previous cancelled scans
         for q in (self.scan_job_queue, self.scan_result_queue):
@@ -1071,7 +1059,7 @@ class TradeBotApp:
                 pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
-            allowed = ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket")
+            allowed = ("trend", "swing", "watchlist", "premarket")
             enqueued = 0
             for i, scan_def in enumerate(types_list):
                 scanner_kind = (scan_def or {}).get("scanner", "")
@@ -1085,7 +1073,7 @@ class TradeBotApp:
         else:
             scan_def = self._get_current_scan_def()
             scanner_kind = (scan_def or {}).get("scanner", "")
-            if scanner_kind not in ("trend", "swing", "watchlist", "velocity_leveraged", "insider", "premarket", "velocity_premarket"):
+            if scanner_kind not in ("trend", "swing", "watchlist", "premarket"):
                 messagebox.showwarning("Scan Type", "Please select a valid scan type.")
                 return
             self.scan_job_queue.put(("scan", scan_def, index))
@@ -1099,7 +1087,7 @@ class TradeBotApp:
         self._schedule_process_result_queue()
     
     def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, index=None):
-        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500', 'russell2000', or 'etfs' to include market breadth."""
+        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500' or 'etfs' to include market breadth."""
         try:
             from report_generator import HTMLReportGenerator
 
@@ -1107,7 +1095,7 @@ class TradeBotApp:
             if scan_type == "Swing":
                 min_score = int(self.config.get("emotional_min_score", 65))
             else:
-                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell", "Premarket", "Velocity Pre-Market Hunter") else 65))
+                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket") else 65))
             reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -2084,12 +2072,12 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.5
+ClearBlueSky Stock Scanner v7.7
 
 QUICK START:
-1. Select scan type and index (N/A for Watchlist / Insider).
+1. Select scan type and index (S&P 500 / ETFs / Leveraged).
 2. Click Run Scan. You get: PDF report + JSON analysis package.
-3. Optional: Check "Run all scans" (may take 20+ min; rate-limited).
+3. Optional: Check "Run all scans" (may take 15+ min; rate-limited).
 4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
 
 OUTPUTS (per run):
@@ -2097,43 +2085,24 @@ OUTPUTS (per run):
 • JSON – Same data + "instructions" field (use with any AI: "follow the instructions in this JSON").
 • *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
 
-SCANNERS:
-• Trend – Uptrending (S&P 500 / Russell 2000 / ETFs). Best: after close.
+SCANNERS (4 total):
+• Trend – Long-term sector rotation holds (S&P 500 / ETFs). Best: after close.
 • Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
-• Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers. Config: Min % down, Filter.
-• Leveraged Barbell – Sector signals → Foundation + Runner leveraged ETF pairs. Config: min sector %, theme.
-• Insider – Latest insider transactions (Finviz).
-• Pre-Market – Pre-market volume. Best: 7–9:25 AM.
-• Pre-Market Hunter – Pre-market setups (gap recovery, accumulation, breakout, gap-and-go); grades A+–F.
+• Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers.
+• Pre-Market – Combined volume scan + velocity gap analysis. Best: 7–9:25 AM.
 
-QUICK LOOKUP:
-• Enter 1-5 ticker symbols (comma or space separated) in Quick Lookup box.
-• Click Report for instant analysis of those tickers.
-
-WATCHLIST:
-• Add tickers (max 200). When one appears in a scan: 2 beeps + WATCHLIST in report.
-• Import from Finviz CSV: Watchlist → Import CSV.
-
-IMPORT/EXPORT CONFIG:
-• Click 💾 Config to export your full config (all settings + API keys) for backup.
-• Import on a new PC or fresh install to restore all settings.
-• ⚠️ Backup includes API keys - keep it secure!
-
-SETTINGS (optional):
-• Finviz API key – Scanner data (or scraping).
-• OpenRouter API key + model – Enables AI analysis → *_ai.txt.
-• Alpha Vantage key – Sentiment + headlines per ticker.
-• RAG books folder – .txt/.pdf books; Build RAG index; include in AI prompt.
-• Include TA / SEC insider context / chart images – Toggle report and AI inputs.
-
-AI STRATEGY:
-• Elite Swing Trader methodology: 1-5 day max hold (optimal 1-2 days).
-• Focus: S&P 500 stocks + leveraged ETFs, specific entry/exit windows, T+1 settlement.
+NEW IN v7.7:
+• Earnings date warnings per ticker (EARNINGS TOMORROW, etc.)
+• News sentiment flags (DANGER / NEGATIVE / POSITIVE / NEUTRAL)
+• Overnight/overseas markets (Japan, China, Europe, etc.) in AI context
+• Insider data folded into Trend & Swing scans
+• Leveraged ETF suggestions on Swing & Pre-Market
+• AI gives 5+ top picks (was 3)
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.5
+ClearBlueSky v7.7
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

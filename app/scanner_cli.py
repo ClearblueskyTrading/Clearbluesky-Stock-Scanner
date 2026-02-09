@@ -20,13 +20,11 @@ DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
 SCAN_DISPLAY_NAMES = {
     "trend": "Trend",
     "swing": "Swing",
-    "velocity": "Velocity Barbell",
     "premarket": "Premarket",
-    "insider": "Insider",
     "watchlist": "Watchlist",
 }
 
-# Scan types that use index (sp500 / russell2000 / etfs)
+# Scan types that use index (sp500 / etfs)
 INDEX_SCANS = {"trend", "swing", "premarket"}
 
 
@@ -43,7 +41,7 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
     """Generate PDF + JSON + optional _ai.txt. Returns base path (no extension) or None."""
     from report_generator import HTMLReportGenerator
 
-    zero_min = ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Insider", "Velocity Barbell")
+    zero_min = ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket")
     default_min = 0 if scan_type_display in zero_min else 65
     min_score = int(config.get(f"{scan_type_display.lower()}_min_score", default_min))
     reports_dir = config.get("reports_folder") or DEFAULT_REPORTS_DIR
@@ -125,16 +123,14 @@ def main() -> int:
         choices=[
             "trend",
             "swing",
-            "velocity",
             "premarket",
-            "insider",
             "watchlist",
         ],
         help="Scan type to run",
     )
     parser.add_argument(
         "--index",
-        choices=["sp500", "russell2000", "etfs"],
+        choices=["sp500", "etfs"],
         default="sp500",
         help="Index for trend/swing/premarket (default: sp500)",
     )
@@ -180,17 +176,20 @@ def main() -> int:
             from emotional_dip_scanner import run_emotional_dip_scan
             results = run_emotional_dip_scan(progress_callback=_progress, index=index)
 
-        elif scan_key == "velocity":
-            from velocity_leveraged_scanner import run_velocity_leveraged_scan
-            results = run_velocity_leveraged_scan(progress_callback=_progress, config=config)
-
         elif scan_key == "premarket":
             from premarket_volume_scanner import run_premarket_volume_scan
             results = run_premarket_volume_scan(progress_callback=_progress, index=index)
-
-        elif scan_key == "insider":
-            from insider_scanner import run_insider_scan
-            results = run_insider_scan(progress_callback=_progress, config=config)
+            # Merge velocity premarket results if available
+            try:
+                from velocity_scanner import run_premarket_scan as _vpm
+                vpm = _vpm(progress_callback=_progress, index=index)
+                if vpm:
+                    seen = {r.get("ticker") for r in (results or [])}
+                    for r in vpm:
+                        if r.get("ticker") not in seen:
+                            results = (results or []) + [r]
+            except Exception:
+                pass
 
         elif scan_key == "watchlist":
             from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan

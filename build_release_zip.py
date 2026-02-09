@@ -18,6 +18,7 @@ APP = ROOT / "app"
 EXCLUDE_DIRS = {
     "__pycache__",
     ".git",
+    ".cursor",
     "update_backups",
     "reports",
     "scanner_output",
@@ -46,6 +47,9 @@ EXCLUDE_FILES = {
     "RELEASE_v7.2.md",
     "RELEASE_v7.3.md",
     "RELEASE_v7.4.md",
+    "RELEASE_v7.5.md",
+    "RELEASE_v7.6.md",
+    "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

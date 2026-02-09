@@ -156,3 +156,87 @@ def run_insider_scan(
 
     progress(f"Found {len(results)} insider transaction(s).")
     return results
+
+
+def get_insider_data_for_tickers(tickers: List[str], progress_callback=None) -> Dict[str, List[Dict]]:
+    """
+    Fetch recent insider activity and return a dict keyed by ticker.
+    Used to enrich Trend and Swing scan results with insider context.
+
+    Returns: { "AAPL": [{"Owner": ..., "Transaction": "Buy", ...}], ... }
+    """
+    if not tickers:
+        return {}
+
+    def progress(msg):
+        if progress_callback:
+            progress_callback(msg)
+
+    progress("Fetching insider data for scan tickers...")
+    try:
+        from finvizfinance.insider import Insider
+    except ImportError:
+        return {}
+
+    ticker_set = {t.upper().strip() for t in tickers if t}
+    insider_by_ticker: Dict[str, List[Dict]] = {}
+
+    import time
+    for option in ("latest buys", "latest sales"):
+        try:
+            time.sleep(1.0)  # polite delay between Finviz insider calls
+            finsider = Insider(option=option)
+            df = finsider.get_insider()
+            if df is None or df.empty:
+                continue
+            col_map = {}
+            for c in df.columns:
+                cnorm = str(c).strip().lower().replace(" ", "_").replace("#", "").replace("$", "").replace("(", "").replace(")", "")
+                col_map[c] = cnorm
+            for _, row in df.iterrows():
+                try:
+                    ticker = None
+                    for orig, norm in col_map.items():
+                        if norm in ("ticker", "symbol"):
+                            ticker = row.get(orig)
+                            break
+                    if ticker is None and len(df.columns) > 0:
+                        ticker = row.iloc[0]
+                    ticker = str(ticker).strip().upper() if ticker is not None else ""
+                    if not ticker or ticker not in ticker_set:
+                        continue
+                    owner = ""
+                    for orig, norm in col_map.items():
+                        if norm == "owner":
+                            owner = str(row.get(orig, "")).strip()
+                            break
+                    transaction = ""
+                    for orig, norm in col_map.items():
+                        if norm == "transaction":
+                            transaction = str(row.get(orig, "")).strip()
+                            break
+                    value = ""
+                    for orig, norm in col_map.items():
+                        if "value" in norm:
+                            value = str(row.get(orig, "")).strip()
+                            break
+                    trans_date = ""
+                    for orig, norm in col_map.items():
+                        if norm == "date":
+                            trans_date = str(row.get(orig, "")).strip()
+                            break
+                    if ticker not in insider_by_ticker:
+                        insider_by_ticker[ticker] = []
+                    insider_by_ticker[ticker].append({
+                        "Owner": owner,
+                        "Transaction": transaction,
+                        "Value": value,
+                        "Date": trans_date,
+                    })
+                except Exception:
+                    continue
+        except Exception:
+            continue
+
+    progress(f"Insider data: {len(insider_by_ticker)} tickers with activity")
+    return insider_by_ticker

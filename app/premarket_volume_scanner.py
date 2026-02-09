@@ -50,7 +50,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     
     Args:
         progress_callback: function(msg) for status updates
-        index: 'sp500', 'russell2000', or 'etfs'
+        index: 'sp500' or 'etfs'
         cancel_event: threading.Event to signal cancellation
     
     Returns:
@@ -60,7 +60,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     _cancel_event = cancel_event
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
+    index_name = "S&P 500" if index == "sp500" else "ETFs"
     
     if progress_callback:
         progress_callback(f"Scanning {index_name} for pre-market volume activity...")
@@ -305,9 +305,9 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
             except Exception as e:
                 continue
             
-            # Rate limit
+            # Rate limit — polite delay to avoid Finviz bans
             if i < len(candidates) - 1:
-                time.sleep(0.3)
+                time.sleep(0.5)
         
         print(f"[PREMARKET] Deep analysis done: {len(results)} passed, {failed_fetches} total fetch failures")
         # Sort by score

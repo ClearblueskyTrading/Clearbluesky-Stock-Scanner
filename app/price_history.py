@@ -7,6 +7,7 @@
 
 import json
 import os
+import time
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional
@@ -22,7 +23,7 @@ CORE_TICKERS = [
     # Leveraged single-stock
     "TSLL", "NVDU", "AAPU", "AMZU", "MSFU", "GGLL", "METU", "CONL", "NFXL",
     # Market benchmarks
-    "SPY", "QQQ", "DIA", "IWM",
+    "SPY", "QQQ", "DIA",
 ]
 
 
@@ -82,7 +83,7 @@ def fetch_price_history(scan_tickers: List[str] = None, progress_callback=None) 
         progress_callback(f"Fetching 30-day price history ({len(all_tickers)} tickers)...")
 
     results = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         futures = {pool.submit(_fetch_one, t): t for t in all_tickers}
         done = 0
         for future in as_completed(futures):
@@ -94,6 +95,7 @@ def fetch_price_history(scan_tickers: List[str] = None, progress_callback=None) 
                     results[ticker] = data
             except Exception:
                 pass
+            time.sleep(0.2)  # polite delay between yfinance responses
 
     if progress_callback:
         progress_callback(f"Price history: {len(results)}/{len(all_tickers)} tickers loaded.")

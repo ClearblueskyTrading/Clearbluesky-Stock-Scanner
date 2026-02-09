@@ -4,6 +4,47 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.8] – 2026-02-09
+
+### Changed — API Rate-Limit Protection (all scanners)
+- **finviz_safe.py** — Retry backoff increased to 3s/6s/9s exponential (was 1.5s). Stuck-thread wait increased to 3s.
+- **velocity_scanner.py** — Replaced 8-worker parallel ticker scanning with fully sequential + 0.3s delay. Market context fetch reduced from 4 workers to 2 with delays.
+- **smart_money.py** — Replaced 4-worker parallel (yfinance + SEC EDGAR) with fully sequential + 0.5s delay per ticker.
+- **price_history.py** — Reduced from 8 workers to 3, added 0.2s delay between completions.
+- **market_intel.py** — Reduced from 5 workers to 2, added 0.3s delay between task completions.
+- **premarket_volume_scanner.py** — Inter-ticker delay increased from 0.3s to 0.5s.
+- **report_generator.py** — Inter-ticker delay increased from 0.5s to 0.8s. News fetch delay increased to 0.5s.
+- **enhanced_dip_scanner.py** — Inter-ticker delay increased from 0.5s to 0.8s. News retry backoff increased to 4s.
+- **insider_scanner.py** — Delay between Finviz insider calls increased from 0.5s to 1.0s.
+- **trend_scan_v2.py** — Added 1.0s delay between Finviz screener overview and performance calls.
+- **ticker_enrichment.py** — Already sequential from v7.7 (0.5s delay).
+- **watchlist_scanner.py** — Already sequential from v7.7 (0.5s delay).
+- **accuracy_tracker.py** — Uses single batch yf.download (no change needed).
+
+### Philosophy
+- All scanners now prioritize API safety over speed. Scans may take longer but will not trigger rate-limit bans from Finviz, yfinance, or SEC EDGAR.
+
+---
+
+## [7.7] – 2026-02-09
+
+### Added
+- **Ticker Enrichment** — New `ticker_enrichment.py` module adds per-ticker earnings date warnings ("EARNINGS TOMORROW", etc.), news sentiment flags (DANGER/NEGATIVE/POSITIVE/NEUTRAL), live price at report time, and leveraged ETF suggestions (Swing & Pre-Market only)
+- **Overnight / Overseas Markets** — 9 international ETFs (EWJ, FXI, EWZ, EFA, EWG, EWU, INDA, EWT, EWY) tracked via yfinance and injected into AI prompt as "OVERNIGHT / OVERSEAS MARKETS" context
+- **Insider Data in Trend & Swing** — SEC Form 4 insider buys/sales fetched for scan tickers via `insider_scanner.get_insider_data_for_tickers()` and attached to per-ticker report data + AI prompt
+
+### Changed
+- **Scanner consolidation (7 → 4)** — Removed standalone Velocity Barbell, Insider – Latest, and Velocity Pre-Market Hunter scanners. Pre-Market now combines volume scan + velocity gap analysis. Insider data folded into Trend & Swing as enrichment. Leveraged suggestions added to Swing & Pre-Market.
+- **Trend scanner reweighted** — Yearly/YTD 10→30pts, Quarter 25pts (unchanged), Month 20→15pts, Week 10→5pts, Today 10→5pts. Prioritizes sustained sector momentum over short-term pops.
+- **AI prompt** — Minimum top picks raised from 3 to 5. New required sections: "OVERNIGHT / OVERSEAS IMPACT" and "NEWS & EARNINGS ALERTS". Critical Data references added for earnings, news, overnight, live price.
+- **Russell 2000 removed** — Dropped from all scanner index dropdowns, CLI choices, and documentation. S&P 500 and ETFs only.
+- **scan_types.json** — Reduced from 7 to 4 entries.
+- **scan_settings.py** — Removed velocity_leveraged, insider, velocity_premarket param specs.
+- **scanner_cli.py** — Removed velocity and insider scan choices; premarket now merges velocity premarket results.
+- **Help text** — Updated to v7.7 with new scanner descriptions and feature list.
+
+---
+
 ## [7.6] – 2026-02-09
 
 ### Fixed — Stability & QA Release

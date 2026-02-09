@@ -14,6 +14,7 @@ import finviz
 def get_stock_safe(ticker: str, timeout: float = 30.0, max_attempts: int = 2) -> Optional[Dict]:
     """
     Fetch finviz stock data with timeout protection and retry.
+    Includes polite delays between retries to avoid rate-limit bans.
 
     Args:
         ticker: Stock ticker symbol
@@ -40,23 +41,24 @@ def get_stock_safe(ticker: str, timeout: float = 30.0, max_attempts: int = 2) ->
         if t.is_alive():
             # Thread is stuck — abandon it
             if attempt < max_attempts - 1:
-                time.sleep(1.0)
+                time.sleep(3.0)  # longer backoff before retry
                 continue
             return None
 
         if exc[0]:
             err_str = str(exc[0]).lower()
-            # Retry on transient errors
+            # Retry on transient errors with exponential backoff
             if attempt < max_attempts - 1 and ('429' in err_str or 'timeout' in err_str or 'rate' in err_str or 'connection' in err_str):
-                time.sleep(1.5 * (attempt + 1))
+                wait = 3.0 * (attempt + 1)  # 3s, 6s, 9s...
+                time.sleep(wait)
                 continue
             return None
 
         if result[0] is not None:
             return result[0]
 
-        # Got None result — retry
+        # Got None result — retry with backoff
         if attempt < max_attempts - 1:
-            time.sleep(0.5)
+            time.sleep(2.0)
 
     return None

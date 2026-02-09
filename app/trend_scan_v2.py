@@ -21,14 +21,14 @@ def trend_scan(progress_callback=None, index="sp500"):
     """
     TREND SCAN with company info and scoring
     progress_callback: function(message) for status updates
-    index: 'sp500', 'russell2000', or 'etfs'
+    index: 'sp500' or 'etfs'
     """
     def progress(msg):
         print(msg)
         if progress_callback:
             progress_callback(msg)
     
-    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Russell 2000")
+    index_name = "S&P 500" if index == "sp500" else "ETFs"
     progress(f"Starting Trend Scan ({index_name})...")
     
     try:
@@ -46,7 +46,7 @@ def trend_scan(progress_callback=None, index="sp500"):
             }
         else:
             filters = {
-                'Index': 'S&P 500' if index == "sp500" else 'RUSSELL 2000',
+                'Index': 'S&P 500',
                 '200-Day Simple Moving Average': 'Price above SMA200',
                 '50-Day Simple Moving Average': 'Price above SMA50',
                 '20-Day Simple Moving Average': 'Price above SMA20',
@@ -56,6 +56,8 @@ def trend_scan(progress_callback=None, index="sp500"):
         overview.set_filter(filters_dict=filters)
         df_overview = overview.screener_view()
         
+        import time
+        time.sleep(1.0)  # polite delay between Finviz screener calls
         progress("Fetching performance data...")
         perf = Performance()
         perf.set_filter(filters_dict=filters)
@@ -90,7 +92,11 @@ def trend_scan(progress_callback=None, index="sp500"):
 
 
 def calculate_scores(df):
-    """Calculate 1-100 trend score"""
+    """
+    Calculate 1-100 long-term trend score.
+    Heavily weights YTD/quarterly/monthly performance for sector rotation holds.
+    Short-term noise (daily change) is minimal.
+    """
     scores = []
     
     for _, row in df.iterrows():
@@ -117,7 +123,23 @@ def calculate_scores(df):
             except Exception:
                 return None
         
-        # QUARTER PERFORMANCE (25 points)
+        # YEARLY / YTD PERFORMANCE (30 points) - heaviest weight for long-term
+        year = get_pct(row.get('Perf Year', row.get('Perf YTD', 0)))
+        if year is not None:
+            if year >= 100:
+                score += 30
+            elif year >= 50:
+                score += 25
+            elif year >= 30:
+                score += 20
+            elif year >= 15:
+                score += 15
+            elif year >= 5:
+                score += 10
+            elif year >= 0:
+                score += 5
+        
+        # QUARTER PERFORMANCE (25 points) - sector rotation signal
         qtr = get_pct(row.get('Perf Quart', row.get('Perf Quarter', 0)))
         if qtr is not None:
             if qtr >= 30:
@@ -131,65 +153,53 @@ def calculate_scores(df):
             elif qtr >= 0:
                 score += 5
         
-        # MONTH PERFORMANCE (20 points)
+        # MONTH PERFORMANCE (15 points)
         month = get_pct(row.get('Perf Month', 0))
         if month is not None:
             if month >= 15:
-                score += 20
-            elif month >= 10:
                 score += 15
+            elif month >= 10:
+                score += 12
             elif month >= 5:
-                score += 10
-            elif month >= 0:
-                score += 5
-        
-        # WEEK PERFORMANCE (10 points)
-        week = get_pct(row.get('Perf Week', 0))
-        if week is not None:
-            if week >= 5:
-                score += 10
-            elif week >= 2:
                 score += 8
-            elif week >= 0:
+            elif month >= 0:
                 score += 4
         
-        # RELATIVE VOLUME (15 points)
+        # WEEK PERFORMANCE (5 points) - minor for long-term
+        week = get_pct(row.get('Perf Week', 0))
+        if week is not None:
+            if week >= 3:
+                score += 5
+            elif week >= 1:
+                score += 3
+            elif week >= 0:
+                score += 1
+        
+        # RELATIVE VOLUME (10 points) - institutional interest
         rel_vol = get_num(row.get('Rel Volume', row.get('Relative Volume', 0)))
         if rel_vol is not None:
             if rel_vol >= 3:
-                score += 15
+                score += 10
             elif rel_vol >= 2:
-                score += 12
-            elif rel_vol >= 1.5:
                 score += 8
+            elif rel_vol >= 1.5:
+                score += 6
             elif rel_vol >= 1:
-                score += 5
+                score += 3
             else:
-                score += 2
+                score += 1
         
-        # TODAY'S CHANGE (10 points)
+        # TODAY'S CHANGE (5 points) - minimal for long-term
         change = get_pct(row.get('Change', 0))
         if change is not None:
-            if change >= 5:
-                score += 10
-            elif change >= 2:
-                score += 8
+            if change >= 3:
+                score += 5
+            elif change >= 1:
+                score += 3
             elif change >= 0:
-                score += 5
+                score += 2
             elif change > -2:
-                score += 2
-        
-        # YEARLY PERFORMANCE (10 points bonus)
-        year = get_pct(row.get('Perf Year', row.get('Perf YTD', 0)))
-        if year is not None:
-            if year >= 100:
-                score += 10
-            elif year >= 50:
-                score += 7
-            elif year >= 25:
-                score += 5
-            elif year >= 0:
-                score += 2
+                score += 1
         
         # Base points for passing all MA filters (10 points)
         score += 10
