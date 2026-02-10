@@ -43,7 +43,7 @@ EXCLUDE_FILES = {
     "RELEASE_v6.2.md", "RELEASE_v6.3.md", "RELEASE_v6.4.md", "RELEASE_v6.5.md",
     "RELEASE_v7.0.md", "RELEASE_v7.1.md", "RELEASE_v7.2.md", "RELEASE_v7.3.md",
     "RELEASE_v7.4.md", "RELEASE_v7.5.md", "RELEASE_v7.6.md", "RELEASE_v7.7.md",
-    "RELEASE_v7.8.md", "RELEASE_v7.81.md",
+    "RELEASE_v7.8.md", "RELEASE_v7.81.md", "RELEASE_v7.82.md",
     "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")

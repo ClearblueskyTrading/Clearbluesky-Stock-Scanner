@@ -4,6 +4,17 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.84] – 2026-02-10
+
+### Changed — Watchlist scanner
+- **Filter** — Slider = max of range (0–X% down). Before: X–25%. Now: 0–X%.
+- **Labels** — "Down % today" / "All tickers". Slider disabled when All.
+- **run_watchlist_10.py** — CLI helper for 10% down scan.
+
+See **app/CHANGELOG.md** for full details.
+
+---
+
 ## [7.83] – 2026-02-10
 
 ### Added
@@ -12,6 +23,7 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 - **New filters** — Optional beat SPY, min volume, volume confirm, MA stack, RSI band (all off by default).
 
 ### Changed
+- **Broker button removed** — Use IBKR + IBOT for orders; prompt AI to craft IBOT commands. See docs/guidelines/trading-workflow.md.
 - **Legacy Trend removed** — Trend - Long-term scanner replaced by Velocity Trend Growth. trend_scan_v2.py deleted.
 - **Default scan** — Velocity Trend Growth first in dropdown.
 - **Target return** — 1–300%, default 5%.

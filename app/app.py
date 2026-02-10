@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.83
+# ClearBlueSky Stock Scanner v7.84
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.83"
+VERSION = "7.84"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -632,13 +632,12 @@ class TradeBotApp:
         btn_frame = tk.Frame(main, bg="#f8f9fa")
         btn_frame.pack(fill="x", pady=(6, 2))
 
-        # Row 1: Broker, Reports, History, Logs, Config
+        # Row 1: Reports, History, Logs, Config
         grid1 = tk.Frame(btn_frame, bg="#f8f9fa")
         grid1.pack(fill="x", padx=3, pady=(0, 2))
-        for i in range(5):
+        for i in range(4):
             grid1.columnconfigure(i, weight=1)
-        for i, (text, cmd) in enumerate([("Broker", self.open_broker),
-                                          ("Reports", self.open_reports),
+        for i, (text, cmd) in enumerate([("Reports", self.open_reports),
                                           ("History", self.show_history_report),
                                           ("Logs", self.view_logs),
                                           ("Config", self.import_export_config)]):
@@ -817,15 +816,21 @@ class TradeBotApp:
                     continue
                 if ptype == "choice":
                     options = spec.get("options", [])
+                    labels = spec.get("option_labels", {})  # value -> display label
                     default = cfg.get(key, spec.get("default", options[0] if options else ""))
                     if default not in options and options:
                         default = options[0]
-                    var = tk.StringVar(value=default)
+                    display_values = [labels.get(o, o) for o in options] if labels else options
+                    display_default = labels.get(default, default) if labels else default
+                    var = tk.StringVar(value=display_default)
                     row = tk.Frame(sliders_frame, bg="white")
                     row.pack(fill="x", pady=4)
                     tk.Label(row, text=label_text, font=("Arial", 9), bg="white", width=32, anchor="w").pack(side="left")
-                    ttk.Combobox(row, textvariable=var, values=options, state="readonly", width=34, font=("Arial", 9)).pack(side="left", padx=(5, 0), fill="x", expand=True)
+                    ttk.Combobox(row, textvariable=var, values=display_values, state="readonly", width=34, font=("Arial", 9)).pack(side="left", padx=(5, 0), fill="x", expand=True)
                     widget_vars[key] = (var, spec)
+                    hint = spec.get("hint")
+                    if hint:
+                        tk.Label(sliders_frame, text=hint, font=("Arial", 8), bg="white", fg="#666", wraplength=420, justify="left").pack(anchor="w", padx=(0, 0), pady=(0, 4))
                     continue
                 else:
                     if ptype == "int_vol_k":
@@ -855,6 +860,19 @@ class TradeBotApp:
                     hint = spec.get("hint")
                     if hint:
                         tk.Label(sliders_frame, text=hint, font=("Arial", 8), bg="white", fg="#666", wraplength=420, justify="left").pack(anchor="w", padx=(0, 0), pady=(0, 4))
+                    # Disable Max % down slider when watchlist filter is "All tickers"
+                    if scanner == "watchlist" and key == "watchlist_pct_down_from_open":
+                        filter_var = widget_vars.get("watchlist_filter", (None,))[0]
+                        if filter_var:
+                            def _update_slider_state(*a):
+                                fv = str(filter_var.get() or "").strip().lower()
+                                is_all = fv in ("all", "all tickers")
+                                scale.config(state="disabled" if is_all else "normal")
+                            try:
+                                filter_var.trace_add("write", lambda *a: _update_slider_state())
+                                _update_slider_state()
+                            except Exception:
+                                pass
 
         def on_scan_change_internal(*args):
             self.scan_type.set(scan_var.get())
@@ -872,7 +890,13 @@ class TradeBotApp:
                 elif ptype == "str":
                     self.config[key] = str(val).strip()
                 elif ptype == "choice":
-                    self.config[key] = str(val).strip()
+                    labels = spec.get("option_labels", {})
+                    val_str = str(val).strip()
+                    if labels:
+                        rev = {v: k for k, v in labels.items()}
+                        self.config[key] = rev.get(val_str, val_str)
+                    else:
+                        self.config[key] = val_str
                 elif ptype == "int":
                     self.config[key] = int(round(val))
                 else:
@@ -918,6 +942,14 @@ class TradeBotApp:
                         export_cfg[key] = bool(val)
                     elif ptype == "str":
                         export_cfg[key] = str(val).strip()
+                    elif ptype == "choice":
+                        labels = spec.get("option_labels", {})
+                        val_str = str(val).strip()
+                        if labels:
+                            rev = {v: k for k, v in labels.items()}
+                            export_cfg[key] = rev.get(val_str, val_str)
+                        else:
+                            export_cfg[key] = val_str
                     elif ptype == "int":
                         export_cfg[key] = int(round(val))
                     else:
@@ -1555,10 +1587,6 @@ class TradeBotApp:
                 api_entry.config(show="")
         api_var.trace("w", update_mask)
         update_mask()  # Initial check
-        
-        tk.Label(f, text="Broker URL:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
-        broker_var = tk.StringVar(value=self.config.get('broker_url', 'https://www.schwab.com'))
-        tk.Entry(f, textvariable=broker_var, width=40).pack(anchor="w", pady=(2,10))
 
         # --- OpenRouter API (AI analysis) ---
         sep_openrouter = tk.Frame(scroll_frame, bg="#ddd", height=1)
@@ -1793,7 +1821,6 @@ class TradeBotApp:
         
         def save():
             self.config['finviz_api_key'] = api_var.get()
-            self.config['broker_url'] = broker_var.get()
             self.config['openrouter_api_key'] = openrouter_api_var.get().strip()
             self.config['openrouter_model'] = openrouter_model_from_display()
             self.config['use_vision_charts'] = use_vision_var.get()
@@ -1958,9 +1985,6 @@ class TradeBotApp:
         tk.Button(btn_row, text="Import CSV", command=import_csv, bg=BLUE, fg="white", font=("Arial", 9), width=9, relief="flat", cursor="hand2").pack(side="left", padx=2)
         tk.Button(btn_row, text="Save", command=save_watchlist, bg=BLUE, fg="white", font=("Arial", 9), width=6, relief="flat", cursor="hand2").pack(side="left", padx=2)
 
-    def open_broker(self):
-        webbrowser.open(self.config.get('broker_url', 'https://www.schwab.com'))
-    
     def _open_path(self, path):
         """Cross-platform file/folder open."""
         import subprocess, platform

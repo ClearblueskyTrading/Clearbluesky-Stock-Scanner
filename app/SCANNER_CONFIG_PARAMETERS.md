@@ -78,11 +78,12 @@ Single reference of every config parameter used by each scan. Use this for AI re
 
 ## 4. Watchlist 3pm (`watchlist`)
 
-**Purpose:** Watchlist tickers that are down X% today (slider 1–25%). Best run ~3 PM.
+**Purpose:** Watchlist tickers that are down within 0–X% today (slider = max of range). Best run ~3 PM.
 
 | Key | Label | Type | Min | Max | Default | Description |
 |-----|-------|------|-----|-----|---------|-------------|
-| `watchlist_pct_down_from_open` | % down (1–25%) | float | 1 | 25 | 5 | Minimum % down today for a watchlist ticker to qualify. Max is 25%. |
+| `watchlist_filter` | Filter | choice | — | — | down_pct | `down_pct` (Down % today) or `all` (All tickers). |
+| `watchlist_pct_down_from_open` | Max % down (0–25% range) | float | 0 | 25 | 5 | Max % down for range. Only used when filter is Down % today. Slider disabled when All tickers. |
 
 **Data:** Uses `config["watchlist"]` (list of tickers). Scanner: `watchlist_scanner.run_watchlist_scan`.
 
@@ -147,7 +148,6 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 - `play_alarm_on_complete` – Play sound when scan finishes (default: true).
 - `alarm_sound_choice` – `"beep"` \| `"asterisk"` \| `"exclamation"` (system-style beeps).
 - `finviz_api_key` – Optional Finviz API key.
-- `broker_url` – Broker link (e.g. Schwab).
 - **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). `openrouter_model` – Model: `"google/gemini-3-pro-preview"` or `"anthropic/claude-sonnet-4.5"` (use credits), or `"tngtech/deepseek-r1t2-chimera:free"` (free, no credits). Selectable in Settings under “OpenRouter API (AI analysis)”.
 - **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the PDF gets programmatic TA from `ta_engine` (yfinance + pandas-ta): SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
 - Risk/position (legacy Settings tab): `account_size`, `risk_per_trade_percent`, `max_position_dollars`, `max_daily_loss_dollars`, `max_concurrent_positions`.

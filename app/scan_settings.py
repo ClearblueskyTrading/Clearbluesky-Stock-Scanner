@@ -80,8 +80,10 @@ SCAN_PARAM_SPECS = {
         {"key": "premarket_track_sector_heat", "label": "Track sector heat", "default": True, "type": "bool"},
     ],
     "watchlist": [
-        {"key": "watchlist_filter", "label": "Filter", "type": "choice", "default": "down_pct", "options": ["down_pct", "all"]},
-        {"key": "watchlist_pct_down_from_open", "label": "Min % down (range 1–25%)", "min": 1, "max": 25, "default": 5, "type": "float"},
+        {"key": "watchlist_filter", "label": "Filter", "type": "choice", "default": "down_pct", "options": ["down_pct", "all"],
+         "option_labels": {"down_pct": "Down % today", "all": "All tickers"}, "hint": "Down % = only tickers down today; All = every watchlist ticker"},
+        {"key": "watchlist_pct_down_from_open", "label": "Max % down (0–25% range)", "min": 0, "max": 25, "default": 5, "type": "float",
+         "hint": "Only used when filter is Down % today"},
     ],
     # Legacy scanner params kept for backward compat with user_config.json
     # velocity_leveraged, insider, velocity_premarket removed from UI in v7.7
@@ -206,7 +208,7 @@ def load_config():
         "premarket_min_vol_float_ratio": 0.01,
         "premarket_track_sector_heat": True,
         
-        # Watchlist scanner (today's Change % down 1-25% — big-name dips)
+        # Watchlist scanner (today's Change % down 0–X% range; slider = max)
         "watchlist_pct_down_from_open": 5.0,
         
         # Velocity Barbell scanner: min sector %, theme = auto | barbell | single_shot

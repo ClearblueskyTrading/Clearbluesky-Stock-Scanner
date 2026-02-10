@@ -4,7 +4,29 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.84] – 2026-02-10
+
+### Changed — Watchlist scanner filter (0–25% down range)
+
+- **Filter logic** — Slider now sets max of range: tickers down 0% to X% (X = slider). Before: down X% to 25%. Now: down 0.01% to X%.
+- **Slider range** — 0–25% (was 0.5–25%). Full flexibility for shallow or deep dips.
+- **Filter labels** — "Down % today" and "All tickers" (was "down_pct" / "all"). Clearer UI.
+- **Hints** — Filter: "Down % = only tickers down today; All = every watchlist ticker." Slider: "Only used when filter is Down % today."
+- **Slider disable** — Max % down slider disabled when "All tickers" selected (it has no effect).
+
+### Added
+
+- **run_watchlist_10.py** — One-off script to run watchlist scan with 10% down filter. Useful for quick CLI dip scanning.
+
+---
+
 ## [7.83] – 2026-02-10
+
+### Changed — Broker UI removed; IBKR + IBOT workflow
+
+- **Broker button removed** — No longer opens a broker URL. Use IBKR with IBOT for order entry.
+- **Broker URL setting removed** — No broker link in Settings.
+- **Trading workflow** — Scanner for ideas; IBOT for orders; prompt AI to craft IBOT commands. See `docs/guidelines/trading-workflow.md`.
 
 ### Added — Velocity Trend Growth (sector-first momentum scan)
 

@@ -3,7 +3,7 @@
 # ============================================================
 # Scans only tickers in the user's watchlist.
 # Two modes:
-#   "down_pct" — stocks down X–25% today (emotional dip candidates)
+#   "down_pct" — stocks down 0–X% today (X = slider = max of range; emotional dip candidates)
 #   "all"      — every watchlist ticker with full TA data
 #
 # Features:
@@ -283,18 +283,19 @@ def run_watchlist_scan(
             progress_callback("Watchlist is empty. Add tickers in Watchlist first.")
         return []
 
-    pct_down_min = float(cfg.get("watchlist_pct_down_from_open", 5.0))
-    pct_down_min = max(1.0, min(25.0, pct_down_min))
-    pct_down_max = 25.0
+    # Slider = max % down. Range is 0% to X% (down within that range, not exact X).
+    pct_down_max = float(cfg.get("watchlist_pct_down_from_open", 5.0))
+    pct_down_max = max(0.1, min(25.0, pct_down_max))
+    pct_down_min = 0.01  # Include any down ticker; max is slider
 
     def progress(msg):
         if progress_callback:
             progress_callback(msg)
 
-    progress(f"Scanning {len(watchlist)} watchlist tickers ({pct_down_min}–{pct_down_max}% down today)...")
+    progress(f"Scanning {len(watchlist)} watchlist tickers (down 0–{pct_down_max}% today)...")
 
     def _down_filter(stock, change_pct):
-        """Only keep tickers that are down within the configured range."""
+        """Only keep tickers that are down within the range 0% to X% (X = slider)."""
         if change_pct is None or change_pct >= 0:
             return False
         pct_down = abs(change_pct)
@@ -302,7 +303,7 @@ def run_watchlist_scan(
 
     results = _scan_watchlist_sequential(watchlist, progress, cancel_event, filter_fn=_down_filter)
     results.sort(key=lambda x: -x["score"])
-    progress(f"Found {len(results)} watchlist tickers {pct_down_min}–{pct_down_max}% down today.")
+    progress(f"Found {len(results)} watchlist tickers down 0–{pct_down_max}% today.")
     return results
 
 
