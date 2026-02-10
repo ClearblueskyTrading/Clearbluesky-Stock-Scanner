@@ -218,6 +218,9 @@ def load_config():
         "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
         # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
         "alpha_vantage_api_key": "",
+        # Alpaca (trading API – paper or live; used by MCP / integrations)
+        "alpaca_api_key": "",
+        "alpaca_secret_key": "",
         # Market Intelligence (Google News RSS + Finviz news + sector performance + market snapshot)
         "use_market_intel": True,
         # SEC EDGAR insider context (10b5-1 plan vs discretionary)

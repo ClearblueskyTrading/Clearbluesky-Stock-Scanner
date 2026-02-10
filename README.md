@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.7
+# ClearBlueSky Stock Scanner v7.82
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 

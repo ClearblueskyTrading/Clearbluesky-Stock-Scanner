@@ -23,11 +23,6 @@ try:
 except ImportError:
     FINVIZ_AVAILABLE = False
 
-try:
-    from finviz_safe import get_stock_safe
-except ImportError:
-    get_stock_safe = None
-
 # ── News sentiment keywords ──────────────────────────────────
 
 RED_FLAG_KEYWORDS = [
@@ -171,19 +166,17 @@ def _score_news_sentiment(headlines: List[str]) -> Dict:
 # ── Price at report time ─────────────────────────────────────
 
 def _get_current_price(ticker: str) -> Optional[Dict]:
-    """Get current price and timestamp for report stamping."""
-    if get_stock_safe:
-        try:
-            stock = get_stock_safe(ticker, timeout=15.0, max_attempts=1)
-            if stock:
-                price = float(stock.get("Price", 0))
-                if price > 0:
-                    return {
-                        "price_at_report": price,
-                        "report_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S ET"),
-                    }
-        except Exception:
-            pass
+    """Get current price for report stamping. Failover: yfinance > finviz > alpaca."""
+    try:
+        from data_failover import get_price_volume
+        pv = get_price_volume(ticker)
+        if pv and pv.get("price") and pv["price"] > 0:
+            return {
+                "price_at_report": pv["price"],
+                "report_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S ET"),
+            }
+    except Exception:
+        pass
     return None
 
 

@@ -28,16 +28,32 @@ except ImportError:
 
 def get_chart_base64(ticker, period="3mo", figsize=(6, 3), dpi=100):
     """
-    Fetch OHLC for ticker (yfinance) and render a simple candlestick-style chart.
+    Fetch OHLC for ticker and render a simple candlestick-style chart.
+    Failover: yfinance first, then Alpaca bars when keys set.
     Returns base64-encoded PNG string (data:image/png;base64,...) or None on failure.
     """
-    if not YF_AVAILABLE or not MPL_AVAILABLE:
+    if not MPL_AVAILABLE:
+        return None
+    df = None
+    if YF_AVAILABLE:
+        try:
+            sym = yf.Ticker(ticker)
+            df = sym.history(period=period, interval="1d")
+        except Exception:
+            pass
+    if df is None or df.empty or len(df) < 5:
+        try:
+            from alpaca_data import has_alpaca_keys, get_bars, bars_to_dataframe
+            if has_alpaca_keys():
+                days = 95 if "3mo" in period else (65 if "2mo" in period else 40)
+                bars = get_bars(ticker, days=days, timeframe="1Day", limit=100)
+                if bars:
+                    df = bars_to_dataframe(bars)
+        except Exception:
+            pass
+    if df is None or df.empty or len(df) < 5:
         return None
     try:
-        sym = yf.Ticker(ticker)
-        df = sym.history(period=period, interval="1d")
-        if df is None or df.empty or len(df) < 5:
-            return None
         df = df.astype(float, errors="ignore")
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         ax.fill_between(df.index, df["Low"], df["High"], alpha=0.2, color="gray")

@@ -12,6 +12,8 @@ ClearBlueSkyWin/
 
 # User data – never commit (contains optional API keys and preferences)
 app/user_config.json
+scripts/voice_choice.txt
+screenshots/
 
 # Generated / runtime
 app/error_log.txt
@@ -35,6 +37,18 @@ app/update_backup_manifest.json
 # Optional: local preset exports (may contain user choices)
 # app/scan_presets.json
 # app/scanner_presets_export.json
+
+# Security — NEVER commit files that may contain API keys
+CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md
+**/api_keys*
+**/api-keys*
+**/.env
+**/.env.*
+**/secrets.*
+**/mcp.json
+
+# Cursor IDE rules (project-local, not for distribution)
+.cursor/
 
 # OS
 .DS_Store

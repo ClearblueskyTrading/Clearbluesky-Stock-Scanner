@@ -4,6 +4,47 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.82] – 2026-02-09
+
+### Changed — Unified AI prompt and experienced-trader output
+
+- **Same prompt everywhere** — PDF, JSON `instructions`, and AI analysis (app.py, scanner_cli.py) all use the same `MASTER_TRADING_REPORT_DIRECTIVE` from report_generator. app.py and scanner_cli.py now use `analysis_package.instructions` as system prompt instead of a separate short prompt.
+
+- **Output format for experienced traders** — Directive updated with:
+  - Target audience: experienced trader (direct, actionable, no fluff)
+  - Per-pick: R:R, Invalidation level, Timing (when to enter), Catalyst (priced in or fresh)
+  - Tier 3: correlation notes (e.g. trades with NVDA/SEMIs)
+  - Market snapshot: regime, trade implication
+  - Risk management: conviction-based sizing, regime-aware
+  - Avoid list: why to avoid (prevents FOMO)
+
+- **Release zip security** — build_release_zip.py now excludes `mcp.json`, `.env`, and older release notes (RELEASE_v7.7, RELEASE_v7.8).
+
+---
+
+## [7.81] – 2026-02-09
+
+### Changed — Data failover order
+
+- **Price/volume failover (yfinance → finviz → alpaca):**
+  - **data_failover.py** — New module with `get_price_volume()` and `get_price_volume_batch()`.
+  - **report_generator.py** — Price/volume/change % via failover instead of Alpaca-first.
+  - **ticker_enrichment.py** — `_get_current_price()` uses failover.
+  - **accuracy_tracker.py** — `_get_current_prices()` uses failover batch.
+
+- **Bars failover (yfinance → alpaca):**
+  - **price_history.py**, **ta_engine.py**, **velocity_scanner.py**, **backtest_db.py**, **chart_engine.py** — Try yfinance first, then Alpaca when keys set.
+
+- **market_intel.py** — ETF snapshots (SPY, QQQ, overnight) now use yfinance first, then Alpaca for missing.
+
+- **SCANNER_DATA_SOURCES.md** — Updated to document failover order and module usage.
+
+### Versioning
+
+- Version format: 7.81 → 7.82 → 7.83 onward.
+
+---
+
 ## [7.8] – 2026-02-09
 
 ### Changed — API Rate-Limit Protection (all scanners)

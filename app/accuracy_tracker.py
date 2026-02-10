@@ -19,37 +19,20 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple
 
-import yfinance as yf
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def _get_current_prices(tickers: List[str]) -> Dict[str, float]:
-    """Fetch latest price for a batch of tickers."""
+    """Fetch latest price for a batch of tickers. Failover: yfinance > finviz > alpaca."""
     prices = {}
     if not tickers:
         return prices
     try:
-        # yfinance batch download is faster than individual
-        data = yf.download(tickers, period="1d", interval="1d", progress=False, auto_adjust=True, timeout=30)
-        if data is not None and not data.empty:
-            if len(tickers) == 1:
-                # Single ticker: columns are just Open/High/Low/Close/Volume
-                if hasattr(data.columns, 'levels'):
-                    data.columns = data.columns.get_level_values(0)
-                if not data.empty:
-                    prices[tickers[0]] = round(float(data["Close"].iloc[-1]), 2)
-            else:
-                # Multiple tickers: MultiIndex columns (field, ticker)
-                close = data.get("Close") if "Close" in data.columns.get_level_values(0) else None
-                if close is not None:
-                    for t in tickers:
-                        try:
-                            val = close[t].iloc[-1]
-                            if val and val == val:  # not NaN
-                                prices[t] = round(float(val), 2)
-                        except Exception:
-                            pass
+        from data_failover import get_price_volume_batch
+        pv = get_price_volume_batch(tickers)
+        for t in tickers:
+            if t in pv and pv[t].get("price") and pv[t]["price"] > 0:
+                prices[t] = round(float(pv[t]["price"]), 2)
     except Exception:
         pass
     return prices

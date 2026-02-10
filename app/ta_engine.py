@@ -33,16 +33,34 @@ def get_ta_for_ticker(ticker, period="6mo", interval="1d"):
     Keys: sma20, sma50, sma200, rsi, macd_hist, bb_upper, bb_mid, bb_lower, atr, obv,
     fib_38, fib_50, fib_62, price_vs_sma20, price_vs_sma50, price_vs_sma200.
     On failure or missing deps, returns empty dict or partial dict.
+    Failover: yfinance first, then Alpaca bars when keys set.
     """
     out = {}
-    if not YF_AVAILABLE or not PANDAS_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         return out
 
+    df = None
+    if YF_AVAILABLE:
+        try:
+            sym = yf.Ticker(ticker)
+            df = sym.history(period=period, interval=interval)
+        except Exception:
+            pass
+
+    if df is None or df.empty or len(df) < 30:
+        try:
+            from alpaca_data import has_alpaca_keys, get_bars, bars_to_dataframe
+            if has_alpaca_keys():
+                days = 220 if "6mo" in period or "1y" in period else 40
+                bars = get_bars(ticker, days=days, timeframe="1Day", limit=250)
+                if bars:
+                    df = bars_to_dataframe(bars)
+        except Exception:
+            pass
+
+    if df is None or df.empty or len(df) < 30:
+        return out
     try:
-        sym = yf.Ticker(ticker)
-        df = sym.history(period=period, interval=interval)
-        if df is None or df.empty or len(df) < 30:
-            return out
         df = df.astype(float, errors="ignore")
         close = df["Close"]
         high = df["High"]
@@ -130,7 +148,6 @@ def get_ta_for_ticker(ticker, period="6mo", interval="1d"):
             out["recent_low"] = round(recent_low, 2)
         else:
             out["fib_38"] = out["fib_50"] = out["fib_62"] = out["recent_high"] = out["recent_low"] = None
-
     except Exception:
         pass
     return out

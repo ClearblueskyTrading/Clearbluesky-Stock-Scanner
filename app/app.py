@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.8
+# ClearBlueSky Stock Scanner v7.82
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.8"
+VERSION = "7.82"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -622,7 +622,7 @@ class TradeBotApp:
             tk.Button(grid1, text=text, command=cmd, bg="#e9ecef", fg="#333",
                      font=("Arial", 9), relief="flat", cursor="hand2").grid(row=0, column=i, sticky="ew", padx=2)
 
-        # Row 2: Watchlist, Settings, Help, Manual
+        # Row 2: Dashboard, Watchlist, Settings, Help, Manual
         grid2 = tk.Frame(btn_frame, bg="#f8f9fa")
         grid2.pack(fill="x", padx=3, pady=(0, 2))
         for i in range(4):
@@ -1142,7 +1142,7 @@ class TradeBotApp:
                         try: self.root.update()
                         except tk.TclError: pass
                         from openrouter_client import analyze_with_config
-                        system_prompt = "You are a professional stock analyst. You are receiving a structured JSON analysis package (scan results, technical indicators, news). Your response must start with a brief executive summary: explain context, market/sector backdrop, scan rationale, and key findings in plain language—not only trade recommendations. Then for each stock provide: YOUR SCORE (1-100), chart/TA summary, news check, RECOMMENDATION (BUY/HOLD/PASS), and if BUY: Entry, Stop, Target, position size. End with TOP PICKS, AVOID LIST, and RISK MANAGEMENT notes."
+                        system_prompt = analysis_package.get("instructions", "").strip() or "You are a professional stock analyst. Analyze the JSON package and produce the report in the required format."
                         if self.config.get("rag_enabled") and self.config.get("rag_books_folder"):
                             try:
                                 from rag_engine import get_rag_context_for_scan
@@ -1179,7 +1179,7 @@ class TradeBotApp:
                         except tk.TclError: pass
                         base = path[:-4] if path.lower().endswith(".pdf") else path
                         ai_path = base + "_ai.txt"
-                        _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Include a brief executive summary (context, market/sector backdrop, scan rationale, key findings) in plain language, then trade recommendations.\n\n---\n\n"
+                        _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
                         if ai_response:
                             with open(ai_path, "w", encoding="utf-8") as f:
                                 f.write(_ai_header + ai_response)
@@ -1482,14 +1482,14 @@ class TradeBotApp:
     def api_settings(self):
         win = tk.Toplevel(self.root)
         win.title("Settings")
-        win.geometry("620x720")
+        win.geometry("680x920")
         win.transient(self.root)
         win.grab_set()
         win.configure(bg="white")
-        win.minsize(560, 580)
+        win.minsize(600, 640)
         win.resizable(True, True)
         
-        # Scrollable container so all settings fit on any screen
+        # Scrollable container so all settings fit on any screen (room for API keys, Alpaca, and more)
         canvas = tk.Canvas(win, bg="white", highlightthickness=0)
         scrollbar = tk.Scrollbar(win, orient="vertical", command=canvas.yview)
         scroll_frame = tk.Frame(canvas, bg="white")
@@ -1599,6 +1599,30 @@ class TradeBotApp:
             av_entry.config(show="*" if av_var.get() else "")
         av_var.trace("w", av_mask)
         av_mask()
+
+        # --- Alpaca (Data API) ---
+        sep_alpaca = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_alpaca.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="Alpaca (Data API)", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Optional. API Key and Secret from alpaca.markets. Stored in user_config.json (gitignored). With keys set, the scanner uses Alpaca for live price/volume data.",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        alpaca_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        alpaca_f.pack(fill="x")
+        tk.Label(alpaca_f, text="Alpaca API Key:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        alpaca_key_var = tk.StringVar(value=self.config.get("alpaca_api_key", "") or "")
+        alpaca_key_entry = tk.Entry(alpaca_f, textvariable=alpaca_key_var, width=52)
+        alpaca_key_entry.pack(anchor="w", pady=(2, 2))
+        tk.Label(alpaca_f, text="Alpaca Secret Key:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(6, 0))
+        alpaca_secret_var = tk.StringVar(value=self.config.get("alpaca_secret_key", "") or "")
+        alpaca_secret_entry = tk.Entry(alpaca_f, textvariable=alpaca_secret_var, width=52)
+        alpaca_secret_entry.pack(anchor="w", pady=(2, 4))
+        def alpaca_mask(*args):
+            alpaca_key_entry.config(show="*" if alpaca_key_var.get() else "")
+            alpaca_secret_entry.config(show="*" if alpaca_secret_var.get() else "")
+        alpaca_key_var.trace("w", alpaca_mask)
+        alpaca_secret_var.trace("w", alpaca_mask)
+        alpaca_mask()
 
         # --- Market Intelligence (Google News + Finviz + sectors + market snapshot) ---
         sep_mi = tk.Frame(scroll_frame, bg="#ddd", height=1)
@@ -1750,6 +1774,8 @@ class TradeBotApp:
             self.config['openrouter_model'] = openrouter_model_from_display()
             self.config['use_vision_charts'] = use_vision_var.get()
             self.config['alpha_vantage_api_key'] = av_var.get().strip()
+            self.config['alpaca_api_key'] = alpaca_key_var.get().strip()
+            self.config['alpaca_secret_key'] = alpaca_secret_var.get().strip()
             self.config['use_market_intel'] = market_intel_var.get()
             self.config['use_sec_insider_context'] = sec_insider_var.get()
             self.config['rag_books_folder'] = rag_folder_var.get().strip()
@@ -2097,12 +2123,13 @@ NEW IN v7.7:
 • Overnight/overseas markets (Japan, China, Europe, etc.) in AI context
 • Insider data folded into Trend & Swing scans
 • Leveraged ETF suggestions on Swing & Pre-Market
-• AI gives 5+ top picks (was 3)
+• TOP 5 PLAYS (exactly 5, ranked by conviction)
+• Same prompt in PDF, JSON, _ai.txt — paste all 3 into any AI for human-ready summary
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.7
+ClearBlueSky v7.82
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

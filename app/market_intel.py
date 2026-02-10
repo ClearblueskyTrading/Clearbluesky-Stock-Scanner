@@ -173,71 +173,97 @@ OVERNIGHT_SYMBOLS = {
 }
 
 
-def _fetch_market_snapshot():
-    """Fetch latest price + daily change for key market ETFs via yfinance."""
+# Alpaca supports US equities/ETFs; ^VIX is an index — use yfinance for it
+MARKET_SYMBOLS_ALPACA = {k: v for k, v in MARKET_SYMBOLS.items() if not k.startswith("^")}
+
+
+def _yf_snapshot_from_data(data, symbols, symbol_labels):
+    """Build snapshot list from yfinance DataFrame. Returns list of dicts."""
     snapshot = []
+    if data is None or data.empty:
+        return snapshot
+    for sym, label in symbol_labels.items():
+        if sym not in symbols:
+            continue
+        try:
+            if len(symbols) > 1 and hasattr(data.columns, "levels") and sym in data.columns.get_level_values(0):
+                closes = data[sym]["Close"].dropna()
+            elif len(symbols) == 1 and "Close" in data.columns:
+                closes = data["Close"].dropna()
+            else:
+                continue
+            if len(closes) < 1:
+                continue
+            price = round(float(closes.iloc[-1]), 2)
+            change_pct = None
+            if len(closes) >= 2:
+                prev = float(closes.iloc[-2])
+                if prev:
+                    change_pct = round((price - prev) / prev * 100, 2)
+            snapshot.append({"symbol": sym, "name": label, "price": price, "change_pct": change_pct})
+        except Exception:
+            continue
+    return snapshot
+
+
+def _fetch_market_snapshot():
+    """Fetch latest price + daily change. Failover: yfinance first, then Alpaca for missing."""
+    snapshot = []
+    # 1. yfinance first
     try:
         import yfinance as yf
-        symbols = list(MARKET_SYMBOLS.keys())
-        data = yf.download(symbols, period="5d", progress=False, group_by="ticker", timeout=30)
-        for sym, label in MARKET_SYMBOLS.items():
-            try:
-                if len(MARKET_SYMBOLS) > 1:
-                    closes = data[sym]["Close"].dropna()
-                else:
-                    closes = data["Close"].dropna()
-                if len(closes) < 1:
-                    continue
-                price = round(float(closes.iloc[-1]), 2)
-                change_pct = None
-                if len(closes) >= 2:
-                    prev = float(closes.iloc[-2])
-                    if prev:
-                        change_pct = round((price - prev) / prev * 100, 2)
-                snapshot.append({
-                    "symbol": sym,
-                    "name": label,
-                    "price": price,
-                    "change_pct": change_pct,
-                })
-            except Exception:
-                continue
+        data = yf.download(list(MARKET_SYMBOLS.keys()), period="5d", progress=False, group_by="ticker", timeout=30)
+        snapshot = _yf_snapshot_from_data(data, list(MARKET_SYMBOLS.keys()), MARKET_SYMBOLS)
     except Exception:
         pass
+    # 2. Alpaca for missing (tradeable symbols only; ^VIX stays from yfinance)
+    missing = [s for s in MARKET_SYMBOLS_ALPACA if s not in {x["symbol"] for x in snapshot}]
+    if missing:
+        try:
+            from alpaca_data import has_alpaca_keys, get_price_volume_batch
+            if has_alpaca_keys():
+                pv = get_price_volume_batch(missing)
+                for sym in missing:
+                    if sym in pv and pv[sym].get("price"):
+                        snapshot.append({
+                            "symbol": sym,
+                            "name": MARKET_SYMBOLS[sym],
+                            "price": pv[sym]["price"],
+                            "change_pct": pv[sym].get("change_pct"),
+                        })
+        except Exception:
+            pass
     return snapshot
 
 
 def _fetch_overnight_markets():
-    """Fetch latest price + daily change for overseas/overnight market ETFs."""
+    """Fetch latest price + daily change for overseas/overnight ETFs. Failover: yfinance first, then Alpaca."""
     snapshot = []
+    symbols = list(OVERNIGHT_SYMBOLS.keys())
+    # 1. yfinance first
     try:
         import yfinance as yf
-        symbols = list(OVERNIGHT_SYMBOLS.keys())
         data = yf.download(symbols, period="5d", progress=False, group_by="ticker", timeout=30)
-        for sym, label in OVERNIGHT_SYMBOLS.items():
-            try:
-                if len(OVERNIGHT_SYMBOLS) > 1:
-                    closes = data[sym]["Close"].dropna()
-                else:
-                    closes = data["Close"].dropna()
-                if len(closes) < 1:
-                    continue
-                price = round(float(closes.iloc[-1]), 2)
-                change_pct = None
-                if len(closes) >= 2:
-                    prev = float(closes.iloc[-2])
-                    if prev and prev != 0:
-                        change_pct = round((price - prev) / prev * 100, 2)
-                snapshot.append({
-                    "symbol": sym,
-                    "name": label,
-                    "price": price,
-                    "change_pct": change_pct,
-                })
-            except Exception:
-                continue
+        snapshot = _yf_snapshot_from_data(data, symbols, OVERNIGHT_SYMBOLS)
     except Exception:
         pass
+    # 2. Alpaca for missing
+    missing = [s for s in symbols if s not in {x["symbol"] for x in snapshot}]
+    if missing:
+        try:
+            from alpaca_data import has_alpaca_keys, get_price_volume_batch
+            if has_alpaca_keys():
+                pv = get_price_volume_batch(missing)
+                for sym in missing:
+                    if sym in pv and pv[sym].get("price"):
+                        snapshot.append({
+                            "symbol": sym,
+                            "name": OVERNIGHT_SYMBOLS[sym],
+                            "price": pv[sym]["price"],
+                            "change_pct": pv[sym].get("change_pct"),
+                        })
+        except Exception:
+            pass
     return snapshot
 
 

@@ -29,6 +29,8 @@ EXCLUDE_DIRS = {
 }
 EXCLUDE_FILES = {
     "user_config.json",
+    "mcp.json",
+    ".env",
     "error_log.txt",
     "update_backup_manifest.json",
     "scanner_presets_export.json",
@@ -49,6 +51,8 @@ EXCLUDE_FILES = {
     "RELEASE_v7.4.md",
     "RELEASE_v7.5.md",
     "RELEASE_v7.6.md",
+    "RELEASE_v7.7.md",
+    "RELEASE_v7.8.md",
     "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")

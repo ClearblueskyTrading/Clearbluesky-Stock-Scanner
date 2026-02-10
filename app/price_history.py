@@ -27,8 +27,8 @@ CORE_TICKERS = [
 ]
 
 
-def _fetch_one(ticker: str, period: str = "1mo") -> Optional[Dict]:
-    """Fetch 30-day daily OHLCV for a single ticker. Returns dict or None."""
+def _fetch_one_yf(ticker: str, period: str = "1mo") -> Optional[Dict]:
+    """Fetch 30-day daily OHLCV via yfinance. Returns dict or None."""
     try:
         df = yf.download(ticker, period=period, interval="1d", progress=False, auto_adjust=True, timeout=30)
         if df is None or df.empty:
@@ -69,6 +69,51 @@ def _fetch_one(ticker: str, period: str = "1mo") -> Optional[Dict]:
         return None
 
 
+def _fetch_one_alpaca(ticker: str) -> Optional[Dict]:
+    """Fetch 30-day daily OHLCV via Alpaca (when keys set). Returns dict or None."""
+    try:
+        from alpaca_data import has_alpaca_keys, get_bars
+        if not has_alpaca_keys():
+            return None
+        bars = get_bars(ticker, days=35, timeframe="1Day", limit=40)
+        if not bars:
+            return None
+        rows = [{"date": b["date"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "volume": b["volume"]} for b in bars]
+        closes = [r["close"] for r in rows]
+        first_close = closes[0] if closes else 0
+        last_close = closes[-1] if closes else 0
+        high_30d = max(r["high"] for r in rows)
+        low_30d = min(r["low"] for r in rows)
+        pct_change = round(((last_close - first_close) / first_close) * 100, 2) if first_close else 0
+        return {
+            "ticker": ticker,
+            "period": "30d",
+            "last_close": last_close,
+            "high_30d": high_30d,
+            "low_30d": low_30d,
+            "pct_change_30d": pct_change,
+            "days": len(rows),
+            "daily": rows,
+        }
+    except Exception:
+        return None
+
+
+def _fetch_one(ticker: str, period: str = "1mo", use_alpaca: bool = True) -> Optional[Dict]:
+    """Fetch 30-day OHLCV. Failover: yfinance first, then Alpaca when keys set."""
+    data = _fetch_one_yf(ticker, period)
+    if data:
+        return data
+    if use_alpaca:
+        try:
+            data = _fetch_one_alpaca(ticker)
+            if data:
+                return data
+        except Exception:
+            pass
+    return None
+
+
 def fetch_price_history(scan_tickers: List[str] = None, progress_callback=None) -> Dict:
     """
     Fetch 30-day price history for scan tickers + core leveraged/market ETFs.
@@ -82,9 +127,15 @@ def fetch_price_history(scan_tickers: List[str] = None, progress_callback=None) 
     if progress_callback:
         progress_callback(f"Fetching 30-day price history ({len(all_tickers)} tickers)...")
 
+    try:
+        from alpaca_data import has_alpaca_keys
+        use_alpaca = has_alpaca_keys()
+    except Exception:
+        use_alpaca = False
+
     results = {}
     with ThreadPoolExecutor(max_workers=3) as pool:
-        futures = {pool.submit(_fetch_one, t): t for t in all_tickers}
+        futures = {pool.submit(_fetch_one, t, "1mo", use_alpaca): t for t in all_tickers}
         done = 0
         for future in as_completed(futures):
             ticker = futures[future]

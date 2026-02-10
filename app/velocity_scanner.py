@@ -129,17 +129,30 @@ def fetch_market_context() -> Dict[str, Any]:
 
 
 def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
-    """Step 2: Prior day (close, volume, SMA, RSI, ATR, BB) + pre-market price/volume."""
+    """Step 2: Prior day (close, volume, SMA, RSI, ATR, BB) + pre-market price/volume.
+    Failover: yfinance first, then Alpaca. Pre-market always from yfinance."""
     d = {"ticker": ticker, "prior_close": None, "prior_volume": None, "pm_price": None, "pm_volume": None,
          "sma20": None, "sma50": None, "sma200": None, "rsi": None, "atr": None, "bb_upper": None, "bb_lower": None,
          "earnings_days": None, "prior_high": None, "prior_low": None}
-    if not YF:
+    df = None
+    if YF:
+        try:
+            t = yf.Ticker(ticker)
+            df = t.history(period="60d", interval="1d")
+        except Exception:
+            pass
+    if df is None or df.empty or len(df) < 20:
+        try:
+            from alpaca_data import has_alpaca_keys, get_bars, bars_to_dataframe
+            if has_alpaca_keys():
+                bars = get_bars(ticker, days=75, timeframe="1Day", limit=80)
+                if bars:
+                    df = bars_to_dataframe(bars)
+        except Exception:
+            pass
+    if df is None or df.empty or len(df) < 20:
         return d
     try:
-        t = yf.Ticker(ticker)
-        df = t.history(period="60d", interval="1d")
-        if df is None or df.empty or len(df) < 20:
-            return d
         df = df.astype(float, errors="ignore")
         close = df["Close"]
         d["prior_close"] = _last(close)
@@ -170,9 +183,10 @@ def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
         std = close.rolling(20).std()
         d["bb_upper"] = _last(mid + 2 * std)
         d["bb_lower"] = _last(mid - 2 * std)
-        # Pre-market
+        # Pre-market (yfinance only — Alpaca extended hours differ)
+        t_for_pm = yf.Ticker(ticker) if YF else None
         try:
-            pm = t.history(period="1d", interval="5m", prepost=True)
+            pm = t_for_pm.history(period="1d", interval="5m", prepost=True) if t_for_pm else None
             if pm is not None and not pm.empty:
                 d["pm_price"] = _last(pm["Close"])
                 d["pm_volume"] = int(_last(pm["Volume"]) or 0)

@@ -1,0 +1,13 @@
+{
+  "_comment": "Reference only. Cursor reads MCP config from its own app data. Copy to mcp.json in project only if you want a local copy; mcp.json is gitignored. Alpaca MCP typically uses env vars APCA_API_KEY_ID and APCA_API_SECRET_KEY.",
+  "mcpServers": {
+    "alpaca": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-alpaca"],
+      "env": {
+        "APCA_API_KEY_ID": "<your-alpaca-api-key>",
+        "APCA_API_SECRET_KEY": "<your-alpaca-secret-key>"
+      }
+    }
+  }
+}

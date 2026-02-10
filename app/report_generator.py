@@ -39,48 +39,100 @@ def _default_risk_checks():
     }
 
 # Elite Swing Trader System Prompt (included in every report)
+# Used identically in PDF, JSON instructions, and when sending to AI — same prompt everywhere.
 MASTER_TRADING_REPORT_DIRECTIVE = r"""
 ═══════════════════════════════════════════════════════════════════════════════
 ELITE SWING TRADER - AI Analysis Directive
 ═══════════════════════════════════════════════════════════════════════════════
 
-EXECUTIVE SUMMARY REQUIRED: Start with a brief executive summary covering market
-context, sector backdrop, scan rationale, and key findings in plain language.
-Then provide per-ticker analysis and actionable trade recommendations.
+You are a professional stock analyst. Use the scan data, market intelligence, news,
+earnings flags, and price history below to produce a human-ready trading report.
+
+TARGET AUDIENCE: Experienced trader. Output must be direct, actionable, no fluff.
+Assume the reader knows basics; focus on setup quality, catalyst, invalidation, and execution.
 
 Context: Swing trading, 1-5 day holds (optimal 1-2 days). Universe is S&P 500
 stocks + leveraged bull ETFs. Cash account, ~$20K portfolio.
 
-## What You Must Provide Per Ticker
+CRITICAL DATA TO USE:
+- **EARNINGS WARNINGS**: Tickers with "EARNINGS IN X DAYS" (1-3 days) → AVOID unless exceptional.
+- **NEWS SENTIMENT**: DANGER = skip. NEGATIVE = extra caution. POSITIVE = bullish catalyst.
+- **OVERNIGHT MARKETS**: Use overseas data for gap risk and sentiment.
+- **PRICE AT REPORT**: Compare scanner price vs live price for drift.
+- **RELATIVE VOLUME**: 1.5x+ = unusual interest. Use with price action.
+- **RSI**: >75 = extended (wait for dip). <30 = oversold potential.
+- **Leveraged ETFs (SOXL, TQQQ, etc.)**: MAX 3-DAY HOLD due to decay.
 
-[TICKER] - [PRICE] - [CHANGE %] - [SCORE]
-- **Recommendation**: BUY / HOLD / PASS (with reasoning)
-- **Entry Price**: Exact price or range
-- **Stop Loss**: Price level (-5% hard max)
-- **Target**: Price level (+3-8% depending on setup)
-- **Hold Period**: 1-2 days / 2-3 days / 3-5 days max
-- **Position Size**: $2-3K cautious / $5K standard / $10K conviction
-- **Risk/Reward**: R:R ratio
-- **Key Levels**: Support and resistance
-- **Setup Quality**: Score 90+ = A+, 80-89 = A, 70-79 = B+, <70 = pass
-- **Leveraged ETF note**: Max 3-day hold due to decay
+REQUIRED OUTPUT FORMAT — Produce your response in this exact structure:
 
-## Critical Data to Use
+📊 MARKET SNAPSHOT
+──────────────────
+[Date] Key indices (SPY, QQQ, DIA) + % change. Sector leader(s). VIX level + trend.
+Regime: [e.g. Relief rally in bear context / Risk-on / Defensive]
+Overnight: [Asia, Europe impact on US open]. Trade implication: [1 line — e.g. tight stops / swing freely]
 
-- **EARNINGS WARNINGS**: If a ticker is flagged with "EARNINGS IN X DAYS", factor this heavily.
-  Tickers with earnings in 1-3 days should generally be PASS unless the setup is exceptional.
-- **NEWS SENTIMENT**: DANGER = likely skip. NEGATIVE = extra caution. POSITIVE = bullish catalyst.
-- **OVERNIGHT MARKETS**: Use overseas market data to assess gap risk and overnight sentiment.
-- **PRICE AT REPORT**: Compare scanner price vs live price for any drift since scan.
+🎯 TIER 1: ELITE SETUPS (90+ SCORES)
+═══════════════════════════════════════════════════════════════════════════════
 
-## Required Sections
+#. [TICKER] - [COMPANY NAME] ⭐
+   Score: [X]/100 | Price: $[X.XX] ([±X.XX]%) | R:R [X]:1
+   Entry: $[X]-[X] | Stop: $[X] | Target: $[X]/$[X]
+   Setup: [Technical thesis — SMA structure, RSI, pattern, relative strength vs sector]
+   Catalyst: [News, upgrade, sector theme — is it priced in or fresh?]
+   Invalidation: [Price level or event that breaks the thesis — e.g. "Break below $X kills it"]
+   Timing: [When to enter — open, dip to X, breakout above X, or wait for pullback]
+   [Relevant headline(s) if they drive the trade]
 
-1. **Executive Summary** (market context, overnight markets impact, what this scan found)
-2. **Per-Ticker Analysis** (using format above — flag earnings/news risks prominently)
-3. **TOP PICKS** (minimum 5 picks, ranked by conviction — more is better)
-4. **AVOID LIST** (with reasons — earnings, news red flags, bad chart, etc.)
-5. **OVERNIGHT / OVERSEAS IMPACT** (how overseas markets affect today's US session)
-6. **RISK MANAGEMENT** (current market conditions, position sizing advice)
+[Repeat for each Tier 1 pick — up to 5]
+
+🎯 TIER 2: STRONG SETUPS (85-90 SCORES)
+═══════════════════════════════════════════════════════════════════════════════
+
+[Same format. Add ⚠️ if extended (RSI >70), wait-for-dip, or other caution]
+
+🎯 TIER 3: TACTICAL PLAYS (75-85 SCORES)
+═══════════════════════════════════════════════════════════════════════════════
+
+[Same format. For leveraged ETFs add: ⚠️ 3-DAY MAX HOLD (leveraged decay)]
+[Include correlation note if relevant — e.g. "Trades with NVDA/SEMIs"]
+
+❌ AVOID LIST - DO NOT TRADE
+═══════════════════════════════════════════════════════════════════════════════
+
+[Group by reason. Experienced trader needs to know WHY to avoid — prevents FOMO.]
+
+🚫 EARNINGS TOO CLOSE (Binary Risk)
+   • [TICKER] - Earnings [date] ([X] days)
+
+🚫 EXTREME OVEREXTENSION (RSI > 75)
+   • [TICKER] - RSI [X.XX]
+
+🚫 RELATIVE WEAKNESS (Red on Green Day)
+   • [TICKER] - Down [X]% while sector/indices up
+
+🚫 NEWS RED FLAGS
+   • [TICKER] - [DANGER/NEGATIVE reason from headlines]
+
+⚠️ RISK MANAGEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+• Order type: LIMIT preferred (avoid slippage on gaps); when to use market
+• Hard -5% stops on ALL positions
+• 50% profit rule: take half at T1 if gap up 3%+
+• Hold period: 5-day max, 3-day for leveraged
+• Entry window: [e.g. 9:45-10:15 AM best, or wait for dip]
+• Position sizing: Conviction-based ($2K cautious, $5K standard, $10K conviction)
+• Regime-aware: [e.g. "Relief rally in bear context — tight stops mandatory"]
+
+📈 KEY INSIGHT / SECTOR ROTATION
+═══════════════════════════════════════════════════════════════════════════════
+
+1-3 sentences: Money flow direction, sector rotation signal, correlation.
+E.g. "Money flowing INTO Semis/Hardware, OUT OF Software. Buy leaders, avoid laggards."
+
+TOP 5 PLAYS: Your highest-conviction picks (can span tiers). Exactly 5.
+For each: Ticker, Score, Entry, Stop, Target, Setup, Catalyst, Invalidation.
+Include news/catalysts and execution timing. Experienced trader needs actionable detail.
 
 ═══════════════════════════════════════════════════════════════════════════════
 END OF DIRECTIVE — Scan data follows below.
@@ -122,8 +174,8 @@ class ReportGenerator:
             print(f"  Finviz get_stock for {ticker}: {last_error}")
         return None
 
-    def get_finviz_data(self, ticker):
-        """Get stock data from Finviz (with retry on transient errors)."""
+    def get_finviz_data(self, ticker, config=None):
+        """Get stock data from Finviz; augment price/volume via failover (yfinance > finviz > alpaca)."""
         data = {'ticker': ticker, 'price': 'N/A', 'change': 'N/A'}
         
         if not FINVIZ_AVAILABLE:
@@ -170,6 +222,18 @@ class ReportGenerator:
             data['risk_checks'] = self._parse_risk_checks(stock)
         else:
             data['risk_checks'] = _default_risk_checks()
+
+        # Price/volume failover: yfinance > finviz > alpaca (improve when Finviz is missing or stale)
+        try:
+            from data_failover import get_price_volume
+            pv = get_price_volume(ticker, config)
+            if pv:
+                data['price'] = pv['price']
+                data['volume'] = pv['volume'] if pv.get('volume') else data.get('volume', 'N/A')
+                if pv.get('change_pct') is not None:
+                    data['change'] = f"{pv['change_pct']}%"
+        except Exception:
+            pass
         return data
 
     def _derive_sma200_status(self, row):
@@ -400,7 +464,7 @@ class ReportGenerator:
             score = q['score']
             on_watchlist = q.get('on_watchlist', False)
             progress(f"Processing {i}/{len(qualifying)}: {ticker}...")
-            data = self.get_finviz_data(ticker)
+            data = self.get_finviz_data(ticker, config)
             row = {'ticker': ticker, 'score': score, 'on_watchlist': on_watchlist, **data}
             r = q.get('data', {})
             for k in insider_keys:
@@ -590,82 +654,16 @@ class ReportGenerator:
             sma50_pct = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
-        ai_prompt = f"""You are a professional stock analyst. Analyze these {scan_type.lower()} scan candidates.{breadth_line_prompt}
+        ai_prompt = f"""SCAN: {scan_type}.{breadth_line_prompt}
 {market_intel_prompt}{smart_money_prompt}{insider_prompt}{price_history_prompt}
-IMPORTANT: For each stock:
-1. Use the technical data (chart data and scanner data) in this report to assess setup
-2. Use the MARKET INTELLIGENCE, SMART MONEY SIGNALS, INSIDER ACTIVITY, and 30-DAY PRICE HISTORY above to understand market context, institutional positioning, social sentiment, and recent price action
-3. Use the 30-day price history as a SANITY CHECK — verify entries/targets make sense vs recent highs/lows
-4. Determine if any price movement is EMOTIONAL (buyable dip) or FUNDAMENTAL (avoid)
 
-═══════════════════════════════════════════════════
 STOCKS TO ANALYZE: {tickers_list}
-{watchlist_line}═══════════════════════════════════════════════════
+{watchlist_line}
 
 DATA SUMMARY:
 {chr(10).join(data_lines)}
 
-═══════════════════════════════════════════════════
-FOR EACH STOCK, PROVIDE:
-═══════════════════════════════════════════════════
-
-1. YOUR SCORE (1-100):
-   - 90-100: Elite setup, high conviction
-   - 80-89: Excellent, strong setup
-   - 70-79: Good, worth considering
-   - 60-69: Decent, smaller position
-   - Below 60: Skip
-
-2. CHART ANALYSIS:
-   - Trend direction
-   - Key support level
-   - Key resistance level
-   - Any patterns visible
-
-3. NEWS CHECK:
-   - Search recent news for this ticker
-   - Any catalysts (earnings, upgrades, contracts)?
-   - Any red flags (downgrades, lawsuits, guidance cuts)?
-   - Is the move EMOTIONAL (trade it) or FUNDAMENTAL (skip it)?
-
-4. RECOMMENDATION: BUY / HOLD / PASS
-
-5. IF BUY - ORDER SETTINGS:
-   - Entry Price: $XX.XX (limit order price)
-   - Position Size: X shares (for $2,000-5,000 position)
-   - Stop Loss: $XX.XX (where to exit if wrong)
-   - Target 1: $XX.XX (take 50% profit)
-   - Target 2: $XX.XX (trail rest with stop)
-
-6. ORDER TYPE RECOMMENDATION:
-   - Use LIMIT order at $XX.XX, or
-   - Use STOP-LIMIT if breaks above $XX.XX, or
-   - Use TRAILING STOP of X% for profit protection
-
-═══════════════════════════════════════════════════
-FINAL SUMMARY:
-═══════════════════════════════════════════════════
-
-TOP PICKS (minimum 5, ranked by conviction):
-For each pick give: Ticker, Your Score, Entry, Stop, Target, Why
-
-AVOID LIST:
-Which stocks to skip and why (news red flags, bad chart, earnings risk, etc.)
-
-NEWS & EARNINGS ALERTS:
-Any breaking news, upcoming earnings, FDA decisions, or events that could affect these trades.
-PAY ATTENTION to tickers flagged with EARNINGS warnings or DANGER/NEGATIVE news sentiment above.
-
-OVERNIGHT / OVERSEAS IMPACT:
-How did overseas markets (Asia, Europe) perform overnight and what does it mean for US open?
-
-MARKET CONTEXT:
-Current market conditions affecting these trades
-
-RISK MANAGEMENT:
-- Best order type for current volatility
-- Suggested trailing stop % for winners
-- Max position size recommendation
+Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks (Setup + Catalyst for each) → AVOID LIST (categorized) → RISK MANAGEMENT → KEY INSIGHT → TOP 5 PLAYS. Include news/catalysts and entry details — more detail for humans.
 """
 
         leveraged_mapping = self._load_leveraged_mapping()

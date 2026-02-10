@@ -5,6 +5,8 @@
   "openrouter_model": "google/gemini-3-pro-preview",
   "use_vision_charts": false,
   "alpha_vantage_api_key": "",
+  "alpaca_api_key": "",
+  "alpaca_secret_key": "",
   "use_sec_insider_context": false,
   "rag_books_folder": "",
   "rag_enabled": false,

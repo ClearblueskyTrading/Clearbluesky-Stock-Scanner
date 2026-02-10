@@ -148,32 +148,48 @@ def update_outcomes(progress_callback=None):
     for row in rows:
         sid, ticker, signal_date, price_at_signal = row["id"], row["ticker"], row["signal_date"], row["price_at_signal"]
         try:
+            signal_dt = datetime.strptime(signal_date[:10], "%Y-%m-%d")
+        except Exception:
+            continue
+        end_dt = signal_dt + timedelta(days=25)
+        start_str = signal_dt.strftime("%Y-%m-%d")
+        end_str = end_dt.strftime("%Y-%m-%d")
+
+        hist = None
+        try:
             sym = yf.Ticker(ticker)
-            hist = sym.history(period="1mo", interval="1d", timeout=30)
-            if hist is None or hist.empty or len(hist) < 2:
-                continue
-            hist = hist.sort_index()
-            closes = hist["Close"]
+            hist = sym.history(start=start_str, end=end_str, interval="1d", timeout=30)
+        except Exception:
+            pass
+        if hist is None or hist.empty:
             try:
-                signal_dt = datetime.strptime(signal_date[:10], "%Y-%m-%d")
+                from alpaca_data import has_alpaca_keys, get_bars, bars_to_dataframe
+                if has_alpaca_keys():
+                    bars = get_bars(ticker, config=None, start_date=start_str, end_date=end_str, limit=30)
+                    if bars:
+                        hist = bars_to_dataframe(bars)
             except Exception:
-                continue
-            # Rows on or after signal_date; T+1 = second row, T+3 = fourth, etc.
-            mask = hist.index >= signal_dt
-            future_closes = closes.loc[mask].iloc[:15]
-            if len(future_closes) < 2:
-                continue
-            def at(n):
-                if len(future_closes) <= n:
-                    return None
-                try:
-                    return float(future_closes.iloc[n])
-                except Exception:
-                    return None
-            pt1 = at(1)
-            pt3 = at(3)
-            pt5 = at(5)
-            pt10 = at(10)
+                pass
+        if hist is None or hist.empty or len(hist) < 2:
+            continue
+        hist = hist.sort_index()
+        closes = hist["Close"]
+        mask = hist.index >= signal_dt
+        future_closes = closes.loc[mask].iloc[:15]
+        if len(future_closes) < 2:
+            continue
+        def at(n):
+            if len(future_closes) <= n:
+                return None
+            try:
+                return float(future_closes.iloc[n])
+            except Exception:
+                return None
+        pt1 = at(1)
+        pt3 = at(3)
+        pt5 = at(5)
+        pt10 = at(10)
+        try:
             update_outcomes_for_signal(sid, pt1, pt3, pt5, pt10, price_at_signal)
             updated += 1
         except Exception:
