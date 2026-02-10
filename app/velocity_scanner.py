@@ -43,10 +43,10 @@ def get_universe_for_index(index: Optional[str]) -> List[str]:
     Return ticker list for the scan. When index is sp500/etfs, fetch from
     Finviz (not ticker restricted). Otherwise use fixed SCAN_UNIVERSE (e.g. index='velocity' or None).
     """
-    if index and index in ("sp500", "etfs"):
+    if index and index in ("sp500", "etfs", "sp500_etfs"):
         try:
             from breadth import fetch_full_index_for_breadth
-            rows = fetch_full_index_for_breadth(index, progress_callback=None)
+            rows = fetch_full_index_for_breadth("sp500_etfs", progress_callback=None)
             tickers = [str(r.get("Ticker") or "").strip().upper() for r in (rows or []) if r.get("Ticker")]
             tickers = [t for t in tickers if t]
             return tickers[:INDEX_UNIVERSE_CAP] if tickers else SCAN_UNIVERSE

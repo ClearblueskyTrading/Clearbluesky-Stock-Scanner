@@ -228,24 +228,71 @@ def _parse_float(value: Any) -> Optional[float]:
         return None
 
 
+# Curated ETFs for momentum scans — avoids fetching 250+ ETFs from Finviz.
+# Index, sector, leveraged, commodities. ~45 tickers.
+CURATED_ETFS = [
+    "SPY", "QQQ", "IWM", "DIA",  # index
+    "TQQQ", "QLD", "UPRO", "SSO", "TNA", "TECL", "SOXL", "SPXL", "UMDD",  # leveraged
+    "XLF", "XLK", "XLE", "XLV", "XLI", "XLP", "XLY", "XLU", "XLB", "XLRE", "XLC",  # sector (11 GICS)
+    "GDX", "GLD", "SLV", "USO", "UNG",  # commodities
+    "SMH", "ARKK", "KRE", "XBI", "VNQ", "XLRE",  # thematic
+]
+
+def fetch_sp500_plus_curated_etfs(progress_callback=None) -> List[Dict[str, Any]]:
+    """
+    Fast fetch for momentum scans: S&P 500 from Finviz + curated ETF list.
+    Skips full ETF screener (~250 tickers) — saves ~1.5 min.
+    """
+    seen = set()
+    rows = []
+    try:
+        from finviz.screener import Screener
+    except ImportError:
+        return []
+    if progress_callback:
+        progress_callback("Fetching S&P 500...")
+    try:
+        screener = Screener(filters=["idx_sp500"], order="ticker")
+        for stock in screener:
+            t = (stock.get("Ticker") or "").strip().upper()
+            if t and t not in seen:
+                seen.add(t)
+                rows.append(dict(stock))
+    except Exception:
+        pass
+    # Sector ETF -> GICS sector (for sector-first filtering in velocity scan)
+    SECTOR_ETF_MAP = {
+        "XLK": "Technology", "XLF": "Financial", "XLE": "Energy", "XLV": "Healthcare",
+        "XLI": "Industrials", "XLP": "Consumer Defensive", "XLY": "Consumer Cyclical",
+        "XLU": "Utilities", "XLB": "Basic Materials", "XLRE": "Real Estate", "XLC": "Communication Services",
+    }
+    for t in CURATED_ETFS:
+        t = t.strip().upper()
+        if t and t not in seen:
+            seen.add(t)
+            sector = SECTOR_ETF_MAP.get(t, "ETF")
+            rows.append({"Ticker": t, "Sector": sector, "Industry": sector})
+    return rows
+
+
 def fetch_full_index_for_breadth(
     index: str, progress_callback=None
 ) -> List[Dict[str, Any]]:
     """
-    Fetch full index (S&P 500 or ETFs) from Finviz for breadth calculation.
-    index: 'sp500' or 'etfs'
+    Fetch full index from Finviz for breadth calculation.
+    index: 'sp500', 'etfs', or 'sp500_etfs' (S&P 500 + ETFs combined)
     Returns list of stock dicts (Finviz keys); empty list on error.
     """
-    if index not in ("sp500", "etfs"):
+    if index not in ("sp500", "etfs", "sp500_etfs"):
         return []
     try:
         from finviz.screener import Screener
     except ImportError:
         return []
-    if index == "etfs":
-        idx_filter = "ind_exchangetradedfund"
-    else:
-        idx_filter = "idx_sp500"
+    if index == "sp500_etfs":
+        # Use fast path: S&P 500 + curated ETFs only (skip full 250+ ETF screener)
+        return fetch_sp500_plus_curated_etfs(progress_callback)
+    idx_filter = "ind_exchangetradedfund" if index == "etfs" else "idx_sp500"
     try:
         if progress_callback:
             progress_callback("Fetching index for breadth...")

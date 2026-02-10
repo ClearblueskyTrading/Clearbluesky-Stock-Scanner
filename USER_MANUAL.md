@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.7 — User Manual
+# ClearBlueSky Stock Scanner v7.83 — User Manual
 
 ---
 
@@ -52,10 +52,8 @@ Every scan produces up to 3 files in the `reports/` folder:
 
 ### Stock Scanner Section
 
-- **Scan dropdown** — Select which scanner to run (4 options: Trend, Swing, Watchlist, Pre-Market).
-- **Index dropdown** — Choose the stock universe:
-  - **S&P 500** — ~500 large-cap stocks
-  - **ETFs** — Exchange-traded funds
+- **Scan dropdown** — Select which scanner to run (4 options: Velocity Trend Growth, Swing, Watchlist, Pre-Market).
+- **Index** — S&P 500 + ETFs combined (automatic for Velocity Trend Growth, Swing, Pre-Market).
 - **Run Scan** — Starts the selected scan in the background. The GUI stays responsive.
 - **Stop** — Cancels a running scan.
 - **Config** — Opens per-scanner settings (sliders/toggles specific to the selected scanner).
@@ -77,15 +75,15 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ## 3. Scanners
 
-### Trend — Long-term
+### Velocity Trend Growth
 
-**What it does:** Finds stocks in strong long-term uptrends using moving average stacking (SMA20 > SMA50 > SMA200), yearly/quarterly/monthly performance, and relative volume. Reweighted in v7.7 to prioritize sustained multi-month sector momentum over short-term pops. Includes SEC insider data (Form 4 filings) as a confirmation signal.
+**What it does:** Momentum scan with sector-first logic. Ranks 11 GICS sectors by N-day return (sector SPDRs), then scans only S&P 500 stocks + ETFs in the top 4 leading sectors. Filters by target return %, optional beat SPY, volume, MA stack, RSI. Includes SEC insider data and sector heat in output.
 
 **Best time to run:** After market close (4:00 PM ET) or anytime — uses daily data.
 
-**Index options:** S&P 500, ETFs.
+**Index:** S&P 500 + curated ETFs (automatic).
 
-**Use case:** Finding stocks with institutional momentum and sector rotation for long-term position trades (weeks to months). Insider buying activity adds conviction.
+**Use case:** Finding momentum leaders in sectors that are already moving. Faster than full-market scan (~160 tickers vs ~400).
 
 ---
 
@@ -131,15 +129,17 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 Click the **Config** button next to the scan dropdown to open per-scanner settings. Each scanner has different parameters:
 
-### Trend Config
+### Velocity Trend Growth Config
 | Setting | Default | Description |
 |---------|---------|-------------|
-| Min Score | 70 | Minimum trend score (0–100) to include in results |
-| Min Quarter % | 10 | Minimum quarterly performance percentage |
-| Min Price $ | 5 | Exclude penny stocks below this price |
-| Max Price $ | 500 | Exclude very high-priced stocks |
-| Min Avg Vol (K) | 500 | Minimum average daily volume in thousands |
-| Require MA Stack | On | Require SMA20 > SMA50 > SMA200 |
+| Trend Days | 20 | 20 or 50 trading days |
+| Target Return % | 5 | Minimum N-day return (1–300%) |
+| Min/Max Price $ | 25/600 | Price range filter |
+| Require beats SPY | Off | Only stocks outperforming SPY |
+| Min Volume (K) | 100 | Minimum average volume |
+| Volume above 20d avg | Off | Accumulation confirmation |
+| Require MA stack | Off | Price > EMA10 > EMA20 > EMA50 |
+| RSI min/max | 0/100 | RSI band (0/100 = off) |
 
 ### Swing Config
 | Setting | Default | Description |
@@ -171,7 +171,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Filter | Down X% | "down_pct" = only show stocks down X% today; "all" = show everything |
 | Min % down | 5 | Minimum percentage down from open (when filter = down_pct) |
 
-*Note: Velocity Barbell, Insider, and Pre-Market Hunter were standalone scanners in v7.6 and earlier. In v7.7, their functionality is folded into the remaining 4 scanners (insider data in Trend & Swing, leveraged suggestions in Swing & Pre-Market, velocity gap analysis in Pre-Market).*
+*Note: Velocity Barbell, Insider, and Pre-Market Hunter were standalone scanners in v7.6 and earlier. In v7.7, their functionality is folded into the remaining 4 scanners (insider data in Velocity Trend Growth & Swing, leveraged suggestions in Swing & Pre-Market, velocity gap analysis in Pre-Market).*
 
 ---
 
@@ -325,14 +325,14 @@ New in v7.7 — after the initial scan data is gathered, each ticker is enriched
 | **News Sentiment** | DANGER / NEGATIVE / POSITIVE / NEUTRAL from recent headlines | All scanners |
 | **Live Price** | Current price stamped at report generation time | All scanners |
 | **Leveraged Suggestion** | Matching leveraged ETF (e.g., TQQQ for QQQ-tracking stocks) | Swing & Pre-Market only |
-| **Insider Activity** | Recent SEC Form 4 insider buys/sales (owner, transaction type, value) | Trend & Swing only |
+| **Insider Activity** | Recent SEC Form 4 insider buys/sales (owner, transaction type, value) | Velocity Trend Growth & Swing |
 
 ### How It's Used
 
 - **AI Prompt** — Earnings warnings and news sentiment are appended to each ticker's data line. The AI is instructed to avoid entries before earnings and flag news risks.
 - **Reports** — Enrichment data appears in both PDF and JSON outputs.
 - **Leveraged Suggestions** — When a stock on the Swing or Pre-Market scan has a leveraged ETF equivalent, the AI can suggest the leveraged play for higher-conviction entries.
-- **Insider Data** — Heavy insider buying on a Trend or Swing pick adds conviction. The AI references insider activity in its analysis.
+- **Insider Data** — Heavy insider buying on a Velocity Trend Growth or Swing pick adds conviction. The AI references insider activity in its analysis.
 
 ### Performance
 
@@ -488,7 +488,7 @@ import json
 import requests
 
 # Load the ClearBlueSky analysis package
-with open("reports/Trend_Scan_20260208_160000.json") as f:
+with open("reports/Velocity_Trend_Growth_20260208_160000.json") as f:
     package = json.load(f)
 
 system_prompt = package.get("instructions", "Analyze these stocks.")
@@ -588,7 +588,7 @@ Read the output files from each model and look for:
 | `app/scan_settings.py` | Config specs, default values, and scan param definitions |
 | `app/market_intel.py` | Market Intelligence module (Google News, Finviz, sectors, market snapshot, overnight markets) |
 | `app/ticker_enrichment.py` | Earnings warnings, news sentiment, live price, leveraged suggestions |
-| `app/insider_scanner.py` | SEC insider data — standalone + enrichment for Trend & Swing |
+| `app/insider_scanner.py` | SEC insider data — enrichment for Velocity Trend Growth & Swing |
 | `app/report_generator.py` | PDF/JSON report generation + AI prompt construction |
 | `app/finviz_safe.py` | Timeout-protected Finviz wrapper used by all scanners |
 | `app/reports/` | Generated PDF, JSON, and AI analysis files |

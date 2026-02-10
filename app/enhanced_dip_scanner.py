@@ -51,7 +51,7 @@ RATING_SCORES = {
 def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     """
     Scan index for stocks down within configured range.
-    index: 'sp500' or 'etfs'
+    index: 'sp500', 'etfs', or 'sp500_etfs' — always uses S&P 500 + ETFs combined
     Returns raw list before filtering.
     """
     min_dip = float(config.get('dip_min_percent', 1.0))
@@ -60,50 +60,46 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     max_price = float(config.get('max_price', 500.0))
     min_volume = int(float(config.get('min_avg_volume', 500000)))
     
-    # Index filter (Finviz: idx_sp500, ind_exchangetradedfund for ETFs)
-    if index == 'etfs':
-        idx_filter = 'ind_exchangetradedfund'
-    else:
-        idx_filter = 'idx_sp500'
+    # Always scan both S&P 500 and ETFs
+    idx_filters = [('idx_sp500', 'sp500'), ('ind_exchangetradedfund', 'etfs')]
+    seen = set()
+    results = []
     
-    filters = [
-        idx_filter,
-        f'sh_price_o{int(min_price)}',
-        f'sh_price_u{int(max_price)}',
-        f'sh_avgvol_o{int(min_volume/1000)}',  # Finviz uses K
-        'ta_change_d',  # Down today
-    ]
+    for idx_filter, _ in idx_filters:
+        filters = [
+            idx_filter,
+            f'sh_price_o{int(min_price)}',
+            f'sh_price_u{int(max_price)}',
+            f'sh_avgvol_o{int(min_volume/1000)}',
+            'ta_change_d',
+        ]
+        try:
+            screener = Screener(filters=filters, order='change')
+            for stock in screener:
+                try:
+                    t = (stock.get('Ticker') or '').strip().upper()
+                    if t and t in seen:
+                        continue
+                    change_str = stock.get('Change', '0%').replace('%', '')
+                    change = float(change_str)
+                    if -max_dip <= change <= -min_dip:
+                        seen.add(t)
+                        results.append({
+                            'ticker': stock.get('Ticker'),
+                            'company': stock.get('Company'),
+                            'price': float(stock.get('Price', 0)),
+                            'change': change,
+                            'volume': stock.get('Volume'),
+                            'rel_volume': stock.get('Rel Volume'),
+                            'sector': stock.get('Sector') or '',
+                            'industry': stock.get('Industry'),
+                        })
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"Screener error ({idx_filter}): {e}")
     
-    try:
-        screener = Screener(filters=filters, order='change')
-        results = []
-        
-        for stock in screener:
-            try:
-                change_str = stock.get('Change', '0%').replace('%', '')
-                change = float(change_str)
-                
-                # Filter for our dip range (negative values)
-                if -max_dip <= change <= -min_dip:
-                    sector = stock.get('Sector') or ''
-                    results.append({
-                        'ticker': stock.get('Ticker'),
-                        'company': stock.get('Company'),
-                        'price': float(stock.get('Price', 0)),
-                        'change': change,
-                        'volume': stock.get('Volume'),
-                        'rel_volume': stock.get('Rel Volume'),
-                        'sector': sector,
-                        'industry': stock.get('Industry'),
-                    })
-            except Exception:
-                continue
-        
-        return results
-        
-    except Exception as e:
-        print(f"Screener error: {e}")
-        return []
+    return results
 
 
 def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict]:

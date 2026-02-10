@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.82
+# ClearBlueSky Stock Scanner v7.83
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.82"
+VERSION = "7.83"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -174,7 +174,7 @@ def _check_for_updates(root):
 def _scan_worker_loop(app):
     """Background thread: run scan jobs from job queue; post progress/done/error to result queue."""
     SCANNER_TO_REPORT_LABEL = {
-        "trend": "Trend",
+        "velocity_trend_growth": "Velocity Trend Growth",
         "swing": "Swing",
         "watchlist": "Watchlist",
         "premarket": "Premarket",
@@ -208,7 +208,7 @@ def _scan_worker_loop(app):
         scanner_kind = (scan_def or {}).get("scanner", "")
         label = (scan_def or {}).get("label", "Scan")
         short_label = SCANNER_TO_REPORT_LABEL.get(scanner_kind, label)
-        if scanner_kind not in ("trend", "swing", "watchlist", "premarket"):
+        if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist", "premarket"):
             continue
         try:
             app.scan_result_queue.put(("start", label))
@@ -227,10 +227,41 @@ def _scan_worker_loop(app):
 
         results = None
         try:
-            if scanner_kind == "trend":
-                from trend_scan_v2 import trend_scan
-                df = trend_scan(progress_callback=progress_put, index=index)
-                results = df.to_dict("records") if df is not None and len(df) > 0 else None
+            if scanner_kind == "velocity_trend_growth":
+                from velocity_trend_growth import run_velocity_trend_growth_scan
+                trend_days = int(config.get("vtg_trend_days", 20) or 20)
+                if isinstance(trend_days, str):
+                    trend_days = int(trend_days) if trend_days.isdigit() else 20
+                target_pct = float(config.get("vtg_target_return_pct", 5) or 5)
+                risk_pct = float(config.get("vtg_risk_pct", 30) or 30)
+                max_tickers = int(config.get("vtg_max_tickers", 20) or 20)
+                min_price = float(config.get("vtg_min_price", 25) or 25)
+                max_price = float(config.get("vtg_max_price", 600) or 600)
+                min_vol_k = int(config.get("vtg_min_volume", 100) or 100)
+                min_volume = min_vol_k * 1000  # stored as K
+                require_beats_spy = bool(config.get("vtg_require_beats_spy", False))
+                require_volume_confirm = bool(config.get("vtg_require_volume_confirm", False))
+                require_ma_stack = bool(config.get("vtg_require_ma_stack", False))
+                rsi_min = int(config.get("vtg_rsi_min", 0) or 0)
+                rsi_max = int(config.get("vtg_rsi_max", 100) or 100)
+                cancel_evt = getattr(app, "_scan_cancel_event", None)
+                results = run_velocity_trend_growth_scan(
+                    progress_callback=progress_put,
+                    index=index,
+                    trend_days=trend_days,
+                    target_return_pct=target_pct,
+                    risk_pct=risk_pct,
+                    max_tickers=max_tickers,
+                    min_price=min_price,
+                    max_price=max_price,
+                    require_beats_spy=require_beats_spy,
+                    min_volume=min_volume,
+                    require_volume_confirm=require_volume_confirm,
+                    require_ma_stack=require_ma_stack,
+                    rsi_min=rsi_min,
+                    rsi_max=rsi_max,
+                    cancel_event=cancel_evt,
+                )
             elif scanner_kind == "swing":
                 from emotional_dip_scanner import run_emotional_dip_scan
                 results = run_emotional_dip_scan(progress_put, index=index)
@@ -416,7 +447,7 @@ class TradeBotApp:
         except Exception as e:
             log_error(e, "Failed to load scan types, using defaults")
             self.scan_types = [
-                {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
+                {"id": "velocity_trend_growth", "label": "Velocity Trend Growth", "scanner": "velocity_trend_growth"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
                 {"id": "watchlist", "label": "Watchlist", "scanner": "watchlist"},
                 {"id": "premarket", "label": "Pre-Market", "scanner": "premarket"},
@@ -487,27 +518,19 @@ class TradeBotApp:
         type_row = tk.Frame(scan_frame, bg="white")
         type_row.pack(fill="x", padx=6, pady=(6, 2))
         tk.Label(type_row, text="Scan:", font=("Arial", 9), bg="white", fg="#555").pack(side="left")
-        default_label = self.scan_types[0]["label"] if self.scan_types else "Trend - Long-term"
+        default_label = self.scan_types[0]["label"] if self.scan_types else "Velocity Trend Growth"
         self.scan_type = tk.StringVar(value=default_label)
         self.scan_type_combo = ttk.Combobox(
             type_row,
             textvariable=self.scan_type,
             values=[st["label"] for st in self.scan_types] or [default_label],
             state="readonly",
-            width=16,
+            width=24,
             font=("Arial", 9),
         )
-        self.scan_type_combo.pack(side="left", padx=(4, 12))
-        tk.Label(type_row, text="Index:", font=("Arial", 9), bg="white", fg="#555").pack(side="left")
-        self.scan_index = tk.StringVar(value="S&P 500")
-        ttk.Combobox(
-            type_row,
-            textvariable=self.scan_index,
-            values=["S&P 500", "ETFs", "Leveraged (high-conviction)"],
-            state="readonly",
-            width=10,
-            font=("Arial", 9),
-        ).pack(side="left", padx=(4, 0))
+        self.scan_type_combo.pack(side="left", padx=(4, 0))
+        tk.Label(type_row, text="  (S&P 500 + ETFs)", font=("Arial", 9), bg="white", fg="#666").pack(side="left")
+        self.scan_index = tk.StringVar(value="sp500_etfs")  # Always use combined universe
         
         scan_btn_row = tk.Frame(scan_frame, bg="white")
         scan_btn_row.pack(fill="x", padx=6, pady=(2, 4))
@@ -712,13 +735,11 @@ class TradeBotApp:
         types_list = load_scan_types()
         labels = [st["label"] for st in types_list]
         current_scan = getattr(self, "scan_type", None)
-        current_scan = current_scan.get() if current_scan and hasattr(current_scan, "get") else (labels[0] if labels else "Trend - Long-term")
+        current_scan = current_scan.get() if current_scan and hasattr(current_scan, "get") else (labels[0] if labels else "Velocity Trend Growth")
         scan_var = tk.StringVar(value=current_scan)
         combo = ttk.Combobox(main_f, textvariable=scan_var, values=labels, state="readonly", width=24, font=("Arial", 9))
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
-        tk.Label(main_f, text="Index:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
-        idx_var = tk.StringVar(value=self.scan_index.get())
-        ttk.Combobox(main_f, textvariable=idx_var, values=["S&P 500", "ETFs", "Leveraged (high-conviction)"], state="readonly", width=12, font=("Arial", 9)).grid(row=0, column=3, sticky="w", pady=4)
+        tk.Label(main_f, text="(S&P 500 + ETFs)", font=("Arial", 9), bg="white", fg="#666").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -762,14 +783,14 @@ class TradeBotApp:
             for st in load_scan_types():
                 if st.get("label") == label:
                     return st.get("scanner", "trend")
-            return "trend"
+            return "velocity_trend_growth"
 
         def build_sliders():
             for w in sliders_frame.winfo_children():
                 w.destroy()
             widget_vars.clear()
             scanner = get_scanner()
-            specs = SCAN_PARAM_SPECS.get(scanner, SCAN_PARAM_SPECS.get("trend", []))
+            specs = SCAN_PARAM_SPECS.get(scanner, SCAN_PARAM_SPECS.get("velocity_trend_growth", []))
             cfg = self.config
             for spec in specs:
                 key = spec["key"]
@@ -831,6 +852,9 @@ class TradeBotApp:
                                     length=240, resolution=res, showvalue=1, bg="white", font=("Arial", 8))
                     scale.pack(side="left", padx=(5, 0))
                     widget_vars[key] = (var, spec)
+                    hint = spec.get("hint")
+                    if hint:
+                        tk.Label(sliders_frame, text=hint, font=("Arial", 8), bg="white", fg="#666", wraplength=420, justify="left").pack(anchor="w", padx=(0, 0), pady=(0, 4))
 
         def on_scan_change_internal(*args):
             self.scan_type.set(scan_var.get())
@@ -838,7 +862,6 @@ class TradeBotApp:
 
         def _collect_and_save():
             self.scan_type.set(scan_var.get())
-            self.scan_index.set(idx_var.get())
             for key, (var, spec) in widget_vars.items():
                 ptype = spec.get("type", "float")
                 val = var.get()
@@ -910,7 +933,6 @@ class TradeBotApp:
         except Exception as e:
             log_error(e, "Scan config build_sliders")
             tk.Label(sliders_frame, text="Parameters could not load. Check config.", font=("Arial", 9), bg="white", fg="#c00").pack(anchor="w")
-        idx_var.trace("w", lambda *a: self.scan_index.set(idx_var.get()))
         scan_var.trace("w", on_scan_change_internal)
 
         win.protocol("WM_DELETE_WINDOW", win.destroy)
@@ -1024,8 +1046,8 @@ class TradeBotApp:
             if st.get("label") == label:
                 return st
         # Fallback based on label text if config is missing
-        if "Trend" in label:
-            return {"id": "trend_fallback", "label": label, "scanner": "trend"}
+        if "Velocity" in label or "velocity_trend" in label.lower() or "Trend" in label:
+            return {"id": "vtg_fallback", "label": label, "scanner": "velocity_trend_growth"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
         if "Pre-Market" in label or "Pre" in label or "Premarket" in label:
@@ -1047,8 +1069,7 @@ class TradeBotApp:
         if self.scan_worker is not None and self.scan_worker.is_alive():
             messagebox.showinfo("Scan", "A scan is already running.")
             return
-        idx_text = self.scan_index.get()
-        index = "sp500" if "S&P" in idx_text else ("etfs" if "ETF" in idx_text else ("velocity" if "Leveraged" in idx_text else "sp500"))
+        index = "sp500_etfs"  # Always S&P 500 + ETFs combined
         self.scan_cancelled = False
         # Clear any stale jobs and results from previous cancelled scans
         for q in (self.scan_job_queue, self.scan_result_queue):
@@ -1059,7 +1080,7 @@ class TradeBotApp:
                 pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
-            allowed = ("trend", "swing", "watchlist", "premarket")
+            allowed = ("velocity_trend_growth", "swing", "watchlist", "premarket")
             enqueued = 0
             for i, scan_def in enumerate(types_list):
                 scanner_kind = (scan_def or {}).get("scanner", "")
@@ -1073,7 +1094,7 @@ class TradeBotApp:
         else:
             scan_def = self._get_current_scan_def()
             scanner_kind = (scan_def or {}).get("scanner", "")
-            if scanner_kind not in ("trend", "swing", "watchlist", "premarket"):
+            if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist", "premarket"):
                 messagebox.showwarning("Scan Type", "Please select a valid scan type.")
                 return
             self.scan_job_queue.put(("scan", scan_def, index))
@@ -1094,8 +1115,10 @@ class TradeBotApp:
             # Swing uses emotional logic -> emotional_min_score
             if scan_type == "Swing":
                 min_score = int(self.config.get("emotional_min_score", 65))
+            elif scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket", "Velocity Trend Growth"):
+                min_score = int(self.config.get(f'{scan_type.lower().replace(" ", "_")}_min_score', 0))
             else:
-                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 0 if scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket") else 65))
+                min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 65))
             reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
             gen = HTMLReportGenerator(save_dir=reports_dir)
             watchlist = self.config.get("watchlist", []) or []
@@ -1179,7 +1202,8 @@ class TradeBotApp:
                         except tk.TclError: pass
                         base = path[:-4] if path.lower().endswith(".pdf") else path
                         ai_path = base + "_ai.txt"
-                        _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
+                        from report_generator import SCANNER_GITHUB_URL
+                        _ai_header = f"Created using ClearBlueSky Stock Scanner. Scanner: {SCANNER_GITHUB_URL}\n\nPrompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
                         if ai_response:
                             with open(ai_path, "w", encoding="utf-8") as f:
                                 f.write(_ai_header + ai_response)
@@ -2112,7 +2136,7 @@ OUTPUTS (per run):
 • *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
 
 SCANNERS (4 total):
-• Trend – Long-term sector rotation holds (S&P 500 / ETFs). Best: after close.
+• Velocity Trend Growth – Momentum scan (sector-first, top sectors). Best: after close.
 • Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
 • Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers.
 • Pre-Market – Combined volume scan + velocity gap analysis. Best: 7–9:25 AM.
@@ -2121,7 +2145,7 @@ NEW IN v7.7:
 • Earnings date warnings per ticker (EARNINGS TOMORROW, etc.)
 • News sentiment flags (DANGER / NEGATIVE / POSITIVE / NEUTRAL)
 • Overnight/overseas markets (Japan, China, Europe, etc.) in AI context
-• Insider data folded into Trend & Swing scans
+• Insider data folded into Velocity Trend Growth & Swing scans
 • Leveraged ETF suggestions on Swing & Pre-Market
 • TOP 5 PLAYS (exactly 5, ranked by conviction)
 • Same prompt in PDF, JSON, _ai.txt — paste all 3 into any AI for human-ready summary
@@ -2129,7 +2153,7 @@ NEW IN v7.7:
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.82
+ClearBlueSky v7.83
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

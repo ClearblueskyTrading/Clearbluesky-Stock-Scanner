@@ -28,38 +28,30 @@ EXCLUDE_DIRS = {
     "backup-v6.4",
 }
 EXCLUDE_FILES = {
-    "user_config.json",
-    "mcp.json",
-    ".env",
+    "user_config.json",      # user API keys, preferences
+    "mcp.json",             # user MCP config
+    ".env", ".env.local",  # env vars, API keys
     "error_log.txt",
     "update_backup_manifest.json",
-    "scanner_presets_export.json",
+    "scanner_presets_export.json",   # user exports
     "release_notes_v7.md",
     "backtest_signals.db",
     "GITHUB_PUSH.md",
     "TESTING_v7.0.md",
     "NEXT_RELEASE.md",
     # Old release notes (keep only last 2 versions in zip)
-    "RELEASE_v6.2.md",
-    "RELEASE_v6.3.md",
-    "RELEASE_v6.4.md",
-    "RELEASE_v6.5.md",
-    "RELEASE_v7.0.md",
-    "RELEASE_v7.1.md",
-    "RELEASE_v7.2.md",
-    "RELEASE_v7.3.md",
-    "RELEASE_v7.4.md",
-    "RELEASE_v7.5.md",
-    "RELEASE_v7.6.md",
-    "RELEASE_v7.7.md",
-    "RELEASE_v7.8.md",
+    "RELEASE_v6.2.md", "RELEASE_v6.3.md", "RELEASE_v6.4.md", "RELEASE_v6.5.md",
+    "RELEASE_v7.0.md", "RELEASE_v7.1.md", "RELEASE_v7.2.md", "RELEASE_v7.3.md",
+    "RELEASE_v7.4.md", "RELEASE_v7.5.md", "RELEASE_v7.6.md", "RELEASE_v7.7.md",
+    "RELEASE_v7.8.md", "RELEASE_v7.81.md",
     "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [
     re.compile(r"ClearBlueSky-\d+\.\d+\.zip", re.I),
-    re.compile(r"Trend_Scan_Report_.*\.pdf", re.I),
+    re.compile(r".*_Scan_Report_.*\.pdf", re.I),
     re.compile(r"^_test_", re.I),
+    re.compile(r"\.env\.", re.I),  # .env.local, .env.prod, etc.
 ]
 
 

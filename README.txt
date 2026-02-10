@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 7.7 | Free & Open Source | Made with Claude AI
+   Version 7.83 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,20 +11,20 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v7.7
+   WHAT'S IN v7.83
 ════════════════════════════════════════════════════════════════════════════
 
-• 4 Scanners: Trend (long-term), Swing (emotional dips), Watchlist, Pre-Market (S&P 500 / ETFs)
-• Ticker Enrichment: earnings date warnings, news sentiment flags, live price, leveraged ETF suggestions
-• Overnight/Overseas Markets: Japan, China, Europe, India, etc. tracked and fed to AI
-• Insider Data: SEC Form 4 insider buys/sales folded into Trend & Swing scans
+• 4 Scanners: Velocity Trend Growth (momentum), Swing (emotional dips), Watchlist, Pre-Market
+• Velocity Trend Growth: Sector-first — ranks sectors by return, scans only leading sectors (~160 tickers)
+• Curated ETFs: ~45 key ETFs instead of 250+ (faster scans)
+• Ticker Enrichment: earnings warnings, news sentiment, live price, leveraged suggestions
+• Insider Data: SEC Form 4 folded into Velocity Trend Growth & Swing
 • Market Intelligence: Google News, Finviz news, sector performance, market snapshot
-• Smart Money: WSB/Reddit sentiment, institutional 13F holders
 • Run all scans – Optional checkbox runs all 4 scanners in sequence (~15 min)
-• CLI – Run scans from command line: python app/scanner_cli.py --scan <type>
-• PDF + JSON reports – per-stock SMA200 status; JSON includes "instructions" for any AI
+• CLI – python app/scanner_cli.py --scan velocity_trend_growth
+• PDF + JSON reports – sector heat, JSON includes "instructions" for any AI
 • Optional OpenRouter AI – set API key in Settings; AI analysis saved as *_ai.txt
-• Watchlist – up to 200 tickers; 2 beeps + WATCHLIST when one appears in a scan
+• Watchlist – up to 200 tickers; 2 beeps + WATCHLIST when one appears
 • In-app Update & Rollback – backs up current version, downloads latest from GitHub
 
 
@@ -56,17 +56,15 @@ OTHER WAYS TO RUN (no Windows installer):
 
 1. Launch the app (Desktop shortcut or app/START.bat)
 
-2. Select scan type: Trend, Swing, Watchlist, Pre-Market
+2. Select scan type: Velocity Trend Growth, Swing, Watchlist, Pre-Market
 
-3. Select index: S&P 500 or ETFs (N/A for Watchlist)
-
-4. Click "Run Scan". Optional: check "Run all scans" (~15 min).
+3. Click "Run Scan". Optional: check "Run all scans" (~15 min).
    When done, the PDF report opens.
 
-5. Use the PDF with your preferred AI (Claude, Gemini, ChatGPT) for analysis.
+4. Use the PDF with your preferred AI (Claude, Gemini, ChatGPT) for analysis.
 
-6. Optional: Add tickers in Watchlist (max 200).
-   When a watchlist stock appears in a scan, you get 2 beeps and it's at the top of the report.
+5. Optional: Add tickers in Watchlist (max 200).
+   When a watchlist stock appears in a scan, you get 2 beeps and it's at the top.
 
 
 ════════════════════════════════════════════════════════════════════════════
@@ -74,11 +72,11 @@ OTHER WAYS TO RUN (no Windows installer):
 ════════════════════════════════════════════════════════════════════════════
 
 FREE (no API key required):
-  Trend (long-term sector rotation), Swing (emotional dips), Watchlist, Pre-Market
-  S&P 500, ETFs
+  Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist, Pre-Market
+  S&P 500 + ETFs
   Ticker enrichment: earnings warnings, news sentiment, leveraged suggestions
   Overnight/overseas market context
-  Insider data in Trend & Swing scans
+  Insider data in Velocity Trend Growth & Swing scans
   Run all scans
   PDF reports with AI-oriented prompts
   Watchlist with 2-beep alert and report highlight
@@ -97,14 +95,14 @@ INSTALL.bat          - Run this to install (Windows)
 README.txt           - This file
 README.md            - GitHub / markdown readme
 LICENSE.txt          - MIT license
-RELEASE_v7.7.md      - v7.7 release notes
+RELEASE_v7.83.md     - v7.83 release notes
 USER_MANUAL.md       - Full user manual
 DOCKER.md            - Run with Docker on any OS
 Dockerfile, docker-compose.yml - Docker setup
 
 app/
   app.py                  - Main application
-  trend_scan_v2.py        - Trend scanner (long-term)
+  velocity_trend_growth.py - Velocity Trend Growth (momentum) scanner
   emotional_dip_scanner.py - Swing (emotional dips)
   watchlist_scanner.py    - Watchlist (Down X% or All)
   premarket_volume_scanner.py - Pre-Market volume scanner
@@ -113,10 +111,10 @@ app/
   market_intel.py         - Market intelligence + overnight markets
   report_generator.py     - PDF report builder
   finviz_safe.py          - Timeout-protected Finviz wrapper
-  scan_settings.py        - Configuration
+  scan_settings.py       - Configuration
   requirements.txt
-  scan_types.json         - Scan types (4 scanners)
-  scanner_cli.py          - CLI for automation
+  scan_types.json        - Scan types (4 scanners)
+  scanner_cli.py         - CLI for automation
   reports/                - Generated PDFs (created at runtime)
 
 
@@ -148,5 +146,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v7.7 - made with Claude AI
+   ClearBlueSky v7.83 - made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

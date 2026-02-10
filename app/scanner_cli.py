@@ -18,14 +18,14 @@ DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
 
 # Scan type -> display name for report generator
 SCAN_DISPLAY_NAMES = {
-    "trend": "Trend",
+    "velocity_trend_growth": "Velocity Trend Growth",
     "swing": "Swing",
     "premarket": "Premarket",
     "watchlist": "Watchlist",
 }
 
-# Scan types that use index (sp500 / etfs)
-INDEX_SCANS = {"trend", "swing", "premarket"}
+# Scan types that use index (S&P 500 + ETFs)
+INDEX_SCANS = {"velocity_trend_growth", "swing", "premarket"}
 
 
 def _progress(msg: str) -> None:
@@ -41,7 +41,7 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
     """Generate PDF + JSON + optional _ai.txt. Returns base path (no extension) or None."""
     from report_generator import HTMLReportGenerator
 
-    zero_min = ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket")
+    zero_min = ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket", "Velocity Trend Growth")
     default_min = 0 if scan_type_display in zero_min else 65
     min_score = int(config.get(f"{scan_type_display.lower()}_min_score", default_min))
     reports_dir = config.get("reports_folder") or DEFAULT_REPORTS_DIR
@@ -85,7 +85,8 @@ def _generate_report_cli(results, scan_type_display: str, config: dict, index: s
             content = __import__("json").dumps(analysis_package, indent=2)
             ai_response = analyze_with_config(config, system_prompt, content, image_base64_list=None)
             ai_path = base + "_ai.txt"
-            _ai_header = "Prompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
+            from report_generator import SCANNER_GITHUB_URL
+            _ai_header = f"Created using ClearBlueSky Stock Scanner. Scanner: {SCANNER_GITHUB_URL}\n\nPrompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
             if ai_response:
                 with open(ai_path, "w", encoding="utf-8") as f:
                     f.write(_ai_header + ai_response)
@@ -115,18 +116,12 @@ def main() -> int:
         "--scan",
         required=True,
         choices=[
-            "trend",
+            "velocity_trend_growth",
             "swing",
             "premarket",
             "watchlist",
         ],
         help="Scan type to run",
-    )
-    parser.add_argument(
-        "--index",
-        choices=["sp500", "etfs"],
-        default="sp500",
-        help="Index for trend/swing/premarket (default: sp500)",
     )
     parser.add_argument(
         "--watchlist-file",
@@ -150,25 +145,50 @@ def main() -> int:
         _progress(f"Using watchlist from file: {len(tickers)} tickers")
 
     scan_key = args.scan
-    index = args.index if scan_key in INDEX_SCANS else None
+    index = "sp500_etfs" if scan_key in INDEX_SCANS else None
     display_name = SCAN_DISPLAY_NAMES[scan_key]
 
-    print(f"Starting {display_name} scan...", flush=True)
-    if index:
-        print(f"   Index: {index}", flush=True)
+    print(f"Starting {display_name} scan (S&P 500 + ETFs)...", flush=True)
 
     try:
         results = None
 
-        if scan_key == "trend":
-            from trend_scan_v2 import trend_scan
-            _progress("Fetching overview data (this may take a minute)...")
-            df = trend_scan(progress_callback=_progress, index=index)
-            results = df.to_dict("records") if df is not None and len(df) > 0 else None
-
-        elif scan_key == "swing":
+        if scan_key == "swing":
             from emotional_dip_scanner import run_emotional_dip_scan
             results = run_emotional_dip_scan(progress_callback=_progress, index=index)
+
+        elif scan_key == "velocity_trend_growth":
+            from velocity_trend_growth import run_velocity_trend_growth_scan
+            cfg = config or {}
+            trend_days = int(cfg.get("vtg_trend_days", 20) or 20)
+            target_pct = float(cfg.get("vtg_target_return_pct", 5) or 5)
+            risk_pct = float(cfg.get("vtg_risk_pct", 30) or 30)
+            max_tickers = int(cfg.get("vtg_max_tickers", 20) or 20)
+            min_price = float(cfg.get("vtg_min_price", 25) or 25)
+            max_price = float(cfg.get("vtg_max_price", 600) or 600)
+            min_vol_k = int(cfg.get("vtg_min_volume", 100) or 100)
+            min_volume = min_vol_k * 1000
+            require_beats_spy = bool(cfg.get("vtg_require_beats_spy", False))
+            require_volume_confirm = bool(cfg.get("vtg_require_volume_confirm", False))
+            require_ma_stack = bool(cfg.get("vtg_require_ma_stack", False))
+            rsi_min = int(cfg.get("vtg_rsi_min", 0) or 0)
+            rsi_max = int(cfg.get("vtg_rsi_max", 100) or 100)
+            results = run_velocity_trend_growth_scan(
+                progress_callback=_progress,
+                index=index,
+                trend_days=trend_days,
+                target_return_pct=target_pct,
+                risk_pct=risk_pct,
+                max_tickers=max_tickers,
+                min_price=min_price,
+                max_price=max_price,
+                require_beats_spy=require_beats_spy,
+                min_volume=min_volume,
+                require_volume_confirm=require_volume_confirm,
+                require_ma_stack=require_ma_stack,
+                rsi_min=rsi_min,
+                rsi_max=rsi_max,
+            )
 
         elif scan_key == "premarket":
             from premarket_volume_scanner import run_premarket_volume_scan

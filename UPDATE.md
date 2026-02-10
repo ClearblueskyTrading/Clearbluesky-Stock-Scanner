@@ -14,8 +14,9 @@ Backups are stored in `app/update_backups/`. The updater uses the GitHub release
 
 - **v7.0** – Base release with queue-based scans, Run all scans, in-app **Update** and **Rollback**.
 - **v7.1–v7.6** – Incremental feature + stability releases.
-- **v7.7** – Scanner consolidation (7→4), ticker enrichment, overnight markets, insider data in Trend & Swing.
-- Future versions follow strict incremental versioning (`v7.8`, `v7.9`, etc.).
+- **v7.7** – Scanner consolidation (7→4), ticker enrichment, overnight markets, insider data.
+- **v7.83** – Velocity Trend Growth (sector-first momentum), legacy Trend removed, curated ETFs.
+- Future versions follow strict incremental versioning (`v7.84`, etc.).
 
 When you **Update** from the app, you get the latest release. When you **Rollback**, you return to the version you had before that update.
 

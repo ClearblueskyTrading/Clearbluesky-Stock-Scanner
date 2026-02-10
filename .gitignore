@@ -25,6 +25,7 @@ app/__pycache__/
 # Reports and scan outputs (user-generated)
 app/reports/
 app/scans/
+app/scanner_output/
 
 # RAG index and backtest DB (user-generated; do not ship)
 app/rag_store/

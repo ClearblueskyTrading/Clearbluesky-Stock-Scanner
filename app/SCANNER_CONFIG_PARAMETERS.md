@@ -8,28 +8,34 @@ Single reference of every config parameter used by each scan. Use this for AI re
 
 | Key | Description | Default | Used by |
 |-----|-------------|---------|---------|
-| `min_price` | Minimum stock price ($) | 5.0 | Trend, Swing, Emotional, Pre-Market |
-| `max_price` | Maximum stock price ($) | 500.0 | Trend, Swing, Emotional, Pre-Market |
-| `min_avg_volume` | Minimum average volume (stored in thousands in UI; app uses ×1000) | 500000 | Trend, Swing, Emotional, Pre-Market |
+| `min_price` | Minimum stock price ($) | 5.0 | Velocity Trend Growth, Swing, Emotional, Pre-Market |
+| `max_price` | Maximum stock price ($) | 500.0 | Velocity Trend Growth, Swing, Emotional, Pre-Market |
+| `min_avg_volume` | Minimum average volume (stored in thousands in UI; app uses ×1000) | 500000 | Swing, Emotional, Pre-Market |
 
 **Note:** News and analyst ratings are always fetched (Finviz) for all scans that do per-ticker analysis; there are no toggles.
 
 ---
 
-## 1. Trend – Long-term (`trend`)
+## 1. Velocity Trend Growth (`velocity_trend_growth`)
 
-**Purpose:** Uptrending names (MA stack, performance). Best run after market close.
+**Purpose:** Momentum scan (sector-first). Ranks sectors by N-day return, then scans S&P 500 stocks + ETFs in leading sectors only. Best run after market close.
 
 | Key | Label | Type | Min | Max | Default | Description |
 |-----|-------|------|-----|-----|---------|-------------|
-| `trend_min_score` | Min Score | int | 50 | 95 | 70 | Minimum score for a stock to appear in the report (report filter). |
-| `trend_min_quarter_perf` | Min Quarter % | float | 0 | 50 | 10 | Minimum quarterly performance % (used in legacy Settings; Trend screener uses fixed Finviz filters). |
-| `min_price` | Min Price $ | float | 1 | 50 | 5 | Min price filter. |
-| `max_price` | Max Price $ | float | 100 | 1000 | 500 | Max price filter. |
-| `min_avg_volume` | Min Avg Vol (K) | int_vol_k | 100 | 5000 | 500 | Min average volume (K); stored as 500000 in config. |
-| `trend_require_ma_stack` | Require MA Stack | bool | — | — | true | Require price > SMA20 > SMA50 > SMA200 (used in legacy Settings; Trend screener uses Finviz MA filters). |
+| `vtg_trend_days` | Trend Days | choice | — | — | 20 | 20 or 50 trading days. |
+| `vtg_target_return_pct` | Target Return % | float | 1 | 300 | 5 | Minimum N-day return. 5–8% weak markets; 12–15% strong. |
+| `vtg_risk_pct` | Risk % of Account | float | 5 | 50 | 30 | Position sizing. |
+| `vtg_max_tickers` | Max Tickers | int | 5 | 50 | 20 | Max results returned. |
+| `vtg_min_price` | Min Price $ | float | 1 | 100 | 25 | Min price filter. |
+| `vtg_max_price` | Max Price $ | float | 50 | 2000 | 600 | Max price filter. |
+| `vtg_require_beats_spy` | Require beats SPY | bool | — | — | false | Only stocks outperforming SPY. |
+| `vtg_min_volume` | Min Avg Volume (K) | int | 0 | 10000 | 100 | Min average volume (K; app uses ×1000). |
+| `vtg_require_volume_confirm` | Volume above 20d avg | bool | — | — | false | Accumulation confirmation. |
+| `vtg_require_ma_stack` | Require MA stack | bool | — | — | false | Price > EMA10 > EMA20 > EMA50. |
+| `vtg_rsi_min` | RSI min (0=off) | int | 0 | 100 | 0 | RSI filter lower bound. |
+| `vtg_rsi_max` | RSI max (100=off) | int | 0 | 100 | 100 | RSI filter upper bound. |
 
-**Screener (hardcoded in `trend_scan_v2.py`):** Index (S&P 500 or Russell 2000), Price above SMA200/50/20, Average Volume Over 500K, Price Over $5. Scoring is done in Python (quarter/month/week performance, relative volume, change, yearly performance).
+**Data:** Sector-first: ranks 11 sector SPDRs by return, then fetches S&P 500 + curated ETFs. Universe: ~160 tickers (top 4 sectors + index ETFs). Scanner: `velocity_trend_growth.run_velocity_trend_growth_scan`.
 
 ---
 
@@ -127,7 +133,8 @@ No config parameters (empty `SCAN_PARAM_SPECS["watchlist_tickers"]`). Scanner: `
 
 | Concept | Source | Description |
 |---------|--------|-------------|
-| Min score for PDF | `{scan}_min_score` | From config: `trend_min_score`, `swing_min_score`, `emotional_min_score`, `premarket_min_score`. Used in app when calling report generator. |
+| Min score for PDF | `{scan}_min_score` | From config: `swing_min_score`, `emotional_min_score`, `premarket_min_score`. Velocity Trend Growth uses 0. |
+
 | Max tickers in PDF | Hardcoded | Top 15 tickers (by score) included in each PDF (`qualifying = qualifying[:15]` in `report_generator.py`). |
 
 Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.lower()}_min_score', 65)`. Scans that use **min_score 0** (no filter): Watchlist, Watchlist 3pm, Watchlist – All tickers, Insider, Velocity Barbell.
@@ -158,11 +165,12 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 
 ## Summary table (config key → scan)
 
-| Key | Trend | Swing | Emotional | Watchlist | Velocity | Pre-Market |
-|-----|-------|-------|-----------|-----------|----------|------------|
-| `trend_min_score` | ✓ | | | | | |
-| `trend_min_quarter_perf` | ✓ | | | | | |
-| `trend_require_ma_stack` | ✓ | | | | | |
+| Key | Trend Growth | Swing | Emotional | Watchlist | Velocity | Pre-Market |
+|-----|---------------|-------|-----------|-----------|----------|------------|
+| `vtg_trend_days` | ✓ | | | | | |
+| `vtg_target_return_pct` | ✓ | | | | | |
+| `vtg_min_price` | ✓ | | | | | |
+| `vtg_max_price` | ✓ | | | | | |
 | `swing_min_score` | | ✓ | | | | |
 | `dip_min_percent` | | ✓ | | | | |
 | `dip_max_percent` | | ✓ | | | | |
@@ -186,4 +194,4 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 | `premarket_track_sector_heat` | | | | | | ✓ |
 | `min_price` | ✓ | ✓ | ✓ | | | ✓ |
 | `max_price` | ✓ | ✓ | ✓ | | | ✓ |
-| `min_avg_volume` | ✓ | ✓ | ✓ | | | ✓ |
+| `min_avg_volume` | | ✓ | ✓ | | | ✓ |

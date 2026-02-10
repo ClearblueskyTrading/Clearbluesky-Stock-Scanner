@@ -4,6 +4,27 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.83] – 2026-02-10
+
+### Added — Velocity Trend Growth (sector-first momentum scan)
+
+- **Sector-first scan** — Ranks 11 GICS sectors by N-day return (sector SPDRs), then scans only S&P 500 stocks + ETFs in top 4 leading sectors. Reduces universe from ~400 to ~160 tickers; faster and more targeted.
+- **Curated ETF list** — Replaces full Finviz ETF screener (~250 tickers) with ~45 key ETFs (index, sector, leveraged, commodities). Saves ~1.5 min per scan.
+- **New filters** — Optional: beat SPY, min volume (100K default), volume above 20d avg, MA stack (10>20>50), RSI band (55–80). All off by default for maximum results.
+- **Sector heat** — Each result shows sector and count (e.g., "Technology (5)"). Sort by sector-adjusted strength.
+
+### Changed — Removed legacy Trend scanner
+
+- **Trend - Long-term removed** — Replaced by Velocity Trend Growth. Old `trend_scan_v2.py` deleted.
+- **Default scan** — Velocity Trend Growth is now first in scan dropdown.
+- **Target return** — Range 1–300%, default 5%. Relaxed filters for weak markets.
+
+### Fixed
+
+- **No results** — Relaxed defaults (beats SPY off, volume off, RSI off, target 5%) so scans return results in flat/bear markets.
+
+---
+
 ## [7.82] – 2026-02-09
 
 ### Changed — Unified AI prompt and experienced-trader output

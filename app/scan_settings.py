@@ -20,9 +20,9 @@ SCAN_PRESETS_FILE = os.path.join(BASE_DIR, "scan_presets.json")
 # Default scan type definitions (can be customized & shared via JSON)
 DEFAULT_SCAN_TYPES = [
     {
-        "id": "trend_long",
-        "label": "Trend - Long-term",
-        "scanner": "trend",  # uses trend_scan_v2.trend_scan
+        "id": "velocity_trend_growth",
+        "label": "Velocity Trend Growth",
+        "scanner": "velocity_trend_growth",
     },
     {
         "id": "swing_dips",
@@ -43,13 +43,20 @@ DEFAULT_SCAN_TYPES = [
 
 # Slider/param specs per scanner (core params only; strict institutional gates removed so scans pass)
 SCAN_PARAM_SPECS = {
-    "trend": [
-        {"key": "trend_min_score", "label": "Min Score", "min": 50, "max": 95, "default": 70, "type": "int"},
-        {"key": "trend_min_quarter_perf", "label": "Min Quarter %", "min": 0, "max": 50, "default": 10, "type": "float"},
-        {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
-        {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
-        {"key": "min_avg_volume", "label": "Min Avg Vol (K)", "min": 100, "max": 5000, "default": 500, "type": "int_vol_k"},
-        {"key": "trend_require_ma_stack", "label": "Require MA Stack", "default": True, "type": "bool"},
+    "velocity_trend_growth": [
+        {"key": "vtg_trend_days", "label": "Trend Days", "type": "choice", "default": 20, "options": [20, 50]},
+        {"key": "vtg_target_return_pct", "label": "Target Return %", "min": 1, "max": 300, "default": 5, "type": "float",
+         "hint": "1-5% weak markets | 8-15% strong. 20d stocks: 8-15% typical"},
+        {"key": "vtg_risk_pct", "label": "Risk % of Account", "min": 5, "max": 50, "default": 30, "type": "float"},
+        {"key": "vtg_max_tickers", "label": "Max Tickers", "min": 5, "max": 50, "default": 20, "type": "int"},
+        {"key": "vtg_min_price", "label": "Min Price $", "min": 1, "max": 100, "default": 25, "type": "float"},
+        {"key": "vtg_max_price", "label": "Max Price $", "min": 50, "max": 2000, "default": 600, "type": "float"},
+        {"key": "vtg_require_beats_spy", "label": "Require beats SPY", "default": False, "type": "bool"},
+        {"key": "vtg_min_volume", "label": "Min Avg Volume (K)", "min": 0, "max": 10000, "default": 100, "type": "int"},
+        {"key": "vtg_require_volume_confirm", "label": "Volume above 20d avg", "default": False, "type": "bool"},
+        {"key": "vtg_require_ma_stack", "label": "Require MA stack (10>20>50)", "default": False, "type": "bool"},
+        {"key": "vtg_rsi_min", "label": "RSI min (0=off)", "min": 0, "max": 100, "default": 0, "type": "int"},
+        {"key": "vtg_rsi_max", "label": "RSI max (100=off)", "min": 0, "max": 100, "default": 100, "type": "int"},
     ],
     "swing": [
         {"key": "emotional_min_score", "label": "Min Score", "min": 50, "max": 90, "default": 65, "type": "int"},
@@ -273,7 +280,7 @@ def load_scan_types():
     
     Structure:
     [
-      {"id": "trend_long", "label": "Trend - Long-term", "scanner": "trend"},
+      {"id": "velocity_trend_growth", "label": "Velocity Trend Growth", "scanner": "velocity_trend_growth"},
       {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"}
     ]
     
@@ -452,21 +459,6 @@ class ScanSettingsWindow:
         self.min_volume.pack(side="left")
         self.min_volume.insert(0, str(self.config.get("min_avg_volume", 500000)))
         
-        # Trend settings
-        tk.Label(filter_frame, text="").pack()
-        tk.Label(filter_frame, text="Trend Scan Settings:", font=("Arial", 10, "bold")).pack(anchor="w")
-        
-        row_qtr = tk.Frame(filter_frame)
-        row_qtr.pack(fill="x", pady=5)
-        tk.Label(row_qtr, text="Min Quarter Perf %:", width=18, anchor="w").pack(side="left")
-        self.trend_qtr = tk.Entry(row_qtr, width=8)
-        self.trend_qtr.pack(side="left")
-        self.trend_qtr.insert(0, str(self.config.get("trend_min_quarter_perf", 10)))
-        
-        self.ma_stack_var = tk.BooleanVar(value=self.config.get("trend_require_ma_stack", True))
-        tk.Checkbutton(filter_frame, text="Require MA stacking (Price > SMA20 > SMA50 > SMA200)", 
-                      variable=self.ma_stack_var).pack(anchor="w")
-
         # === BUTTONS at bottom ===
         btn_frame = tk.Frame(self.win)
         btn_frame.pack(fill="x", padx=10, pady=10)
@@ -501,8 +493,6 @@ class ScanSettingsWindow:
                 "min_price": float(self.min_price.get()),
                 "max_price": float(self.max_price.get()),
                 "min_avg_volume": int(self.min_volume.get()),
-                "trend_min_quarter_perf": float(self.trend_qtr.get()),
-                "trend_require_ma_stack": self.ma_stack_var.get(),
             })
             
             save_config(self.config)

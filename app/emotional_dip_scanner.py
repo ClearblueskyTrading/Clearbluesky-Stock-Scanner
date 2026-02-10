@@ -41,7 +41,7 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
     """
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else ("ETFs" if index == "etfs" else "Leveraged (high-conviction)")
+    index_name = "S&P 500 + ETFs" if index in ("sp500", "etfs", "sp500_etfs") else "Leveraged (high-conviction)"
     
     if progress_callback:
         progress_callback(f"Scanning {index_name} for emotional dips...")

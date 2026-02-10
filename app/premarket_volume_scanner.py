@@ -60,10 +60,8 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     _cancel_event = cancel_event
     config = load_config()
     
-    index_name = "S&P 500" if index == "sp500" else "ETFs"
-    
     if progress_callback:
-        progress_callback(f"Scanning {index_name} for pre-market volume activity...")
+        progress_callback("Scanning S&P 500 + ETFs for pre-market volume activity...")
     
     # Get current time to validate scan window
     now = datetime.now()
@@ -89,61 +87,56 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     min_vol_float_ratio = float(config.get('premarket_min_vol_float_ratio', 0.01))
     track_sector_heat = config.get('premarket_track_sector_heat', True)
     
-    # Index filter (Finviz: idx_sp500, idx_rut, ind_exchangetradedfund for ETFs)
-    if index == 'etfs':
-        idx_filter = 'ind_exchangetradedfund'
-    else:
-        idx_filter = 'idx_sp500' if index == 'sp500' else 'idx_rut'
-    
-    # Use Finviz screener for unusual volume
-    # Note: Finviz may not have pre-market volume directly, so we use regular volume
-    # and gap filters as proxy
-    filters = [
-        idx_filter,
-        f'sh_price_o{int(min_price)}',
-        f'sh_price_u{int(max_price)}',
-        f'sh_avgvol_o{int(min_volume/1000)}',
-        'ta_change_u',  # Unusual volume
-    ]
+    # Always scan both S&P 500 and ETFs
+    idx_filters = [('idx_sp500', 'sp500'), ('ind_exchangetradedfund', 'etfs')]
+    candidates = []
+    seen = set()
     
     try:
-        print(f"[PREMARKET] Screener filters: {filters}")
-        screener = Screener(filters=filters, order='change')
-        print(f"[PREMARKET] Screener returned {len(screener)} raw results")
-        candidates = []
-        
-        for stock in screener:
-            if _is_cancelled():
-                if progress_callback:
-                    progress_callback("Scan cancelled.")
-                return []
-            try:
-                ticker = stock.get('Ticker')
-                if not ticker:
+        for idx_filter, _ in idx_filters:
+            filters = [
+                idx_filter,
+                f'sh_price_o{int(min_price)}',
+                f'sh_price_u{int(max_price)}',
+                f'sh_avgvol_o{int(min_volume/1000)}',
+                'ta_change_u',
+            ]
+            print(f"[PREMARKET] Screener filters: {filters}")
+            screener = Screener(filters=filters, order='change')
+            print(f"[PREMARKET] Screener returned {len(screener)} raw results")
+            
+            for stock in screener:
+                if _is_cancelled():
+                    if progress_callback:
+                        progress_callback("Scan cancelled.")
+                    return []
+                try:
+                    ticker = stock.get('Ticker')
+                    if not ticker or ticker in seen:
+                        continue
+                    seen.add(ticker)
+                    
+                    price = float(stock.get('Price', 0))
+                    change_str = stock.get('Change', '0%').replace('%', '')
+                    change = float(change_str)
+                    
+                    if abs(change) < min_gap or abs(change) > max_gap:
+                        continue
+                    
+                    candidates.append({
+                        'ticker': ticker,
+                        'company': stock.get('Company', ticker),
+                        'price': price,
+                        'change': change,
+                        'gap_percent': abs(change),
+                        'gap_direction': 'up' if change > 0 else 'down',
+                        'volume': stock.get('Volume', '0'),
+                        'rel_volume': stock.get('Rel Volume', '1.0x'),
+                        'sector': stock.get('Sector', 'N/A'),
+                        'industry': stock.get('Industry', 'N/A'),
+                    })
+                except Exception:
                     continue
-                
-                price = float(stock.get('Price', 0))
-                change_str = stock.get('Change', '0%').replace('%', '')
-                change = float(change_str)
-                
-                # Filter by gap percentage
-                if abs(change) < min_gap or abs(change) > max_gap:
-                    continue
-                
-                candidates.append({
-                    'ticker': ticker,
-                    'company': stock.get('Company', ticker),
-                    'price': price,
-                    'change': change,
-                    'gap_percent': abs(change),
-                    'gap_direction': 'up' if change > 0 else 'down',
-                    'volume': stock.get('Volume', '0'),
-                    'rel_volume': stock.get('Rel Volume', '1.0x'),
-                    'sector': stock.get('Sector', 'N/A'),
-                    'industry': stock.get('Industry', 'N/A'),
-                })
-            except Exception as e:
-                continue
         
         if _is_cancelled():
             return []

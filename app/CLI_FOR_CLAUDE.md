@@ -19,7 +19,7 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 
 | Value | Description |
 |-------|-------------|
-| `trend` | Long-term sector rotation stocks (S&P 500 / ETFs). Best after close. Includes insider data. |
+| `velocity_trend_growth` | Momentum scan: sector-first (top sectors by return), then S&P 500 stocks + ETFs in leading sectors. Best after close. |
 | `swing` | Emotional-only dips (index-based). Best 2:30–4:00 PM. Includes earnings/news/insider enrichment. |
 | `premarket` | Combined pre-market volume + velocity gap analysis (index-based). Best 7–9:25 AM. |
 | `watchlist` | Watchlist: Filter from config – Down X% today (1–25%) or All tickers. Uses config or `--watchlist-file`. |
@@ -29,10 +29,10 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 ## Options
 
 - **`--scan`** (required)  
-  One of: `trend`, `swing`, `premarket`, `watchlist`.
+  One of: `velocity_trend_growth`, `swing`, `premarket`, `watchlist`.
 
 - **`--index`** (optional, default: `sp500`)  
-  Only used for: `trend`, `swing`, `premarket`.  
+  Only used for: `velocity_trend_growth`, `swing`, `premarket`.  
   Values: `sp500`, `etfs`.
 
 - **`--watchlist-file PATH`** (optional)  
@@ -55,7 +55,7 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 - Progress lines are prefixed with spaces (e.g. `   Fetching data from Finviz...`).
 - On success with a report, the last line is:  
   **`[OK] Scan complete: reports/<basename>.*`**  
-  Example: `[OK] Scan complete: reports/Trend_Scan_20260209_160015.*`
+  Example: `[OK] Scan complete: reports/Velocity_Trend_Growth_20260209_160015.*`
 - On failure: **`[FAIL] Rate limit hit: ...`** or **`[FAIL] Scan failed: ...`** (to stderr).  
   (ASCII-only so Windows console works.)
 
@@ -69,21 +69,18 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
   - `{ScanType}_Scan_{YYYYMMDD_HHMMSS}.json`
   - `{ScanType}_Scan_{YYYYMMDD_HHMMSS}_ai.txt` (if OpenRouter is configured and ran)
 
-So after **`[OK] Scan complete: reports/Trend_Scan_20260209_160015.*`**, Claude can look for:
-- `reports/Trend_Scan_20260209_160015.pdf`
-- `reports/Trend_Scan_20260209_160015.json`
-- `reports/Trend_Scan_20260209_160015_ai.txt`
+So after **`[OK] Scan complete: reports/Velocity_Trend_Growth_20260209_160015.*`**, Claude can look for:
+- `reports/Velocity_Trend_Growth_20260209_160015.pdf`
+- `reports/Velocity_Trend_Growth_20260209_160015.json`
+- `reports/Velocity_Trend_Growth_20260209_160015_ai.txt`
 
 ---
 
 ## Example commands (for Claude)
 
 ```bash
-# Trend scan on S&P 500 (default)
-python scanner_cli.py --scan trend
-
-# Trend scan on ETFs
-python scanner_cli.py --scan trend --index etfs
+# Velocity Trend Growth (momentum) on S&P 500 + ETFs
+python scanner_cli.py --scan velocity_trend_growth
 
 # Swing scan on S&P 500 (default)
 python scanner_cli.py --scan swing
