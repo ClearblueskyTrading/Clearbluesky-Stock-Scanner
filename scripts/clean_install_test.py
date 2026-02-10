@@ -41,6 +41,7 @@ def main():
             import json
             data = json.loads(raw)
             data.pop("_comment", None)
+            data["watchlist_filter"] = "all"
             with open(config_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
             print("[2] Blank config (no API keys) written")
@@ -52,18 +53,22 @@ def main():
                 "alpha_vantage_api_key": "",
                 "alpaca_api_key": "",
                 "alpaca_secret_key": "",
-                "trend_min_score": 70,
-                "swing_min_score": 60,
+                "watchlist_filter": "all",
+                "emotional_min_score": 60,
                 "watchlist_pct_down_from_open": 5,
             }
             import json
             with open(config_path, "w", encoding="utf-8") as f:
                 json.dump(cfg, f, indent=2)
 
-        # 4. Run scan from temp app dir (etfs = smaller universe, faster)
-        print("[3] Running scan (trend, etfs — small universe)...")
+        # 4. Build a tiny watchlist fixture and run watchlist scan
+        watchlist_path = app_dest / "_clean_test_watchlist.txt"
+        with open(watchlist_path, "w", encoding="utf-8") as f:
+            f.write("AAPL\nMSFT\nNVDA\n")
+
+        print("[3] Running scan (watchlist, small fixture)...")
         result = subprocess.run(
-            [sys.executable, "scanner_cli.py", "--scan", "trend", "--index", "etfs"],
+            [sys.executable, "scanner_cli.py", "--scan", "watchlist", "--watchlist-file", str(watchlist_path)],
             cwd=str(app_dest),
             timeout=300,
             capture_output=True,
@@ -82,7 +87,8 @@ def main():
         reports = list((app_dest / "reports").glob("*.pdf")) if (app_dest / "reports").exists() else []
         print(f"[5] PDF reports generated: {len(reports)}")
 
-        if result.returncode == 0 and len(reports) >= 1:
+        # No-candidate scans are still success (exit 0) and may not produce a PDF.
+        if result.returncode == 0:
             print("\nCLEAN INSTALL TEST: PASSED")
             return 0
         else:

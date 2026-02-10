@@ -102,7 +102,7 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 ### Watchlist
 
 **What it does:** Monitors your personal watchlist tickers. Two modes:
-- **Down X% today** — Only shows watchlist stocks down at least X% from today's open.
+- **Down % today** — Only shows watchlist stocks down within the 0–X% range (X = slider max).
 - **All tickers** — Shows all watchlist stocks with current data.
 
 **Best time to run:** Anytime during market hours for real-time monitoring.
@@ -168,8 +168,8 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 ### Watchlist Config
 | Setting | Default | Description |
 |---------|---------|-------------|
-| Filter | Down X% | "down_pct" = only show stocks down X% today; "all" = show everything |
-| Min % down | 5 | Minimum percentage down from open (when filter = down_pct) |
+| Filter | Down % today | "down_pct" = only show stocks down in the 0–X% range today; "all" = show everything |
+| Max % down | 5 | Maximum percentage down in the 0–X% range (when filter = down_pct) |
 
 *Note: Velocity Barbell, Insider, and Pre-Market Hunter were standalone scanners in v7.6 and earlier. In v7.7, their functionality is folded into the remaining 4 scanners (insider data in Velocity Trend Growth & Swing, leveraged suggestions in Swing & Pre-Market, velocity gap analysis in Pre-Market).*
 

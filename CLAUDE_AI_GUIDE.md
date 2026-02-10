@@ -104,7 +104,7 @@ User copies prompt to AI for analysis
 - Returns list of dip opportunities
 
 **watchlist_scanner.py** - Watchlist Scanner
-- Filter: Down X% today (min % in 1–25%) or All tickers
+- Filter: Down % today (0–X% range, slider = max) or All tickers
 - Scans only tickers in user watchlist
 - Returns list for report
 
@@ -138,7 +138,6 @@ User copies prompt to AI for analysis
   "trend_require_ma_stack": true,
   "dip_require_news_check": true,
   "dip_require_analyst_check": true,
-  "broker_url": "https://www.schwab.com",
   "other_ai_url": "",
   "finviz_api_key": ""
 }
@@ -184,7 +183,7 @@ PINK = "#E91E63"          # Donate button
 │  │ [====Progress====] 25% (8s) │    │
 │  └─────────────────────────────┘    │
 ├─────────────────────────────────────┤
-│ [Reports] [Broker] [Logs]           │
+│ [Reports] [History] [Logs] [Config] │
 │ [Settings] [Help] [Donate] [Exit]   │
 ├─────────────────────────────────────┤
 │ Status: Ready                       │

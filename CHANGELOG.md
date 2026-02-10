@@ -4,6 +4,18 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.85] – 2026-02-10
+
+### Fixed — QA and CLI consistency
+- **CLI min-score keys** now match GUI/report behavior (Swing uses `emotional_min_score`; normalized scan keys).
+- **Clean install test** now uses valid CLI args (`watchlist` + fixture file) and treats no-candidate scans as success (exit 0).
+- **Watchlist filter handling** accepts both internal value (`all`) and display label (`All tickers`).
+- **Watchlist range parity** runtime now matches documented 0–25% slider behavior.
+- **Config loading** app startup now uses `scan_settings.load_config()` defaults/migrations.
+
+### Docs
+- Updated README, USER_MANUAL, CLI guide, and in-app Help text to current behavior.
+
 ## [7.84] – 2026-02-10
 
 ### Changed — Watchlist scanner

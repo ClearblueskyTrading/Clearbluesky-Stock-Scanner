@@ -32,7 +32,7 @@ DEFAULT_SCAN_TYPES = [
     {
         "id": "watchlist",
         "label": "Watchlist",
-        "scanner": "watchlist",  # Filter: Down X% today or All tickers
+        "scanner": "watchlist",  # Filter: Down % today (0-X range) or All tickers
     },
     {
         "id": "premarket",
@@ -209,6 +209,7 @@ def load_config():
         "premarket_track_sector_heat": True,
         
         # Watchlist scanner (today's Change % down 0–X% range; slider = max)
+        "watchlist_filter": "down_pct",
         "watchlist_pct_down_from_open": 5.0,
         
         # Velocity Barbell scanner: min sector %, theme = auto | barbell | single_shot
@@ -264,6 +265,12 @@ def load_config():
                     defaults["emotional_min_upside_to_target"] = 5.0
                     defaults["emotional_dip_min_percent"] = 1.0
                     defaults["emotional_dip_max_percent"] = 5.0
+                # v7.85 migration: normalize watchlist filter to internal values
+                wf = str(defaults.get("watchlist_filter", "down_pct") or "down_pct").strip().lower()
+                if wf in ("all", "all tickers"):
+                    defaults["watchlist_filter"] = "all"
+                else:
+                    defaults["watchlist_filter"] = "down_pct"
         except Exception:
             pass
 

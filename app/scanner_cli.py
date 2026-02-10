@@ -37,13 +37,37 @@ def _is_rate_limit(err: Exception) -> bool:
     return "429" in s or "rate" in s or "rate limit" in s
 
 
-def _generate_report_cli(results, scan_type_display: str, config: dict, index: str | None, progress_fn) -> str | None:
+def _is_watchlist_all_mode(filter_value) -> bool:
+    """Accept both stored value ('all') and display text ('All tickers')."""
+    return str(filter_value or "down_pct").strip().lower() in ("all", "all tickers")
+
+
+def _get_min_score(config: dict, scan_key: str, scan_type_display: str) -> int:
+    """
+    Keep CLI min-score behavior aligned with GUI/report path in app.py.
+    Supports legacy keys for backward compatibility.
+    """
+    zero_min_scans = {"watchlist", "premarket", "velocity_trend_growth"}
+    default_min = 0 if scan_key in zero_min_scans else 65
+
+    if scan_key == "swing":
+        raw = config.get("emotional_min_score", config.get("swing_min_score", default_min))
+    else:
+        normalized_key = f"{scan_key}_min_score"
+        legacy_display_key = f"{scan_type_display.lower()}_min_score"
+        raw = config.get(normalized_key, config.get(legacy_display_key, default_min))
+
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return default_min
+
+
+def _generate_report_cli(results, scan_key: str, scan_type_display: str, config: dict, index: str | None, progress_fn) -> str | None:
     """Generate PDF + JSON + optional _ai.txt. Returns base path (no extension) or None."""
     from report_generator import HTMLReportGenerator
 
-    zero_min = ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket", "Velocity Trend Growth")
-    default_min = 0 if scan_type_display in zero_min else 65
-    min_score = int(config.get(f"{scan_type_display.lower()}_min_score", default_min))
+    min_score = _get_min_score(config, scan_key, scan_type_display)
     reports_dir = config.get("reports_folder") or DEFAULT_REPORTS_DIR
     if not os.path.isabs(reports_dir):
         reports_dir = os.path.join(APP_DIR, reports_dir)
@@ -207,7 +231,7 @@ def main() -> int:
 
         elif scan_key == "watchlist":
             from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
-            use_all = (config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
+            use_all = _is_watchlist_all_mode(config.get("watchlist_filter"))
             results = run_watchlist_tickers_scan(progress_callback=_progress, config=config) if use_all else run_watchlist_scan(progress_callback=_progress, config=config)
 
         if not results or len(results) == 0:
@@ -216,7 +240,7 @@ def main() -> int:
             return 0
 
         _progress(f"Generating PDF report ({len(results)} candidates)...")
-        base_path = _generate_report_cli(results, display_name, config, index, _progress)
+        base_path = _generate_report_cli(results, scan_key, display_name, config, index, _progress)
         if base_path:
             # Predictable output for Claude: reports/<basename>.* (ASCII so Windows console works)
             bn = os.path.basename(base_path)

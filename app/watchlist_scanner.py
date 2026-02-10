@@ -1,5 +1,5 @@
 # ============================================================
-# ClearBlueSky - Watchlist Scanner v7.7
+# ClearBlueSky - Watchlist Scanner v7.85
 # ============================================================
 # Scans only tickers in the user's watchlist.
 # Two modes:
@@ -272,7 +272,7 @@ def run_watchlist_scan(
 ) -> List[Dict]:
     """
     Watchlist scan — "Down X% today" mode.
-    Only returns tickers down between X% and 25% from prior close.
+    Only returns tickers down within the range 0% to X% from prior close.
     Sequential fetching (rate-limit safe), real scoring, full TA data.
     """
     cfg = config or load_config()
@@ -285,14 +285,14 @@ def run_watchlist_scan(
 
     # Slider = max % down. Range is 0% to X% (down within that range, not exact X).
     pct_down_max = float(cfg.get("watchlist_pct_down_from_open", 5.0))
-    pct_down_max = max(0.1, min(25.0, pct_down_max))
+    pct_down_max = max(0.0, min(25.0, pct_down_max))
     pct_down_min = 0.01  # Include any down ticker; max is slider
 
     def progress(msg):
         if progress_callback:
             progress_callback(msg)
 
-    progress(f"Scanning {len(watchlist)} watchlist tickers (down 0–{pct_down_max}% today)...")
+    progress(f"Scanning {len(watchlist)} watchlist tickers (down 0-{pct_down_max}% today)...")
 
     def _down_filter(stock, change_pct):
         """Only keep tickers that are down within the range 0% to X% (X = slider)."""
@@ -303,7 +303,7 @@ def run_watchlist_scan(
 
     results = _scan_watchlist_sequential(watchlist, progress, cancel_event, filter_fn=_down_filter)
     results.sort(key=lambda x: -x["score"])
-    progress(f"Found {len(results)} watchlist tickers down 0–{pct_down_max}% today.")
+    progress(f"Found {len(results)} watchlist tickers down 0-{pct_down_max}% today.")
     return results
 
 

@@ -1,8 +1,8 @@
-# ClearBlueSky Stock Scanner v7.83
+# ClearBlueSky Stock Scanner v7.85
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **4 Scanners** – Trend (long-term sector rotation), Swing (emotional dips), Watchlist (Down X% or All), Pre-Market (combined volume + velocity gap analysis) — S&P 500 / ETFs universe
+- **4 Scanners** – Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist (Down % today or All), Pre-Market (combined volume + velocity gap analysis) — S&P 500 / ETFs universe
 - **Ticker Enrichment** – Earnings date warnings, news sentiment flags (DANGER/NEGATIVE/POSITIVE), live price at report time, leveraged ETF suggestions on Swing & Pre-Market
 - **Overnight/Overseas Markets** – Japan, China, Brazil, Europe, India, Taiwan, South Korea ETFs tracked and fed to AI context
 - **Insider Data** – SEC Form 4 insider filings folded into Trend & Swing reports (not a standalone scanner)
@@ -27,9 +27,9 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 3. **Scan** – Choose scan type and index (S&P 500 / ETFs); click **Run Scan**. Optional: check **Run all scans** (rate-limited).
 4. **Report** – PDF + JSON open when done (reports show per-stock SMA200 status: Above/Below/At/N/A). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
 
-**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan trend` (or swing, watchlist, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
+**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity_trend_growth` (or swing, watchlist, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
 
-**Watchlist:** Click **Watchlist** to add symbols (max 200). Config: **Filter** = Down X% today (min % in 1–25%) or All tickers. You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it's listed at the top of the report with a WATCHLIST label.
+**Watchlist:** Click **Watchlist** to add symbols (max 200). Config: **Filter** = Down % today (0–X% range, slider = max) or All tickers. You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it's listed at the top of the report with a WATCHLIST label.
 
 **Quick Lookup:** Enter 1-5 ticker symbols (comma or space separated) in the Quick Lookup box and click **Report** for an instant analysis report.
 
@@ -66,17 +66,17 @@ ClearBlueSky/
 ├── CLAUDE_AI_GUIDE.md  ← Guide for modifying/rebuilding with AI
 ├── Dockerfile
 ├── docker-compose.yml
-├── RELEASE_v7.6.md     ← v7.6 release notes
-├── RELEASE_v7.7.md     ← v7.7 release notes (current)
+├── RELEASE_v7.84.md    ← v7.84 release notes
+├── RELEASE_v7.85.md    ← v7.85 release notes (current)
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
     ├── run.sh          ← Run on Linux/macOS (no Docker)
     ├── app.py                  ← Main app
-    ├── trend_scan_v2.py        ← Trend scanner (long-term sector rotation)
+    ├── velocity_trend_growth.py← Velocity Trend Growth scanner (sector-first momentum)
     ├── emotional_dip_scanner.py← Swing (emotional dips)
     ├── report_generator.py     ← PDF reports + AI prompt
-    ├── watchlist_scanner.py    ← Watchlist (Down X% or All)
+    ├── watchlist_scanner.py    ← Watchlist (Down % today 0–X or All)
     ├── market_intel.py         ← Market Intelligence (news, sectors, overnight markets)
     ├── smart_money.py          ← Smart Money signals (WSB, 13F, SEC insider)
     ├── ticker_enrichment.py    ← Earnings warnings, news flags, leveraged suggestions
@@ -103,9 +103,9 @@ ClearBlueSky/
 
 | Scanner        | Best for              | When to run        |
 |----------------|------------------------|--------------------|
-| **Trend**      | Long-term sector rotation holds (weeks–months) | After market close |
+| **Velocity Trend Growth** | Sector-first momentum leaders (weeks–months) | After market close |
 | **Swing – Dips** | Emotional dips (1–5 days) | 2:30–4:00 PM       |
-| **Watchlist**  | Filter: Down X% today (1–25%) or All tickers | Anytime; Config: Min % down, Filter |
+| **Watchlist**  | Filter: Down % today (0–X%) or All tickers | Anytime; Config: Max % down, Filter |
 | **Pre-Market** | Combined volume scan + velocity gap analysis | 7–9:25 AM |
 
 Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data + `instructions` for AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: "Follow the instructions in the `instructions` field." See **app/WORKFLOW.md** for the full pipeline.
@@ -120,8 +120,6 @@ Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data 
 
 ---
 
-*ClearBlueSky v7.7 – made with Claude AI*
+*ClearBlueSky v7.85 – made with Claude AI*
 
-**v7.7:** Scanner consolidation (7→4), ticker enrichment (earnings/news/leveraged), overnight markets, insider data in Trend & Swing, AI gives 5+ picks, Trend reweighted for long-term sector rotation.  
-**v7.6:** Stability & QA — timeout protection on all Finviz/yfinance calls, TclError crash fixes, AI prompt slimmed.  
-See **app/CHANGELOG.md** and **RELEASE_v7.7.md**.
+See **app/CHANGELOG.md** and latest **RELEASE_v7.85.md**.

@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.84
+# ClearBlueSky Stock Scanner v7.85
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.84"
+VERSION = "7.85"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -16,6 +16,7 @@ import threading
 import re
 from datetime import datetime
 from scan_settings import (
+    load_config as load_app_config,
     load_scan_types,
     SCAN_PARAM_SPECS,
     SCAN_TYPES_FILE,
@@ -48,6 +49,11 @@ def _resolve_reports_dir(path):
     if not os.path.isabs(path):
         path = os.path.join(APP_DIR, path)
     return os.path.abspath(path)
+
+
+def _is_watchlist_all_mode(filter_value) -> bool:
+    """Accept both stored value ('all') and display text ('All tickers')."""
+    return str(filter_value or "down_pct").strip().lower() in ("all", "all tickers")
 
 # GitHub: check for new releases
 GITHUB_RELEASES_API = "https://api.github.com/repos/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases/latest"
@@ -267,7 +273,7 @@ def _scan_worker_loop(app):
                 results = run_emotional_dip_scan(progress_put, index=index)
             elif scanner_kind == "watchlist":
                 from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan
-                use_all = (config.get("watchlist_filter") or "down_pct").strip().lower() == "all"
+                use_all = _is_watchlist_all_mode(config.get("watchlist_filter"))
                 cancel_evt = getattr(app, "_scan_cancel_event", None)
                 results = run_watchlist_tickers_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt) if use_all else run_watchlist_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt)
             elif scanner_kind == "premarket":
@@ -463,8 +469,8 @@ class TradeBotApp:
     
     def load_config(self):
         try:
-            with open(CONFIG_FILE, 'r') as f:
-                return json.load(f)
+            cfg = load_app_config()
+            return cfg if isinstance(cfg, dict) else {}
         except Exception:
             return {}
 
@@ -818,6 +824,10 @@ class TradeBotApp:
                     options = spec.get("options", [])
                     labels = spec.get("option_labels", {})  # value -> display label
                     default = cfg.get(key, spec.get("default", options[0] if options else ""))
+                    if default not in options and labels:
+                        # Backward compat: accept display label saved by manual edits/imports
+                        rev_labels = {v: k for k, v in labels.items()}
+                        default = rev_labels.get(default, default)
                     if default not in options and options:
                         default = options[0]
                     display_values = [labels.get(o, o) for o in options] if labels else options
@@ -866,7 +876,7 @@ class TradeBotApp:
                         if filter_var:
                             def _update_slider_state(*a):
                                 fv = str(filter_var.get() or "").strip().lower()
-                                is_all = fv in ("all", "all tickers")
+                                is_all = _is_watchlist_all_mode(fv)
                                 scale.config(state="disabled" if is_all else "normal")
                             try:
                                 filter_var.trace_add("write", lambda *a: _update_slider_state())
@@ -2146,10 +2156,10 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.7
+ClearBlueSky Stock Scanner v7.85
 
 QUICK START:
-1. Select scan type and index (S&P 500 / ETFs / Leveraged).
+1. Select scan type (index is automatic for index-based scans: S&P 500 + ETFs).
 2. Click Run Scan. You get: PDF report + JSON analysis package.
 3. Optional: Check "Run all scans" (may take 15+ min; rate-limited).
 4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
@@ -2162,22 +2172,20 @@ OUTPUTS (per run):
 SCANNERS (4 total):
 • Velocity Trend Growth – Momentum scan (sector-first, top sectors). Best: after close.
 • Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
-• Watchlist – Filter: Down X% today (min % in 1–25% range) or All tickers.
+• Watchlist – Filter: Down % today (range 0–X%) or All tickers.
 • Pre-Market – Combined volume scan + velocity gap analysis. Best: 7–9:25 AM.
 
-NEW IN v7.7:
-• Earnings date warnings per ticker (EARNINGS TOMORROW, etc.)
-• News sentiment flags (DANGER / NEGATIVE / POSITIVE / NEUTRAL)
-• Overnight/overseas markets (Japan, China, Europe, etc.) in AI context
-• Insider data folded into Velocity Trend Growth & Swing scans
-• Leveraged ETF suggestions on Swing & Pre-Market
-• TOP 5 PLAYS (exactly 5, ranked by conviction)
-• Same prompt in PDF, JSON, _ai.txt — paste all 3 into any AI for human-ready summary
+NEW IN v7.85:
+• Watchlist filter uses 0–X% down range (slider is max % down)
+• Watchlist filter labels are clearer: "Down % today" and "All tickers"
+• Max % down slider disables automatically when "All tickers" is selected
+• CLI/report min-score keys now match GUI behavior (Swing uses emotional_min_score)
+• Clean install QA script now runs valid scanner_cli arguments
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.83
+ClearBlueSky v7.85
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

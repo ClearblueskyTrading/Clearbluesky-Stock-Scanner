@@ -7,7 +7,7 @@ This document explains how to run ClearBlueSky scans from the command line so **
 ## Quick reference
 
 ```bash
-python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
+python scanner_cli.py --scan <TYPE> [--watchlist-file PATH]
 ```
 
 - **Exit 0** = scan finished successfully (reports written if there were candidates).
@@ -22,7 +22,7 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 | `velocity_trend_growth` | Momentum scan: sector-first (top sectors by return), then S&P 500 stocks + ETFs in leading sectors. Best after close. |
 | `swing` | Emotional-only dips (index-based). Best 2:30–4:00 PM. Includes earnings/news/insider enrichment. |
 | `premarket` | Combined pre-market volume + velocity gap analysis (index-based). Best 7–9:25 AM. |
-| `watchlist` | Watchlist: Filter from config – Down X% today (1–25%) or All tickers. Uses config or `--watchlist-file`. |
+| `watchlist` | Watchlist: Filter from config – Down % today (0–X%, slider=max) or All tickers. Uses config or `--watchlist-file`. |
 
 ---
 
@@ -30,10 +30,6 @@ python scanner_cli.py --scan <TYPE> [--index sp500|etfs] [--watchlist-file PATH]
 
 - **`--scan`** (required)  
   One of: `velocity_trend_growth`, `swing`, `premarket`, `watchlist`.
-
-- **`--index`** (optional, default: `sp500`)  
-  Only used for: `velocity_trend_growth`, `swing`, `premarket`.  
-  Values: `sp500`, `etfs`.
 
 - **`--watchlist-file PATH`** (optional)  
   Text file, **one ticker per line**. Overrides the watchlist from `user_config.json` for this run only.  
@@ -88,10 +84,7 @@ python scanner_cli.py --scan swing
 # Pre-market (S&P 500)
 python scanner_cli.py --scan premarket
 
-# Pre-market on ETFs
-python scanner_cli.py --scan premarket --index etfs
-
-# Watchlist (Filter from config: Down X% or All; override tickers with file)
+# Watchlist (Filter from config: Down % today or All; override tickers with file)
 python scanner_cli.py --scan watchlist --watchlist-file C:\path\to\tickers.txt
 ```
 
@@ -114,6 +107,6 @@ python scanner_cli.py --scan watchlist --watchlist-file C:\path\to\tickers.txt
 
 ## Summary for Claude
 
-1. Run: `python scanner_cli.py --scan <type> [--index ...] [--watchlist-file ...]`
+1. Run: `python scanner_cli.py --scan <type> [--watchlist-file ...]`
 2. If exit code **0**: check last line for `[OK] Scan complete: reports/<basename>.*` and use that basename to load PDF/JSON/_ai.txt from `reports/`.
 3. If exit code **1**: do not retry on rate limit; treat as failure and surface the error message.

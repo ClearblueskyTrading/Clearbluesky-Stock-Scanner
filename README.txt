@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 7.83 | Free & Open Source | Made with Claude AI
+   Version 7.85 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,10 +11,11 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v7.83
+   WHAT'S IN v7.85
 ════════════════════════════════════════════════════════════════════════════
 
 • 4 Scanners: Velocity Trend Growth (momentum), Swing (emotional dips), Watchlist, Pre-Market
+• QA consistency fixes: CLI min-score keys now match GUI behavior; clean-install test script fixed
 • Velocity Trend Growth: Sector-first — ranks sectors by return, scans only leading sectors (~160 tickers)
 • Curated ETFs: ~45 key ETFs instead of 250+ (faster scans)
 • Ticker Enrichment: earnings warnings, news sentiment, live price, leveraged suggestions
@@ -95,7 +96,7 @@ INSTALL.bat          - Run this to install (Windows)
 README.txt           - This file
 README.md            - GitHub / markdown readme
 LICENSE.txt          - MIT license
-RELEASE_v7.83.md     - v7.83 release notes
+RELEASE_v7.85.md     - v7.85 release notes
 USER_MANUAL.md       - Full user manual
 DOCKER.md            - Run with Docker on any OS
 Dockerfile, docker-compose.yml - Docker setup
@@ -104,7 +105,7 @@ app/
   app.py                  - Main application
   velocity_trend_growth.py - Velocity Trend Growth (momentum) scanner
   emotional_dip_scanner.py - Swing (emotional dips)
-  watchlist_scanner.py    - Watchlist (Down X% or All)
+  watchlist_scanner.py    - Watchlist (Down % today 0–X or All)
   premarket_volume_scanner.py - Pre-Market volume scanner
   ticker_enrichment.py    - Earnings, news, leveraged suggestions
   insider_scanner.py      - SEC insider data

@@ -4,6 +4,22 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.85] – 2026-02-10
+
+### Fixed — QA and CLI parity
+
+- **CLI min-score parity with GUI** — `scanner_cli.py` now resolves min-score keys by scan type and matches app behavior. Swing uses `emotional_min_score` (with legacy fallback to `swing_min_score`).
+- **CLI key normalization** — Prevents invalid keys from display labels with spaces (e.g. `"velocity trend growth_min_score"`).
+- **Watchlist filter normalization** — Accepts both stored value (`all`) and display label (`All tickers`) in GUI and CLI checks.
+- **Clean install test script** — `scripts/clean_install_test.py` now uses valid CLI args (`--scan watchlist --watchlist-file ...`) and treats no-candidate runs (exit 0) as pass.
+- **Watchlist range consistency** — Runtime clamp now allows `0–25` max-down range to match slider/docs.
+- **Watchlist scanner docs/messages** — Updated mode docstring and progress text for 0–X behavior and Windows-safe console output (`0-X`).
+- **Config loading consistency** — `app.py` now loads config via `scan_settings.load_config()` so startup gets defaults/migrations.
+
+### Changed — Docs
+
+- Updated active docs (`README.md`, `USER_MANUAL.md`, `app/CLI_FOR_CLAUDE.md`, in-app Help text) to match current scanner/CLI behavior.
+
 ## [7.84] – 2026-02-10
 
 ### Changed — Watchlist scanner filter (0–25% down range)
