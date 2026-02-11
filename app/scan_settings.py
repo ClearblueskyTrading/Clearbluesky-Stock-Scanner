@@ -34,11 +34,6 @@ DEFAULT_SCAN_TYPES = [
         "label": "Watchlist",
         "scanner": "watchlist",  # Filter: Down % today (0-X range) or All tickers
     },
-    {
-        "id": "premarket",
-        "label": "Pre-Market",
-        "scanner": "premarket",  # combined: premarket_volume_scanner + velocity_scanner premarket
-    },
 ]
 
 # Slider/param specs per scanner (core params only; strict institutional gates removed so scans pass)
@@ -69,16 +64,6 @@ SCAN_PARAM_SPECS = {
         {"key": "emotional_require_buy_rating", "label": "Require Buy rating", "default": False, "type": "bool"},
         {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
         {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
-    ],
-    "premarket": [
-        {"key": "premarket_min_score", "label": "Min Score", "min": 50, "max": 95, "default": 70, "type": "int"},
-        {"key": "premarket_min_volume", "label": "Min PM Vol (K)", "min": 50, "max": 500, "default": 100, "type": "int_vol_k"},
-        {"key": "premarket_min_relative_volume", "label": "Min Rel Vol", "min": 1.0, "max": 5.0, "default": 2.0, "type": "float"},
-        {"key": "premarket_min_gap_percent", "label": "Min Gap %", "min": 0, "max": 10, "default": 2.0, "type": "float"},
-        {"key": "premarket_max_gap_percent", "label": "Max Gap %", "min": 5, "max": 30, "default": 15.0, "type": "float"},
-        {"key": "premarket_min_dollar_volume", "label": "Min $ Vol (K)", "min": 100, "max": 5000, "default": 500, "type": "int_vol_k"},
-        {"key": "premarket_min_vol_float_ratio", "label": "Vol/Float", "min": 0, "max": 0.1, "default": 0.01, "type": "float"},
-        {"key": "premarket_track_sector_heat", "label": "Track sector heat", "default": True, "type": "bool"},
     ],
     "watchlist": [
         {"key": "watchlist_filter", "label": "Filter", "type": "choice", "default": "down_pct", "options": ["down_pct", "all"],
@@ -198,17 +183,6 @@ def load_config():
         "emotional_min_upside_to_target": 5.0,
         "emotional_require_buy_rating": False,
         "vtg_require_above_sma200": True,
-        
-        # Pre-Market Volume Scanner (7:00 AM - 9:25 AM)
-        "premarket_min_score": 70,
-        "premarket_min_volume": 100000,
-        "premarket_min_relative_volume": 2.0,
-        "premarket_min_gap_percent": 2.0,
-        "premarket_max_gap_percent": 15.0,
-        "premarket_min_dollar_volume": 500000,
-        "premarket_max_spread_percent": 1.0,
-        "premarket_min_vol_float_ratio": 0.01,
-        "premarket_track_sector_heat": True,
         
         # Watchlist scanner (today's Change % down 0–X% range; slider = max)
         "watchlist_filter": "down_pct",

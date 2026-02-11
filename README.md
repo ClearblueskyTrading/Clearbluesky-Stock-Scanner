@@ -2,14 +2,14 @@
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
-- **4 Scanners** – Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist (Down % today or All), Pre-Market (combined volume + velocity gap analysis) — S&P 500 / ETFs universe
+- **3 Scanners** – Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist (Down % today or All) — S&P 500 / ETFs universe
 - **ETF Universe Guardrails** – Curated ETF set (including leveraged bull + bear core tickers) with a hard minimum avg-volume floor of `100k` shares
-- **Ticker Enrichment** – Earnings date warnings, news sentiment flags (DANGER/NEGATIVE/POSITIVE), live price at report time, leveraged ETF suggestions on Swing & Pre-Market
+- **Ticker Enrichment** – Earnings date warnings, news sentiment flags (DANGER/NEGATIVE/POSITIVE), live price at report time, leveraged ETF suggestions on Swing
 - **Overnight/Overseas Markets** – Japan, China, Brazil, Europe, India, Taiwan, South Korea ETFs tracked and fed to AI context
 - **Insider Data** – SEC Form 4 insider filings folded into Trend & Swing reports (not a standalone scanner)
 - **Market Intelligence** – Google News RSS headlines, Finviz news, sector performance, and market snapshot (SPY, QQQ, VIX, etc.) automatically gathered and fed to the AI
 - **Smart Money Signals** – WSB/Reddit sentiment (all scanners), institutional 13F holders (Trend scanner) fed to AI for confirmation
-- **Run all scans** – Optional checkbox runs all four scanners in sequence (rate-limited; ~15 minutes)
+- **Run all scans** – Optional checkbox runs all three scanners in sequence (rate-limited)
 - **CLI** – Run scans from the command line for automation: `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
 - **Outputs** – PDF report (with per-stock SMA200/EMA8 context + invalidation cues), JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter
@@ -28,7 +28,7 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 3. **Scan** – Choose scan type and index (S&P 500 / ETFs); click **Run Scan**. Optional: check **Run all scans** (rate-limited).
 4. **Report** – PDF + JSON open when done (reports now include SMA200/EMA8 status and invalidation context). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
 
-**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity_trend_growth` (or swing, watchlist, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
+**CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity_trend_growth` (or swing, watchlist). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
 
 **Watchlist:** Click **Watchlist** to add symbols (max 200). Config: **Filter** = Down % today (0–X% range, slider = max) or All tickers. You can **Import CSV** from a Finviz export (Ticker or Symbol column). When a watchlist ticker appears in a scan, you get 2 beeps and it's listed at the top of the report with a WATCHLIST label.
 
@@ -107,7 +107,6 @@ ClearBlueSky/
 | **Velocity Trend Growth** | Sector-first momentum leaders (weeks–months) | After market close |
 | **Swing – Dips** | Emotional dips (1–5 days) | 2:30–4:00 PM       |
 | **Watchlist**  | Filter: Down % today (0–X%) or All tickers | Anytime; Config: Max % down, Filter |
-| **Pre-Market** | Combined volume scan + velocity gap analysis | 7–9:25 AM |
 
 Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data + `instructions` for AI), and optional `*_ai.txt` (OpenRouter output). Use JSON with any AI: "Follow the instructions in the `instructions` field." See **app/WORKFLOW.md** for the full pipeline.
 

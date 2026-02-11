@@ -2,7 +2,7 @@
 
 **Broker:** IBKR Lite  
 **Order entry:** IBOT (natural language in TWS, Client Portal, or IBKR Mobile)  
-**Scanner:** ClearBlueSky (Velocity Trend Growth, Swing, Watchlist, Pre-Market)
+**Scanner:** ClearBlueSky (Velocity Trend Growth, Swing, Watchlist)
 
 ## Flow
 

@@ -21,7 +21,6 @@ python scanner_cli.py --scan <TYPE> [--watchlist-file PATH]
 |-------|-------------|
 | `velocity_trend_growth` | Momentum scan: sector-first (top sectors by return), then S&P 500 stocks + ETFs in leading sectors. Best after close. |
 | `swing` | Emotional-only dips (index-based). Best 2:30–4:00 PM. Includes earnings/news/insider enrichment. |
-| `premarket` | Combined pre-market volume + velocity gap analysis (index-based). Best 7–9:25 AM. |
 | `watchlist` | Watchlist: Filter from config – Down % today (0–X%, slider=max) or All tickers. Uses config or `--watchlist-file`. |
 
 ---
@@ -29,7 +28,7 @@ python scanner_cli.py --scan <TYPE> [--watchlist-file PATH]
 ## Options
 
 - **`--scan`** (required)  
-  One of: `velocity_trend_growth`, `swing`, `premarket`, `watchlist`.
+  One of: `velocity_trend_growth`, `swing`, `watchlist`.
 
 - **`--watchlist-file PATH`** (optional)  
   Text file, **one ticker per line**. Overrides the watchlist from `user_config.json` for this run only.  
@@ -80,9 +79,6 @@ python scanner_cli.py --scan velocity_trend_growth
 
 # Swing scan on S&P 500 (default)
 python scanner_cli.py --scan swing
-
-# Pre-market (S&P 500)
-python scanner_cli.py --scan premarket
 
 # Watchlist (Filter from config: Down % today or All; override tickers with file)
 python scanner_cli.py --scan watchlist --watchlist-file C:\path\to\tickers.txt

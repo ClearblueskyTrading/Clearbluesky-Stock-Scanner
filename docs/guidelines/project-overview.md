@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Stock scanner app (Trend, Swing/Dip, Watchlist, Pre-Market) with PDF/JSON reports and OpenRouter AI analysis. Python, Tkinter, Finviz, yfinance, optional Alpha Vantage.
+Stock scanner app (Trend, Swing/Dip, Watchlist) with PDF/JSON reports and OpenRouter AI analysis. Python, Tkinter, Finviz, yfinance, optional Alpha Vantage.
 
 ## Key Paths
 

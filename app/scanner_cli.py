@@ -20,12 +20,11 @@ DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
 SCAN_DISPLAY_NAMES = {
     "velocity_trend_growth": "Velocity Trend Growth",
     "swing": "Swing",
-    "premarket": "Premarket",
     "watchlist": "Watchlist",
 }
 
 # Scan types that use index (S&P 500 + ETFs)
-INDEX_SCANS = {"velocity_trend_growth", "swing", "premarket"}
+INDEX_SCANS = {"velocity_trend_growth", "swing"}
 
 
 def _progress(msg: str) -> None:
@@ -47,7 +46,7 @@ def _get_min_score(config: dict, scan_key: str, scan_type_display: str) -> int:
     Keep CLI min-score behavior aligned with GUI/report path in app.py.
     Supports legacy keys for backward compatibility.
     """
-    zero_min_scans = {"watchlist", "premarket", "velocity_trend_growth"}
+    zero_min_scans = {"watchlist", "velocity_trend_growth"}
     default_min = 0 if scan_key in zero_min_scans else 65
 
     if scan_key == "swing":
@@ -142,7 +141,6 @@ def main() -> int:
         choices=[
             "velocity_trend_growth",
             "swing",
-            "premarket",
             "watchlist",
         ],
         help="Scan type to run",
@@ -215,24 +213,6 @@ def main() -> int:
                 rsi_min=rsi_min,
                 rsi_max=rsi_max,
             )
-
-        elif scan_key == "premarket":
-            from premarket_volume_scanner import run_premarket_volume_scan
-            results = run_premarket_volume_scan(progress_callback=_progress, index=index)
-            # Merge velocity premarket results if available
-            try:
-                from velocity_scanner import run_premarket_scan as _vpm
-                vpm_report = _vpm(progress_callback=_progress, index=index)
-                if vpm_report:
-                    vpm_tickers = vpm_report.get("tickers") or []
-                    seen = {(r.get("ticker") or "").upper() for r in (results or [])}
-                    for r in vpm_tickers:
-                        rt = (r.get("ticker") or "").upper()
-                        if rt and rt not in seen:
-                            results = (results or []) + [r]
-                            seen.add(rt)
-            except Exception:
-                pass
 
         elif scan_key == "watchlist":
             from watchlist_scanner import run_watchlist_scan, run_watchlist_tickers_scan

@@ -15,7 +15,7 @@ This document contains everything needed to understand, modify, or rebuild the C
 **License:** MIT (free and open source)
 
 ### Key Features
-- Scanners: Trend, Swing (emotional dips), Watchlist (Down X% or All), Velocity Barbell, Insider, Pre-Market (S&P 500 / Russell 2000 / ETFs)
+- Scanners: Trend, Swing (emotional dips), Watchlist (Down X% or All) — S&P 500 / ETFs
 - Run all scans: optional checkbox runs all six scanners in sequence (rate-limited; may take 20+ minutes)
 - Queue-based scans: background thread keeps GUI responsive (no hanging)
 - PDF + JSON reports with Master Trading Report Directive and optional `instructions` field for any AI

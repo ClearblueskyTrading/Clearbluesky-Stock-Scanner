@@ -183,7 +183,6 @@ def _scan_worker_loop(app):
         "velocity_trend_growth": "Velocity Trend Growth",
         "swing": "Swing",
         "watchlist": "Watchlist",
-        "premarket": "Premarket",
     }
     while True:
         if getattr(app, "scan_cancelled", False):
@@ -214,7 +213,7 @@ def _scan_worker_loop(app):
         scanner_kind = (scan_def or {}).get("scanner", "")
         label = (scan_def or {}).get("label", "Scan")
         short_label = SCANNER_TO_REPORT_LABEL.get(scanner_kind, label)
-        if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist", "premarket"):
+        if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist"):
             continue
         try:
             app.scan_result_queue.put(("start", label))
@@ -278,27 +277,6 @@ def _scan_worker_loop(app):
                 use_all = _is_watchlist_all_mode(config.get("watchlist_filter"))
                 cancel_evt = getattr(app, "_scan_cancel_event", None)
                 results = run_watchlist_tickers_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt) if use_all else run_watchlist_scan(progress_callback=progress_put, config=config, cancel_event=cancel_evt)
-            elif scanner_kind == "premarket":
-                # Combined premarket: volume scan + velocity premarket hunter
-                from premarket_volume_scanner import run_premarket_volume_scan
-                cancel_evt = getattr(app, "_scan_cancel_event", None)
-                pm_results = run_premarket_volume_scan(progress_put, index=index, cancel_event=cancel_evt) or []
-                # Also run velocity premarket for gap/signal analysis
-                try:
-                    from velocity_scanner import run_premarket_scan
-                    progress_put("Running velocity premarket analysis...")
-                    vpm_report = run_premarket_scan(progress_callback=progress_put, index=index)
-                    vpm_tickers = vpm_report.get("tickers") or []
-                    # Merge velocity results — add tickers not already in pm_results
-                    existing_tickers = {(r.get("ticker") or r.get("Ticker", "")).upper() for r in pm_results}
-                    for vt in vpm_tickers:
-                        vt_ticker = (vt.get("ticker") or vt.get("Ticker", "")).upper()
-                        if vt_ticker and vt_ticker not in existing_tickers:
-                            pm_results.append(vt)
-                            existing_tickers.add(vt_ticker)
-                except Exception as e:
-                    print(f"[PREMARKET] Velocity premarket add-on failed: {e}")
-                results = pm_results if pm_results else None
             elapsed = int(time.time() - start_time)
             if getattr(app, "scan_cancelled", False):
                 try:
@@ -458,7 +436,6 @@ class TradeBotApp:
                 {"id": "velocity_trend_growth", "label": "Velocity Trend Growth", "scanner": "velocity_trend_growth"},
                 {"id": "swing_dips", "label": "Swing - Dips", "scanner": "swing"},
                 {"id": "watchlist", "label": "Watchlist", "scanner": "watchlist"},
-                {"id": "premarket", "label": "Pre-Market", "scanner": "premarket"},
             ]
         self.build_ui()
         log("UI ready")
@@ -1049,8 +1026,8 @@ class TradeBotApp:
                             no_result_msg = "No emotional dips today"
                         elif short_label == "Watchlist":
                             no_result_msg = "No watchlist results"
-                        elif short_label == "Premarket":
-                            no_result_msg = "No pre-market activity"
+                        elif short_label == "Watchlist":
+                            no_result_msg = "No watchlist results"
                         self.scan_complete(
                             self.scan_progress, self.scan_status, self.scan_printer,
                             self.scan_btn, no_result_msg, self.scan_stop_btn,
@@ -1094,8 +1071,6 @@ class TradeBotApp:
             return {"id": "vtg_fallback", "label": label, "scanner": "velocity_trend_growth"}
         if "Swing" in label or "Dip" in label:
             return {"id": "swing_fallback", "label": label, "scanner": "swing"}
-        if "Pre-Market" in label or "Pre" in label or "Premarket" in label:
-            return {"id": "premarket_fallback", "label": label, "scanner": "premarket"}
         if "Watchlist" in label:
             return {"id": "watchlist_fallback", "label": label, "scanner": "watchlist"}
         return None
@@ -1124,7 +1099,7 @@ class TradeBotApp:
                 pass
         if self.run_all_scans_var.get():
             types_list = getattr(self, "scan_types", []) or []
-            allowed = ("velocity_trend_growth", "swing", "watchlist", "premarket")
+            allowed = ("velocity_trend_growth", "swing", "watchlist")
             enqueued = 0
             for i, scan_def in enumerate(types_list):
                 scanner_kind = (scan_def or {}).get("scanner", "")
@@ -1138,7 +1113,7 @@ class TradeBotApp:
         else:
             scan_def = self._get_current_scan_def()
             scanner_kind = (scan_def or {}).get("scanner", "")
-            if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist", "premarket"):
+            if scanner_kind not in ("velocity_trend_growth", "swing", "watchlist"):
                 messagebox.showwarning("Scan Type", "Please select a valid scan type.")
                 return
             self.scan_job_queue.put(("scan", scan_def, index))
@@ -1159,7 +1134,7 @@ class TradeBotApp:
             # Swing uses emotional logic -> emotional_min_score
             if scan_type == "Swing":
                 min_score = int(self.config.get("emotional_min_score", 65))
-            elif scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Premarket", "Velocity Trend Growth"):
+            elif scan_type in ("Watchlist", "Watchlist 3pm", "Watchlist - All tickers", "Velocity Trend Growth"):
                 min_score = int(self.config.get(f'{scan_type.lower().replace(" ", "_")}_min_score', 0))
             else:
                 min_score = int(self.config.get(f'{scan_type.lower()}_min_score', 65))

@@ -4,6 +4,12 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [Unreleased]
+
+### Removed
+
+- **Premarket scanner** — Pre-Market scan type, `premarket_volume_scanner.py`, and velocity premarket hunter have been removed. Scan types are now: Velocity Trend Growth, Swing – Dips, Watchlist. `velocity_scanner.py` is a stub exporting only `SCAN_UNIVERSE` for use by the emotional dip scanner.
+
 ## [7.87] – 2026-02-11
 
 ### Fixed — Scanner & report pipeline bugfixes
