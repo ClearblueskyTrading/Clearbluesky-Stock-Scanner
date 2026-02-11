@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.87 - Complete Build Guide
+# ClearBlueSky Stock Scanner v7.88 - Complete Build Guide
 
 ## For Claude AI (or any AI assistant)
 

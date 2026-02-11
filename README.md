@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.87
+# ClearBlueSky Stock Scanner v7.88
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
@@ -68,7 +68,7 @@ ClearBlueSky/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── RELEASE_v7.86.md    ← v7.86 release notes
-├── RELEASE_v7.87.md    ← v7.87 release notes (current)
+├── RELEASE_v7.88.md    ← v7.88 release notes (current)
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
@@ -122,4 +122,4 @@ Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data 
 
 *ClearBlueSky v7.86 – made with Claude AI*
 
-See **app/CHANGELOG.md** and latest **RELEASE_v7.87.md**.
+See **app/CHANGELOG.md** and latest **RELEASE_v7.88.md**.

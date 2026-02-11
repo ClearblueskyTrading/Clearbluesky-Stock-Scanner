@@ -3,7 +3,7 @@
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.87"
+VERSION = "7.88"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
