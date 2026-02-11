@@ -1026,8 +1026,6 @@ class TradeBotApp:
                             no_result_msg = "No emotional dips today"
                         elif short_label == "Watchlist":
                             no_result_msg = "No watchlist results"
-                        elif short_label == "Watchlist":
-                            no_result_msg = "No watchlist results"
                         self.scan_complete(
                             self.scan_progress, self.scan_status, self.scan_printer,
                             self.scan_btn, no_result_msg, self.scan_stop_btn,
