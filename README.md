@@ -120,6 +120,6 @@ Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data 
 
 ---
 
-*ClearBlueSky v7.86 – made with Claude AI*
+*ClearBlueSky v7.88 – made with Claude AI*
 
 See **app/CHANGELOG.md** and latest **RELEASE_v7.88.md**.
