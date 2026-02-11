@@ -54,6 +54,7 @@ SCAN_PARAM_SPECS = {
         {"key": "vtg_require_beats_spy", "label": "Require beats SPY", "default": False, "type": "bool"},
         {"key": "vtg_min_volume", "label": "Min Avg Volume (K)", "min": 0, "max": 10000, "default": 100, "type": "int"},
         {"key": "vtg_require_volume_confirm", "label": "Volume above 20d avg", "default": False, "type": "bool"},
+        {"key": "vtg_require_above_sma200", "label": "Require above SMA200", "default": True, "type": "bool"},
         {"key": "vtg_require_ma_stack", "label": "Require MA stack (10>20>50)", "default": False, "type": "bool"},
         {"key": "vtg_rsi_min", "label": "RSI min (0=off)", "min": 0, "max": 100, "default": 0, "type": "int"},
         {"key": "vtg_rsi_max", "label": "RSI max (100=off)", "min": 0, "max": 100, "default": 100, "type": "int"},
@@ -64,7 +65,7 @@ SCAN_PARAM_SPECS = {
         {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 5.0, "type": "float"},
         {"key": "emotional_min_volume_ratio", "label": "Min Rel Vol", "min": 1.0, "max": 5.0, "default": 1.2, "type": "float"},
         {"key": "emotional_min_upside_to_target", "label": "Min Upside %", "min": 0, "max": 30, "default": 5.0, "type": "float"},
-        {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": False, "type": "bool"},
+        {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": True, "type": "bool"},
         {"key": "emotional_require_buy_rating", "label": "Require Buy rating", "default": False, "type": "bool"},
         {"key": "min_price", "label": "Min Price $", "min": 1, "max": 50, "default": 5, "type": "float"},
         {"key": "max_price", "label": "Max Price $", "min": 100, "max": 1000, "default": 500, "type": "float"},
@@ -193,9 +194,10 @@ def load_config():
         "emotional_dip_min_percent": 1.0,
         "emotional_dip_max_percent": 5.0,
         "emotional_min_volume_ratio": 1.2,
-        "emotional_require_above_sma200": False,
+        "emotional_require_above_sma200": True,
         "emotional_min_upside_to_target": 5.0,
         "emotional_require_buy_rating": False,
+        "vtg_require_above_sma200": True,
         
         # Pre-Market Volume Scanner (7:00 AM - 9:25 AM)
         "premarket_min_score": 70,
@@ -259,7 +261,6 @@ def load_config():
                     defaults["openrouter_model"] = "google/gemini-3-pro-preview"
                 # v7.4 migration: Loosen emotional dip defaults (was too strict, 0 results)
                 if saved.get("emotional_require_above_sma200") is True and saved.get("emotional_min_volume_ratio", 0) >= 1.8:
-                    defaults["emotional_require_above_sma200"] = False
                     defaults["emotional_require_buy_rating"] = False
                     defaults["emotional_min_volume_ratio"] = 1.2
                     defaults["emotional_min_upside_to_target"] = 5.0

@@ -27,26 +27,32 @@ Say the number or the phrase. Example: "5" or "take a screenshot."
 
 ---
 
+## Scan reports
+
+9. **Create AI report** / **read my scan reports and produce the report** — I find the latest scan JSON, read it, and produce the trading report (MARKET SNAPSHOT, TIER 1/2/3, AVOID, RISK, KEY INSIGHT, TOP 5 PLAYS).
+
+---
+
 ## Actions
 
-9. **Open this** — Say "open" plus a URL or file path; I open it in the browser or default app.
-10. **Notify me when done** — For a long task, I run it and then show a Windows toast when it's finished.
-11. **Add to my todo** — I append the next thing you say to your todo file (e.g. "add to my todo: fix the scanner bug").
+10. **Open this** — Say "open" plus a URL or file path; I open it in the browser or default app.
+11. **Notify me when done** — For a long task, I run it and then show a Windows toast when it's finished.
+12. **Add to my todo** — I append the next thing you say to your todo file (e.g. "add to my todo: fix the scanner bug").
 
 ---
 
 ## Execution and status
 
-12. **Do it** / **keep going** — I run the next steps without extra explanation.
-13. **Where we at?** / **What's left?** — Short status or checklist.
-14. **Zip on Desktop and Downloads** — I copy the release zip to Desktop and Downloads.
+13. **Do it** / **keep going** — I run the next steps without extra explanation.
+14. **Where we at?** / **What's left?** — Short status or checklist.
+15. **Zip on Desktop and Downloads** — I copy the release zip to Desktop and Downloads.
 
 ---
 
 ## Backup and restore
 
-15. **Full backup** — I run a full backup (agent + session_logs, trade_journal, ChromaDB) so you can restore and pick up where you left off after a crash or on a new PC.
-16. **Restore from [path to zip]** — I unzip the backup and place cursor + scanner data so you're set up again.
+16. **Full backup** — I run a full backup (agent + session_logs, trade_journal, ChromaDB) so you can restore and pick up where you left off after a crash or on a new PC.
+17. **Restore from [path to zip]** — I unzip the backup and place cursor + scanner data so you're set up again.
 
 ---
 

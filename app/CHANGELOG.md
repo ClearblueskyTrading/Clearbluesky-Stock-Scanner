@@ -4,6 +4,48 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.87] – 2026-02-11
+
+### Fixed — Scanner & report pipeline bugfixes
+
+- **Velocity premarket merge in CLI** — `scanner_cli.py` was iterating over dict keys (`"context"`, `"tickers"`) instead of the `tickers` list when merging velocity premarket results. Premarket velocity candidates were silently dropped; now correctly extracts and merges the `tickers` array.
+- **Premarket `price` undefined (runtime crash)** — `premarket_volume_scanner.py` used `price` in the dollar-volume calculation before defining it, causing `NameError`. Now parses price from the candidate or live quote before use.
+- **Premarket volume source** — Volume filter now takes the higher of the screener snapshot volume and the fresh quote volume so scans run earlier in the session still have usable data.
+- **Premarket direction bias removed** — Removed `ta_change_u` screener filter that limited premarket scan to stocks that were up only; now captures both gap-up and gap-down activity.
+- **Watchlist relative volume parsing** — `_parse_num` did not strip the `"x"` suffix from Finviz `Rel Volume` strings (e.g. `"1.5x"`), so `float("1.5x")` silently failed and relative-volume scoring was always zero. Now strips `x`/`X`.
+- **Enhanced dip ticker normalization** — Stored raw `stock.get('Ticker')` (potentially mixed case / whitespace) instead of the already-normalized uppercase `t`. This caused inconsistent deduplication and downstream ticker mismatches.
+- **History analyzer `leveraged_play` crash** — `leveraged_play` can be a dict (from enrichment) but was used as a `Counter` key, raising `TypeError: unhashable type: 'dict'`. Now extracts the ticker string before counting.
+- **History analyzer smart-money keys** — Checked non-existent keys `wsb` and `insider_filings`; the actual keys from `smart_money.py` are `wsb_rank`, `wsb_mentions`, and `form4_count_90d`. WSB and insider counts were always zero in history reports.
+- **Report PDF wrong directive for momentum scans** — PDF always embedded `MASTER_TRADING_REPORT_DIRECTIVE` (swing-oriented) instead of the scan-specific `directive_block`. Momentum/Velocity Trend scans now get the correct momentum directive in the PDF.
+- **Leveraged play schema consistency** — `_build_analysis_package` stored leveraged plays as bare strings; downstream code (report text, history) expected `{"leveraged_ticker": ..., "match_type": ...}` dicts. Now normalizes to dict everywhere and uses case-insensitive ticker lookup.
+- **Premarket metrics lost in reports** — Premarket-specific fields (`gap_percent`, `dollar_volume`, `float_category`, `vol_float_ratio`, etc.) from the scanner were never copied into report rows. Now preserved for premarket scan types.
+- **Ticker enrichment config passthrough** — `_get_current_price` and `enrich_scan_results` now accept and forward `config` so Alpaca failover uses API keys from user config instead of silently falling back.
+- **Market intel Alpaca config passthrough** — `_fetch_market_snapshot` and `_fetch_overnight_markets` now receive `config` so `has_alpaca_keys()` and `get_price_volume_batch()` use user-provided API keys.
+- **Price history division-by-zero guard** — `pct_change` calculation in `price_history.py` now explicitly checks `first_close != 0` to avoid edge-case division errors.
+
+### Changed — Docs
+
+- **Version labels updated** — `USER_MANUAL.md`, `CLAUDE_AI_GUIDE.md`, `DOCKER.md`, and `INSTALL.bat` were stuck on v7.7; now show v7.87.
+
+## [7.86] – 2026-02-10
+
+### Added — Scanner quality filters and setup context
+
+- **EMA8 in TA engine** — `ta_engine.py` now calculates `ema8` and `price_vs_ema8`, and includes EMA8 in report TA formatting.
+- **Velocity Trend Growth SMA200 gate** — New `vtg_require_above_sma200` setting (default `true`) added to config/UI spec and wired through app + CLI + scanner runtime.
+- **Watchlist EMA8-aware scoring** — Watchlist scanner now pulls TA snapshots per ticker and incorporates EMA8 proximity plus overextension penalties into ranking.
+- **Velocity breakout quality upgrade** — Pre-market breakout scoring now includes resistance multi-touch confirmation and an EMA8 extension penalty.
+- **Report setup context** — Reports/JSON now include `ema8_status`, `invalidation_level`, and extension-penalty metadata for clearer execution and risk framing.
+- **Curated leveraged ETF coverage (bull + bear)** — ETF universe was expanded to include core inverse/bear leveraged tickers alongside bull names for scanner paths that use curated ETFs.
+
+### Changed — Defaults and docs
+
+- **Swing default quality gate** — `emotional_require_above_sma200` default is now `true` for new configs.
+- **Config/docs updates** — Updated `SCANNER_CONFIG_PARAMETERS.md` and `user_config.json.example` for new keys and TA fields.
+- **ETF liquidity guardrail** — Scanner ETF paths now enforce a hard average-volume floor of `100,000` shares to avoid low-liquidity ETFs.
+- **Premarket ETF scope** — Pre-market volume scanner now uses curated ETFs instead of full ETF sweeps, preventing 2000+ ticker runs.
+- **Earnings date correctness** — Fixed report earnings parsing so stale month/day strings no longer roll into next year; report risk checks now prefer yfinance earnings enrichment and suppress false "today" warnings on past earnings dates.
+
 ## [7.85] – 2026-02-10
 
 ### Fixed — QA and CLI parity

@@ -228,14 +228,27 @@ def _parse_float(value: Any) -> Optional[float]:
         return None
 
 
-# Curated ETFs for momentum scans — avoids fetching 250+ ETFs from Finviz.
-# Index, sector, leveraged, commodities. ~45 tickers.
+# Hard floor used by scanner ETF paths (avg volume).
+ETF_MIN_AVG_VOLUME = 100_000
+
+# Curated ETF universe — focused and liquid, with leveraged bull + bear coverage.
+# This avoids full ETF sweeps while still including the most-used leveraged names.
 CURATED_ETFS = [
-    "SPY", "QQQ", "IWM", "DIA",  # index
-    "TQQQ", "QLD", "UPRO", "SSO", "TNA", "TECL", "SOXL", "SPXL", "UMDD",  # leveraged
-    "XLF", "XLK", "XLE", "XLV", "XLI", "XLP", "XLY", "XLU", "XLB", "XLRE", "XLC",  # sector (11 GICS)
-    "GDX", "GLD", "SLV", "USO", "UNG",  # commodities
-    "SMH", "ARKK", "KRE", "XBI", "VNQ", "XLRE",  # thematic
+    # Index / broad
+    "SPY", "QQQ", "IWM", "DIA",
+    # Sector / thematic anchors
+    "XLF", "XLK", "XLE", "XLV", "XLI", "XLP", "XLY", "XLU", "XLB", "XLRE", "XLC",
+    "SMH", "KRE", "XBI", "ARKK", "VNQ",
+    # Commodities / macro
+    "GLD", "SLV", "GDX", "USO", "UNG",
+    # Leveraged bull (core)
+    "TQQQ", "QLD", "UPRO", "SSO", "SPXL", "TNA", "SOXL", "TECL",
+    "FAS", "LABU", "ERX", "GUSH", "NUGT", "CURE", "DFEN", "DPST", "UTSL",
+    "NVDL", "TSLL", "AAPU", "AMZU", "GGLL", "MSFU", "CONL", "BITX", "BITU",
+    "YINN", "EDC",
+    # Leveraged bear / inverse (core)
+    "SQQQ", "QID", "SPXU", "SDS", "SPXS", "SOXS", "TECS", "TZA",
+    "FAZ", "LABD", "ERY", "DRIP", "DUST", "SDOW", "SRTY",
 ]
 
 def fetch_sp500_plus_curated_etfs(progress_callback=None) -> List[Dict[str, Any]]:

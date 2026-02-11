@@ -19,7 +19,7 @@
 
 ---
 
-## 2. Portfolio Structure (Schwab)
+## 2. Portfolio Structure (IBKR)
 
 **Long-term — do not trade (keep):**
 - **SGOL** — Gold (physical gold ETF). Hold.

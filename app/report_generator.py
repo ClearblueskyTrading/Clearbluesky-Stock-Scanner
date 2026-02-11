@@ -9,6 +9,7 @@ import time
 from datetime import datetime, date
 from pathlib import Path
 import json
+import re
 
 # Get the directory where this script is located (portable support)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -335,6 +336,131 @@ class ReportGenerator:
         except (TypeError, ValueError):
             return 'N/A'
 
+    def _to_float(self, value):
+        """Best-effort float parser for mixed string/number report fields."""
+        if value in (None, "", "N/A", "-"):
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            try:
+                cleaned = str(value).replace("%", "").replace("$", "").replace(",", "").replace("x", "").strip()
+                return float(cleaned)
+            except (TypeError, ValueError):
+                return None
+
+    def _derive_ema8_status(self, row):
+        """Return EMA8 trend status based on TA payload."""
+        ta_dict = row.get("ta") or {}
+        pct = self._to_float(ta_dict.get("price_vs_ema8"))
+        if pct is None:
+            return "N/A"
+        if pct > 0:
+            return "Above"
+        if pct < 0:
+            return "Below"
+        return "At"
+
+    def _derive_invalidation_level(self, row):
+        """
+        Build a practical invalidation level for scan commentary.
+        Priority: EMA8 -> SMA20 -> ATR-based fallback.
+        """
+        ta_dict = row.get("ta") or {}
+        ema8 = self._to_float(ta_dict.get("ema8"))
+        if ema8 is not None and ema8 > 0:
+            return f"Daily close below EMA8 (${ema8:.2f})"
+
+        sma20 = self._to_float(ta_dict.get("sma20"))
+        if sma20 is not None and sma20 > 0:
+            return f"Daily close below SMA20 (${sma20:.2f})"
+
+        price = self._to_float(row.get("price"))
+        atr = self._to_float(ta_dict.get("atr"))
+        if price is not None and atr is not None and atr > 0:
+            level = max(0.0, price - 1.5 * atr)
+            return f"Break below ${level:.2f} (~1.5 ATR from current price)"
+
+        return "Break below nearest daily support"
+
+    def _compute_extension_penalty(self, row):
+        """Return (penalty_points, reasons[]) for overextended setups."""
+        penalty = 0
+        reasons = []
+        ta_dict = row.get("ta") or {}
+
+        rsi = self._to_float(row.get("rsi"))
+        if rsi is not None and rsi >= 75:
+            penalty += 8
+            reasons.append(f"RSI {rsi:.1f} (overextended)")
+
+        px_vs_ema8 = self._to_float(ta_dict.get("price_vs_ema8"))
+        if px_vs_ema8 is not None and px_vs_ema8 > 12:
+            extra = min(12, int(round((px_vs_ema8 - 12) * 1.5 + 4)))
+            penalty += extra
+            reasons.append(f"{px_vs_ema8:.1f}% above EMA8")
+
+        return penalty, reasons
+
+    def _parse_finviz_date(self, raw_date):
+        """
+        Parse Finviz-style date strings and return (date_obj, has_explicit_year).
+        Handles examples like:
+        - "Feb 06"
+        - "Mon Feb 06"
+        - "Feb-06-26"
+        - "02/06/2026"
+        """
+        if not raw_date:
+            return (None, False)
+
+        s = str(raw_date).strip()
+        if not s:
+            return (None, False)
+
+        # Remove weekday prefixes if present (Mon, Tue, ...)
+        s = re.sub(r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+", "", s, flags=re.I)
+
+        today = date.today()
+
+        # Text month format: Feb 06 [2026]
+        m = re.search(r"([A-Za-z]{3,9})[\s\-/]+(\d{1,2})(?:[\s\-/]+(\d{2,4}))?", s)
+        if m:
+            mon_txt, day_txt, year_txt = m.groups()
+            try:
+                month_num = datetime.strptime(mon_txt[:3].title(), "%b").month
+                day_num = int(day_txt)
+                has_year = bool(year_txt)
+                if has_year:
+                    year_num = int(year_txt)
+                    if year_num < 100:
+                        year_num += 2000
+                else:
+                    year_num = today.year
+                return (date(year_num, month_num, day_num), has_year)
+            except Exception:
+                pass
+
+        # Numeric format: 02/06[/2026]
+        m = re.search(r"(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?", s)
+        if m:
+            mon_txt, day_txt, year_txt = m.groups()
+            try:
+                month_num = int(mon_txt)
+                day_num = int(day_txt)
+                has_year = bool(year_txt)
+                if has_year:
+                    year_num = int(year_txt)
+                    if year_num < 100:
+                        year_num += 2000
+                else:
+                    year_num = today.year
+                return (date(year_num, month_num, day_num), has_year)
+            except Exception:
+                pass
+
+        return (None, False)
+
     def _parse_risk_checks(self, stock):
         """Build risk_checks from Finviz stock dict: earnings, ex-dividend, relative volume."""
         result = {
@@ -355,42 +481,45 @@ class ReportGenerator:
             timing = None
             if "AMC" in earnings_str.upper():
                 timing = "AMC"
-                earnings_str = earnings_str.upper().replace("AMC", "").strip()
+                earnings_str = re.sub(r"\bAMC\b", "", earnings_str, flags=re.I).strip()
             elif "BMO" in earnings_str.upper():
                 timing = "BMO"
-                earnings_str = earnings_str.upper().replace("BMO", "").strip()
-            try:
-                # "Feb 06" or "Mon Feb 06" -> assume current year
-                parts = [p for p in earnings_str.split() if p]
-                if len(parts) >= 2:
-                    # Use last two tokens as month + day (e.g. "Feb 06" or "Mon Feb 06" -> "Feb 06")
-                    month_day = f"{parts[-2]} {parts[-1]}"
-                else:
-                    month_day = earnings_str
-                earnings_date = datetime.strptime(f"{month_day} {date.today().year}", "%b %d %Y").date()
-                if earnings_date < date.today():
-                    earnings_date = earnings_date.replace(year=earnings_date.year + 1)
+                earnings_str = re.sub(r"\bBMO\b", "", earnings_str, flags=re.I).strip()
+
+            earnings_date, has_year = self._parse_finviz_date(earnings_str)
+            if earnings_date:
                 days_until = (earnings_date - date.today()).days
                 result["earnings_date"] = earnings_date.isoformat()
-                result["days_until_earnings"] = days_until
                 result["earnings_timing"] = timing
-                result["earnings_safe"] = days_until > 5
-            except Exception:
+
+                # If Finviz gives month/day without year and it's clearly in the past,
+                # treat it as stale historical info (do not invent next-year dates).
+                if (not has_year) and days_until < -7:
+                    result["days_until_earnings"] = None
+                    result["earnings_safe"] = True
+                else:
+                    result["days_until_earnings"] = days_until
+                    # Unsafe only when event is upcoming in the next 5 days.
+                    result["earnings_safe"] = not (0 <= days_until <= 5)
+            else:
                 result["earnings_date"] = earnings_str
-                result["earnings_safe"] = False
+                result["earnings_safe"] = True
+
         # Ex-dividend: Finviz "Ex-Dividend Date" or "Ex-Div Date"
         ex_div_str = (stock.get("Ex-Dividend Date") or stock.get("Ex-Div Date") or "").strip()
         if ex_div_str and ex_div_str not in ("-", "N/A", ""):
-            try:
-                # "Mar 15" or similar
-                ex_date = datetime.strptime(f"{ex_div_str} {date.today().year}", "%b %d %Y").date()
-                if ex_date < date.today():
-                    ex_date = ex_date.replace(year=ex_date.year + 1)
+            ex_date, has_year = self._parse_finviz_date(ex_div_str)
+            if ex_date:
+                days_to_ex = (ex_date - date.today()).days
                 result["ex_div_date"] = ex_date.isoformat()
-                result["ex_div_safe"] = (ex_date - date.today()).days > 3
-            except Exception:
+                if (not has_year) and days_to_ex < -7:
+                    result["ex_div_safe"] = True
+                else:
+                    # Unsafe only for upcoming ex-div in next 3 days.
+                    result["ex_div_safe"] = not (0 <= days_to_ex <= 3)
+            else:
                 result["ex_div_date"] = ex_div_str
-                result["ex_div_safe"] = False
+                result["ex_div_safe"] = True
         # Relative volume: "1.23" or "1.23x"
         rel_vol_raw = stock.get("Rel Volume") or stock.get("Relative Volume") or ""
         if rel_vol_raw not in (None, "", "N/A", "-"):
@@ -446,6 +575,9 @@ class ReportGenerator:
             row = {
                 "ticker": s.get("ticker", ""),
                 "score": s.get("score", 0),
+                "score_before_penalty": s.get("score_before_penalty"),
+                "setup_penalty": s.get("setup_penalty"),
+                "setup_penalty_reasons": s.get("setup_penalty_reasons") or [],
                 "on_watchlist": bool(s.get("on_watchlist")),
                 "price": s.get("price", "N/A"),
                 "change": s.get("change", "N/A"),
@@ -458,8 +590,11 @@ class ReportGenerator:
                 "sma50": s.get("sma50") or "N/A",
                 "sma200": s.get("sma200") or "N/A",
                 "sma200_status": s.get("sma200_status", "N/A"),
+                "ema8_status": s.get("ema8_status", "N/A"),
+                "invalidation_level": s.get("invalidation_level", "N/A"),
                 "rel_volume": s.get("rel_volume", "N/A"),
                 "recom": s.get("recom", "N/A"),
+                "earnings": s.get("earnings"),
                 "news": headlines,
                 "ta": s.get("ta") or {},
                 "sentiment_score": s.get("sentiment_score"),
@@ -475,8 +610,26 @@ class ReportGenerator:
             for k in ("Owner", "Relationship", "Date", "Transaction", "Cost", "Shares", "Value"):
                 if s.get(k) not in (None, "", "N/A"):
                     row[k.lower()] = s.get(k)
-            if s.get("score", 0) >= 60 and s.get("ticker") in leveraged_map:
-                row["leveraged_play"] = leveraged_map[s["ticker"]]
+
+            # Keep enrichment schema consistent: leveraged_play is always a dict.
+            lp = s.get("leveraged_play")
+            if isinstance(lp, dict) and lp.get("leveraged_ticker"):
+                row["leveraged_play"] = {
+                    "leveraged_ticker": str(lp.get("leveraged_ticker")).strip().upper(),
+                    "match_type": str(lp.get("match_type", "direct")).strip() or "direct",
+                }
+            elif isinstance(lp, str) and lp.strip():
+                row["leveraged_play"] = {
+                    "leveraged_ticker": lp.strip().upper(),
+                    "match_type": "direct",
+                }
+
+            ticker_upper = str(s.get("ticker", "")).strip().upper()
+            if "leveraged_play" not in row and s.get("score", 0) >= 60 and ticker_upper in leveraged_map:
+                row["leveraged_play"] = {
+                    "leveraged_ticker": leveraged_map[ticker_upper],
+                    "match_type": "direct",
+                }
             stocks_json.append(row)
         backtest_stats = None
         try:
@@ -538,6 +691,8 @@ class ReportGenerator:
 
         stocks_data = []
         insider_keys = ('Owner', 'Relationship', 'Date', 'Transaction', 'Cost', 'Shares', 'Value')
+        scan_type_l = str(scan_type).lower()
+        is_premarket_scan = ("premarket" in scan_type_l) or ("pre-market" in scan_type_l) or ("pre market" in scan_type_l)
         for i, q in enumerate(qualifying, 1):
             ticker = q['ticker']
             score = q['score']
@@ -549,6 +704,17 @@ class ReportGenerator:
             for k in insider_keys:
                 if k in r and r[k] not in (None, '', 'N/A'):
                     row[k] = r[k]
+            if is_premarket_scan:
+                # Preserve premarket-specific metrics generated by the scan path.
+                for k in ("gap_percent", "gap_direction", "relative_volume", "dollar_volume",
+                          "float_size", "float_category", "vol_float_ratio", "market_cap", "recommendation"):
+                    if k in r and r[k] not in (None, "", "N/A"):
+                        row[k] = r[k]
+                if row.get("relative_volume") not in (None, "", "N/A"):
+                    try:
+                        row["rel_volume"] = round(float(row["relative_volume"]), 2)
+                    except Exception:
+                        row["rel_volume"] = row["relative_volume"]
             try:
                 if (config or {}).get("include_ta_in_report", True):
                     from ta_engine import get_ta_for_ticker
@@ -561,6 +727,14 @@ class ReportGenerator:
             row['sma50'] = row.get('sma50') or 'N/A'
             row['sma200'] = row.get('sma200') or 'N/A'
             row['sma200_status'] = self._derive_sma200_status(row)
+            row['ema8_status'] = self._derive_ema8_status(row)
+            row['invalidation_level'] = self._derive_invalidation_level(row)
+            penalty, penalty_reasons = self._compute_extension_penalty(row)
+            if penalty > 0:
+                row['score_before_penalty'] = row.get('score', 0)
+                row['setup_penalty'] = penalty
+                row['setup_penalty_reasons'] = penalty_reasons
+                row['score'] = max(0, int(round((row.get('score', 0) or 0) - penalty)))
             try:
                 av_key = (config or {}).get("alpha_vantage_api_key") or ""
                 if av_key.strip():
@@ -595,6 +769,13 @@ class ReportGenerator:
             stocks_data.append(row)
             time.sleep(0.8)  # polite delay between Finviz + API calls per ticker
 
+        # Re-rank after TA-based penalties so extended names naturally move down.
+        stocks_data.sort(key=lambda x: (not x.get("on_watchlist"), -int(x.get("score", 0) or 0)))
+        stocks_data = [s for s in stocks_data if int(s.get("score", 0) or 0) >= int(min_score)]
+        if not stocks_data:
+            progress(f"No stocks remained above {min_score} after setup-quality penalties.")
+            return None, None, None
+
         # ── Ticker enrichment (earnings, news flags, price stamp, leveraged) ──
         try:
             from ticker_enrichment import enrich_scan_results
@@ -606,16 +787,43 @@ class ReportGenerator:
                 include_news_flags=True,
                 include_price_stamp=True,
                 include_leveraged=is_swing or is_premarket,  # leveraged suggestions on swing/premarket
+                config=config,
                 progress_callback=progress,
             )
         except Exception as e:
             print(f"[ENRICHMENT] Warning: ticker enrichment failed: {e}")
+
+        # Prefer yfinance earnings enrichment when available; it is usually
+        # more accurate for upcoming earnings than raw Finviz date text.
+        for s in stocks_data:
+            e = s.get("earnings") or {}
+            ed = e.get("earnings_date")
+            days_away = e.get("days_away")
+            if ed:
+                rc = s.get("risk_checks") or _default_risk_checks()
+                rc["earnings_date"] = ed
+                if isinstance(days_away, (int, float)):
+                    d = int(days_away)
+                    rc["days_until_earnings"] = d if d >= 0 else None
+                    rc["earnings_safe"] = not (0 <= d <= 5)
+                else:
+                    rc["days_until_earnings"] = None
+                    rc["earnings_safe"] = True
+                s["risk_checks"] = rc
 
         tickers_list = ", ".join([s['ticker'] for s in stocks_data])
         watchlist_matches = [s['ticker'] for s in stocks_data if s.get('on_watchlist')]
         data_lines = []
         for s in stocks_data:
             line = f"- {s['ticker']}: Scanner Score {s['score']}, Price ${s.get('price','N/A')}, Today {s.get('change','N/A')}, RSI {s.get('rsi','N/A')}, Target ${s.get('target','N/A')}, P/E {s.get('pe','N/A')}, RelVol {s.get('rel_volume','N/A')}x"
+            line += f" | EMA8 {s.get('ema8_status', 'N/A')} | Invalidation: {s.get('invalidation_level', 'N/A')}"
+            if s.get("setup_penalty"):
+                before = s.get("score_before_penalty")
+                reasons = "; ".join(s.get("setup_penalty_reasons", [])[:2])
+                if before is not None:
+                    line += f" | Penalty -{s.get('setup_penalty')} (from {before}): {reasons}"
+                else:
+                    line += f" | Penalty -{s.get('setup_penalty')}: {reasons}"
             rc = s.get("risk_checks") or _default_risk_checks()
             if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
                 line += f" | EARNINGS IN {rc.get('days_until_earnings')} DAYS (avoid swing)"
@@ -659,7 +867,7 @@ class ReportGenerator:
         if (config or {}).get("use_market_intel", True):
             try:
                 from market_intel import gather_market_intel, format_intel_for_prompt
-                market_intel = gather_market_intel(progress_callback=progress)
+                market_intel = gather_market_intel(progress_callback=progress, config=config)
                 market_intel_prompt = format_intel_for_prompt(market_intel)
             except Exception:
                 market_intel_prompt = ""
@@ -822,14 +1030,32 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
             # Leveraged play (enrichment-based or legacy mapping)
             lp = s.get("leveraged_play")
             if lp:
-                body_lines.append(f"Leveraged play: {lp['leveraged_ticker']} ({lp.get('match_type','direct')}) - NOT for long-term (volatility decay)")
-            elif score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
-                lev = leveraged_mapping[ticker]
-                body_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
-                body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")
+                if isinstance(lp, dict):
+                    lev_ticker = lp.get("leveraged_ticker")
+                    lev_match = lp.get("match_type", "direct")
+                else:
+                    lev_ticker = str(lp).strip().upper()
+                    lev_match = "direct"
+                if lev_ticker:
+                    body_lines.append(f"Leveraged play: {lev_ticker} ({lev_match}) - NOT for long-term (volatility decay)")
+            else:
+                ticker_upper = str(ticker).strip().upper()
+                if score >= LEVERAGED_MIN_SCORE and ticker_upper in leveraged_mapping:
+                    lev = leveraged_mapping[ticker_upper]
+                    body_lines.append(f"Leveraged play: {lev} (use in place of {ticker_upper} for leveraged exposure)")
+                    body_lines.append("  Leveraged ETFs are high-risk; not suitable for long-term buy-and-hold (volatility decay).")
+
             sector_display = s.get('sector_heat') or s.get('sector', 'N/A')
             body_lines.append(f"Company: {s.get('company', ticker)}  | Sector: {sector_display}")
             body_lines.append(f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | SMA200 status: {s.get('sma200_status','N/A')}  | Recom: {s.get('recom','N/A')}")
+            body_lines.append(f"EMA8 status: {s.get('ema8_status', 'N/A')}  | Invalidation: {s.get('invalidation_level', 'N/A')}")
+            if s.get("setup_penalty"):
+                reasons = "; ".join(s.get("setup_penalty_reasons", [])[:3])
+                before = s.get("score_before_penalty")
+                if before is not None:
+                    body_lines.append(f"Extension penalty: -{s.get('setup_penalty')} (score {before} -> {s.get('score')}) | {reasons}")
+                else:
+                    body_lines.append(f"Extension penalty: -{s.get('setup_penalty')} | {reasons}")
             ta_dict = s.get('ta') or {}
             if ta_dict:
                 from ta_engine import format_ta_for_report
@@ -936,8 +1162,8 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
             y -= line_height * 1.5
             c.setFont("Helvetica", 9)
 
-            # 0b) Master Trading Report Directive (for any AI that receives this PDF)
-            for line in MASTER_TRADING_REPORT_DIRECTIVE.strip().replace("\r", "").split("\n"):
+            # 0b) Scan-appropriate directive (momentum vs swing)
+            for line in directive_block.strip().replace("\r", "").split("\n"):
                 if y < margin + line_height:
                     c.showPage()
                     c.setFont("Helvetica", 9)
@@ -1005,14 +1231,34 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
                     tech_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
                     if s.get("insider_context") not in (None, ""):
                         tech_lines.append(f"Insider context: {s.get('insider_context', 'Unknown')} (from SEC Form 4)")
-                if score >= LEVERAGED_MIN_SCORE and ticker in leveraged_mapping:
-                    lev = leveraged_mapping[ticker]
-                    tech_lines.append(f"Leveraged play: {lev} (use in place of {ticker} for leveraged exposure)")
-                    tech_lines.append("  Leveraged ETFs are high-risk; not for long-term buy-and-hold (volatility decay).")
+                lp = s.get("leveraged_play")
+                if lp:
+                    if isinstance(lp, dict):
+                        lev_ticker = lp.get("leveraged_ticker")
+                        lev_match = lp.get("match_type", "direct")
+                    else:
+                        lev_ticker = str(lp).strip().upper()
+                        lev_match = "direct"
+                    if lev_ticker:
+                        tech_lines.append(f"Leveraged play: {lev_ticker} ({lev_match}) - NOT for long-term (volatility decay)")
+                else:
+                    ticker_upper = str(ticker).strip().upper()
+                    if score >= LEVERAGED_MIN_SCORE and ticker_upper in leveraged_mapping:
+                        lev = leveraged_mapping[ticker_upper]
+                        tech_lines.append(f"Leveraged play: {lev} (use in place of {ticker_upper} for leveraged exposure)")
+                        tech_lines.append("  Leveraged ETFs are high-risk; not for long-term buy-and-hold (volatility decay).")
                 tech_lines.extend([
                     f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}",
                     f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | SMA200 status: {s.get('sma200_status','N/A')}  | Recom: {s.get('recom','N/A')}",
+                    f"EMA8 status: {s.get('ema8_status', 'N/A')}  | Invalidation: {s.get('invalidation_level', 'N/A')}",
                 ])
+                if s.get("setup_penalty"):
+                    reasons = "; ".join(s.get("setup_penalty_reasons", [])[:2])
+                    before = s.get("score_before_penalty")
+                    if before is not None:
+                        tech_lines.append(f"Extension penalty: -{s.get('setup_penalty')} (score {before} -> {s.get('score')}) | {reasons}")
+                    else:
+                        tech_lines.append(f"Extension penalty: -{s.get('setup_penalty')} | {reasons}")
                 ta_dict = s.get('ta') or {}
                 if ta_dict:
                     from ta_engine import format_ta_for_report

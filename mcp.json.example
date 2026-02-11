@@ -1,5 +1,5 @@
 {
-  "_comment": "Reference only. Cursor reads MCP config from its own app data. Copy to mcp.json in project only if you want a local copy; mcp.json is gitignored. Alpaca MCP typically uses env vars APCA_API_KEY_ID and APCA_API_SECRET_KEY.",
+  "_comment": "Reference only. Copy to mcp.json in project only if you want a local copy; mcp.json is gitignored. See docs/ALPACA_MCP_INSTALL.md and docs/IBKR_MCP_INSTALL.md.",
   "mcpServers": {
     "alpaca": {
       "command": "npx",
@@ -8,6 +8,12 @@
         "APCA_API_KEY_ID": "<your-alpaca-api-key>",
         "APCA_API_SECRET_KEY": "<your-alpaca-secret-key>"
       }
+    },
+    "ibkr": {
+      "_comment": "Requires: pip install ib-mcp, TWS or IB Gateway running. Use --port 4001 for Gateway.",
+      "command": "ib-mcp-server",
+      "args": ["--host", "127.0.0.1", "--port", "7497", "--client-id", "1"],
+      "env": {}
     }
   }
 }

@@ -1,5 +1,5 @@
 # ============================================================
-# ClearBlueSky - Watchlist Scanner v7.85
+# ClearBlueSky - Watchlist Scanner v7.86
 # ============================================================
 # Scans only tickers in the user's watchlist.
 # Two modes:
@@ -8,6 +8,7 @@
 #
 # Features:
 #   - Real scoring (0–100) based on price action, volume, TA
+#   - EMA8-aware quality scoring + overextension penalties
 #   - Sequential fetching with polite delays (rate-limit safe)
 #   - Cancel support via threading.Event
 #   - Full TA data: RSI, SMA200, ATR, analyst rating, open, etc.
@@ -20,13 +21,18 @@ from typing import List, Dict, Optional, Callable
 from scan_settings import load_config
 from finviz_safe import get_stock_safe
 
+try:
+    from ta_engine import get_ta_for_ticker
+except Exception:
+    get_ta_for_ticker = None
+
 
 def _parse_num(s, default=0.0) -> float:
     if s is None:
         return default
     if isinstance(s, (int, float)):
         return float(s)
-    s = str(s).strip().replace(",", "").replace("%", "").strip()
+    s = str(s).strip().replace(",", "").replace("%", "").replace("x", "").replace("X", "").strip()
     mult = 1.0
     if s.upper().endswith("K"):
         mult = 1000.0
@@ -55,7 +61,7 @@ def _get_change_pct(stock: dict) -> Optional[float]:
         return None
 
 
-def _score_watchlist_ticker(stock: dict, change_pct: float) -> int:
+def _score_watchlist_ticker(stock: dict, change_pct: float, ta: Optional[dict] = None) -> int:
     """
     Score a watchlist ticker 0–100 based on multiple factors.
     Higher = more interesting setup.
@@ -67,6 +73,8 @@ def _score_watchlist_ticker(stock: dict, change_pct: float) -> int:
       - SMA200 position    (15 pts) — above = healthy stock
       - Analyst rating     (15 pts) — buy/strong buy = conviction
       - Upside to target   (15 pts) — analyst price target headroom
+      - EMA8 proximity     (10 pts) — healthy pullback/reclaim zone
+      - Overextension      (-10 pts) — avoid chasing stretched names
     """
     score = 0
 
@@ -111,6 +119,8 @@ def _score_watchlist_ticker(stock: dict, change_pct: float) -> int:
             score += 7
         elif rsi >= 70:     # overbought — caution but still notable
             score += 3
+        if rsi >= 75:
+            score -= 6
 
     # ── SMA200 position (15 pts) ──
     sma200_str = str(stock.get("SMA200", "")).replace("%", "").strip()
@@ -152,12 +162,37 @@ def _score_watchlist_ticker(stock: dict, change_pct: float) -> int:
         elif upside >= 5:
             score += 5
 
+    # ── EMA8 proximity / extension check (10 pts, up to -10 penalty) ──
+    ema8_dist = None
+    if isinstance(ta, dict):
+        try:
+            raw = ta.get("price_vs_ema8")
+            ema8_dist = float(raw) if raw is not None else None
+        except (TypeError, ValueError):
+            ema8_dist = None
+
+    if ema8_dist is not None:
+        abs_dist = abs(ema8_dist)
+        if abs_dist <= 1.5:
+            score += 10
+        elif abs_dist <= 3.0:
+            score += 8
+        elif abs_dist <= 6.0:
+            score += 5
+        elif abs_dist <= 10.0:
+            score += 2
+
+        # Penalize names that are too far above fast trend support.
+        if ema8_dist > 12.0:
+            score -= 10
+
     return min(100, max(0, score))
 
 
-def _extract_ticker_data(ticker: str, stock: dict, change_pct: float, score: int) -> Dict:
+def _extract_ticker_data(ticker: str, stock: dict, change_pct: float, score: int, ta: Optional[dict] = None) -> Dict:
     """Build a full data row from Finviz stock dict."""
     price = _parse_num(stock.get("Price"), 0)
+    ta = ta or {}
     return {
         "ticker": ticker,
         "score": score,
@@ -200,7 +235,20 @@ def _extract_ticker_data(ticker: str, stock: dict, change_pct: float, score: int
         "52W Low": stock.get("52W Low", "N/A"),
         "Avg Volume": stock.get("Avg Volume", "N/A"),
         "change_pct": change_pct,
+        "ema8": ta.get("ema8"),
+        "price_vs_ema8": ta.get("price_vs_ema8"),
+        "ta": ta,
     }
+
+
+def _fetch_ta_snapshot(ticker: str) -> Dict:
+    """Best-effort TA snapshot used for EMA8-aware watchlist scoring."""
+    if get_ta_for_ticker is None:
+        return {}
+    try:
+        return get_ta_for_ticker(ticker, period="1y", interval="1d") or {}
+    except Exception:
+        return {}
 
 
 def _scan_watchlist_sequential(
@@ -256,8 +304,9 @@ def _scan_watchlist_sequential(
             time.sleep(DELAY)
             continue
 
-        score = _score_watchlist_ticker(stock, change_pct)
-        row = _extract_ticker_data(ticker, stock, change_pct, score)
+        ta = _fetch_ta_snapshot(ticker)
+        score = _score_watchlist_ticker(stock, change_pct, ta=ta)
+        row = _extract_ticker_data(ticker, stock, change_pct, score, ta=ta)
         results.append(row)
 
         time.sleep(DELAY)

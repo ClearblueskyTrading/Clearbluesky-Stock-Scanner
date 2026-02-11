@@ -251,7 +251,12 @@ def analyze_history(history: List[Dict]) -> Dict:
 
             # Leveraged plays
             if s.get("leveraged_play"):
-                stats["leveraged_plays"][s["leveraged_play"]] += 1
+                lp = s.get("leveraged_play")
+                if isinstance(lp, dict):
+                    lp_key = lp.get("leveraged_ticker") or str(lp)
+                else:
+                    lp_key = str(lp)
+                stats["leveraged_plays"][lp_key] += 1
 
             # Watchlist
             stats["watchlist_hit_rate"]["total_stocks"] += 1
@@ -261,9 +266,12 @@ def analyze_history(history: List[Dict]) -> Dict:
             # Smart money
             sm = s.get("smart_money", {})
             stats["smart_money_overlap"]["total_stocks"] += 1
-            if sm.get("wsb"):
+            wsb_rank = sm.get("wsb_rank")
+            wsb_mentions = sm.get("wsb_mentions")
+            if (isinstance(wsb_rank, (int, float)) and wsb_rank > 0) or (isinstance(wsb_mentions, (int, float)) and wsb_mentions > 0):
                 stats["smart_money_overlap"]["wsb_flagged"] += 1
-            if sm.get("insider_filings"):
+            form4_count = sm.get("form4_count_90d")
+            if isinstance(form4_count, (int, float)) and form4_count > 0:
                 stats["smart_money_overlap"]["insider_activity"] += 1
             if sm.get("institutional"):
                 stats["smart_money_overlap"]["institutional"] += 1

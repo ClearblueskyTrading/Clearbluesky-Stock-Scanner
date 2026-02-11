@@ -1,8 +1,9 @@
-# ClearBlueSky Stock Scanner v7.85
+# ClearBlueSky Stock Scanner v7.87
 
 **Free desktop app** that scans the market for trading ideas and generates **PDF + JSON reports** you can use with any AI (in-app via OpenRouter or paste JSON elsewhere).
 
 - **4 Scanners** – Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist (Down % today or All), Pre-Market (combined volume + velocity gap analysis) — S&P 500 / ETFs universe
+- **ETF Universe Guardrails** – Curated ETF set (including leveraged bull + bear core tickers) with a hard minimum avg-volume floor of `100k` shares
 - **Ticker Enrichment** – Earnings date warnings, news sentiment flags (DANGER/NEGATIVE/POSITIVE), live price at report time, leveraged ETF suggestions on Swing & Pre-Market
 - **Overnight/Overseas Markets** – Japan, China, Brazil, Europe, India, Taiwan, South Korea ETFs tracked and fed to AI context
 - **Insider Data** – SEC Form 4 insider filings folded into Trend & Swing reports (not a standalone scanner)
@@ -11,7 +12,7 @@
 - **Run all scans** – Optional checkbox runs all four scanners in sequence (rate-limited; ~15 minutes)
 - **CLI** – Run scans from the command line for automation: `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_CLAUDE.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
-- **Outputs** – PDF report (with per-stock SMA200 status), JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter
+- **Outputs** – PDF report (with per-stock SMA200/EMA8 context + invalidation cues), JSON analysis package (with `instructions` for AI), and optional `*_ai.txt` from OpenRouter
 - **Optional AI pipeline** – OpenRouter API key → AI analysis saved as `*_ai.txt`; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context, chart images
 - **In-app Update & Rollback** – **Update** backs up your version and applies the latest release from GitHub; **Rollback** restores the previous version. **Your `user_config.json` is never overwritten.** See **UPDATE.md**.
 - **Update notice** – On startup, checks for a newer version and shows a link to download
@@ -25,7 +26,7 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).
 3. **Scan** – Choose scan type and index (S&P 500 / ETFs); click **Run Scan**. Optional: check **Run all scans** (rate-limited).
-4. **Report** – PDF + JSON open when done (reports show per-stock SMA200 status: Above/Below/At/N/A). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
+4. **Report** – PDF + JSON open when done (reports now include SMA200/EMA8 status and invalidation context). If OpenRouter key is set in Settings, AI analysis opens as `*_ai.txt`.
 
 **CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity_trend_growth` (or swing, watchlist, premarket). Exit 0 = success. See **app/CLI_FOR_CLAUDE.md**.
 
@@ -66,8 +67,8 @@ ClearBlueSky/
 ├── CLAUDE_AI_GUIDE.md  ← Guide for modifying/rebuilding with AI
 ├── Dockerfile
 ├── docker-compose.yml
-├── RELEASE_v7.84.md    ← v7.84 release notes
-├── RELEASE_v7.85.md    ← v7.85 release notes (current)
+├── RELEASE_v7.86.md    ← v7.86 release notes
+├── RELEASE_v7.87.md    ← v7.87 release notes (current)
 ├── USER_MANUAL.md      ← Full user manual (scanners, settings, scoring)
 ├── UPDATE.md           ← In-app Update & Rollback; versioning (7.1, 7.2)
 └── app/
@@ -120,6 +121,6 @@ Reports: PDF (date/time stamped, per-ticker data + enrichment), JSON (same data 
 
 ---
 
-*ClearBlueSky v7.85 – made with Claude AI*
+*ClearBlueSky v7.86 – made with Claude AI*
 
-See **app/CHANGELOG.md** and latest **RELEASE_v7.85.md**.
+See **app/CHANGELOG.md** and latest **RELEASE_v7.87.md**.

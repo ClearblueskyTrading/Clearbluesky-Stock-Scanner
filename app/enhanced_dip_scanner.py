@@ -12,6 +12,17 @@ import finviz
 
 from scan_settings import load_config
 from finviz_safe import get_stock_safe
+try:
+    from breadth import CURATED_ETFS, ETF_MIN_AVG_VOLUME
+except Exception:
+    ETF_MIN_AVG_VOLUME = 100_000
+    CURATED_ETFS = [
+        "SPY", "QQQ", "IWM", "DIA",
+        "TQQQ", "QLD", "UPRO", "SSO", "TNA", "TECL", "SOXL", "SPXL", "UMDD",
+        "XLF", "XLK", "XLE", "XLV", "XLI", "XLP", "XLY", "XLU", "XLB", "XLRE", "XLC",
+        "GDX", "GLD", "SLV", "USO", "UNG",
+        "SMH", "ARKK", "KRE", "XBI", "VNQ",
+    ]
 
 # News keywords that suggest EMOTIONAL dip (buyable)
 EMOTIONAL_KEYWORDS = [
@@ -48,6 +59,29 @@ RATING_SCORES = {
 }
 
 
+def _parse_num(value, default=0.0) -> float:
+    """Parse Finviz-like numeric fields with K/M/B suffixes."""
+    if value is None:
+        return default
+    if isinstance(value, (int, float)):
+        return float(value)
+    s = str(value).strip().replace(",", "").replace("%", "").replace("x", "")
+    mult = 1.0
+    if s.upper().endswith("K"):
+        mult = 1_000.0
+        s = s[:-1]
+    elif s.upper().endswith("M"):
+        mult = 1_000_000.0
+        s = s[:-1]
+    elif s.upper().endswith("B"):
+        mult = 1_000_000_000.0
+        s = s[:-1]
+    try:
+        return float(s) * mult
+    except (TypeError, ValueError):
+        return default
+
+
 def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     """
     Scan index for stocks down within configured range.
@@ -60,14 +94,16 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
     max_price = float(config.get('max_price', 500.0))
     min_volume = int(float(config.get('min_avg_volume', 500000)))
     
-    # Always scan both S&P 500 and ETFs
-    idx_filters = [('idx_sp500', 'sp500'), ('ind_exchangetradedfund', 'etfs')]
     seen = set()
     results = []
-    
-    for idx_filter, _ in idx_filters:
+
+    scan_sp500 = index in ("sp500", "sp500_etfs")
+    scan_etfs = index in ("etfs", "sp500_etfs")
+
+    # 1) S&P 500 via screener (fast and already focused)
+    if scan_sp500:
         filters = [
-            idx_filter,
+            'idx_sp500',
             f'sh_price_o{int(min_price)}',
             f'sh_price_u{int(max_price)}',
             f'sh_avgvol_o{int(min_volume/1000)}',
@@ -85,7 +121,7 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
                     if -max_dip <= change <= -min_dip:
                         seen.add(t)
                         results.append({
-                            'ticker': stock.get('Ticker'),
+                            'ticker': t,
                             'company': stock.get('Company'),
                             'price': float(stock.get('Price', 0)),
                             'change': change,
@@ -97,7 +133,50 @@ def get_sp500_dips(config: Dict, index: str = "sp500") -> List[Dict]:
                 except Exception:
                     continue
         except Exception as e:
-            print(f"Screener error ({idx_filter}): {e}")
+            print(f"Screener error (sp500): {e}")
+
+    # 2) ETFs via curated list only (avoid scanning 2000+ ETFs)
+    if scan_etfs:
+        etf_min_volume = max(min_volume, ETF_MIN_AVG_VOLUME)
+        for etf in CURATED_ETFS:
+            t = (etf or "").strip().upper()
+            if not t or t in seen:
+                continue
+            try:
+                quote = get_stock_safe(t, timeout=30.0, max_attempts=2)
+                if not quote:
+                    time.sleep(0.2)
+                    continue
+
+                price = _parse_num(quote.get("Price"), 0.0)
+                if price < min_price or price > max_price:
+                    time.sleep(0.2)
+                    continue
+
+                avg_volume = _parse_num(quote.get("Avg Volume"), 0.0)
+                if avg_volume <= 0:
+                    avg_volume = _parse_num(quote.get("Volume"), 0.0)
+                if avg_volume < etf_min_volume:
+                    time.sleep(0.2)
+                    continue
+
+                change = _parse_num(quote.get("Change"), 0.0)
+                if -max_dip <= change <= -min_dip:
+                    seen.add(t)
+                    results.append({
+                        'ticker': t,
+                        'company': quote.get('Company') or t,
+                        'price': price,
+                        'change': change,
+                        'volume': quote.get('Volume'),
+                        'avg_volume': int(avg_volume),
+                        'rel_volume': quote.get('Rel Volume'),
+                        'sector': quote.get('Sector') or 'ETF',
+                        'industry': quote.get('Industry') or 'ETF',
+                    })
+            except Exception:
+                pass
+            time.sleep(0.2)
     
     return results
 
@@ -136,7 +215,7 @@ def get_dips_from_ticker_list(ticker_list: List[str], config: Dict) -> List[Dict
             if price < min_price or price > max_price or vol < min_volume:
                 continue
             results.append({
-                'ticker': stock.get('Ticker') or ticker,
+                'ticker': ticker,
                 'company': stock.get('Company') or ticker,
                 'price': price,
                 'change': change,

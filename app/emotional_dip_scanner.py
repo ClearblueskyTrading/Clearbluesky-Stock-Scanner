@@ -75,7 +75,7 @@ def run_emotional_dip_scan(progress_callback=None, index: str = "sp500") -> List
     
     # Deep analysis - filter for EMOTIONAL ONLY
     results = []
-    require_above_sma200 = config.get('emotional_require_above_sma200', False)
+    require_above_sma200 = config.get('emotional_require_above_sma200', True)
     min_upside = float(config.get('emotional_min_upside_to_target', 5.0))
     require_buy_rating = config.get('emotional_require_buy_rating', False)
     min_vol_ratio = float(config.get('emotional_min_volume_ratio', 1.2))

@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════════════════════════
    CLEARBLUESKY STOCK SCANNER & AI RESEARCH TOOL
-   Version 7.85 | Free & Open Source | Made with Claude AI
+   Version 7.87 | Free & Open Source | Made with Claude AI
 ════════════════════════════════════════════════════════════════════════════
 
 Thank you for downloading ClearBlueSky Stock Scanner!
@@ -11,11 +11,15 @@ Gemini, ChatGPT, or your own private AI.
 
 
 ════════════════════════════════════════════════════════════════════════════
-   WHAT'S IN v7.85
+   WHAT'S IN v7.87
 ════════════════════════════════════════════════════════════════════════════
 
 • 4 Scanners: Velocity Trend Growth (momentum), Swing (emotional dips), Watchlist, Pre-Market
-• QA consistency fixes: CLI min-score keys now match GUI behavior; clean-install test script fixed
+• ETF guardrails: curated ETF universe with leveraged bull + bear core, hard 100k avg-volume floor
+• Quality upgrades: Velocity Trend Growth optional "Above SMA200" gate (default ON)
+• Watchlist scanner: EMA8-aware scoring and overextension penalties
+• Pre-Market velocity breakout: multi-touch resistance confirmation
+• Reports/JSON: EMA8 status + invalidation level + extension penalty context
 • Velocity Trend Growth: Sector-first — ranks sectors by return, scans only leading sectors (~160 tickers)
 • Curated ETFs: ~45 key ETFs instead of 250+ (faster scans)
 • Ticker Enrichment: earnings warnings, news sentiment, live price, leveraged suggestions
@@ -96,7 +100,7 @@ INSTALL.bat          - Run this to install (Windows)
 README.txt           - This file
 README.md            - GitHub / markdown readme
 LICENSE.txt          - MIT license
-RELEASE_v7.85.md     - v7.85 release notes
+RELEASE_v7.87.md     - v7.87 release notes
 USER_MANUAL.md       - Full user manual
 DOCKER.md            - Run with Docker on any OS
 Dockerfile, docker-compose.yml - Docker setup
@@ -147,5 +151,5 @@ Always do your own research before trading.
 Past performance does not guarantee future results.
 
 ════════════════════════════════════════════════════════════════════════════
-   ClearBlueSky v7.83 - made with Claude AI
+   ClearBlueSky v7.86 - made with Claude AI
 ════════════════════════════════════════════════════════════════════════════

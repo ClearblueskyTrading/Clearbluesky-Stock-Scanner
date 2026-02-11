@@ -60,4 +60,4 @@ Your Finviz API key and preferences are stored in `user_config.json` inside the 
 
 ---
 
-*ClearBlueSky v7.7*
+*ClearBlueSky v7.87*

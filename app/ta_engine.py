@@ -30,8 +30,8 @@ except ImportError:
 def get_ta_for_ticker(ticker, period="6mo", interval="1d"):
     """
     Fetch OHLCV and compute TA for a ticker. Returns a dict of computed values (latest).
-    Keys: sma20, sma50, sma200, rsi, macd_hist, bb_upper, bb_mid, bb_lower, atr, obv,
-    fib_38, fib_50, fib_62, price_vs_sma20, price_vs_sma50, price_vs_sma200.
+    Keys: ema8, sma20, sma50, sma200, rsi, macd_hist, bb_upper, bb_mid, bb_lower, atr, obv,
+    fib_38, fib_50, fib_62, price_vs_ema8, price_vs_sma20, price_vs_sma50, price_vs_sma200.
     On failure or missing deps, returns empty dict or partial dict.
     Failover: yfinance first, then Alpaca bars when keys set.
     """
@@ -67,12 +67,14 @@ def get_ta_for_ticker(ticker, period="6mo", interval="1d"):
         low = df["Low"]
         volume = df["Volume"] if "Volume" in df else None
 
-        # SMAs
+        # Moving averages
+        out["ema8"] = _last(close.ewm(span=8, adjust=False).mean())
         out["sma20"] = _last(close.rolling(20).mean())
         out["sma50"] = _last(close.rolling(50).mean())
         out["sma200"] = _last(close.rolling(200).mean()) if len(close) >= 200 else None
         last_close = _last(close)
         out["close"] = last_close
+        out["price_vs_ema8"] = _pct(last_close, out["ema8"])
         out["price_vs_sma20"] = _pct(last_close, out["sma20"])
         out["price_vs_sma50"] = _pct(last_close, out["sma50"])
         out["price_vs_sma200"] = _pct(last_close, out["sma200"])
@@ -193,6 +195,8 @@ def format_ta_for_report(ta_dict):
     parts = []
     if ta_dict.get("close") is not None:
         parts.append(f"Close={ta_dict['close']}")
+    if ta_dict.get("ema8") is not None:
+        parts.append(f"EMA8={ta_dict['ema8']}")
     if ta_dict.get("sma20") is not None:
         parts.append(f"SMA20={ta_dict['sma20']}")
     if ta_dict.get("sma50") is not None:

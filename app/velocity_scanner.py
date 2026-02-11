@@ -12,6 +12,11 @@ import pandas as pd
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional, Any
+try:
+    from breadth import CURATED_ETFS, ETF_MIN_AVG_VOLUME
+except Exception:
+    CURATED_ETFS = []
+    ETF_MIN_AVG_VOLUME = 100_000
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
@@ -73,6 +78,22 @@ def _last(series):
         return None
 
 
+def _count_resistance_touches(high_series, resistance: Optional[float], tolerance_pct: float = 1.0, lookback: int = 20) -> int:
+    """Count recent candles that tested resistance within a tolerance band."""
+    if resistance is None or high_series is None or len(high_series) == 0:
+        return 0
+    try:
+        tail = high_series.dropna().tail(lookback)
+        if tail.empty:
+            return 0
+        tol = abs(float(resistance)) * (tolerance_pct / 100.0)
+        lower = float(resistance) - tol
+        upper = float(resistance) + tol
+        return int(((tail >= lower) & (tail <= upper)).sum())
+    except Exception:
+        return 0
+
+
 def fetch_market_context() -> Dict[str, Any]:
     """Step 1: SPY, QQQ, SMH (SOX proxy), VIX. Prior close + pre-market if available."""
     out = {"spy": {}, "qqq": {}, "smh": {}, "vix": {}, "regime": "UNKNOWN", "bias": "NEUTRAL", "error": None}
@@ -131,8 +152,10 @@ def fetch_market_context() -> Dict[str, Any]:
 def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
     """Step 2: Prior day (close, volume, SMA, RSI, ATR, BB) + pre-market price/volume.
     Failover: yfinance first, then Alpaca. Pre-market always from yfinance."""
-    d = {"ticker": ticker, "prior_close": None, "prior_volume": None, "pm_price": None, "pm_volume": None,
+    d = {"ticker": ticker, "prior_close": None, "prior_volume": None, "avg_volume20": None, "pm_price": None, "pm_volume": None,
+         "ema8": None, "price_vs_ema8": None,
          "sma20": None, "sma50": None, "sma200": None, "rsi": None, "atr": None, "bb_upper": None, "bb_lower": None,
+         "resistance_level": None, "resistance_touches": 0,
          "earnings_days": None, "prior_high": None, "prior_low": None}
     df = None
     if YF:
@@ -157,11 +180,16 @@ def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
         close = df["Close"]
         d["prior_close"] = _last(close)
         d["prior_volume"] = _last(df["Volume"]) if "Volume" in df.columns else None
+        if "Volume" in df.columns:
+            d["avg_volume20"] = _last(df["Volume"].rolling(20).mean()) if len(df["Volume"]) >= 20 else d["prior_volume"]
         d["prior_high"] = _last(df["High"])
         d["prior_low"] = _last(df["Low"])
+        d["ema8"] = _last(close.ewm(span=8, adjust=False).mean())
         d["sma20"] = _last(close.rolling(20).mean())
         d["sma50"] = _last(close.rolling(50).mean())
         d["sma200"] = _last(close.rolling(200).mean()) if len(close) >= 200 else None
+        if d["ema8"] and d["prior_close"]:
+            d["price_vs_ema8"] = (d["prior_close"] - d["ema8"]) / d["ema8"] * 100
         # RSI
         try:
             delta = close.diff()
@@ -183,6 +211,8 @@ def fetch_ticker_data(ticker: str) -> Dict[str, Any]:
         std = close.rolling(20).std()
         d["bb_upper"] = _last(mid + 2 * std)
         d["bb_lower"] = _last(mid - 2 * std)
+        d["resistance_level"] = d.get("bb_upper") or float(df["High"].tail(20).max())
+        d["resistance_touches"] = _count_resistance_touches(df["High"], d["resistance_level"], tolerance_pct=1.0, lookback=20)
         # Pre-market (yfinance only — Alpaca extended hours differ)
         t_for_pm = yf.Ticker(ticker) if YF else None
         try:
@@ -257,15 +287,31 @@ def score_breakout(d: Dict) -> float:
     """Breakout Pre-Load: near resistance, PM volume, ADX proxy (trend)."""
     if d.get("prior_close") is None or d.get("pm_price") is None:
         return 0.0
-    res = d.get("bb_upper") or d.get("prior_high") or d["prior_close"] * 1.02
+    res = d.get("resistance_level") or d.get("bb_upper") or d.get("prior_high") or d["prior_close"] * 1.02
     dist_res = abs(d["pm_price"] - res) / d["pm_price"] * 100 if d["pm_price"] else 10
     if dist_res > 5:
         return max(0, 40 - dist_res * 15)
     pm_vol = d.get("pm_volume") or 0
     avg_vol = d.get("prior_volume") or 1
     pm_vol_ratio = min(100, (pm_vol / (avg_vol / 2)) * 100) if avg_vol else 0
+    touch_count = int(d.get("resistance_touches") or 0)
+    touch_bonus = 0
+    if touch_count >= 3:
+        touch_bonus = 8
+    elif touch_count == 2:
+        touch_bonus = 4
+    elif touch_count <= 1:
+        touch_bonus = -6
+
+    extension_penalty = 0
+    px_vs_ema8 = d.get("price_vs_ema8")
+    if px_vs_ema8 is not None and px_vs_ema8 > 12:
+        extension_penalty = min(12, (px_vs_ema8 - 12) * 1.5 + 4)
+
     adx_proxy = 25
     score = 100 - dist_res * 15 - (100 - pm_vol_ratio) * 0.007 - max(0, 25 - adx_proxy) * 2
+    score += touch_bonus
+    score -= extension_penalty
     return max(0.0, min(100.0, score))
 
 
@@ -386,9 +432,14 @@ def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> D
     ctx = fetch_market_context()
     results = []
     n = len(universe)
+    etf_set = {str(t).strip().upper() for t in (CURATED_ETFS or [])}
 
     def _scan_one(ticker):
         d = fetch_ticker_data(ticker)
+        if ticker.upper() in etf_set:
+            avg_vol = d.get("avg_volume20") or d.get("prior_volume") or 0
+            if avg_vol < ETF_MIN_AVG_VOLUME:
+                return None
         signal_name, raw_score = primary_signal(d)
         final_score = apply_risk_penalties(d, raw_score, signal_name)
         grade = grade_score(final_score)
@@ -407,7 +458,9 @@ def run_premarket_scan(progress_callback=None, index: Optional[str] = None) -> D
         if progress_callback:
             progress_callback(f"Scanning {t} ({i+1}/{n})...")
         try:
-            results.append(_scan_one(t))
+            row = _scan_one(t)
+            if row is not None:
+                results.append(row)
         except Exception:
             pass  # skip tickers that fail (network/API errors)
         time.sleep(0.3)  # polite delay between yfinance calls

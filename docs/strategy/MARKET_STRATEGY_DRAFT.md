@@ -19,7 +19,7 @@
 
 ## 2. Capital (from Feb 6)
 
-- **Portfolio:** ~$19,400 (Schwab).
+- **Portfolio:** ~$19,400 (IBKR).
 - **Tier 1 — Active swing (50% max):** $9,700 → 2 positions, $3,500–5,000 each.
 - **Tier 2 — Strategic long-term (30%):** Not for scanner trades (LRCX, APH, NVDA, GEV, AMAT, metals).
 - **Tier 3 — Cash (20%):** Buffer + A++ opportunities.

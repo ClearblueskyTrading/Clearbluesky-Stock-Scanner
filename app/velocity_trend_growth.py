@@ -113,12 +113,15 @@ def _fetch_ticker_analysis(
     need_volume: bool = True,
     need_rsi: bool = True,
     need_ma: bool = True,
+    need_sma200: bool = False,
 ) -> Optional[Dict[str, Any]]:
-    """Fetch N-day price history and compute return, RSI, volume, MA stack. Failover: yfinance first, then Alpaca."""
+    """Fetch N-day history and compute return, RSI, volume, MA stack, optional SMA200 status."""
     if days < 1:
         return None
     df = None
     need_bars = max(days + 1, 51) if need_ma else (max(days + 1, 15) if need_rsi else days + 1)
+    if need_sma200:
+        need_bars = max(need_bars, 220)
     try:
         import yfinance as yf
         t = yf.Ticker(ticker)
@@ -174,6 +177,10 @@ def _fetch_ticker_analysis(
             ema20 = closes.ewm(span=20, adjust=False).mean().iloc[-1]
             ema50 = closes.ewm(span=50, adjust=False).mean().iloc[-1]
             out["ma_stack"] = end_price > ema10 > ema20 > ema50
+        if need_sma200 and len(closes) >= 200:
+            sma200 = closes.rolling(200).mean().iloc[-1]
+            out["sma200"] = round(float(sma200), 2)
+            out["above_sma200"] = bool(end_price > sma200)
         return out
     except Exception:
         return None
@@ -191,6 +198,7 @@ def run_velocity_trend_growth_scan(
     require_beats_spy: bool = True,
     min_volume: int = 500000,
     require_volume_confirm: bool = True,
+    require_above_sma200: bool = True,
     require_ma_stack: bool = False,
     rsi_min: int = 55,
     rsi_max: int = 80,
@@ -206,6 +214,14 @@ def run_velocity_trend_growth_scan(
             progress_callback(msg)
 
     progress(f"Velocity Trend Growth: {trend_days}d trend, target {target_return_pct}% (S&P 500 + ETFs)...")
+
+    try:
+        from breadth import CURATED_ETFS, ETF_MIN_AVG_VOLUME
+        etf_set = {str(t).strip().upper() for t in CURATED_ETFS}
+        etf_min_avg_volume = ETF_MIN_AVG_VOLUME
+    except Exception:
+        etf_set = set()
+        etf_min_avg_volume = 100_000
 
     tickers, sector_map = _get_universe(index, progress_callback, trend_days=trend_days)
     if not tickers:
@@ -231,7 +247,14 @@ def run_velocity_trend_growth_scan(
         if (i + 1) % 30 == 0:
             progress(f"  {i + 1}/{len(tickers)}...")
         time.sleep(0.25)
-        row = _fetch_ticker_analysis(t, trend_days, need_volume=need_vol, need_rsi=need_rsi, need_ma=require_ma_stack)
+        row = _fetch_ticker_analysis(
+            t,
+            trend_days,
+            need_volume=need_vol,
+            need_rsi=need_rsi,
+            need_ma=require_ma_stack,
+            need_sma200=require_above_sma200,
+        )
         if row is None:
             continue
         price = row.get("price", 0)
@@ -242,9 +265,14 @@ def run_velocity_trend_growth_scan(
             continue
         if require_beats_spy and spy_return is not None and ret <= spy_return:
             continue
-        if min_volume > 0 and row.get("avg_volume", 0) < min_volume:
+        min_volume_required = min_volume
+        if t in etf_set:
+            min_volume_required = max(min_volume, etf_min_avg_volume)
+        if min_volume_required > 0 and row.get("avg_volume", 0) < min_volume_required:
             continue
         if require_volume_confirm and row.get("volume_above_avg") is False:
+            continue
+        if require_above_sma200 and row.get("above_sma200") is not True:
             continue
         if require_ma_stack and row.get("ma_stack") is not True:
             continue
@@ -270,6 +298,7 @@ def run_velocity_trend_growth_scan(
             "n_day_return_pct": ret,
             "sector": sector,
             "rsi": rsi,
+            "above_sma200": row.get("above_sma200"),
             "trend_days": trend_days,
             "target_return_pct": target_return_pct,
             "risk_pct": risk_pct,

@@ -194,6 +194,7 @@ def main() -> int:
             min_volume = min_vol_k * 1000
             require_beats_spy = bool(cfg.get("vtg_require_beats_spy", False))
             require_volume_confirm = bool(cfg.get("vtg_require_volume_confirm", False))
+            require_above_sma200 = bool(cfg.get("vtg_require_above_sma200", True))
             require_ma_stack = bool(cfg.get("vtg_require_ma_stack", False))
             rsi_min = int(cfg.get("vtg_rsi_min", 0) or 0)
             rsi_max = int(cfg.get("vtg_rsi_max", 100) or 100)
@@ -209,6 +210,7 @@ def main() -> int:
                 require_beats_spy=require_beats_spy,
                 min_volume=min_volume,
                 require_volume_confirm=require_volume_confirm,
+                require_above_sma200=require_above_sma200,
                 require_ma_stack=require_ma_stack,
                 rsi_min=rsi_min,
                 rsi_max=rsi_max,
@@ -220,12 +222,15 @@ def main() -> int:
             # Merge velocity premarket results if available
             try:
                 from velocity_scanner import run_premarket_scan as _vpm
-                vpm = _vpm(progress_callback=_progress, index=index)
-                if vpm:
-                    seen = {r.get("ticker") for r in (results or [])}
-                    for r in vpm:
-                        if r.get("ticker") not in seen:
+                vpm_report = _vpm(progress_callback=_progress, index=index)
+                if vpm_report:
+                    vpm_tickers = vpm_report.get("tickers") or []
+                    seen = {(r.get("ticker") or "").upper() for r in (results or [])}
+                    for r in vpm_tickers:
+                        rt = (r.get("ticker") or "").upper()
+                        if rt and rt not in seen:
                             results = (results or []) + [r]
+                            seen.add(rt)
             except Exception:
                 pass
 

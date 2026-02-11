@@ -31,11 +31,13 @@ Single reference of every config parameter used by each scan. Use this for AI re
 | `vtg_require_beats_spy` | Require beats SPY | bool | — | — | false | Only stocks outperforming SPY. |
 | `vtg_min_volume` | Min Avg Volume (K) | int | 0 | 10000 | 100 | Min average volume (K; app uses ×1000). |
 | `vtg_require_volume_confirm` | Volume above 20d avg | bool | — | — | false | Accumulation confirmation. |
+| `vtg_require_above_sma200` | Require above SMA200 | bool | — | — | true | Quality trend filter; skips names below long-term trend. |
 | `vtg_require_ma_stack` | Require MA stack | bool | — | — | false | Price > EMA10 > EMA20 > EMA50. |
 | `vtg_rsi_min` | RSI min (0=off) | int | 0 | 100 | 0 | RSI filter lower bound. |
 | `vtg_rsi_max` | RSI max (100=off) | int | 0 | 100 | 100 | RSI filter upper bound. |
 
-**Data:** Sector-first: ranks 11 sector SPDRs by return, then fetches S&P 500 + curated ETFs. Universe: ~160 tickers (top 4 sectors + index ETFs). Scanner: `velocity_trend_growth.run_velocity_trend_growth_scan`.
+**Data:** Sector-first: ranks 11 sector SPDRs by return, then fetches S&P 500 + curated ETFs (includes leveraged bull + bear core set). Universe: ~160-600 symbols depending on filters. Scanner: `velocity_trend_growth.run_velocity_trend_growth_scan`.
+**Liquidity guardrail:** ETFs are forced to a minimum average volume floor of `100,000` shares.
 
 ---
 
@@ -127,6 +129,7 @@ No config parameters (empty `SCAN_PARAM_SPECS["watchlist_tickers"]`). Scanner: `
 
 **Also used (from global):** `min_price`, `max_price`, `min_avg_volume`.  
 **In code but not in slider UI:** `premarket_max_spread_percent` (default 1.0) in `load_config()`.
+**Liquidity guardrail:** ETFs are forced to a minimum average volume floor of `100,000` shares.
 
 ---
 
@@ -149,7 +152,7 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 - `alarm_sound_choice` – `"beep"` \| `"asterisk"` \| `"exclamation"` (system-style beeps).
 - `finviz_api_key` – Optional Finviz API key.
 - **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). `openrouter_model` – Model: `"google/gemini-3-pro-preview"` or `"anthropic/claude-sonnet-4.5"` (use credits), or `"tngtech/deepseek-r1t2-chimera:free"` (free, no credits). Selectable in Settings under “OpenRouter API (AI analysis)”.
-- **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the PDF gets programmatic TA from `ta_engine` (yfinance + pandas-ta): SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
+- **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the PDF gets programmatic TA from `ta_engine` (yfinance + pandas-ta): EMA8, SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
 - Risk/position (legacy Settings tab): `account_size`, `risk_per_trade_percent`, `max_position_dollars`, `max_daily_loss_dollars`, `max_concurrent_positions`.
 
 ---
@@ -169,6 +172,7 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 |-----|---------------|-------|-----------|-----------|----------|------------|
 | `vtg_trend_days` | ✓ | | | | | |
 | `vtg_target_return_pct` | ✓ | | | | | |
+| `vtg_require_above_sma200` | ✓ | | | | | |
 | `vtg_min_price` | ✓ | | | | | |
 | `vtg_max_price` | ✓ | | | | | |
 | `swing_min_score` | | ✓ | | | | |

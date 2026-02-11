@@ -16,6 +16,7 @@ Everything is returned as a single dict suitable for:
 import time
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Google News RSS
@@ -206,7 +207,7 @@ def _yf_snapshot_from_data(data, symbols, symbol_labels):
     return snapshot
 
 
-def _fetch_market_snapshot():
+def _fetch_market_snapshot(config: Optional[dict] = None):
     """Fetch latest price + daily change. Failover: yfinance first, then Alpaca for missing."""
     snapshot = []
     # 1. yfinance first
@@ -221,8 +222,8 @@ def _fetch_market_snapshot():
     if missing:
         try:
             from alpaca_data import has_alpaca_keys, get_price_volume_batch
-            if has_alpaca_keys():
-                pv = get_price_volume_batch(missing)
+            if has_alpaca_keys(config):
+                pv = get_price_volume_batch(missing, config)
                 for sym in missing:
                     if sym in pv and pv[sym].get("price"):
                         snapshot.append({
@@ -236,7 +237,7 @@ def _fetch_market_snapshot():
     return snapshot
 
 
-def _fetch_overnight_markets():
+def _fetch_overnight_markets(config: Optional[dict] = None):
     """Fetch latest price + daily change for overseas/overnight ETFs. Failover: yfinance first, then Alpaca."""
     snapshot = []
     symbols = list(OVERNIGHT_SYMBOLS.keys())
@@ -252,8 +253,8 @@ def _fetch_overnight_markets():
     if missing:
         try:
             from alpaca_data import has_alpaca_keys, get_price_volume_batch
-            if has_alpaca_keys():
-                pv = get_price_volume_batch(missing)
+            if has_alpaca_keys(config):
+                pv = get_price_volume_batch(missing, config)
                 for sym in missing:
                     if sym in pv and pv[sym].get("price"):
                         snapshot.append({
@@ -271,7 +272,7 @@ def _fetch_overnight_markets():
 # Public API – gather everything
 # ---------------------------------------------------------------------------
 
-def gather_market_intel(progress_callback=None):
+def gather_market_intel(progress_callback=None, config: Optional[dict] = None):
     """
     Gather all market intelligence in parallel.
 
@@ -303,8 +304,8 @@ def gather_market_intel(progress_callback=None):
         "google_news": _fetch_google_news,
         "finviz_news": _fetch_finviz_news,
         "sector_performance": _fetch_sector_performance,
-        "market_snapshot": _fetch_market_snapshot,
-        "overnight_markets": _fetch_overnight_markets,
+        "market_snapshot": lambda: _fetch_market_snapshot(config=config),
+        "overnight_markets": lambda: _fetch_overnight_markets(config=config),
     }
     with ThreadPoolExecutor(max_workers=2) as pool:
         futures = {pool.submit(fn): key for key, fn in tasks.items()}

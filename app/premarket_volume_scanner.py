@@ -14,6 +14,15 @@ import finviz
 
 from scan_settings import load_config
 from finviz_safe import get_stock_safe
+try:
+    from breadth import CURATED_ETFS, ETF_MIN_AVG_VOLUME
+except Exception:
+    ETF_MIN_AVG_VOLUME = 100_000
+    CURATED_ETFS = [
+        "SPY", "QQQ", "IWM", "DIA",
+        "TQQQ", "SQQQ", "UPRO", "SPXU", "SOXL", "SOXS", "TNA", "TZA",
+        "XLF", "XLK", "XLE", "XLV", "SMH", "GLD", "USO",
+    ]
 
 # Global cancel event - set by caller to abort scan
 _cancel_event: Optional[threading.Event] = None
@@ -34,6 +43,29 @@ def get_float_category(float_size: float) -> str:
         return "High"
 
 
+def _parse_num(value, default=0.0) -> float:
+    """Parse Finviz-like numeric values with optional K/M/B suffixes."""
+    if value is None:
+        return default
+    if isinstance(value, (int, float)):
+        return float(value)
+    s = str(value).strip().replace(",", "").replace("%", "").replace("x", "")
+    mult = 1.0
+    if s.upper().endswith("K"):
+        mult = 1_000.0
+        s = s[:-1]
+    elif s.upper().endswith("M"):
+        mult = 1_000_000.0
+        s = s[:-1]
+    elif s.upper().endswith("B"):
+        mult = 1_000_000_000.0
+        s = s[:-1]
+    try:
+        return float(s) * mult
+    except (TypeError, ValueError):
+        return default
+
+
 def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", cancel_event: threading.Event = None) -> List[Dict]:
     """
     Run Pre-Market Volume scan - finds unusual activity before market open.
@@ -50,7 +82,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     
     Args:
         progress_callback: function(msg) for status updates
-        index: 'sp500' or 'etfs'
+        index: 'sp500', 'etfs', or 'sp500_etfs'
         cancel_event: threading.Event to signal cancellation
     
     Returns:
@@ -61,7 +93,7 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     config = load_config()
     
     if progress_callback:
-        progress_callback("Scanning S&P 500 + ETFs for pre-market volume activity...")
+        progress_callback("Scanning S&P 500 + curated ETFs for pre-market volume activity...")
     
     # Get current time to validate scan window
     now = datetime.now()
@@ -87,23 +119,24 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
     min_vol_float_ratio = float(config.get('premarket_min_vol_float_ratio', 0.01))
     track_sector_heat = config.get('premarket_track_sector_heat', True)
     
-    # Always scan both S&P 500 and ETFs
-    idx_filters = [('idx_sp500', 'sp500'), ('ind_exchangetradedfund', 'etfs')]
+    # Universe selection: use S&P 500 screener + curated ETF set (avoid full ETF sweeps)
+    scan_sp500 = index in ("sp500", "sp500_etfs")
+    scan_etfs = index in ("etfs", "sp500_etfs")
+    etf_min_avg_volume = max(min_volume, ETF_MIN_AVG_VOLUME)
     candidates = []
     seen = set()
     
     try:
-        for idx_filter, _ in idx_filters:
+        if scan_sp500:
             filters = [
-                idx_filter,
+                'idx_sp500',
                 f'sh_price_o{int(min_price)}',
                 f'sh_price_u{int(max_price)}',
                 f'sh_avgvol_o{int(min_volume/1000)}',
-                'ta_change_u',
             ]
-            print(f"[PREMARKET] Screener filters: {filters}")
+            print(f"[PREMARKET] Screener filters (sp500): {filters}")
             screener = Screener(filters=filters, order='change')
-            print(f"[PREMARKET] Screener returned {len(screener)} raw results")
+            print(f"[PREMARKET] S&P 500 screener returned {len(screener)} raw results")
             
             for stock in screener:
                 if _is_cancelled():
@@ -137,6 +170,59 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
                     })
                 except Exception:
                     continue
+
+        # Curated ETF pass: enforce hard avg-volume floor (>=100k)
+        if scan_etfs:
+            if progress_callback:
+                progress_callback("Checking curated leveraged ETFs...")
+            for t in CURATED_ETFS:
+                if _is_cancelled():
+                    if progress_callback:
+                        progress_callback("Scan cancelled.")
+                    return []
+                ticker = (t or "").strip().upper()
+                if not ticker or ticker in seen:
+                    continue
+                try:
+                    quote = get_stock_safe(ticker, timeout=30.0, max_attempts=2)
+                    if not quote:
+                        time.sleep(0.2)
+                        continue
+
+                    price = _parse_num(quote.get("Price"), 0.0)
+                    if price < min_price or price > max_price:
+                        time.sleep(0.2)
+                        continue
+
+                    avg_vol = _parse_num(quote.get("Avg Volume"), 0.0)
+                    if avg_vol <= 0:
+                        avg_vol = _parse_num(quote.get("Volume"), 0.0)
+                    if avg_vol < etf_min_avg_volume:
+                        time.sleep(0.2)
+                        continue
+
+                    change = _parse_num(quote.get("Change"), 0.0)
+                    if abs(change) < min_gap or abs(change) > max_gap:
+                        time.sleep(0.2)
+                        continue
+
+                    seen.add(ticker)
+                    candidates.append({
+                        'ticker': ticker,
+                        'company': quote.get('Company', ticker),
+                        'price': price,
+                        'change': change,
+                        'gap_percent': abs(change),
+                        'gap_direction': 'up' if change > 0 else 'down',
+                        'volume': quote.get('Volume', 0),
+                        'avg_volume': avg_vol,
+                        'rel_volume': quote.get('Rel Volume', '1.0x'),
+                        'sector': quote.get('Sector', 'ETF'),
+                        'industry': quote.get('Industry', 'ETF'),
+                    })
+                except Exception:
+                    pass
+                time.sleep(0.2)
         
         if _is_cancelled():
             return []
@@ -181,17 +267,17 @@ def run_premarket_volume_scan(progress_callback=None, index: str = "sp500", canc
                 failed_fetches = 0  # Reset on success
                 
                 # Extract key metrics
-                volume_str = candidate.get('volume', '0')
-                try:
-                    volume = int(volume_str.replace(',', ''))
-                except:
-                    volume = 0
+                price = _parse_num(candidate.get('price'), 0.0) or _parse_num(quote.get('Price'), 0.0)
+                if price <= 0:
+                    continue
+                # Prefer the freshest quote volume when available; fallback to screener snapshot.
+                volume_candidate = _parse_num(candidate.get('volume', 0), 0.0)
+                volume_quote = _parse_num(quote.get('Volume', 0), 0.0)
+                volume = int(max(volume_candidate, volume_quote))
+                if volume < min_pm_volume:
+                    continue
                 
-                rel_vol_str = candidate.get('rel_volume', '1.0x')
-                try:
-                    rel_vol = float(rel_vol_str.replace('x', '').replace(' ', ''))
-                except:
-                    rel_vol = 1.0
+                rel_vol = _parse_num(candidate.get('rel_volume', '1.0x'), 1.0)
                 
                 # Dollar volume
                 dollar_volume = volume * price

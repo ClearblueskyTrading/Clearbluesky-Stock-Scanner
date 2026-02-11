@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.85
+# ClearBlueSky Stock Scanner v7.86
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.85"
+VERSION = "7.87"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import json
@@ -247,6 +247,7 @@ def _scan_worker_loop(app):
                 min_volume = min_vol_k * 1000  # stored as K
                 require_beats_spy = bool(config.get("vtg_require_beats_spy", False))
                 require_volume_confirm = bool(config.get("vtg_require_volume_confirm", False))
+                require_above_sma200 = bool(config.get("vtg_require_above_sma200", True))
                 require_ma_stack = bool(config.get("vtg_require_ma_stack", False))
                 rsi_min = int(config.get("vtg_rsi_min", 0) or 0)
                 rsi_max = int(config.get("vtg_rsi_max", 100) or 100)
@@ -263,6 +264,7 @@ def _scan_worker_loop(app):
                     require_beats_spy=require_beats_spy,
                     min_volume=min_volume,
                     require_volume_confirm=require_volume_confirm,
+                    require_above_sma200=require_above_sma200,
                     require_ma_stack=require_ma_stack,
                     rsi_min=rsi_min,
                     rsi_max=rsi_max,

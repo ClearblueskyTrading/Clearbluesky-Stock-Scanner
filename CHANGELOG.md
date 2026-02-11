@@ -4,6 +4,46 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.87] – 2026-02-11
+
+### Fixed — Scanner & report pipeline bugfixes
+- **CLI premarket merge** — Velocity premarket results were silently dropped (iterated dict keys instead of `tickers` list).
+- **Premarket `price` NameError** — Undefined `price` caused crash in dollar-volume calc; fixed.
+- **Premarket direction bias** — Removed `ta_change_u` filter so both gap-up and gap-down are captured.
+- **Watchlist rel-volume** — `"1.5x"` strings now parse correctly (stripped `x` suffix).
+- **Enhanced dip ticker case** — Stored normalized uppercase ticker for consistent dedup.
+- **History leveraged_play crash** — Dict used as Counter key; now extracts ticker string.
+- **History smart-money keys** — Fixed wrong keys (`wsb` → `wsb_rank`/`wsb_mentions`, `insider_filings` → `form4_count_90d`); stats were always zero.
+- **PDF directive mismatch** — Momentum scans got swing directive in PDF; now uses correct `directive_block`.
+- **Leveraged play schema** — Normalized to `{leveraged_ticker, match_type}` dict everywhere; case-insensitive lookup.
+- **Premarket metrics in reports** — Gap %, dollar volume, float, vol/float now preserved in report rows.
+- **Config passthrough** — Ticker enrichment + market intel now forward user config to Alpaca failover.
+- **Price history div-by-zero** — Guarded `pct_change` against `first_close == 0`.
+
+### Changed
+- Version labels updated in USER_MANUAL, CLAUDE_AI_GUIDE, DOCKER, INSTALL.bat (were stuck on v7.7).
+
+See **app/CHANGELOG.md** for full details.
+
+---
+
+## [7.86] – 2026-02-10
+
+### Added
+- EMA8 support in programmatic TA (`ema8`, `price_vs_ema8`) and report formatting.
+- Velocity Trend Growth `vtg_require_above_sma200` (default on) wired in GUI + CLI.
+- Watchlist EMA8-aware scoring and overextension penalties.
+- Pre-market breakout multi-touch resistance confirmation and EMA8 extension penalty.
+- Report metadata for setup quality: `ema8_status`, `invalidation_level`, extension-penalty context.
+- Curated leveraged ETF universe expanded to include core bull + bear/inverse symbols.
+
+### Changed
+- `emotional_require_above_sma200` default now `true` for new configs.
+- Config/docs refreshed for the new scanner controls and TA fields.
+- ETF scanner paths now enforce a hard `100k` average-volume floor.
+- Pre-market ETF scan scope moved to curated ETFs (no full 2000+ ETF sweeps).
+- Earnings parsing fixed so stale month/day values no longer roll into next year; report risk checks now prefer yfinance earnings enrichment and avoid false "today" warnings for historical earnings.
+
 ## [7.85] – 2026-02-10
 
 ### Fixed — QA and CLI consistency

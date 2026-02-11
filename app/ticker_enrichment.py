@@ -73,55 +73,84 @@ def _get_earnings_date(ticker: str) -> Optional[Dict]:
         cal = t.calendar
         if cal is None:
             return None
-        # yfinance calendar can be a dict or DataFrame
-        earnings_date = None
+
+        # yfinance calendar can be a dict or DataFrame; collect candidate dates.
+        today = date.today()
+        candidates = []
+
+        def _to_date(v):
+            if v is None:
+                return None
+            if hasattr(v, "date"):
+                try:
+                    return v.date()
+                except Exception:
+                    return None
+            if isinstance(v, str):
+                try:
+                    return datetime.strptime(v[:10], "%Y-%m-%d").date()
+                except Exception:
+                    return None
+            if isinstance(v, date):
+                return v
+            return None
+
         if isinstance(cal, dict):
             ed = cal.get("Earnings Date")
             if ed:
-                if isinstance(ed, list) and len(ed) > 0:
-                    earnings_date = ed[0]
-                elif hasattr(ed, 'date'):
-                    earnings_date = ed
+                if isinstance(ed, list):
+                    for item in ed:
+                        d = _to_date(item)
+                        if d:
+                            candidates.append(d)
+                else:
+                    d = _to_date(ed)
+                    if d:
+                        candidates.append(d)
         elif hasattr(cal, 'columns'):
             # DataFrame format
             if "Earnings Date" in cal.columns:
                 vals = cal["Earnings Date"].dropna()
-                if len(vals) > 0:
-                    earnings_date = vals.iloc[0]
+                for item in vals.tolist():
+                    d = _to_date(item)
+                    if d:
+                        candidates.append(d)
             elif 0 in cal.columns:
                 try:
-                    earnings_date = cal.loc["Earnings Date", 0]
+                    d = _to_date(cal.loc["Earnings Date", 0])
+                    if d:
+                        candidates.append(d)
                 except Exception:
                     pass
 
-        if earnings_date is None:
+        if not candidates:
             return None
 
-        # Convert to date
-        if hasattr(earnings_date, 'date'):
-            ed = earnings_date.date()
-        elif isinstance(earnings_date, str):
-            ed = datetime.strptime(earnings_date[:10], "%Y-%m-%d").date()
+        # Prefer the nearest upcoming earnings date. If none are upcoming,
+        # keep the most recent historical date for context (no warning).
+        upcoming = sorted([d for d in candidates if d >= today])
+        if upcoming:
+            ed = upcoming[0]
         else:
-            ed = earnings_date
+            ed = max(candidates)
 
-        today = date.today()
         days_away = (ed - today).days
 
         warning = None
-        if days_away <= 0:
+        if days_away == 0:
             warning = "EARNINGS TODAY"
         elif days_away == 1:
             warning = "EARNINGS TOMORROW - DO NOT HOLD OVERNIGHT"
-        elif days_away <= 3:
+        elif 2 <= days_away <= 3:
             warning = f"EARNINGS IN {days_away} DAYS - HIGH RISK"
-        elif days_away <= 7:
+        elif 4 <= days_away <= 7:
             warning = f"EARNINGS IN {days_away} DAYS - CAUTION"
 
         return {
             "earnings_date": str(ed),
             "days_away": days_away,
             "warning": warning,
+            "is_upcoming": days_away >= 0,
         }
     except Exception:
         return None
@@ -165,11 +194,11 @@ def _score_news_sentiment(headlines: List[str]) -> Dict:
 
 # ── Price at report time ─────────────────────────────────────
 
-def _get_current_price(ticker: str) -> Optional[Dict]:
+def _get_current_price(ticker: str, config: Optional[Dict] = None) -> Optional[Dict]:
     """Get current price for report stamping. Failover: yfinance > finviz > alpaca."""
     try:
         from data_failover import get_price_volume
-        pv = get_price_volume(ticker)
+        pv = get_price_volume(ticker, config)
         if pv and pv.get("price") and pv["price"] > 0:
             return {
                 "price_at_report": pv["price"],
@@ -216,7 +245,8 @@ def _get_leveraged_suggestion(ticker: str, sector: str, leveraged_map: Dict) -> 
 
 def enrich_scan_results(results: List[Dict], include_earnings: bool = True,
                         include_news_flags: bool = True, include_price_stamp: bool = True,
-                        include_leveraged: bool = False, progress_callback=None) -> List[Dict]:
+                        include_leveraged: bool = False, config: Optional[Dict] = None,
+                        progress_callback=None) -> List[Dict]:
     """
     Enrich scan results with earnings dates, news flags, price stamps, and leveraged suggestions.
 
@@ -226,6 +256,7 @@ def enrich_scan_results(results: List[Dict], include_earnings: bool = True,
         include_news_flags: Score news headlines for red/green flags
         include_price_stamp: Add current price at report time
         include_leveraged: Add leveraged ETF suggestions
+        config: Optional app config for data failover providers
         progress_callback: Optional progress function
 
     Returns:
@@ -265,7 +296,7 @@ def enrich_scan_results(results: List[Dict], include_earnings: bool = True,
 
         # Price at report time
         if include_price_stamp:
-            price_data = _get_current_price(ticker)
+            price_data = _get_current_price(ticker, config=config)
             if price_data:
                 enrichment.update(price_data)
 

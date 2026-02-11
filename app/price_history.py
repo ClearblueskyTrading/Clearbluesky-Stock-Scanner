@@ -54,7 +54,7 @@ def _fetch_one_yf(ticker: str, period: str = "1mo") -> Optional[Dict]:
         last_close = closes[-1] if closes else 0
         high_30d = max(r["high"] for r in rows)
         low_30d = min(r["low"] for r in rows)
-        pct_change = round(((last_close - first_close) / first_close) * 100, 2) if first_close else 0
+        pct_change = round(((last_close - first_close) / first_close) * 100, 2) if first_close and first_close != 0 else 0
         return {
             "ticker": ticker,
             "period": "30d",
@@ -84,7 +84,7 @@ def _fetch_one_alpaca(ticker: str) -> Optional[Dict]:
         last_close = closes[-1] if closes else 0
         high_30d = max(r["high"] for r in rows)
         low_30d = min(r["low"] for r in rows)
-        pct_change = round(((last_close - first_close) / first_close) * 100, 2) if first_close else 0
+        pct_change = round(((last_close - first_close) / first_close) * 100, 2) if first_close and first_close != 0 else 0
         return {
             "ticker": ticker,
             "period": "30d",
