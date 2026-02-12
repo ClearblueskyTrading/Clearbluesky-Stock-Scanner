@@ -56,6 +56,7 @@ EXCLUDE_FILES = {
     "alpaca_trades.py",
     "paper_trading_manager.py",
     "alpaca_swing_dip_strategy.py",
+    "PaperTradingManager.bat",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

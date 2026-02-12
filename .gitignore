@@ -47,9 +47,16 @@ CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md
 **/.env.*
 **/secrets.*
 **/mcp.json
+mcp-servers/
 
 # Cursor IDE rules (project-local, not for distribution)
 .cursor/
+
+# Trading (Cursor project only — not scanner app)
+app/alpaca_trades.py
+app/paper_trading_manager.py
+app/alpaca_swing_dip_strategy.py
+app/PaperTradingManager.bat
 
 # OS
 .DS_Store

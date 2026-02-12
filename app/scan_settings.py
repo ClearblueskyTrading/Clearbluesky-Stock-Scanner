@@ -204,7 +204,7 @@ def load_config():
         "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
         # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
         "alpha_vantage_api_key": "",
-        # Alpaca (trading API – paper or live; used by MCP / integrations)
+        # Alpaca (market data failover: price/bars when yfinance unavailable)
         "alpaca_api_key": "",
         "alpaca_secret_key": "",
         # Market Intelligence (Google News RSS + Finviz news + sector performance + market snapshot)
@@ -220,15 +220,6 @@ def load_config():
 
         # Universe toggle: sp500 | etfs (one or the other; no combined to avoid list limits)
         "scan_index": "sp500",
-
-        # Paper Trading Manager (Cursor project only; not in scanner app release)
-        "ptm_enabled": False,
-        "ptm_position_pct": 5.0,           # % of buying power per position
-        "ptm_max_position_dollars": 5000,
-        "ptm_stop_pct": -5.0,
-        "ptm_target_pct": 10.0,
-        "ptm_min_score": 85,
-        "ptm_max_positions": 5,
     }
     
     if os.path.exists(CONFIG_FILE):

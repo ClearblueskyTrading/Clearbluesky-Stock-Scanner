@@ -36,7 +36,7 @@ Scanner data uses **yfinance > finviz > alpaca** for price/volume, and **yfinanc
 
 ## Rate limits
 
-- **Alpaca:** 60 requests/min, 3/sec in `alpaca_data.py`. See `.cursor/rules/alpaca-rate-limits.mdc`.
+- **Alpaca:** 60 requests/min, 3/sec in `alpaca_data.py` (market data only).
 - **Finviz:** Delays and retries in `finviz_safe.py` and report generator.
 - **yfinance:** Polite delays between requests to reduce Yahoo rate-limit issues.
 
