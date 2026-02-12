@@ -5,8 +5,8 @@ See the main **[README.md](../README.md)** in the project root for full document
 ## Quick Reference
 
 - **3 Scanners:** Velocity Trend Growth (momentum), Swing (emotional dips), Watchlist
-- **Index:** S&P 500 + ETFs (sector-first for Velocity Trend Growth)
-- **New in v7.83:** Sector-first momentum scan, curated ETFs, legacy Trend removed
-- **Run:** `python app.py` (GUI) or `python scanner_cli.py --scan <type>` (CLI)
+- **Universe:** S&P 500 or ETFs (toggle in GUI; `--index sp500|etfs` in CLI)
+- **Run:** `python app.py` (GUI) or `python scanner_cli.py --scan <type>` (CLI) or `CLI.bat --scan <type>` (Windows)
+- **AI:** 3-model consensus (Llama, OpenAI, DeepSeek); chart data in JSON. Free models only.
 
-See **CLI_FOR_CLAUDE.md** for CLI automation details.
+See **CLI_FOR_AI.md** for CLI/AI automation.

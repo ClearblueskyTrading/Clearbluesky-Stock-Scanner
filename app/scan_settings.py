@@ -200,7 +200,7 @@ def load_config():
         "finviz_api_key": "",
         # OpenRouter API (for AI analysis; one key for all models)
         "openrouter_api_key": "",
-        "openrouter_model": "google/gemini-3-pro-preview",  # or tngtech/deepseek-r1t2-chimera:free (free)
+        "openrouter_model": "tngtech/deepseek-r1t2-chimera:free",  # free models only
         "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
         # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
         "alpha_vantage_api_key": "",
@@ -217,6 +217,18 @@ def load_config():
 
         # Report: include programmatic TA (yfinance + pandas-ta: SMAs, RSI, MACD, BB, ATR, Fib) per ticker
         "include_ta_in_report": True,
+
+        # Universe toggle: sp500 | etfs (one or the other; no combined to avoid list limits)
+        "scan_index": "sp500",
+
+        # Paper Trading Manager (Cursor project only; not in scanner app release)
+        "ptm_enabled": False,
+        "ptm_position_pct": 5.0,           # % of buying power per position
+        "ptm_max_position_dollars": 5000,
+        "ptm_stop_pct": -5.0,
+        "ptm_target_pct": 10.0,
+        "ptm_min_score": 85,
+        "ptm_max_positions": 5,
     }
     
     if os.path.exists(CONFIG_FILE):
@@ -229,10 +241,11 @@ def load_config():
                     defaults["openrouter_api_key"] = saved.get("gemini_api_key", "")
                 gm = saved.get("gemini_model")
                 if gm and not saved.get("openrouter_model"):
-                    defaults["openrouter_model"] = "google/gemini-3-pro-preview" if gm == "gemini-3-pro-preview" else "tngtech/deepseek-r1t2-chimera:free"
-                # v7.2 migration: Claude removed — switch to Gemini
-                if "claude" in (defaults.get("openrouter_model") or "").lower():
-                    defaults["openrouter_model"] = "google/gemini-3-pro-preview"
+                    defaults["openrouter_model"] = "tngtech/deepseek-r1t2-chimera:free"
+                # Migration: paid models removed — switch to free default
+                om = (defaults.get("openrouter_model") or "").lower()
+                if any(x in om for x in ("claude", "gemini", "gpt-4o", "gpt-4")):
+                    defaults["openrouter_model"] = "tngtech/deepseek-r1t2-chimera:free"
                 # v7.4 migration: Loosen emotional dip defaults (was too strict, 0 results)
                 if saved.get("emotional_require_above_sma200") is True and saved.get("emotional_min_volume_ratio", 0) >= 1.8:
                     defaults["emotional_require_buy_rating"] = False

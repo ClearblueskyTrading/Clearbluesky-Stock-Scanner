@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ClearBlueSky CLI – for Claude / automation.
+ClearBlueSky CLI – for AI / automation.
 Runs scans without the GUI; exit 0 on success, 1 on failure.
 No retries on rate limit (429).
 """
@@ -63,8 +63,8 @@ def _get_min_score(config: dict, scan_key: str, scan_type_display: str) -> int:
 
 
 def _generate_report_cli(results, scan_key: str, scan_type_display: str, config: dict, index: str | None, progress_fn) -> str | None:
-    """Generate PDF + JSON + optional _ai.txt. Returns base path (no extension) or None."""
-    from report_generator import HTMLReportGenerator
+    """Generate single .md report. Returns path to .md file or None."""
+    from report_generator import HTMLReportGenerator, build_markdown_report
 
     min_score = _get_min_score(config, scan_key, scan_type_display)
     reports_dir = config.get("reports_folder") or DEFAULT_REPORTS_DIR
@@ -77,7 +77,7 @@ def _generate_report_cli(results, scan_key: str, scan_type_display: str, config:
     watchlist_set = set(str(t).upper().strip() for t in watchlist if t)
 
     gen = HTMLReportGenerator(save_dir=reports_dir)
-    path, analysis_text, analysis_package = gen.generate_combined_report_pdf(
+    base_path, report_text, analysis_package = gen.generate_combined_report_pdf(
         results,
         scan_type_display,
         min_score,
@@ -86,16 +86,14 @@ def _generate_report_cli(results, scan_key: str, scan_type_display: str, config:
         config=config,
         index=index,
     )
-    if not path:
+    if not base_path:
         return None
 
-    base = path[:-4] if path.lower().endswith(".pdf") else path
-
-    # Optional: OpenRouter AI analysis (no browser)
+    ai_response = ""
     if config.get("openrouter_api_key") and analysis_package:
         try:
-            from openrouter_client import analyze_with_config
-            progress_fn("Sending to OpenRouter for AI analysis...")
+            from openrouter_client import analyze_with_all_models
+            progress_fn("Sending to OpenRouter (3 models)...")
             system_prompt = (analysis_package.get("instructions") or "").strip() or "You are a professional stock analyst. Analyze the JSON package and produce the report in the required format."
             if config.get("rag_enabled") and config.get("rag_books_folder"):
                 try:
@@ -106,34 +104,27 @@ def _generate_report_cli(results, scan_key: str, scan_type_display: str, config:
                 except Exception:
                     pass
             content = __import__("json").dumps(analysis_package, indent=2)
-            ai_response = analyze_with_config(config, system_prompt, content, image_base64_list=None)
-            ai_path = base + "_ai.txt"
-            from report_generator import SCANNER_GITHUB_URL
-            _ai_header = f"Created using ClearBlueSky Stock Scanner. Scanner: {SCANNER_GITHUB_URL}\n\nPrompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
+            image_list = None
+            ai_response = analyze_with_all_models(config, system_prompt, content, progress_callback=progress_fn, image_base64_list=image_list) or ""
             if ai_response:
-                with open(ai_path, "w", encoding="utf-8") as f:
-                    f.write(_ai_header + ai_response)
-                progress_fn("AI analysis saved to " + ai_path)
-            else:
-                fallback = (analysis_package.get("instructions") or "") if isinstance(analysis_package, dict) else ""
-                with open(ai_path, "w", encoding="utf-8") as f:
-                    f.write("AI returned empty. Paste the report JSON into your preferred AI.\n\n---\n\n" + fallback)
-                progress_fn("AI empty; instructions written to " + ai_path)
+                ai_response = "Consensus from 3 AI models (Llama, OpenAI, DeepSeek).\n\n" + ai_response
         except Exception as e:
             progress_fn("AI analysis failed: " + str(e))
-            try:
-                fallback = (analysis_package.get("instructions") or "") if isinstance(analysis_package, dict) else ""
-                with open(base + "_ai.txt", "w", encoding="utf-8") as f:
-                    f.write(f"AI analysis failed: {e}\n\n---\n\n{fallback}")
-            except Exception:
-                pass  # analysis_package may be undefined
+            ai_response = f"AI analysis failed: {e}\n\nSet OpenRouter API key for analysis."
+    else:
+        ai_response = ""
 
-    return base
+    md_content = build_markdown_report(analysis_package, report_text, ai_response)
+    md_path = base_path + ".md"
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md_content)
+    progress_fn("Report saved: " + md_path)
+    return md_path
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="ClearBlueSky CLI – run scans for Claude/automation. Exit 0 = success, 1 = failure."
+        description="ClearBlueSky CLI – run scans for AI/automation. Exit 0 = success, 1 = failure."
     )
     parser.add_argument(
         "--scan",
@@ -150,10 +141,28 @@ def main() -> int:
         metavar="PATH",
         help="Optional: text file with one ticker per line (overrides config watchlist for this run)",
     )
+    parser.add_argument(
+        "--index",
+        choices=["sp500", "etfs"],
+        help="Universe override: sp500 or etfs (for velocity_trend_growth, swing). Overrides user_config.json",
+    )
+    parser.add_argument(
+        "--reports-dir",
+        metavar="PATH",
+        help="Override reports output directory (default: reports/ under app folder or user_config)",
+    )
     args = parser.parse_args()
 
     from scan_settings import load_config
     config = load_config()
+
+    config = dict(config) if config else {}
+    if args.index and args.scan in INDEX_SCANS:
+        config["scan_index"] = args.index
+        _progress(f"Universe override: {args.index}")
+    if args.reports_dir:
+        config["reports_folder"] = os.path.abspath(args.reports_dir)
+        _progress(f"Reports dir: {config['reports_folder']}")
 
     if args.watchlist_file:
         path = os.path.abspath(args.watchlist_file)
@@ -162,15 +171,17 @@ def main() -> int:
             return 1
         with open(path, "r", encoding="utf-8") as f:
             tickers = [line.strip().upper() for line in f if line.strip()]
-        config = dict(config) if config else {}
         config["watchlist"] = tickers
         _progress(f"Using watchlist from file: {len(tickers)} tickers")
 
     scan_key = args.scan
-    index = "sp500_etfs" if scan_key in INDEX_SCANS else None
+    index = None
+    if scan_key in INDEX_SCANS:
+        idx_raw = config.get("scan_index", "sp500")
+        index = idx_raw if idx_raw in ("sp500", "etfs", "sp500_etfs") else "sp500"
     display_name = SCAN_DISPLAY_NAMES[scan_key]
-
-    print(f"Starting {display_name} scan (S&P 500 + ETFs)...", flush=True)
+    idx_label = "S&P 500" if index == "sp500" else "ETFs" if index == "etfs" else "S&P 500 + ETFs"
+    print(f"Starting {display_name} scan ({idx_label})...", flush=True)
 
     try:
         results = None
@@ -224,12 +235,11 @@ def main() -> int:
             print(f"[OK] {display_name} scan completed (no candidates). Check reports folder if previous runs wrote files.", flush=True)
             return 0
 
-        _progress(f"Generating PDF report ({len(results)} candidates)...")
+        _progress(f"Generating report ({len(results)} candidates)...")
         base_path = _generate_report_cli(results, scan_key, display_name, config, index, _progress)
         if base_path:
-            # Predictable output for Claude: reports/<basename>.* (ASCII so Windows console works)
             bn = os.path.basename(base_path)
-            print(f"[OK] Scan complete: reports/{bn}.*", flush=True)
+            print(f"[OK] Scan complete: reports/{bn}", flush=True)
         else:
             print("[OK] Scan complete (no report: no stocks above min score).", flush=True)
         return 0

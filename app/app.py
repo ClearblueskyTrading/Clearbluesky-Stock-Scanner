@@ -1,14 +1,16 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.86
+# ClearBlueSky Stock Scanner v7.90
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.88"
+VERSION = "7.90"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
+import sys
 import json
 import csv
 import queue
+import subprocess
 import webbrowser
 import traceback
 import time
@@ -17,6 +19,7 @@ import re
 from datetime import datetime
 from scan_settings import (
     load_config as load_app_config,
+    save_config as save_app_config,
     load_scan_types,
     SCAN_PARAM_SPECS,
     SCAN_TYPES_FILE,
@@ -38,7 +41,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(APP_DIR, "user_config.json")
 LOG_FILE = os.path.join(APP_DIR, "error_log.txt")
 DEFAULT_REPORTS_DIR = os.path.join(APP_DIR, "reports")
-WATCHLIST_MAX = 200
+WATCHLIST_MAX = 400
 
 
 def _resolve_reports_dir(path):
@@ -104,11 +107,18 @@ def _parse_version(s):
     return tuple(int(x) for x in parts[:2])
 
 
+def _restart_app():
+    """Restart the app (same Python, same script). Replaces current process."""
+    app_path = os.path.join(APP_DIR, "app.py")
+    os.chdir(APP_DIR)
+    os.execv(sys.executable, [sys.executable, app_path])
+
+
 def _show_update_notice(root, tag, url):
-    """Show a dialog that a new version is available, with link to download."""
+    """Show a dialog: Update now (download + apply + restart) or Later."""
     win = tk.Toplevel(root)
     win.title("Update available")
-    win.geometry("380x140")
+    win.geometry("400x180")
     win.resizable(False, False)
     win.configure(bg="white")
     win.transient(root)
@@ -116,23 +126,65 @@ def _show_update_notice(root, tag, url):
     f.pack(fill="both", expand=True)
     tk.Label(
         f, text=f"A new version of ClearBlueSky is available: {tag}",
-        font=("Arial", 10, "bold"), bg="white", fg="#333", wraplength=340
+        font=("Arial", 10, "bold"), bg="white", fg="#333", wraplength=360
     ).pack(anchor="w", pady=(0, 6))
-    tk.Label(
-        f, text="Download the latest version from the link below.",
-        font=("Arial", 9), bg="white", fg="#555", wraplength=340
-    ).pack(anchor="w", pady=(0, 12))
+    status_label = tk.Label(
+        f, text="Click Update now to download and install automatically. Your config will be kept.",
+        font=("Arial", 9), bg="white", fg="#555", wraplength=360
+    )
+    status_label.pack(anchor="w", pady=(0, 12))
     btn_frame = tk.Frame(f, bg="white")
     btn_frame.pack(fill="x")
+
+    def do_update():
+        upd_btn.config(state="disabled", text="Updating...")
+        later_btn.config(state="disabled")
+
+        def progress(msg):
+            try:
+                root.after(0, lambda: status_label.config(text=msg))
+                root.update_idletasks()
+            except Exception:
+                pass
+
+        def run():
+            err = run_update_flow(VERSION, progress_callback=progress)
+            def done():
+                if err:
+                    try:
+                        status_label.config(text="Update failed.")
+                        upd_btn.config(state="normal", text="Update now")
+                        later_btn.config(state="normal")
+                        messagebox.showerror("Update failed", err, parent=win)
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        win.destroy()
+                        root.quit()
+                        root.destroy()
+                        _restart_app()
+                    except Exception:
+                        pass
+            root.after(0, done)
+        threading.Thread(target=run, daemon=True).start()
+
+    upd_btn = tk.Button(
+        btn_frame, text="Update now", font=("Arial", 9),
+        command=do_update, bg=GREEN, fg="white",
+        relief="flat", padx=12, pady=4, cursor="hand2"
+    )
+    upd_btn.pack(side="left", padx=(0, 8))
+    later_btn = tk.Button(
+        btn_frame, text="Later", font=("Arial", 9),
+        command=win.destroy, bg=GRAY, fg="white", relief="flat", padx=12, pady=4
+    )
+    later_btn.pack(side="left")
     tk.Button(
         btn_frame, text="Open download page", font=("Arial", 9),
         command=lambda: (webbrowser.open(url), win.destroy()), bg=BLUE, fg="white",
         relief="flat", padx=12, pady=4, cursor="hand2"
-    ).pack(side="left", padx=(0, 8))
-    tk.Button(
-        btn_frame, text="Later", font=("Arial", 9),
-        command=win.destroy, bg=GRAY, fg="white", relief="flat", padx=12, pady=4
-    ).pack(side="left")
+    ).pack(side="left", padx=(8, 0))
     win.update_idletasks()
     win.grab_set()
 
@@ -146,7 +198,7 @@ def _cleanup_old_reports(config, max_age_days=30):
         import glob
         cutoff = time.time() - max_age_days * 86400
         removed = 0
-        for pattern in ("*.pdf", "*.json", "*_ai.txt"):
+        for pattern in ("*.md",):
             for f in glob.glob(os.path.join(reports_dir, pattern)):
                 try:
                     if os.path.getmtime(f) < cutoff:
@@ -453,6 +505,17 @@ class TradeBotApp:
         except Exception:
             return {}
 
+    def _save_scan_index(self):
+        """Persist universe choice (S&P 500 vs ETFs) to config."""
+        try:
+            val = getattr(self.scan_index, "get", lambda: "sp500")()
+            if val not in ("sp500", "etfs"):
+                val = "sp500"
+            self.config["scan_index"] = val
+            save_app_config(self.config)
+        except Exception:
+            pass
+
     def build_ui(self):
         # === KEYBOARD SHORTCUTS ===
         self.root.bind("<Return>", lambda e: self.run_scan())
@@ -465,7 +528,7 @@ class TradeBotApp:
         header.pack_propagate(False)
         tk.Label(header, text=f"☁️ ClearBlueSky Stock Scanner v{VERSION}", font=("Arial", 12, "bold"),
                 fg="white", bg=BG_DARK).pack(pady=(6, 0))
-        tk.Label(header, text="AI Stock Research Tool · works best with Claude AI", font=("Arial", 8),
+        tk.Label(header, text="AI Stock Research Tool", font=("Arial", 8),
                 fg="#aaaaaa", bg=BG_DARK).pack(pady=(0, 4))
         
         # === METRICS BAR (accuracy, hits, misses) ===
@@ -499,7 +562,7 @@ class TradeBotApp:
         scan_frame = tk.Frame(main, bg="white", relief="solid", bd=1)
         scan_frame.pack(fill="x", pady=(0, 6), ipady=6, ipadx=8)
         
-        # Scan + Index on one row
+        # Scan type row
         type_row = tk.Frame(scan_frame, bg="white")
         type_row.pack(fill="x", padx=6, pady=(6, 2))
         tk.Label(type_row, text="Scan:", font=("Arial", 9), bg="white", fg="#555").pack(side="left")
@@ -514,9 +577,21 @@ class TradeBotApp:
             font=("Arial", 9),
         )
         self.scan_type_combo.pack(side="left", padx=(4, 0))
-        tk.Label(type_row, text="  (S&P 500 + ETFs)", font=("Arial", 9), bg="white", fg="#666").pack(side="left")
-        self.scan_index = tk.StringVar(value="sp500_etfs")  # Always use combined universe
-        
+        # Universe toggle — own row for visibility
+        univ_row = tk.Frame(scan_frame, bg="white")
+        univ_row.pack(fill="x", padx=6, pady=(2, 2))
+        tk.Label(univ_row, text="Universe:", font=("Arial", 9), bg="white", fg="#555").pack(side="left", padx=(0, 6))
+        _idx = self.config.get("scan_index", "sp500")
+        if _idx not in ("sp500", "etfs"):
+            _idx = "sp500"
+        self.scan_index = tk.StringVar(value=_idx)
+        tk.Radiobutton(univ_row, text="S&P 500", variable=self.scan_index, value="sp500",
+                       font=("Arial", 9), bg="white", fg="#333", activebackground="white",
+                       activeforeground="#333", selectcolor="white", command=self._save_scan_index).pack(side="left", padx=(0, 8))
+        tk.Radiobutton(univ_row, text="ETFs", variable=self.scan_index, value="etfs",
+                       font=("Arial", 9), bg="white", fg="#333", activebackground="white",
+                       activeforeground="#333", selectcolor="white", command=self._save_scan_index).pack(side="left")
+
         scan_btn_row = tk.Frame(scan_frame, bg="white")
         scan_btn_row.pack(fill="x", padx=6, pady=(2, 4))
         
@@ -589,12 +664,9 @@ class TradeBotApp:
             fg="#666",
         ).pack(side="left", padx=(8, 0))
         
-        # --- OpenRouter credit display ---
-        self.openrouter_credit_label = tk.Label(
-            scan_frame, text="", font=("Arial", 8), bg="white", fg="#888",
-        )
-        self.openrouter_credit_label.pack(anchor="w", padx=6, pady=(0, 2))
-        self._refresh_openrouter_credit()
+        self.ai_status_label = tk.Label(scan_frame, text="", font=("Arial", 8), bg="white", fg="#888")
+        self.ai_status_label.pack(anchor="w", padx=6, pady=(0, 2))
+        self._refresh_ai_status()
         
         # --- QUICK TICKER ---
         ticker_label = tk.Label(main, text="🔍 Quick Lookup", font=("Arial", 9, "bold"),
@@ -723,7 +795,16 @@ class TradeBotApp:
         scan_var = tk.StringVar(value=current_scan)
         combo = ttk.Combobox(main_f, textvariable=scan_var, values=labels, state="readonly", width=24, font=("Arial", 9))
         combo.grid(row=0, column=1, sticky="ew", padx=(0, 15), pady=4)
-        tk.Label(main_f, text="(S&P 500 + ETFs)", font=("Arial", 9), bg="white", fg="#666").grid(row=0, column=2, sticky="w", padx=(0, 5), pady=4)
+        tk.Label(main_f, text="Universe:", font=("Arial", 9), bg="white", fg="#333").grid(row=0, column=2, sticky="w", padx=(15, 4), pady=4)
+        univ_f = tk.Frame(main_f, bg="white")
+        univ_f.grid(row=0, column=3, sticky="w", pady=4)
+        idx_var = getattr(self, "scan_index", None) or tk.StringVar(value=self.config.get("scan_index", "sp500"))
+        tk.Radiobutton(univ_f, text="S&P 500", variable=idx_var, value="sp500",
+                       font=("Arial", 9), bg="white", fg="#333", activebackground="white",
+                       activeforeground="#333", selectcolor="white").pack(side="left", padx=(0, 8))
+        tk.Radiobutton(univ_f, text="ETFs", variable=idx_var, value="etfs",
+                       font=("Arial", 9), bg="white", fg="#333", activebackground="white",
+                       activeforeground="#333", selectcolor="white").pack(side="left")
 
         # Row 1: Load, Save, Import, Export (always visible)
         btn_f = tk.Frame(main_f, bg="white")
@@ -869,6 +950,11 @@ class TradeBotApp:
 
         def _collect_and_save():
             self.scan_type.set(scan_var.get())
+            idx_val = (idx_var.get() or "sp500").strip()
+            if idx_val in ("sp500", "etfs"):
+                self.config["scan_index"] = idx_val
+                if hasattr(self, "scan_index"):
+                    self.scan_index.set(idx_val)
             for key, (var, spec) in widget_vars.items():
                 ptype = spec.get("type", "float")
                 val = var.get()
@@ -1086,7 +1172,9 @@ class TradeBotApp:
         if self.scan_worker is not None and self.scan_worker.is_alive():
             messagebox.showinfo("Scan", "A scan is already running.")
             return
-        index = "sp500_etfs"  # Always S&P 500 + ETFs combined
+        index = (self.scan_index.get() or "sp500").strip()
+        if index not in ("sp500", "etfs"):
+            index = "sp500"
         self.scan_cancelled = False
         # Clear any stale jobs and results from previous cancelled scans
         for q in (self.scan_job_queue, self.scan_result_queue):
@@ -1125,9 +1213,14 @@ class TradeBotApp:
         self._schedule_process_result_queue()
     
     def generate_report_from_results(self, results, scan_type, progress, status, printer, btn, stop_btn=None, elapsed=0, index=None):
-        """Generate PDF report (analyst prompt at beginning, then stock data). index='sp500' or 'etfs' to include market breadth."""
+        """Generate single .md report (YAML frontmatter + report body + AI analysis). index='sp500' or 'etfs' to include market breadth."""
+        report_start = time.time()
+        def _elapsed():
+            s = int(time.time() - report_start)
+            return f"{s // 60}:{s % 60:02d}"
+        _safe_widget(status, "config", text=f"Report: starting • {_elapsed()}")
         try:
-            from report_generator import HTMLReportGenerator
+            from report_generator import HTMLReportGenerator, build_markdown_report
 
             # Swing uses emotional logic -> emotional_min_score
             if scan_type == "Swing":
@@ -1150,38 +1243,42 @@ class TradeBotApp:
                 _safe_widget(status, "config", text=f"Watchlist match: {', '.join(watchlist_matches)}")
 
             def rpt_progress(msg):
-                if "Processing" in msg:
+                elapsed_str = _elapsed()
+                if "Processing" in msg and "(" in msg and "/" in msg:
                     try:
-                        ticker = msg.split(":")[-1].strip()
-                        progress.set(92, ticker)
-                        _safe_widget(status, "config", text=f"Getting {ticker} data...")
+                        import re
+                        m = re.search(r"Processing\s+(\d+)/(\d+):", msg)
+                        if m:
+                            i, tot = int(m.group(1)), int(m.group(2))
+                            pct = 88 + int((i / tot) * 4) if tot else 90
+                            progress.set(min(92, pct), f"{i}/{tot}")
+                            _safe_widget(status, "config", text=f"Report: {i}/{tot} tickers • {elapsed_str}")
+                        else:
+                            _safe_widget(status, "config", text=f"{msg[:45]} • {elapsed_str}")
                     except Exception:
-                        pass
+                        _safe_widget(status, "config", text=f"{msg[:45]} • {elapsed_str}")
+                else:
+                    _safe_widget(status, "config", text=f"{msg[:50]} • {elapsed_str}")
                 try:
                     self.root.update()
                 except tk.TclError:
                     pass
 
-            path, analysis_text, analysis_package = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config, index=index)
+            base_path, report_text, analysis_package = gen.generate_combined_report_pdf(results, scan_type, min_score, rpt_progress, watchlist_tickers=watchlist_set, config=self.config, index=index)
 
-            if path:
-                file_url = "file:///" + path.replace("\\", "/").lstrip("/")
+            if base_path:
                 self.last_scan_type = scan_type
                 self.last_scan_time = datetime.now()
-                content_to_send = json.dumps(analysis_package, indent=2) if analysis_package else (analysis_text or "") if self.config.get("openrouter_api_key") else ""
-                # If we're going to call OpenRouter, keep progress bar moving through AI phase
+                content_to_send = json.dumps(analysis_package, indent=2) if analysis_package else ""
+                ai_response = ""
                 if self.config.get("openrouter_api_key") and content_to_send:
-                    progress.set(92, "Report saved")
-                    _safe_widget(status, "config", text="Opening PDF...")
+                    progress.set(92, "Report ready")
+                    _safe_widget(status, "config", text=f"Preparing AI... • {_elapsed()}")
                     try: self.root.update()
                     except tk.TclError: pass
-                    webbrowser.open(file_url)
                     try:
-                        progress.set(94, "Preparing AI...")
-                        _safe_widget(status, "config", text="Building prompt...")
-                        try: self.root.update()
-                        except tk.TclError: pass
-                        from openrouter_client import analyze_with_config
+                        progress.set(94, f"Building prompt • {_elapsed()}")
+                        from openrouter_client import analyze_with_all_models
                         system_prompt = analysis_package.get("instructions", "").strip() or "You are a professional stock analyst. Analyze the JSON package and produce the report in the required format."
                         if self.config.get("rag_enabled") and self.config.get("rag_books_folder"):
                             try:
@@ -1191,86 +1288,40 @@ class TradeBotApp:
                                     system_prompt = system_prompt + "\n\n" + rag_ctx
                             except Exception:
                                 pass
-                        progress.set(95, "Prompt ready")
+                        progress.set(95, f"Preparing AI • {_elapsed()}")
                         image_list = None
-                        if self.config.get("use_vision_charts") and analysis_package and analysis_package.get("stocks"):
-                            try:
-                                from chart_engine import get_charts_for_tickers
-                                tickers = [s.get("ticker") for s in analysis_package["stocks"] if s.get("ticker")]
-                                _safe_widget(status, "config", text="Generating chart images...")
-                                try: self.root.update()
-                                except tk.TclError: pass
-                                def _chart_cb(t):
-                                    _safe_widget(status, "config", text=f"Chart {t}...")
-                                    try: self.root.update()
-                                    except tk.TclError: pass
-                                charts = get_charts_for_tickers(tickers, max_charts=5, progress_callback=_chart_cb)
-                                image_list = [b64 for _, b64 in charts] if charts else None
-                            except Exception:
-                                image_list = None
-                        progress.set(97, "Sending to AI...")
-                        _safe_widget(status, "config", text="Sending to AI (OpenRouter) - may take a minute...")
-                        try: self.root.update()
-                        except tk.TclError: pass
-                        ai_response = analyze_with_config(self.config, system_prompt, content_to_send, image_base64_list=image_list)
-                        progress.set(99, "Received")
-                        _safe_widget(status, "config", text="Saving AI response...")
-                        try: self.root.update()
-                        except tk.TclError: pass
-                        base = path[:-4] if path.lower().endswith(".pdf") else path
-                        ai_path = base + "_ai.txt"
-                        from report_generator import SCANNER_GITHUB_URL
-                        _ai_header = f"Created using ClearBlueSky Stock Scanner. Scanner: {SCANNER_GITHUB_URL}\n\nPrompt for AI (when using this file alone or with the matching PDF/JSON): Follow the instructions in the JSON. Produce output in the required format: MARKET SNAPSHOT, TIER 1/2/3 picks, AVOID LIST, RISK MANAGEMENT, KEY INSIGHT, TOP 5 PLAYS. Include news/catalysts for each pick.\n\n---\n\n"
+                        progress.set(97, f"Sending to AI • {_elapsed()}")
+                        def _ai_progress(msg):
+                            _safe_widget(status, "config", text=f"{msg} • {_elapsed()}")
+                            try: self.root.update()
+                            except tk.TclError: pass
+                        ai_response = analyze_with_all_models(self.config, system_prompt, content_to_send, progress_callback=_ai_progress, image_base64_list=image_list) or ""
                         if ai_response:
-                            with open(ai_path, "w", encoding="utf-8") as f:
-                                f.write(_ai_header + ai_response)
-                            webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
-                            progress.set(100, f"Done! ({elapsed}s)")
-                            _safe_widget(status, "config", text="AI analysis saved and opened")
-                        else:
-                            fallback = "AI returned no response (empty). You can paste the instructions below into another AI.\n\n--- Instructions ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
-                            try:
-                                with open(ai_path, "w", encoding="utf-8") as f:
-                                    f.write(fallback)
-                            except Exception:
-                                pass
-                            progress.set(100, f"Done ({elapsed}s)")
-                            _safe_widget(status, "config", text="AI response empty; see _ai.txt for instructions")
-                        self._update_status_ready()
+                            ai_response = "Consensus from 3 AI models (Llama, OpenAI, DeepSeek).\n\n" + ai_response
                     except Exception as e:
                         log_error(e, "OpenRouter analysis")
-                        progress.set(100, f"Done ({elapsed}s)")
-                        err_short = str(e).strip()[:80]
-                        _safe_widget(status, "config", text=f"AI failed: {err_short}")
-                        base = path[:-4] if path.lower().endswith(".pdf") else path
-                        ai_path = base + "_ai.txt"
-                        fallback = f"AI analysis failed: {e}\n\nDetails in: {LOG_FILE}\n\n--- Instructions (paste into another AI if needed) ---\n" + (analysis_package.get("instructions", "") if analysis_package else "")
+                        ai_response = f"AI analysis failed: {e}\n\nDetails in: {LOG_FILE}\n\nSet OpenRouter API key in Settings for analysis."
                         try:
-                            with open(ai_path, "w", encoding="utf-8") as f:
-                                f.write(fallback)
-                            webbrowser.open("file:///" + ai_path.replace("\\", "/").lstrip("/"))
+                            messagebox.showwarning("AI analysis failed", f"{e}\n\nSee error_log.txt for details.")
                         except Exception:
                             pass
-                        try:
-                            messagebox.showwarning("AI analysis failed", f"{e}\n\nSee error_log.txt for details.\nA fallback _ai.txt was saved with instructions you can paste elsewhere.")
-                        except Exception:
-                            pass
-                        self._update_status_ready()
-                else:
-                    progress.set(100, f"Done! ({elapsed}s)")
-                    _safe_widget(status, "config", text="Opening PDF report...")
-                    try: self.root.update()
-                    except tk.TclError: pass
-                    webbrowser.open(file_url)
-                    self._update_status_ready()
+
+                md_content = build_markdown_report(analysis_package, report_text, ai_response)
+                md_path = base_path + ".md"
+                with open(md_path, "w", encoding="utf-8") as f:
+                    f.write(md_content)
+                progress.set(100, f"Done! ({_elapsed()})")
+                _safe_widget(status, "config", text=f"Report saved and opened • {_elapsed()}")
+                webbrowser.open("file:///" + md_path.replace("\\", "/").lstrip("/"))
+                self._update_status_ready()
             else:
-                progress.set(100, "No qualifying stocks")
-                _safe_widget(status, "config", text=f"No stocks above score {min_score}")
+                progress.set(100, f"Done • {_elapsed()}")
+                _safe_widget(status, "config", text=f"No stocks above score {min_score} • {_elapsed()}")
                 log(f"Report: no stocks above min_score {min_score} for {scan_type}")
         except Exception as e:
             log_error(e, "Report failed")
-            progress.set(100, "Error")
-            _safe_widget(status, "config", text="Report error")
+            progress.set(100, f"Error • {_elapsed()}")
+            _safe_widget(status, "config", text=f"Report error • {_elapsed()}")
         
         printer.stop()
         _safe_widget(btn, "config", state="normal")
@@ -1334,19 +1385,23 @@ class TradeBotApp:
 
         def _run_report():
             try:
-                from report_generator import HTMLReportGenerator
+                from report_generator import HTMLReportGenerator, build_markdown_report
                 reports_dir = _resolve_reports_dir(self.config.get("reports_folder", DEFAULT_REPORTS_DIR) or DEFAULT_REPORTS_DIR)
                 gen = HTMLReportGenerator(save_dir=reports_dir)
-                
+
                 # Build ticker list for report (each gets score 80 for quick lookup)
                 ticker_data = [{'ticker': sym, 'score': 80} for sym in symbols]
-                
-                path, _, _ = gen.generate_combined_report_pdf(ticker_data, "Quick Lookup", 0)
+
+                base_path, report_text, analysis_package = gen.generate_combined_report_pdf(ticker_data, "Quick Lookup", 0)
                 def _done():
-                    if path:
-                        file_url = "file:///" + path.replace("\\", "/").lstrip("/")
+                    if base_path and analysis_package:
+                        md_content = build_markdown_report(analysis_package, report_text, ai_response="")
+                        md_path = base_path + ".md"
+                        with open(md_path, "w", encoding="utf-8") as f:
+                            f.write(md_content)
+                        file_url = "file:///" + md_path.replace("\\", "/").lstrip("/")
                         webbrowser.open(file_url)
-                    self.status.config(text="PDF report opened")
+                        self.status.config(text="Report opened")
                 self.root.after(0, _done)
             except Exception as e:
                 self.root.after(0, lambda: (self.status.config(text="Error"), messagebox.showerror("Error", str(e))))
@@ -1393,13 +1448,13 @@ class TradeBotApp:
             else:
                 acc_color = "#dc3545"  # red
 
-            days = acc.get("lookback_days", 7)
+            td = acc.get("lookback_trading_days", 20)
 
             def _update():
                 _safe_widget(self.metric_accuracy, "config", text=f"Accuracy: {pct}%", fg=acc_color)
                 _safe_widget(self.metric_hits, "config", text=f"Hits: {hits}")
                 _safe_widget(self.metric_misses, "config", text=f"Misses: {misses}")
-                _safe_widget(self.metric_total, "config", text=f"Picks: {total} ({days}d)")
+                _safe_widget(self.metric_total, "config", text=f"Picks: {total} (rolling {td}d)")
             try:
                 self.root.after(0, _update)
             except Exception:
@@ -1407,51 +1462,36 @@ class TradeBotApp:
         except Exception:
             pass
 
-    def _refresh_openrouter_credit(self):
-        """Check OpenRouter key status and display model info."""
+    def _refresh_ai_status(self):
+        """Show AI connection status (connected / no key / invalid)."""
         api_key = (self.config.get("openrouter_api_key") or "").strip()
-        model = self.config.get("openrouter_model", "google/gemini-3-pro-preview")
-        model_short = model.split("/")[-1] if "/" in model else model
         if not api_key:
-            self.openrouter_credit_label.config(text=f"AI: No API key set · Model: {model_short}", fg="#888")
+            self.ai_status_label.config(text="AI: No API key set", fg="#888")
             return
-        # Show immediately while checking
-        self.openrouter_credit_label.config(text=f"AI: Checking key... · Model: {model_short}", fg="#888")
+        self.ai_status_label.config(text="AI: Checking...", fg="#888")
         def _fetch():
-            txt = ""
-            color = "#2a7ae2"
+            color = "#28a745"
+            txt = "AI: No key"
             try:
                 import requests
-                # Try /credits endpoint (management keys)
-                resp = requests.get(
-                    "https://openrouter.ai/api/v1/credits",
+                r = requests.get(
+                    "https://openrouter.ai/api/v1/models",
                     headers={"Authorization": f"Bearer {api_key}"},
                     timeout=8,
                 )
-                if resp.status_code == 200:
-                    data = resp.json().get("data", {})
-                    total = data.get("total_credits", 0)
-                    used = data.get("total_usage", 0)
-                    remaining = total - used
-                    txt = f"AI: ${remaining:.2f} credit · Model: {model_short}"
-                elif resp.status_code == 401:
-                    # 401 = key invalid/expired OR regular key (can't check credits)
-                    # Try a zero-cost models list call to verify key works at all
-                    r2 = requests.get(
-                        "https://openrouter.ai/api/v1/models",
-                        headers={"Authorization": f"Bearer {api_key}"},
-                        timeout=8,
-                    )
-                    if r2.status_code == 200:
-                        txt = f"AI: Key active · Model: {model_short}"
-                    else:
-                        txt = f"AI: Key invalid or expired · Model: {model_short}"
-                        color = "#c44"
+                if r.status_code == 200:
+                    txt = "AI: Connected"
+                    color = "#28a745"
                 else:
-                    txt = f"AI: Key set · Model: {model_short}"
+                    txt = "AI: Key invalid or expired"
+                    color = "#dc3545"
             except Exception:
-                txt = f"AI: Key set · Model: {model_short}"
-            self.root.after(0, lambda: self.openrouter_credit_label.config(text=txt, fg=color))
+                txt = "AI: Connection failed"
+                color = "#dc3545"
+            try:
+                self.root.after(0, lambda: self.ai_status_label.config(text=txt, fg=color))
+            except Exception:
+                pass
         threading.Thread(target=_fetch, daemon=True).start()
 
     # === UPDATE / ROLLBACK (preserve user config) ===
@@ -1480,9 +1520,11 @@ class TradeBotApp:
                 if err:
                     messagebox.showerror("Update failed", err)
                 else:
-                    messagebox.showinfo("Update", "Update complete. Restart the app to use the new version.")
                     if getattr(self, "rollback_btn", None):
                         self.rollback_btn.config(state="normal")
+                    self.root.quit()
+                    self.root.destroy()
+                    _restart_app()
             self.root.after(0, done)
         threading.Thread(target=run, daemon=True).start()
     
@@ -1514,7 +1556,9 @@ class TradeBotApp:
                 if err:
                     messagebox.showerror("Rollback failed", err)
                 else:
-                    messagebox.showinfo("Rollback", "Rollback complete. Restart the app to use the previous version.")
+                    self.root.quit()
+                    self.root.destroy()
+                    _restart_app()
             self.root.after(0, done)
         threading.Thread(target=run, daemon=True).start()
     
@@ -1578,7 +1622,7 @@ class TradeBotApp:
         sep_openrouter.pack(fill="x", padx=20, pady=8)
         tk.Label(scroll_frame, text="OpenRouter API (AI analysis)", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="Used when sending the analysis package to AI. One key for all models. Use credits for Gemini, or free model (DeepSeek) when no credits.",
+        tk.Label(scroll_frame, text="Used when sending the analysis package to AI. Free models only — no credits required.",
                 font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         openrouter_f = tk.Frame(scroll_frame, bg="white", padx=20)
         openrouter_f.pack(fill="x")
@@ -1593,32 +1637,6 @@ class TradeBotApp:
                 openrouter_api_entry.config(show="")
         openrouter_api_var.trace("w", openrouter_update_mask)
         openrouter_update_mask()
-        tk.Label(openrouter_f, text="Model:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(8, 0))
-        OPENROUTER_MODELS = [
-            ("Gemini 3 Pro Preview (credits)", "google/gemini-3-pro-preview"),
-            ("DeepSeek R1 T2 Chimera (free)", "tngtech/deepseek-r1t2-chimera:free"),
-        ]
-        current_openrouter_id = self.config.get("openrouter_model", "google/gemini-3-pro-preview") or "google/gemini-3-pro-preview"
-        initial_label = "Gemini 3 Pro Preview (credits)"
-        for label, mid in OPENROUTER_MODELS:
-            if mid == current_openrouter_id:
-                initial_label = label
-                break
-        openrouter_model_var = tk.StringVar(value=initial_label)
-        openrouter_combo = ttk.Combobox(openrouter_f, textvariable=openrouter_model_var, width=38, state="readonly",
-                                        values=[label for label, _ in OPENROUTER_MODELS])
-        openrouter_combo.pack(anchor="w", pady=(2, 4))
-
-        def openrouter_model_from_display():
-            sel = openrouter_model_var.get()
-            for label, mid in OPENROUTER_MODELS:
-                if label == sel:
-                    return mid
-            return "google/gemini-3-pro-preview"
-        use_vision_var = tk.BooleanVar(value=self.config.get("use_vision_charts", False))
-        tk.Checkbutton(openrouter_f, text="Include chart images in AI analysis (vision layer; multimodal models only)", variable=use_vision_var,
-                      bg="white", font=("Arial", 9), wraplength=540, justify="left").pack(anchor="w", pady=(6, 0))
-
         # --- News / Sentiment (Alpha Vantage) ---
         sep_av = tk.Frame(scroll_frame, bg="#ddd", height=1)
         sep_av.pack(fill="x", padx=20, pady=8)
@@ -1760,7 +1778,7 @@ class TradeBotApp:
         sep_reports.pack(fill="x", padx=20, pady=8)
         tk.Label(scroll_frame, text="Reports", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="PDF reports (date/time stamped) are saved in the folder below. Include TA: SMAs, RSI, MACD, BB, ATR, Fib per ticker (slower when enabled).",
+        tk.Label(scroll_frame, text="Reports (.md, date/time stamped) are saved in the folder below. Include TA: SMAs, RSI, MACD, BB, ATR, Fib per ticker (slower when enabled).",
                 font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         reports_f = tk.Frame(scroll_frame, bg="white", padx=20)
         reports_f.pack(fill="x")
@@ -1807,8 +1825,6 @@ class TradeBotApp:
         def save():
             self.config['finviz_api_key'] = api_var.get()
             self.config['openrouter_api_key'] = openrouter_api_var.get().strip()
-            self.config['openrouter_model'] = openrouter_model_from_display()
-            self.config['use_vision_charts'] = use_vision_var.get()
             self.config['alpha_vantage_api_key'] = av_var.get().strip()
             self.config['alpaca_api_key'] = alpaca_key_var.get().strip()
             self.config['alpaca_secret_key'] = alpaca_secret_var.get().strip()
@@ -1824,7 +1840,7 @@ class TradeBotApp:
             self.config['alarm_sound_choice'] = c if c in ("beep", "asterisk", "exclamation") else "beep"
             with open(CONFIG_FILE, 'w') as f:
                 json.dump(self.config, f, indent=2)
-            self._refresh_openrouter_credit()  # Refresh credit display after settings save
+            self._refresh_ai_status()
             win.destroy()
         
         btn_frame = tk.Frame(scroll_frame, bg="white")
@@ -2131,36 +2147,27 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.85
+ClearBlueSky Stock Scanner v7.90
 
 QUICK START:
-1. Select scan type (index is automatic for index-based scans: S&P 500 + ETFs).
-2. Click Run Scan. You get: PDF report + JSON analysis package.
+1. Select scan type and Universe (S&P 500 or ETFs).
+2. Click Run Scan. You get: single .md report (YAML frontmatter + data + AI analysis).
 3. Optional: Check "Run all scans" (may take 15+ min; rate-limited).
-4. If OpenRouter API key is set (Settings): AI analysis runs and opens *_ai.txt.
+4. If OpenRouter API key is set (Settings): 3-model AI consensus is included in the .md file.
+5. AI status shows: Connected (green), No key, or Invalid.
 
 OUTPUTS (per run):
-• PDF – Report with Elite Swing Trader System Prompt + per-ticker data.
-• JSON – Same data + "instructions" field (use with any AI: "follow the instructions in this JSON").
-• *_ai.txt – AI analysis (only if OpenRouter key set in Settings).
+• .md – Single file: structured data (YAML frontmatter), report text, and AI analysis (when API key set).
 
-SCANNERS (4 total):
+SCANNERS (3 total):
 • Velocity Trend Growth – Momentum scan (sector-first, top sectors). Best: after close.
 • Swing – Dips – Emotional-only dips (1-5 day holds). Best: 2:30–4:00 PM.
 • Watchlist – Filter: Down % today (range 0–X%) or All tickers.
-• Pre-Market – Combined volume scan + velocity gap analysis. Best: 7–9:25 AM.
-
-NEW IN v7.85:
-• Watchlist filter uses 0–X% down range (slider is max % down)
-• Watchlist filter labels are clearer: "Down % today" and "All tickers"
-• Max % down slider disables automatically when "All tickers" is selected
-• CLI/report min-score keys now match GUI behavior (Swing uses emotional_min_score)
-• Clean install QA script now runs valid scanner_cli arguments
 
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
-AI Stock Research Tool · works best with Claude AI
-ClearBlueSky v7.85
+AI Stock Research Tool
+ClearBlueSky v7.90
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)
@@ -2179,9 +2186,28 @@ ClearBlueSky v7.85
         win.grab_set()
 
 
+def _ensure_dependencies_updated():
+    """Background thread: pip install -r requirements.txt --upgrade so deps stay current."""
+    req_path = os.path.join(APP_DIR, "requirements.txt")
+    if not os.path.isfile(req_path):
+        return
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", req_path, "--upgrade", "--quiet"],
+            capture_output=True,
+            timeout=120,
+            check=False,
+        )
+    except Exception as e:
+        log(f"Dependency update skipped: {e}", "WARN")
+
+
 def main():
     log("=" * 40)
     log(f"ClearBlueSky v{VERSION}")
+    # Start dependency update in background (pip --upgrade); app runs immediately
+    t = threading.Thread(target=_ensure_dependencies_updated, daemon=True)
+    t.start()
     root = tk.Tk()
     TradeBotApp(root)
     root.mainloop()

@@ -1,4 +1,4 @@
-# ClearBlueSky Stock Scanner v7.83 — User Manual
+# ClearBlueSky Stock Scanner v7.90 — User Manual
 
 ---
 
@@ -38,13 +38,11 @@
 
 ### What You Get Per Scan
 
-Every scan produces up to 3 files in the `reports/` folder:
+Every scan produces a single **.md** file in the `reports/` folder:
 
 | File | Description |
 |------|-------------|
-| `*.pdf` | Visual PDF report with scores, news, TA data, and the AI trading directive |
-| `*.json` | Machine-readable analysis package — paste into any AI chat with "follow the instructions in this JSON" |
-| `*_ai.txt` | AI-generated analysis (only if OpenRouter API key is configured) |
+| `*.md` | Single Markdown report: YAML frontmatter (structured data), report body (per-ticker data, market breadth, price history), and AI analysis (when OpenRouter key is set). 3-model consensus (Llama, OpenAI, DeepSeek). Chart data included as JSON (30-day OHLC, recent daily bars) — no chart images. |
 
 ---
 
@@ -52,24 +50,24 @@ Every scan produces up to 3 files in the `reports/` folder:
 
 ### Stock Scanner Section
 
-- **Scan dropdown** — Select which scanner to run (4 options: Velocity Trend Growth, Swing, Watchlist, Pre-Market).
-- **Index** — S&P 500 + ETFs combined (automatic for Velocity Trend Growth, Swing, Pre-Market).
+- **Scan dropdown** — Select which scanner to run (3 options: Velocity Trend Growth, Swing, Watchlist).
+- **Universe** — Toggle between **S&P 500** or **ETFs** (own row for visibility). Velocity and Swing use the selected universe; Watchlist uses your watchlist.
 - **Run Scan** — Starts the selected scan in the background. The GUI stays responsive.
 - **Stop** — Cancels a running scan.
 - **Config** — Opens per-scanner settings (sliders/toggles specific to the selected scanner).
-- **Run all scans** — Checkbox that runs all 4 scanners in sequence with 60-second delays between them to respect API rate limits. Takes ~15 minutes.
+- **Run all scans** — Checkbox that runs all 3 scanners in sequence with 60-second delays between them to respect API rate limits. Takes ~15 minutes.
 
-### OpenRouter Status Line
+### AI Status Line
 
-Below "Run all scans" you'll see the AI status:
+Below "Run all scans" you'll see the AI connection status:
 
-- `AI: $9.82 credit · Model: gemini-3-pro-preview` — Key works, showing remaining credit
-- `AI: Key active · Model: gemini-3-pro-preview` — Key works but credits can't be queried
-- `AI: No API key set · Model: gemini-3-pro-preview` — No key configured (scans still work, just no AI analysis)
+- **AI: Connected** (green) — OpenRouter API key works; AI analysis will run.
+- **AI: No API key set** — No key configured (scans still work, just no AI analysis).
+- **AI: Key invalid or expired** (red) — Key rejected; check Settings and regenerate at openrouter.ai/keys.
 
 ### Progress Bar and Status
 
-Shows real-time progress during scans: ticker count, current phase, elapsed time.
+Shows real-time progress: step labels (Report: 5/12 tickers, Enrichment..., AI: Meta Llama (1/3)...) and elapsed time (e.g. **• 2:15**).
 
 ---
 
@@ -113,9 +111,9 @@ Shows real-time progress during scans: ticker count, current phase, elapsed time
 
 ---
 
-### Pre-Market
+### Pre-Market *(removed in v7.88)*
 
-**What it does:** Combined pre-market scanner that runs both volume analysis and velocity gap analysis in a single pass. Scans for unusual pre-market volume, gap percentage, dollar volume, and sector heat. Also scores 4 velocity signal types: Gap Recovery, Institutional Accumulation, Breakout, and Gap-and-Go. Enriched with earnings warnings, news flags, and leveraged ETF suggestions.
+**What it did:** Combined pre-market scanner that ran both volume analysis and velocity gap analysis in a single pass. Scans for unusual pre-market volume, gap percentage, dollar volume, and sector heat. Also scores 4 velocity signal types: Gap Recovery, Institutional Accumulation, Breakout, and Gap-and-Go. Enriched with earnings warnings, news flags, and leveraged ETF suggestions.
 
 **Best time to run:** 7:00–9:25 AM ET (pre-market session).
 
@@ -153,7 +151,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Require Buy rating | On | Require analyst Buy/Strong Buy rating |
 | Min/Max Price | 5/500 | Price range filter |
 
-### Pre-Market Config
+### Pre-Market Config *(removed in v7.88)*
 | Setting | Default | Description |
 |---------|---------|-------------|
 | Min Score | 70 | Minimum pre-market score |
@@ -171,7 +169,7 @@ Click the **Config** button next to the scan dropdown to open per-scanner settin
 | Filter | Down % today | "down_pct" = only show stocks down in the 0–X% range today; "all" = show everything |
 | Max % down | 5 | Maximum percentage down in the 0–X% range (when filter = down_pct) |
 
-*Note: Velocity Barbell, Insider, and Pre-Market Hunter were standalone scanners in v7.6 and earlier. In v7.7, their functionality is folded into the remaining 4 scanners (insider data in Velocity Trend Growth & Swing, leveraged suggestions in Swing & Pre-Market, velocity gap analysis in Pre-Market).*
+*Note: Pre-Market scanner was removed in v7.88. Velocity Barbell and Insider were folded into other scanners in v7.7. Current scanners: Velocity Trend Growth, Swing, Watchlist.*
 
 ---
 
@@ -181,7 +179,7 @@ Enter 1–5 ticker symbols (comma or space separated) in the Quick Lookup box an
 
 **Example:** `AAPL, MSFT, NVDA` or `TSLA AMZN`
 
-This generates an instant PDF report for those specific tickers without running a full scan. Useful for:
+This generates an instant .md report for those specific tickers without running a full scan. Useful for:
 - Researching a stock someone mentioned
 - Getting a quick AI analysis of your current holdings
 - Generating a report before opening a position
@@ -192,7 +190,7 @@ The report runs in the background — the GUI stays responsive.
 
 ## 6. Watchlist
 
-Click **Watchlist** to manage your personal stock list (up to 200 tickers).
+Click **Watchlist** to manage your personal stock list (up to 400 tickers).
 
 - **Add** — Type a ticker and click Add
 - **Remove** — Select a ticker and click Remove
@@ -216,11 +214,9 @@ Click **Settings** to configure API keys and app options.
 
 ### OpenRouter API (AI Analysis)
 - **What:** API key from openrouter.ai — one key works for all AI models.
-- **Required?** No — scanners work without it. Only needed for AI-generated `*_ai.txt` analysis.
+- **Required?** No — scanners work without it. Only needed for AI analysis in the .md report.
 - **Get one:** https://openrouter.ai/keys
-- **Models:**
-  - **Gemini 3 Pro Preview** (credits) — Best quality, costs ~$0.01–0.05 per analysis
-  - **DeepSeek R1 T2 Chimera** (free) — Free, good quality, no credits needed
+- **Models:** 3 free models (Llama 3.3 70B, OpenAI GPT-OSS 120B, DeepSeek R1T2 Chimera). Consensus analysis included in the .md file. Chart data (30-day OHLC, recent daily bars) is in the JSON sent to the AI — no chart images.
 
 ### Alpha Vantage API Key
 - **What:** API key for news sentiment headlines per ticker.
@@ -243,8 +239,7 @@ Click **Settings** to configure API keys and app options.
 |---------|-------------|
 | Include TA in report | Add technical analysis data (RSI, MAs, Bollinger) to reports |
 | Include SEC insider context | Add insider trading context to AI analysis |
-| Chart images in AI analysis | Send candlestick chart images to multimodal AI models |
-| Reports folder | Where PDF/JSON files are saved (default: `app/reports/`) |
+| Reports folder | Where .md reports are saved (default: `app/reports/`) |
 | Play alarm on complete | Beep when a scan finishes |
 | Alarm sound | Choose: beep, asterisk, or exclamation |
 
@@ -254,24 +249,15 @@ Click **Settings** to configure API keys and app options.
 
 ### What's in a Report
 
-Every scan generates a PDF with:
+Every scan generates a single **.md** file with:
 
-1. **Header** — Scan type, timestamp, ticker count
-2. **Per-ticker sections** — Score, price, change %, news headlines, analyst rating, technical data
-3. **AI Trading Directive** — The "Elite Swing Trader System Prompt" is embedded in every report:
-   - 1–5 day maximum hold (optimal 1–2 days)
-   - S&P 500 stocks + leveraged ETFs
-   - Entry/exit windows (8AM–8AM cycle)
-   - The 1-2-5 exit framework
-   - Position sizing by conviction score
+1. **YAML frontmatter** — Structured data: stocks (ticker, score, price, TA, etc.), market_breadth, market_intel, price_history_30d (with recent daily OHLC for chart-like data).
+2. **Report body** — Per-ticker sections, score, price, change %, news headlines, analyst rating, technical data, Elite Swing Trader directive.
+3. **AI Analysis** — When OpenRouter key is set: consensus from 3 models (Llama, OpenAI, DeepSeek). Chart data (30-day high/low/close, recent daily bars) is in the JSON sent to the AI — no chart images. The AI response is appended to the .md file.
 
-### JSON Analysis Package
+### AI Consensus (3 models)
 
-The `*.json` file contains the same data in machine-readable format with an `instructions` field. You can paste this into any AI (ChatGPT, Claude, Gemini, etc.) and say: *"Follow the instructions in this JSON and give me your analysis."*
-
-### AI Analysis (_ai.txt)
-
-If you have an OpenRouter API key configured, the app automatically sends the JSON package to the selected AI model and saves the response as `*_ai.txt`. This file opens automatically after the scan.
+The app sends the analysis package to 3 free OpenRouter models: Meta Llama 3.3 70B, OpenAI GPT-OSS 120B, and DeepSeek R1T2 Chimera. The combined consensus is included in the .md file. All models receive the same data including price history; no chart images are sent.
 
 ### GitHub Attribution
 
@@ -324,14 +310,14 @@ New in v7.7 — after the initial scan data is gathered, each ticker is enriched
 | **Earnings Date Warning** | Flags like "EARNINGS TOMORROW", "EARNINGS THIS WEEK", "EARNINGS NEXT WEEK" | All scanners |
 | **News Sentiment** | DANGER / NEGATIVE / POSITIVE / NEUTRAL from recent headlines | All scanners |
 | **Live Price** | Current price stamped at report generation time | All scanners |
-| **Leveraged Suggestion** | Matching leveraged ETF (e.g., TQQQ for QQQ-tracking stocks) | Swing & Pre-Market only |
+| **Leveraged Suggestion** | Matching leveraged ETF (e.g., TQQQ for QQQ-tracking stocks) | Swing only |
 | **Insider Activity** | Recent SEC Form 4 insider buys/sales (owner, transaction type, value) | Velocity Trend Growth & Swing |
 
 ### How It's Used
 
 - **AI Prompt** — Earnings warnings and news sentiment are appended to each ticker's data line. The AI is instructed to avoid entries before earnings and flag news risks.
 - **Reports** — Enrichment data appears in both PDF and JSON outputs.
-- **Leveraged Suggestions** — When a stock on the Swing or Pre-Market scan has a leveraged ETF equivalent, the AI can suggest the leveraged play for higher-conviction entries.
+- **Leveraged Suggestions** — When a stock on the Swing scan has a leveraged ETF equivalent, the AI can suggest the leveraged play for higher-conviction entries.
 - **Insider Data** — Heavy insider buying on a Velocity Trend Growth or Swing pick adds conviction. The AI references insider activity in its analysis.
 
 ### Performance
@@ -398,9 +384,9 @@ All scanners use a 0–100 scoring system:
 | 60–69 | Decent | Meets minimum criteria, lower conviction |
 | Below 60 | Skip | Does not meet quality threshold |
 
-### Pre-Market Velocity Grades
+### Pre-Market Velocity Grades *(removed in v7.88)*
 
-The velocity gap analysis portion of the Pre-Market scanner grades each signal:
+The velocity gap analysis portion of the Pre-Market scanner (removed) used to grade each signal:
 
 | Grade | Score | Position Size |
 |-------|-------|--------------|
@@ -539,7 +525,7 @@ Read the output files from each model and look for:
 - **Start with OpenRouter** — The built-in integration is the easiest way to get AI analysis. Only move to RunPod if you need multi-model consensus or have high volume.
 - **Use the JSON `instructions` field** — It contains the full Elite Swing Trader System Prompt. Any LLM that follows instructions well will produce structured analysis.
 - **70B+ models recommended** — Smaller models (7B, 13B) often miss nuance in financial analysis. 70B+ models perform comparably to GPT-4/Claude for this task.
-- **Batch processing** — If running multiple scans (e.g., all 4 scanners), collect all JSON files and send them to RunPod in one batch to minimize GPU idle time.
+- **Batch processing** — If running multiple scans (e.g., all 3 scanners), collect all JSON files and send them to RunPod in one batch to minimize GPU idle time.
 - **Serverless RunPod** — Use RunPod's serverless endpoints to avoid paying for idle GPUs. You're charged only when processing requests.
 
 ---
@@ -555,18 +541,18 @@ Read the output files from each model and look for:
 ### Scan takes a long time
 - Some scanners make many API calls (one per ticker). S&P 500 scans take longer than ETFs.
 - "Run all scans" adds 60-second delays between scanners to avoid rate limits.
-- The Pre-Market scanner uses parallel scanning (8 threads) for speed.
+- *(Pre-Market scanner was removed in v7.88.)*
 
 ### OpenRouter / AI analysis fails
 - Check your API key in Settings
-- The credit line below "Run all scans" shows your balance
+- The AI status line shows: Connected (green), No key, or Invalid
 - The app retries up to 3 times on network errors
-- Try the free DeepSeek model if you're out of credits
+- All 3 models are free — no credits required
 
 ### Reports not opening
 - Check the Reports folder path in Settings
 - Click **Reports** button to open the folder directly
-- PDF generation requires `reportlab` — if not installed, reports save as TXT
+- Reports are saved as .md (Markdown) — open with any text editor or browser
 
 ### App won't start
 - Run `pip install -r app/requirements.txt` to install all dependencies
@@ -584,17 +570,17 @@ Read the output files from each model and look for:
 |------|---------|
 | `app/app.py` | Main GUI application |
 | `app/user_config.json` | Your settings and API keys (never shared or overwritten by updates) |
-| `app/scan_types.json` | Scanner definitions (4 scanners in v7.7) |
+| `app/scan_types.json` | Scanner definitions (3 scanners) |
 | `app/scan_settings.py` | Config specs, default values, and scan param definitions |
 | `app/market_intel.py` | Market Intelligence module (Google News, Finviz, sectors, market snapshot, overnight markets) |
 | `app/ticker_enrichment.py` | Earnings warnings, news sentiment, live price, leveraged suggestions |
 | `app/insider_scanner.py` | SEC insider data — enrichment for Velocity Trend Growth & Swing |
-| `app/report_generator.py` | PDF/JSON report generation + AI prompt construction |
+| `app/report_generator.py` | .md report generation + AI prompt construction |
 | `app/finviz_safe.py` | Timeout-protected Finviz wrapper used by all scanners |
-| `app/reports/` | Generated PDF, JSON, and AI analysis files |
+| `app/reports/` | Generated .md report files (YAML + body + AI analysis) |
 | `app/requirements.txt` | Python dependencies |
 
 ---
 
-*ClearBlueSky Stock Scanner v7.87 — Made with Claude AI*
+*ClearBlueSky Stock Scanner v7.90*
 *https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases*

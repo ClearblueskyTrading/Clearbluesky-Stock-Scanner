@@ -183,17 +183,24 @@ def format_price_history_for_prompt(history: Dict) -> str:
     return "\n".join(lines)
 
 
-def price_history_for_json(history: Dict) -> Dict:
-    """Return a JSON-safe version (summary only, no daily rows to keep size down)."""
+def price_history_for_json(history: Dict, scan_tickers: List[str] = None, include_recent_daily: int = 10) -> Dict:
+    """Return JSON-safe version. Includes recent daily OHLC (last N days) for scan tickers as chart data."""
     if not history:
         return {}
+    scan_set = set((s or "").strip().upper() for s in (scan_tickers or [])) if scan_tickers else set()
     out = {}
     for ticker, d in history.items():
-        out[ticker] = {
+        entry = {
             "last_close": d["last_close"],
             "high_30d": d["high_30d"],
             "low_30d": d["low_30d"],
             "pct_change_30d": d["pct_change_30d"],
             "days": d["days"],
         }
+        # Add recent daily OHLC for scan tickers (chart-like data for AI)
+        daily = d.get("daily", [])
+        if daily and include_recent_daily > 0 and (not scan_set or ticker.upper() in scan_set):
+            recent = daily[-include_recent_daily:]
+            entry["recent_daily"] = [{"date": r["date"], "o": r["open"], "h": r["high"], "l": r["low"], "c": r["close"], "v": r.get("volume", 0)} for r in recent]
+        out[ticker] = entry
     return out

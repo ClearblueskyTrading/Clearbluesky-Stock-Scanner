@@ -11,8 +11,14 @@
 #
 # Only evaluates picks that are 1-5 trading days old (the app's
 # swing hold window).  Skips same-day picks (no time to move).
+#
+# Rolling history: uses ~20 trading days (~30 calendar days).
 
 import json
+
+LOOKBACK_TRADING_DAYS = 20
+LOOKBACK_CALENDAR_DAYS = 30  # ~20 trading days (20 * 365/252)
+
 import os
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -38,7 +44,7 @@ def _get_current_prices(tickers: List[str]) -> Dict[str, float]:
     return prices
 
 
-def calculate_accuracy(reports_dir: str = None, lookback_days: int = 7) -> Dict:
+def calculate_accuracy(reports_dir: str = None, lookback_days: int = LOOKBACK_CALENDAR_DAYS) -> Dict:
     """
     Calculate accuracy by comparing past scan picks to current prices.
     
@@ -183,6 +189,7 @@ def calculate_accuracy(reports_dir: str = None, lookback_days: int = 7) -> Dict:
         "accuracy_pct": accuracy,
         "total_evaluated": total,
         "lookback_days": lookback_days,
+        "lookback_trading_days": LOOKBACK_TRADING_DAYS,
         "by_scan_type": by_type_out,
         "details": details,
         "last_updated": now.strftime("%Y-%m-%d %H:%M"),
@@ -205,7 +212,8 @@ def format_accuracy_for_gui(acc: Dict) -> str:
     pct = acc["accuracy_pct"]
     total = acc["total_evaluated"]
     
-    return f"Accuracy: {pct}% ({hits} hits / {misses} misses, {total} picks, last {acc.get('lookback_days', 7)}d)"
+    td = acc.get('lookback_trading_days', LOOKBACK_TRADING_DAYS)
+    return f"Accuracy: {pct}% ({hits} hits / {misses} misses, {total} picks, rolling {td} trading days)"
 
 
 def format_accuracy_for_report(acc: Dict) -> str:
@@ -217,7 +225,7 @@ def format_accuracy_for_report(acc: Dict) -> str:
         "─" * 65,
         "  ACCURACY RATING (past picks vs current price)",
         "─" * 65,
-        f"  Lookback: {acc.get('lookback_days', 7)} days  |  Updated: {acc.get('last_updated', '')}",
+        f"  Lookback: rolling {acc.get('lookback_trading_days', LOOKBACK_TRADING_DAYS)} trading days  |  Updated: {acc.get('last_updated', '')}",
         "",
         f"  OVERALL:  {acc['accuracy_pct']}%  ({acc['hits']} hits / {acc['misses']} misses / {acc['total_evaluated']} total)",
         "",

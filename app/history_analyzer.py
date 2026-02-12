@@ -49,9 +49,29 @@ def _parse_report_timestamp(ts_str: str) -> Optional[str]:
     return ts_str[:16] if len(ts_str) >= 16 else ts_str
 
 
+def _parse_md_frontmatter(filepath: str) -> Optional[Dict]:
+    """Parse YAML frontmatter from .md file. Returns dict or None."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        if not content.strip().startswith('---'):
+            return None
+        parts = content.split('---', 2)
+        if len(parts) < 3:
+            return None
+        fm = parts[1].strip()
+        try:
+            import yaml
+            return yaml.safe_load(fm)
+        except Exception:
+            return None
+    except Exception:
+        return None
+
+
 def backfill_from_reports(reports_dir: str = None, progress_callback=None) -> int:
     """
-    Scan all JSON report files in reports_dir and backfill scan_history.json.
+    Scan all report files (JSON and .md) in reports_dir and backfill scan_history.json.
     Deduplicates by scan_type + timestamp.
     Returns number of new entries added.
     """
@@ -76,19 +96,25 @@ def backfill_from_reports(reports_dir: str = None, progress_callback=None) -> in
         key = f"{e.get('scan_type', '')}|{e.get('timestamp', '')}"
         existing_keys.add(key)
 
-    # Find all JSON report files (exclude scan_history.json itself)
     import glob
     json_files = sorted(glob.glob(os.path.join(reports_dir, "*.json")))
     json_files = [f for f in json_files if "scan_history" not in os.path.basename(f).lower()]
+    md_files = sorted(glob.glob(os.path.join(reports_dir, "*.md")))
+    all_files = [(f, "json") for f in json_files] + [(f, "md") for f in md_files]
 
     if progress_callback:
-        progress_callback(f"Scanning {len(json_files)} report files...")
+        progress_callback(f"Scanning {len(all_files)} report files...")
 
     added = 0
-    for filepath in json_files:
+    for filepath, fmt in all_files:
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                report = json.load(f)
+            if fmt == "json":
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    report = json.load(f)
+            else:
+                report = _parse_md_frontmatter(filepath)
+                if not report:
+                    continue
         except Exception:
             continue
 

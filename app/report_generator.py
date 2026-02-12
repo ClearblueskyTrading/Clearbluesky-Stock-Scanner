@@ -1,6 +1,6 @@
 """
-ClearBlueSky PDF Report Generator
-Generates date/time-stamped PDF reports for uploads. No HTML.
+ClearBlueSky Report Generator
+Generates date/time-stamped .md reports (YAML frontmatter + body + AI analysis).
 """
 
 import os
@@ -44,7 +44,7 @@ SCANNER_GITHUB_URL = "https://github.com/ClearblueskyTrading/Clearbluesky-Stock-
 SCANNER_ATTRIBUTION = f"This report was created using the ClearBlueSky Stock Scanner. Scanner: {SCANNER_GITHUB_URL}"
 
 # Elite Swing Trader System Prompt (included in every report)
-# Used identically in PDF, JSON instructions, and when sending to AI — same prompt everywhere.
+# Used identically in report body and when sending to AI — same prompt everywhere.
 MASTER_TRADING_REPORT_DIRECTIVE = r"""
 ═══════════════════════════════════════════════════════════════════════════════
 ELITE SWING TRADER - AI Analysis Directive
@@ -135,9 +135,9 @@ Overnight: [Asia, Europe impact on US open]. Trade implication: [1 line — e.g.
 1-3 sentences: Money flow direction, sector rotation signal, correlation.
 E.g. "Money flowing INTO Semis/Hardware, OUT OF Software. Buy leaders, avoid laggards."
 
-TOP 5 PLAYS: Your highest-conviction picks (can span tiers). Exactly 5.
-For each: Ticker, Score, Entry, Stop, Target, Setup, Catalyst, Invalidation.
-Include news/catalysts and execution timing. Experienced trader needs actionable detail.
+TOP 5 PLAYS: Your highest-conviction picks. Exactly 5.
+**GATE:** Prefer stocks with elite_qualified=True (Elite ✓TOP5). Place stocks with landmines (earnings within 2 days, news DANGER) in AVOID LIST, not TOP 5.
+For each: Ticker, Score, Elite, Entry, Stop, Target, Setup, Catalyst, Invalidation.
 
 ATTRIBUTION (include in your output): At the end of your analysis, add:
 "This report was created using the ClearBlueSky Stock Scanner. Scanner: https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases"
@@ -209,7 +209,9 @@ Group picks by sector. E.g. "Energy: XOM, CVX, OXY | Technology: ... | Services:
 • Scale in: Add on strength, not on dips
 • Sector concentration: Avoid over-weighting one sector
 
-TOP 5 PLAYS: Your highest-conviction momentum picks. For each: Ticker, Sector, Entry, Trailing stop, Hold period (weeks/months).
+TOP 5 PLAYS: Your highest-conviction momentum picks. Exactly 5.
+**GATE:** Prefer elite_qualified=True (Elite ✓TOP5). Place stocks with landmines in AVOID, not TOP 5.
+For each: Ticker, Sector, Entry, Trailing stop, Hold period (weeks/months).
 
 ATTRIBUTION: At the end add: "This report was created using the ClearBlueSky Stock Scanner. Scanner: https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/releases"
 
@@ -223,7 +225,7 @@ Scanner: https://github.com/ClearblueskyTrading/Clearbluesky-Stock-Scanner/relea
 
 
 class ReportGenerator:
-    """Generate date/time-stamped PDF reports only."""
+    """Generate date/time-stamped .md reports only."""
 
     def __init__(self, save_dir=None):
         if save_dir is None:
@@ -231,10 +233,10 @@ class ReportGenerator:
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
 
-    def _finviz_get_stock_with_retry(self, ticker, max_attempts=3):
+    def _finviz_get_stock_with_retry(self, ticker, max_attempts=3, config=None):
         """Call finviz.get_stock with timeout + retries on failure (timeout, 429, etc.)."""
         if get_stock_safe is not None:
-            return get_stock_safe(ticker, timeout=30.0, max_attempts=max_attempts)
+            return get_stock_safe(ticker, timeout=30.0, max_attempts=max_attempts, config=config)
         # Fallback if finviz_safe not available
         last_error = None
         for attempt in range(max_attempts):
@@ -260,7 +262,7 @@ class ReportGenerator:
         if not FINVIZ_AVAILABLE:
             return data
         
-        stock = self._finviz_get_stock_with_retry(ticker)
+        stock = self._finviz_get_stock_with_retry(ticker, config=config)
         if stock:
             # Normalize SMA so we never store None (avoids "null" in JSON/report)
             sma50_raw = stock.get('SMA50') or stock.get('SMA 50') or stock.get('50-Day SMA')
@@ -606,6 +608,9 @@ class ReportGenerator:
                 "insider_context": s.get("insider_context"),
                 "risk_checks": s.get("risk_checks") or _default_risk_checks(),
                 "smart_money": s.get("smart_money") or {},
+                "elite_score": s.get("elite_score"),
+                "elite_qualified": bool(s.get("elite_qualified")),
+                "elite_landmines": s.get("elite_landmines") or [],
             }
             for k in ("Owner", "Relationship", "Date", "Transaction", "Cost", "Shares", "Value"):
                 if s.get(k) not in (None, "", "N/A"):
@@ -656,7 +661,7 @@ class ReportGenerator:
         return out
 
     def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None, index=None):
-        """Generate ONE PDF report. index='sp500' or 'etfs' to include market breadth (full index fetch)."""
+        """Generate report data (MD saved by caller). index='sp500' or 'etfs' to include market breadth (full index fetch)."""
         def progress(msg):
             print(msg)
             if progress_callback:
@@ -686,8 +691,7 @@ class ReportGenerator:
         timestamp_display = now.strftime('%B %d, %Y at %I:%M:%S %p')
         safe_type = "".join(c if c.isalnum() else "_" for c in scan_type)[:20]
         base_name = f"{safe_type}_Scan_{timestamp_file}"
-        filepath_pdf = self.save_dir / f"{base_name}.pdf"
-        filepath_txt = self.save_dir / f"{base_name}.txt"
+        base_path = self.save_dir / base_name
 
         stocks_data = []
         insider_keys = ('Owner', 'Relationship', 'Date', 'Transaction', 'Cost', 'Shares', 'Value')
@@ -764,6 +768,7 @@ class ReportGenerator:
             return None, None, None
 
         # ── Ticker enrichment (earnings, news flags, price stamp, leveraged) ──
+        progress("Enrichment (earnings, news, price stamp)...")
         try:
             from ticker_enrichment import enrich_scan_results
             is_swing = "swing" in scan_type.lower() or "dip" in scan_type.lower()
@@ -796,6 +801,17 @@ class ReportGenerator:
                     rc["days_until_earnings"] = None
                     rc["earnings_safe"] = True
                 s["risk_checks"] = rc
+
+        # Elite second-round scoring (earnings, sentiment, RSI, etc.) — gates TOP 5
+        try:
+            from elite_scorer import add_elite_scores
+            add_elite_scores(stocks_data)
+        except Exception as e:
+            print(f"[ELITE SCORER] Warning: {e}")
+            for s in stocks_data:
+                s.setdefault("elite_score", s.get("score", 0))
+                s.setdefault("elite_qualified", False)
+                s.setdefault("elite_landmines", [])
 
         tickers_list = ", ".join([s['ticker'] for s in stocks_data])
         watchlist_matches = [s['ticker'] for s in stocks_data if s.get('on_watchlist')]
@@ -836,13 +852,22 @@ class ReportGenerator:
             lp = s.get("leveraged_play")
             if lp:
                 line += f" | Leveraged: {lp['leveraged_ticker']}"
+            # Elite score (second-round scrutiny)
+            es = s.get("elite_score")
+            eq = s.get("elite_qualified")
+            lm = s.get("elite_landmines") or []
+            if es is not None:
+                line += f" | Elite {es}" + (" ✓TOP5" if eq else "")
+                if lm:
+                    line += f" | Landmines: {', '.join(lm)}"
             data_lines.append(line)
 
         market_breadth = None
         if index and index in ("sp500", "etfs", "sp500_etfs"):
+            progress("Market breadth...")
             try:
                 from breadth import fetch_full_index_for_breadth, calculate_market_breadth
-                all_stocks = fetch_full_index_for_breadth("sp500_etfs", progress)
+                all_stocks = fetch_full_index_for_breadth(index, progress)
                 if all_stocks:
                     market_breadth = calculate_market_breadth(all_stocks)
             except Exception:
@@ -851,6 +876,7 @@ class ReportGenerator:
         # Market Intelligence (Google News, Finviz news, sectors, market snapshot)
         market_intel = None
         if (config or {}).get("use_market_intel", True):
+            progress("Market intelligence...")
             try:
                 from market_intel import gather_market_intel, format_intel_for_prompt
                 market_intel = gather_market_intel(progress_callback=progress, config=config)
@@ -861,6 +887,7 @@ class ReportGenerator:
             market_intel_prompt = ""
 
         # Smart Money signals (WSB for all scanners; full package for Trend)
+        progress("Smart money signals...")
         smart_money_data = {}
         smart_money_prompt = ""
         try:
@@ -887,6 +914,7 @@ class ReportGenerator:
             pass
 
         # Insider data folded into Trend and Swing scans
+        progress("Insider data...")
         insider_prompt = ""
         if "trend" in scan_type.lower() or "velocity_trend" in scan_type.lower() or "swing" in scan_type.lower() or "dip" in scan_type.lower():
             try:
@@ -910,6 +938,7 @@ class ReportGenerator:
                 print(f"[INSIDER] Insider enrichment failed: {e}")
 
         # 30-day price history (fresh download every scan run — sanity check)
+        progress("30-day price history...")
         price_history = {}
         price_history_prompt = ""
         try:
@@ -1042,6 +1071,14 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
                     body_lines.append(f"Extension penalty: -{s.get('setup_penalty')} (score {before} -> {s.get('score')}) | {reasons}")
                 else:
                     body_lines.append(f"Extension penalty: -{s.get('setup_penalty')} | {reasons}")
+            es = s.get("elite_score")
+            if es is not None:
+                eq = s.get("elite_qualified")
+                lm = s.get("elite_landmines") or []
+                elite_line = f"Elite score: {es}" + (" [TOP 5 QUALIFIED]" if eq else "")
+                if lm:
+                    elite_line += f" | Landmines: {', '.join(lm)}"
+                body_lines.append(elite_line)
             ta_dict = s.get('ta') or {}
             if ta_dict:
                 from ta_engine import format_ta_for_report
@@ -1072,23 +1109,15 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
             log_signals_from_report(stocks_data, scan_type)
         except Exception:
             pass
-        # Build and save JSON analysis package (for API + future use)
-        # Build JSON-safe price history summary (no daily rows)
+        # Build analysis package (for AI + MD output)
         ph_json = {}
         try:
             if price_history:
                 from price_history import price_history_for_json
-                ph_json = price_history_for_json(price_history)
+                ph_json = price_history_for_json(price_history, scan_tickers=ph_tickers, include_recent_daily=10)
         except Exception:
             pass
         analysis_package = self._build_analysis_package(stocks_data, scan_type, timestamp_display, watchlist_matches, config=config, instructions=instructions_for_json, market_breadth=market_breadth, market_intel=market_intel, price_history=ph_json)
-        filepath_json = self.save_dir / f"{base_name}.json"
-        try:
-            with open(filepath_json, 'w', encoding='utf-8') as f:
-                json.dump(analysis_package, f, indent=2)
-            progress(f"JSON saved: {filepath_json}")
-        except Exception:
-            pass
 
         # Append slim record to long-term scan history (scan_history.json)
         try:
@@ -1128,191 +1157,91 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
                 json.dump(history, f, indent=2)
         except Exception:
             pass
+        progress("Report ready (MD will be saved by caller with AI analysis)")
+        return str(base_path), full_text_txt, analysis_package
 
+
+def _to_yaml_safe(obj):
+    """Convert numpy/other non-JSON types to native Python for YAML serialization."""
+    try:
+        import numpy as np
+        if isinstance(obj, (np.floating, np.integer)):
+            return float(obj) if isinstance(obj, np.floating) else int(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+    except ImportError:
+        pass
+    if isinstance(obj, dict):
+        return {k: _to_yaml_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_yaml_safe(x) for x in obj]
+    if hasattr(obj, "item"):  # numpy scalar
         try:
-            from reportlab.lib.pagesizes import letter
-            from reportlab.pdfgen import canvas
-            from reportlab.lib.units import inch
+            return obj.item()
+        except Exception:
+            return str(obj)
+    return obj
 
-            c = canvas.Canvas(str(filepath_pdf), pagesize=letter)
-            width, height = letter
-            margin = inch
-            x, y = margin, height - margin
-            c.setFont("Helvetica", 9)
-            line_height = 11
-            max_width_ch = 100
 
-            # 0) Date/time stamp on first page
-            c.setFont("Helvetica-Bold", 10)
-            c.drawString(x, y, f"Report generated: {timestamp_display}")
-            y -= line_height * 1.5
-            c.setFont("Helvetica", 9)
+def build_markdown_report(analysis_package: dict, report_text: str, ai_response: str = "") -> str:
+    """
+    Build a single MD file with YAML frontmatter (structured data) + report body + AI analysis.
+    Returns the full markdown string. Caller saves to {base_path}.md
+    """
+    try:
+        import yaml
+    except ImportError:
+        yaml = None
 
-            # 0b) Scan-appropriate directive (momentum vs swing)
-            for line in directive_block.strip().replace("\r", "").split("\n"):
-                if y < margin + line_height:
-                    c.showPage()
-                    c.setFont("Helvetica", 9)
-                    y = height - margin
-                draw_line = line[:max_width_ch] if len(line) > max_width_ch else line
-                c.drawString(x, y, draw_line)
-                y -= line_height
-            y -= line_height
+    front = {
+        "scan_type": analysis_package.get("scan_type", "Scan"),
+        "timestamp": analysis_package.get("timestamp", ""),
+        "watchlist_matches": analysis_package.get("watchlist_matches") or [],
+        "stocks": _to_yaml_safe(analysis_package.get("stocks") or []),
+    }
+    if analysis_package.get("market_breadth") and "error" not in (analysis_package.get("market_breadth") or {}):
+        front["market_breadth"] = _to_yaml_safe(analysis_package["market_breadth"])
+    if analysis_package.get("market_intel"):
+        front["market_intel"] = _to_yaml_safe(analysis_package["market_intel"])
+    if analysis_package.get("price_history_30d"):
+        front["price_history_30d"] = _to_yaml_safe(analysis_package["price_history_30d"])
+    if analysis_package.get("backtest_stats"):
+        front["backtest_stats"] = _to_yaml_safe(analysis_package["backtest_stats"])
 
-            # 1) Scan-specific AI prompt and watchlist
-            for line in ai_prompt.replace("\r", "").split("\n"):
-                if y < margin + line_height:
-                    c.showPage()
-                    c.setFont("Helvetica", 9)
-                    y = height - margin
-                draw_line = line[:max_width_ch] if len(line) > max_width_ch else line
-                c.drawString(x, y, draw_line)
-                y -= line_height
+    if yaml:
+        fm = yaml.dump(front, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        frontmatter = f"---\n{fm}---\n\n"
+    else:
+        frontmatter = "---\n" + json.dumps(front, indent=2) + "\n---\n\n"
 
-            # 2) Market breadth (if present)
-            if market_breadth and "error" not in market_breadth:
-                regime = market_breadth.get("market_regime", "N/A")
-                sma50 = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
-                sma200 = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
-                ad = market_breadth.get("advance_decline")
-                rsi = market_breadth.get("avg_rsi_sp500")
-                breadth_line = f"Market breadth: {regime} | Above SMA50: {sma50}% | Above SMA200: {sma200}% | A/D: {ad} | Avg RSI: {rsi}"
-                if y < margin + line_height:
-                    c.showPage()
-                    c.setFont("Helvetica", 9)
-                    y = height - margin
-                draw_line = breadth_line[:max_width_ch] if len(breadth_line) > max_width_ch else breadth_line
-                c.drawString(x, y, draw_line)
-                y -= line_height * 2
-            # 3) Per-ticker technicals
-            for s in stocks_data:
-                ticker = s['ticker']
-                score = s.get('score', 0)
-                on_watchlist = s.get('on_watchlist', False)
-                y -= line_height
-                if y < margin + line_height:
-                    c.showPage()
-                    c.setFont("Helvetica", 9)
-                    y = height - margin
-                c.setFont("Helvetica-Bold", 11)
-                header = f"——— {ticker} ———"
-                if on_watchlist:
-                    header += "  ★ WATCHLIST"
-                c.drawString(x, y, header[:max_width_ch] if len(header) > max_width_ch else header)
-                y -= line_height
-                c.setFont("Helvetica", 9)
-                tech_lines = [
-                    f"Score {s['score']}  | Price ${s.get('price','N/A')}  | Change {s.get('change','N/A')}  | RSI {s.get('rsi','N/A')}  | Target ${s.get('target','N/A')}  | P/E {s.get('pe','N/A')}  | RelVol {s.get('rel_volume','N/A')}x",
-                ]
-                rc = s.get("risk_checks") or _default_risk_checks()
-                if rc.get("earnings_safe") is False and rc.get("days_until_earnings") is not None:
-                    tech_lines.append(f"EARNINGS IN {rc.get('days_until_earnings')} DAYS - avoid for swing")
-                elif rc.get("earnings_date") or rc.get("earnings_safe") is True:
-                    tech_lines.append("Earnings safe (>5 days out)" if rc.get("earnings_safe") else "Earnings: no date")
-                if rc.get("ex_div_safe") is False and rc.get("ex_div_date"):
-                    tech_lines.append(f"Ex-div {rc.get('ex_div_date')} - price drop expected")
-                if rc.get("volume_unusual") and rc.get("relative_volume") is not None:
-                    tech_lines.append(f"RelVol {rc.get('relative_volume')}x (unusual)")
-                if any(s.get(k) for k in ('Owner', 'Transaction', 'Date', 'Value')):
-                    tech_lines.append(f"Insider: {s.get('Owner','')} | {s.get('Relationship','')} | {s.get('Date','')} | {s.get('Transaction','')} | Cost {s.get('Cost','')} | Shares {s.get('Shares','')} | Value {s.get('Value','')}")
-                    if s.get("insider_context") not in (None, ""):
-                        tech_lines.append(f"Insider context: {s.get('insider_context', 'Unknown')} (from SEC Form 4)")
-                lp = s.get("leveraged_play")
-                if lp:
-                    if isinstance(lp, dict):
-                        lev_ticker = lp.get("leveraged_ticker")
-                        lev_match = lp.get("match_type", "direct")
-                    else:
-                        lev_ticker = str(lp).strip().upper()
-                        lev_match = "direct"
-                    if lev_ticker:
-                        tech_lines.append(f"Leveraged play: {lev_ticker} ({lev_match}) - NOT for long-term (volatility decay)")
-                else:
-                    ticker_upper = str(ticker).strip().upper()
-                    if score >= LEVERAGED_MIN_SCORE and ticker_upper in leveraged_mapping:
-                        lev = leveraged_mapping[ticker_upper]
-                        tech_lines.append(f"Leveraged play: {lev} (use in place of {ticker_upper} for leveraged exposure)")
-                        tech_lines.append("  Leveraged ETFs are high-risk; not for long-term buy-and-hold (volatility decay).")
-                tech_lines.extend([
-                    f"Company: {s.get('company', ticker)}  | Sector: {s.get('sector','N/A')}",
-                    f"SMA50: {s.get('sma50','N/A')}  | SMA200: {s.get('sma200','N/A')}  | SMA200 status: {s.get('sma200_status','N/A')}  | Recom: {s.get('recom','N/A')}",
-                    f"EMA8 status: {s.get('ema8_status', 'N/A')}  | Invalidation: {s.get('invalidation_level', 'N/A')}",
-                ])
-                if s.get("setup_penalty"):
-                    reasons = "; ".join(s.get("setup_penalty_reasons", [])[:2])
-                    before = s.get("score_before_penalty")
-                    if before is not None:
-                        tech_lines.append(f"Extension penalty: -{s.get('setup_penalty')} (score {before} -> {s.get('score')}) | {reasons}")
-                    else:
-                        tech_lines.append(f"Extension penalty: -{s.get('setup_penalty')} | {reasons}")
-                ta_dict = s.get('ta') or {}
-                if ta_dict:
-                    from ta_engine import format_ta_for_report
-                    tech_lines.append(format_ta_for_report(ta_dict))
-                if s.get("sentiment_label") is not None or s.get("sentiment_score") is not None:
-                    sent_line = f"Sentiment: {s.get('sentiment_label', 'N/A')} (score {s.get('sentiment_score', 'N/A')})"
-                    if s.get("earnings_in_topics"):
-                        sent_line += " | Earnings in recent news"
-                    tech_lines.append(sent_line)
-                news_list = s.get('news') or []
-                if news_list:
-                    tech_lines.append("Headlines:")
-                    for i, item in enumerate(news_list[:5]):
-                        if isinstance(item, (list, tuple)) and len(item) > 1:
-                            head = item[1]
-                        elif isinstance(item, dict):
-                            head = item.get('title') or item.get('headline') or str(item)
-                        else:
-                            head = str(item)
-                        tech_lines.append(f"  {i+1}. {str(head).strip()}")
-                tech_lines.append("")
-                for line in tech_lines:
-                    if y < margin + line_height:
-                        c.showPage()
-                        c.setFont("Helvetica", 9)
-                        y = height - margin
-                    draw_line = line[:max_width_ch] if len(line) > max_width_ch else line
-                    c.drawString(x, y, draw_line)
-                    y -= line_height
-                y -= line_height
+    body = ["# ClearBlueSky Scan Report\n", report_text]
 
-            # Footer: attribution and GitHub link
-            y -= line_height * 2
-            if y < margin + line_height * 3:
-                c.showPage()
-                c.setFont("Helvetica", 9)
-                y = height - margin
-            c.setFont("Helvetica-Oblique", 8)
-            footer_line_1 = "This report was created using the ClearBlueSky Stock Scanner."
-            footer_line_2 = SCANNER_GITHUB_URL
-            c.drawString(x, y, footer_line_1)
-            y -= line_height
-            c.drawString(x, y, footer_line_2)
+    body.append("\n\n---\n\n# AI Analysis\n")
+    if ai_response and ai_response.strip():
+        body.append(ai_response)
+    else:
+        body.append("*Set OpenRouter API key in Settings for 3-model consensus analysis.*")
 
-            c.save()
-            progress(f"PDF saved: {filepath_pdf}")
-            return str(filepath_pdf), full_text_txt, analysis_package
-        except ImportError:
-            with open(filepath_txt, 'w', encoding='utf-8') as f:
-                f.write(full_text_txt)
-            progress(f"Report saved as TXT (install reportlab for PDF): {filepath_txt}")
-            return str(filepath_txt), full_text_txt, analysis_package
-        except Exception as e:
-            with open(filepath_txt, 'w', encoding='utf-8') as f:
-                f.write(full_text_txt)
-            progress(f"PDF failed, saved as TXT: {filepath_txt}")
-            return str(filepath_txt), full_text_txt, analysis_package
+    body.append(f"\n\n---\n*Generated by ClearBlueSky Stock Scanner. {SCANNER_GITHUB_URL}*")
+    return frontmatter + "\n".join(body)
+
 
 # Backward compatibility: app may still import HTMLReportGenerator
 HTMLReportGenerator = ReportGenerator
 
 
 def generate_report(ticker, scan_type="Analysis", score=None):
-    """Quick single-ticker PDF report. Returns path."""
+    """Quick single-ticker report. Returns path to .md file."""
     gen = ReportGenerator()
     results = [{'ticker': ticker, 'score': score or 75}]
-    path, _, _ = gen.generate_combined_report_pdf(results, scan_type, min_score=0)
-    return path
+    base_path, report_text, analysis_package = gen.generate_combined_report_pdf(results, scan_type, min_score=0)
+    if not base_path:
+        return None
+    md_content = build_markdown_report(analysis_package, report_text, ai_response="")
+    md_path = base_path + ".md"
+    with open(md_path, 'w', encoding='utf-8') as f:
+        f.write(md_content)
+    return md_path
 
 
 if __name__ == "__main__":
@@ -1320,5 +1249,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         gen = ReportGenerator()
         results = [{'ticker': t, 'score': 80} for t in sys.argv[1:]]
-        path, _, _ = gen.generate_combined_report_pdf(results, "Test", min_score=0)
-        print(f"Report: {path}")
+        base_path, report_text, analysis_package = gen.generate_combined_report_pdf(results, "Test", min_score=0)
+        if base_path:
+            md_content = build_markdown_report(analysis_package, report_text, ai_response="")
+            md_path = base_path + ".md"
+            with open(md_path, 'w', encoding='utf-8') as f:
+                f.write(md_content)
+            print(f"Report: {md_path}")

@@ -133,13 +133,13 @@ No config parameters (empty `SCAN_PARAM_SPECS["watchlist_tickers"]`). Scanner: `
 
 ---
 
-## Report / PDF behavior (all scans)
+## Report / .md behavior (all scans)
 
 | Concept | Source | Description |
 |---------|--------|-------------|
-| Min score for PDF | `{scan}_min_score` | From config: `swing_min_score`, `emotional_min_score`, `premarket_min_score`. Velocity Trend Growth uses 0. |
+| Min score for report | `{scan}_min_score` | From config: `swing_min_score`, `emotional_min_score`, `premarket_min_score`. Velocity Trend Growth uses 0. |
 
-| Max tickers in PDF | Hardcoded | Top 15 tickers (by score) included in each PDF (`qualifying = qualifying[:15]` in `report_generator.py`). |
+| Max tickers in report | Hardcoded | Top 15 tickers (by score) included in each .md file (`qualifying = qualifying[:15]` in `report_generator.py`). |
 
 Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.lower()}_min_score', 65)`. Scans that use **min_score 0** (no filter): Watchlist, Watchlist 3pm, Watchlist – All tickers, Insider, Velocity Barbell.
 
@@ -147,12 +147,12 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 
 ## Other app settings (not scan-type specific)
 
-- `reports_folder` – Where PDFs are saved (default: `reports` under app dir).
+- `reports_folder` – Where .md reports are saved (default: `reports` under app dir).
 - `play_alarm_on_complete` – Play sound when scan finishes (default: true).
 - `alarm_sound_choice` – `"beep"` \| `"asterisk"` \| `"exclamation"` (system-style beeps).
 - `finviz_api_key` – Optional Finviz API key.
-- **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). `openrouter_model` – Model: `"google/gemini-3-pro-preview"` or `"anthropic/claude-sonnet-4.5"` (use credits), or `"tngtech/deepseek-r1t2-chimera:free"` (free, no credits). Selectable in Settings under “OpenRouter API (AI analysis)”.
-- **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the PDF gets programmatic TA from `ta_engine` (yfinance + pandas-ta): EMA8, SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
+- **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). 3 free models (Meta Llama 3.3 70B, OpenAI GPT-OSS 120B, DeepSeek R1T2 Chimera) run consensus analysis. Chart data (30-day OHLC, recent daily bars) in JSON; no chart images. No credits required. Selectable in Settings under “OpenRouter API (AI analysis)”.
+- **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the .md report gets programmatic TA from `ta_engine` (yfinance + pandas-ta): EMA8, SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
 - Risk/position (legacy Settings tab): `account_size`, `risk_per_trade_percent`, `max_position_dollars`, `max_daily_loss_dollars`, `max_concurrent_positions`.
 
 ---

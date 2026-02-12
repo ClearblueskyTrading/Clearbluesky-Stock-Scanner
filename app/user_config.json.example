@@ -2,7 +2,7 @@
   "_comment": "Example config - copy to user_config.json if needed. All API keys are blank. Never commit user_config.json (see .gitignore).",
   "finviz_api_key": "",
   "openrouter_api_key": "",
-  "openrouter_model": "google/gemini-3-pro-preview",
+  "openrouter_model": "tngtech/deepseek-r1t2-chimera:free",
   "use_vision_charts": false,
   "alpha_vantage_api_key": "",
   "alpaca_api_key": "",

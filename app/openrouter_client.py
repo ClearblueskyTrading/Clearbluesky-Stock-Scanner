@@ -13,7 +13,14 @@ except ImportError:
     REQUESTS_AVAILABLE = False
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-DEFAULT_MODEL = "google/gemini-3-pro-preview"
+DEFAULT_MODEL = "tngtech/deepseek-r1t2-chimera:free"
+
+# 3 text models (no vision). Chart data in JSON only.
+CONSENSUS_MODELS = [
+    ("Meta Llama 3.3 70B", "meta-llama/llama-3.3-70b-instruct:free", False),
+    ("OpenAI GPT-OSS 120B", "openai/gpt-oss-120b:free", False),
+    ("DeepSeek R1T2 Chimera", "tngtech/deepseek-r1t2-chimera:free", False),
+]
 
 
 def _build_user_content(user_content, image_base64_list=None):
@@ -44,7 +51,7 @@ def analyze(api_key, model_id, system_prompt, user_content, max_tokens=8192, tem
 
     Args:
         api_key: OpenRouter API key (required).
-        model_id: OpenRouter model id (e.g. google/gemini-3-pro-preview, tngtech/deepseek-r1t2-chimera:free).
+        model_id: OpenRouter model id (free models, e.g. tngtech/deepseek-r1t2-chimera:free).
         system_prompt: System message (analyst instructions).
         user_content: User message – report text or JSON string (the analysis package).
         max_tokens: Max tokens to generate (default 8192).
@@ -87,7 +94,7 @@ def analyze(api_key, model_id, system_prompt, user_content, max_tokens=8192, tem
     last_exc = None
     for attempt in range(MAX_RETRIES):
         try:
-            resp = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=180)
+            resp = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=90)
             # Parse body for detailed errors before raise_for_status
             try:
                 data = resp.json()
@@ -147,3 +154,44 @@ def analyze_with_config(config, system_prompt, user_content, max_tokens=8192, te
         return None
     model_id = config.get("openrouter_model") or DEFAULT_MODEL
     return analyze(api_key, model_id, system_prompt, user_content, max_tokens=max_tokens, temperature=temperature, image_base64_list=image_base64_list)
+
+
+def analyze_with_all_models(config, system_prompt, user_content, progress_callback=None, max_tokens=8192, temperature=0.3, image_base64_list=None):
+    """
+    Run analysis through 5 consensus models (4 text + 1 vision). Text models get JSON only;
+    vision model gets JSON + chart images when image_base64_list provided.
+    Returns combined output with each model's opinion.
+    If API key missing, returns None.
+    """
+    api_key = (config.get("openrouter_api_key") or "").strip()
+    if not api_key:
+        return None
+
+    n_models = len(CONSENSUS_MODELS)
+    results = []
+    for i, item in enumerate(CONSENSUS_MODELS):
+        label = item[0]
+        model_id = item[1]
+        if progress_callback:
+            progress_callback(f"AI: {label} ({i + 1}/{n_models})...")
+        try:
+            resp = analyze(api_key, model_id, system_prompt, user_content, max_tokens=max_tokens, temperature=temperature)
+            results.append((label, resp or "(no response)"))
+        except Exception as e:
+            results.append((label, f"[Error: {e}]"))
+
+    lines = [
+        "=" * 70,
+        "AI ANALYSIS — Consensus from 3 models (Llama, OpenAI, DeepSeek)",
+        "Each model analyzed the same scan data and 30-day price history.",
+        "=" * 70,
+    ]
+    for label, content in results:
+        lines.append("")
+        lines.append("-" * 50)
+        lines.append(f"  {label}")
+        lines.append("-" * 50)
+        lines.append("")
+        lines.append(content)
+        lines.append("")
+    return "\n".join(lines)

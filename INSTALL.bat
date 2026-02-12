@@ -1,10 +1,10 @@
 @echo off
-title ClearBlueSky Stock Scanner v7.88 - Installer
+title ClearBlueSky Stock Scanner v7.90 - Installer
 color 0A
 
 echo.
 echo  ============================================
-echo    ClearBlueSky Stock Scanner v7.88
+echo    ClearBlueSky Stock Scanner v7.90
 echo    Free and Open Source - Made with Claude AI
 echo  ============================================
 echo.
@@ -101,6 +101,12 @@ if %errorLevel% neq 0 (
     ) else (
         pip install finviz finvizfinance pandas requests pygame reportlab yfinance pandas-ta chromadb PyMuPDF 2>nul
     )
+)
+echo  Verifying critical packages (finviz, yfinance)...
+python -c "from finviz.screener import Screener; from yfinance import __version__; print('OK')" 2>nul
+if %errorLevel% neq 0 (
+    echo  [!] Finviz or yfinance not found. Reinstalling...
+    pip install finviz yfinance --force-reinstall --quiet 2>nul
 )
 
 :: Create desktop shortcut

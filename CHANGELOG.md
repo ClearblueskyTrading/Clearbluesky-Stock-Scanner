@@ -4,6 +4,22 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ---
 
+## [7.90] – 2026-02-12
+
+### Changed
+- **Single .md report** — Replaces PDF, JSON, `*_ai.txt`. One file: YAML frontmatter + body + AI consensus.
+- **3-model AI consensus** — Llama 3.3 70B, OpenAI GPT-OSS 120B, DeepSeek R1T2 Chimera; all free. Chart data in JSON (30-day OHLC); no chart images.
+- **AI status** — `AI: Connected` / `No API key set` / `Key invalid or expired`. Credit display removed.
+- **Universe toggle** — Own row: S&P 500 vs ETFs.
+- **Progress** — Step labels + elapsed time (e.g. `• 2:15`).
+
+### Removed
+- Fast mode, Quick Report, AI credit display, chart images, separate PDF/JSON/_ai.txt.
+
+See **RELEASE_v7.90.md** for details.
+
+---
+
 ## [7.87] – 2026-02-11
 
 ### Fixed — Scanner & report pipeline bugfixes

@@ -1,7 +1,7 @@
 @echo off
-title ClearBlueSky Stock Scanner v6.5
+title ClearBlueSky Stock Scanner v7.89
 cd /d "%~dp0"
-echo Starting ClearBlueSky Stock Scanner v6.5...
+echo Starting ClearBlueSky Stock Scanner v7.89...
 python app.py
 if %errorLevel% neq 0 (
     echo.

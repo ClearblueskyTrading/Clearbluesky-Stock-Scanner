@@ -23,7 +23,7 @@ This folder is **Tier 1** from the [RAG + System Memory Architecture](../../CURS
 ## How This Fits With Our Setup
 
 - **Tier 1 (this folder):** Static docs in `docs/` + shared folder `C:\Users\EricR\OneDrive\Desktop\Claude AI Knowledge\`
-- **Tier 2 (RAG):** `D:\scanner\velocity_memory\` — ChromaDB, session logs, trade journal, auto-indexed. Shared with Claude Desktop.
-- **Query RAG:** `python "D:\scanner\velocity_memory\velocity_rag.py" --query "your question"`
+- **Tier 2 (RAG):** `d:\cursor\velocity_memory\` — ChromaDB (chroma_db/), session logs, trade journal. Cursor has its own velocity_rag.py; separate from D:\scanner.
+- **Query RAG:** `python "d:\cursor\velocity_memory\velocity_rag.py" --query "your question"`
 
 See **references/our-rag-setup.md** for the full mapping to the generic architecture.

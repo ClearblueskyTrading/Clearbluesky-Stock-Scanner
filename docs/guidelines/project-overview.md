@@ -7,7 +7,7 @@ Stock scanner app (Trend, Swing/Dip, Watchlist) with PDF/JSON reports and OpenRo
 ## Key Paths
 
 - **App (this repo):** `d:\cursor\app\` (or `D:\scanner\app\`)
-- **RAG / shared memory:** `D:\scanner\velocity_memory\`
+- **RAG / shared memory:** `d:\cursor\velocity_memory\` (Cursor’s own; separate from D:\scanner)
 - **Knowledge base:** `C:\Users\EricR\OneDrive\Desktop\Claude AI Knowledge\`
 - **Reports:** `app/reports/`
 

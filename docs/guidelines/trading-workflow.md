@@ -4,6 +4,11 @@
 **Order entry:** IBOT (natural language in TWS, Client Portal, or IBKR Mobile)  
 **Scanner:** ClearBlueSky (Velocity Trend Growth, Swing, Watchlist)
 
+## ⛔ Rule: No Solo Picks
+
+**Never allow discretionary stock picks unless 3 AIs agree.**  
+If you ask to buy/sell a ticker on your own impulse, the AI must refuse unless the pick is already supported by agreement from 3 separate AI analyses (e.g., scanner report + OpenRouter + another source).
+
 ## Flow
 
 1. **Scan** — Run ClearBlueSky scanners for ideas.

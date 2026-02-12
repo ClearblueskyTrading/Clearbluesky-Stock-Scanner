@@ -21,11 +21,11 @@ INDEX_UNIVERSE_CAP = 200
 
 
 def get_universe_for_index(index: Optional[str]) -> List[str]:
-    """Return ticker list. For sp500/etfs fetch from Finviz; otherwise SCAN_UNIVERSE."""
+    """Return ticker list. For sp500/etfs fetch from breadth; otherwise SCAN_UNIVERSE."""
     if index and index in ("sp500", "etfs", "sp500_etfs"):
         try:
             from breadth import fetch_full_index_for_breadth
-            rows = fetch_full_index_for_breadth("sp500_etfs", progress_callback=None)
+            rows = fetch_full_index_for_breadth(index, progress_callback=None)
             tickers = [str(r.get("Ticker") or "").strip().upper() for r in (rows or []) if r.get("Ticker")]
             tickers = [t for t in tickers if t]
             return tickers[:INDEX_UNIVERSE_CAP] if tickers else SCAN_UNIVERSE

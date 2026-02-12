@@ -50,11 +50,11 @@ def _rank_sectors_by_return(days: int, progress_callback=None) -> List[tuple]:
 
 def _get_universe(index: str, progress_callback=None, trend_days: int = 20) -> tuple:
     """
-    Sector-first: rank sectors by momentum, then fetch only S&P 500 stocks + ETFs in leading sectors.
+    Sector-first: rank sectors by momentum, then fetch tickers in leading sectors.
+    index: 'sp500' = S&P 500 only; 'etfs' = ETFs only; 'sp500_etfs' = combined.
     Returns (tickers, sector_map). sector_map: ticker -> sector name.
     """
-    use_index = "sp500_etfs" if index in ("sp500", "etfs", "sp500_etfs") else index
-    if use_index not in ("sp500", "etfs", "sp500_etfs"):
+    if index not in ("sp500", "etfs", "sp500_etfs"):
         return [], {}
     try:
         # 1. Rank sectors by N-day return (sector ETFs)
@@ -66,9 +66,15 @@ def _get_universe(index: str, progress_callback=None, trend_days: int = 20) -> t
             leading = ", ".join(f"{s[0]} ({s[1]:+.1f}%)" for s in sector_rank[:3])
             progress_callback(f"Leading sectors: {leading}")
 
-        # 2. Fetch S&P 500, keep only stocks in leading sectors
-        from breadth import fetch_sp500_plus_curated_etfs
-        rows = fetch_sp500_plus_curated_etfs(progress_callback)
+        # 2. Fetch universe based on toggle (S&P 500 only, ETFs only, or combined)
+        from breadth import fetch_sp500_only, fetch_etfs_only, fetch_sp500_plus_curated_etfs
+        if index == "sp500":
+            rows = fetch_sp500_only(progress_callback)
+        elif index == "etfs":
+            rows = fetch_etfs_only(progress_callback)
+        else:
+            rows = fetch_sp500_plus_curated_etfs(progress_callback)
+
         tickers = []
         sector_map = {}
         for r in (rows or []):
@@ -77,13 +83,18 @@ def _get_universe(index: str, progress_callback=None, trend_days: int = 20) -> t
                 continue
             sector = (r.get("Sector") or r.get("Industry") or "Unknown").strip()
             sector_map[t] = sector
-            # Include: index ETFs always; stocks + sector ETFs if in leading sectors
-            if t in INDEX_ETFS:
+            # ETFs-only: include all (full list). S&P 500 only: sectors. Combined: index ETFs + sectors
+            if index == "etfs":
                 tickers.append(t)
-            elif sector in top_sectors:
-                tickers.append(t)
+            elif index == "sp500":
+                if sector in top_sectors:
+                    tickers.append(t)
+            else:
+                if t in INDEX_ETFS or sector in top_sectors:
+                    tickers.append(t)
 
-        tickers = tickers[:INDEX_UNIVERSE_CAP]
+        if index != "etfs":
+            tickers = tickers[:INDEX_UNIVERSE_CAP]
         return tickers, sector_map
     except Exception:
         return [], {}
@@ -284,7 +295,9 @@ def run_velocity_trend_growth_scan(
                 continue
 
         sector = sector_map.get(t, "Unknown")
-        score = min(100, max(1, int(20 + ret * 1.5)))
+        # Tighter curve: only strong momentum (15%+) gets 70+, 20%+ gets 80+
+        # 5%→42, 10%→55, 15%→68, 20%→80, 25%→92, 30%→100
+        score = min(100, max(1, int(25 + ret * 2.5)))
         results.append({
             "Ticker": t,
             "ticker": t,

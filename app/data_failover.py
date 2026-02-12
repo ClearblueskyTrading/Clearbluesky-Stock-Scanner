@@ -57,7 +57,7 @@ def get_price_volume(ticker: str, config: Optional[dict] = None) -> Optional[Dic
     # 2. finviz
     try:
         from finviz_safe import get_stock_safe
-        stock = get_stock_safe(ticker, timeout=12.0, max_attempts=1)
+        stock = get_stock_safe(ticker, timeout=12.0, max_attempts=1, config=config)
         if stock:
             price_raw = stock.get("Price") or stock.get("price")
             if price_raw is not None and str(price_raw).strip():
