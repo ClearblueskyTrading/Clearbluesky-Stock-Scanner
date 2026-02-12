@@ -39,15 +39,7 @@ EXCLUDE_FILES = {
     "scanner_presets_export.json",   # user exports
     "release_notes_v7.md",
     "backtest_signals.db",
-    "GITHUB_PUSH.md",
-    "TESTING_v7.0.md",
-    "NEXT_RELEASE.md",
-    # Old release notes (keep only last 2 versions: 7.89, 7.90)
-    "RELEASE_v6.2.md", "RELEASE_v6.3.md", "RELEASE_v6.4.md", "RELEASE_v6.5.md",
-    "RELEASE_v7.0.md", "RELEASE_v7.1.md", "RELEASE_v7.2.md", "RELEASE_v7.3.md",
-    "RELEASE_v7.4.md", "RELEASE_v7.5.md", "RELEASE_v7.6.md", "RELEASE_v7.7.md",
-    "RELEASE_v7.8.md", "RELEASE_v7.81.md", "RELEASE_v7.82.md", "RELEASE_v7.83.md",
-    "RELEASE_v7.84.md", "RELEASE_v7.85.md", "RELEASE_v7.86.md", "RELEASE_v7.87.md", "RELEASE_v7.88.md",
+    # Old release notes (only RELEASE_v7.90 kept)
     "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
     # Cursor project only — not scanner release
     "CURSOR_AI_GUIDE.md",

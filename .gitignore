@@ -35,9 +35,8 @@ app/backtest_signals.db
 app/update_backups/
 app/update_backup_manifest.json
 
-# Optional: local preset exports (may contain user choices)
-# app/scan_presets.json
-# app/scanner_presets_export.json
+# User preset exports (do not commit)
+app/scanner_presets_export.json
 
 # Security — NEVER commit files that may contain API keys
 CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md
