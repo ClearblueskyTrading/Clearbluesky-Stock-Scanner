@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
 Build a clean release zip for ClearBlueSky v7.0 (and future 7.1, 7.2).
-Excludes user data, __pycache__, reports, update_backups, etc.
+Uses git ls-files so zip = repo contents only (no Cursor project filesystem pollution).
+Excludes user data, Cursor/trading docs, etc.
 Run from repo root: python build_release_zip.py
 Output: ClearBlueSky-v7.0.zip (or version from app/app.py VERSION)
 """
 
 import os
 import re
+import subprocess
 import zipfile
 from pathlib import Path
 
@@ -57,6 +59,11 @@ EXCLUDE_FILES = {
     "paper_trading_manager.py",
     "alpaca_swing_dip_strategy.py",
     "PaperTradingManager.bat",
+    # Cursor/trading docs in repo
+    "ALPACA_PAPER_TRADE_FEATURE_PLAN.md",
+    "MARKET_STRATEGY_DRAFT.md",
+    "NON_DAYTRADE_STRATEGY.md",
+    "mcp.json.example",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [
@@ -65,6 +72,8 @@ EXCLUDE_PATTERNS = [
     re.compile(r"^_test_", re.I),
     re.compile(r"\.env\.", re.I),  # .env.local, .env.prod, etc.
     re.compile(r"docs[/\\]docs[/\\]", re.I),  # nested docs/docs duplicate
+    re.compile(r"docs[/\\]strategy[/\\]", re.I),  # trading strategy docs
+    re.compile(r"docs[/\\]CURSOR_AGENT", re.I),  # Cursor agent spec
 ]
 
 
@@ -103,31 +112,41 @@ def main():
     out_name = f"ClearBlueSky-v{version}.zip"
     out_path = ROOT / out_name
 
+    # Use git ls-files so zip = repo only (no filesystem pollution from Cursor project)
+    try:
+        result = subprocess.run(
+            ["git", "ls-files"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if result.returncode != 0:
+            raise RuntimeError("git ls-files failed")
+        files = [f.strip() for f in result.stdout.splitlines() if f.strip()]
+    except Exception as e:
+        raise SystemExit(f"Build requires git. Run from repo root. Error: {e}")
+
+    if not files:
+        raise SystemExit("No files from git ls-files. Run from repo root.")
+
     # Remove old zip if present
     if out_path.exists():
         out_path.unlink()
 
     added = 0
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for base in [ROOT]:
-            for dirpath, dirnames, filenames in os.walk(base):
-                # Don't descend into excluded dirs
-                dirnames[:] = [d for d in dirnames if not should_exclude(os.path.relpath(os.path.join(dirpath, d), ROOT), True)]
-                for f in filenames:
-                    full = os.path.join(dirpath, f)
-                    try:
-                        rel = os.path.relpath(full, ROOT)
-                    except ValueError:
-                        continue
-                    if rel.startswith("..") or "\\.." in rel or "/.." in rel:
-                        continue
-                    if should_exclude(rel, False):
-                        continue
-                    # Skip build script itself in zip if we're at root
-                    if rel == "build_release_zip.py":
-                        continue
-                    zf.write(full, rel)
-                    added += 1
+        for rel in files:
+            rel = rel.replace("/", os.sep)
+            if should_exclude(rel, False):
+                continue
+            if rel == "build_release_zip.py":
+                continue
+            full = ROOT / rel
+            if not full.is_file():
+                continue
+            zf.write(full, rel)
+            added += 1
 
     print(f"Created {out_path} with {added} files (version {version}).")
     return 0
