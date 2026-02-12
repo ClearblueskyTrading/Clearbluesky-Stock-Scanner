@@ -26,6 +26,7 @@ EXCLUDE_DIRS = {
     "scans",
     "ClearBlueSkyWin",
     "backup-v6.4",
+    "scripts",  # Cursor agent tooling — scanner-only on GitHub
 }
 EXCLUDE_FILES = {
     "user_config.json",      # user API keys, preferences
@@ -46,6 +47,15 @@ EXCLUDE_FILES = {
     "RELEASE_v7.8.md", "RELEASE_v7.81.md", "RELEASE_v7.82.md", "RELEASE_v7.83.md",
     "RELEASE_v7.84.md", "RELEASE_v7.85.md", "RELEASE_v7.86.md", "RELEASE_v7.87.md", "RELEASE_v7.88.md",
     "CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md",
+    # Cursor project only — not scanner release
+    "CURSOR_AI_GUIDE.md",
+    "CURSOR_AGENT_SYSTEM.md",
+    "CURSOR_OPENROUTER_SETUP.md",
+    "DESKTOP_AGENT_PANEL.md",
+    # Trading (Cursor project only)
+    "alpaca_trades.py",
+    "paper_trading_manager.py",
+    "alpaca_swing_dip_strategy.py",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [
@@ -53,6 +63,7 @@ EXCLUDE_PATTERNS = [
     re.compile(r".*_Scan_Report_.*\.pdf", re.I),
     re.compile(r"^_test_", re.I),
     re.compile(r"\.env\.", re.I),  # .env.local, .env.prod, etc.
+    re.compile(r"docs[/\\]docs[/\\]", re.I),  # nested docs/docs duplicate
 ]
 
 
@@ -67,7 +78,7 @@ def should_exclude(rel_path: str, is_dir: bool) -> bool:
         if name.endswith(EXCLUDE_SUFFIXES):
             return True
         for pat in EXCLUDE_PATTERNS:
-            if pat.search(name):
+            if pat.search(rel_path.replace("\\", "/")):
                 return True
     return False
 

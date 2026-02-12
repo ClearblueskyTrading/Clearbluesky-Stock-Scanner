@@ -42,7 +42,7 @@ CLI.bat --scan velocity_trend_growth
 
 ## Usage
 
-**From app folder `D:\cursor\app`:**
+**From app folder** (e.g. `C:\TradingBot\app` or wherever you installed):
 ```powershell
 python scanner_cli.py --scan velocity_trend_growth
 python scanner_cli.py --scan swing --index etfs
