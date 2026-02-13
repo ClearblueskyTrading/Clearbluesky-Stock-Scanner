@@ -201,7 +201,11 @@ def load_config():
         # OpenRouter API (for AI analysis; one key for all models)
         "openrouter_api_key": "",
         "openrouter_model": "tngtech/deepseek-r1t2-chimera:free",  # free models only
+        "openrouter_synthesis_enabled": True,  # B: run Trinity to synthesize 5-model consensus into final summary
         "use_vision_charts": False,  # Phase 6: attach chart images to OpenRouter (multimodal models only)
+        # Google AI (Gemini) – free-tier models, adds to consensus when key set
+        "google_ai_api_key": "",
+        "google_ai_model": "gemini-2.5-flash",  # Free: gemini-2.0-flash, gemini-2.5-flash, gemini-2.5-pro, gemini-3-flash-preview
         # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
         "alpha_vantage_api_key": "",
         # Alpaca (market data failover: price/bars when yfinance unavailable)
@@ -210,7 +214,7 @@ def load_config():
         # Market Intelligence (Google News RSS + Finviz news + sector performance + market snapshot)
         "use_market_intel": True,
         # SEC EDGAR insider context (10b5-1 plan vs discretionary)
-        "use_sec_insider_context": False,
+        "use_sec_insider_context": True,
         # RAG AI Knowledge (ChromaDB; folder of documents)
         "rag_books_folder": "",
         "rag_enabled": False,

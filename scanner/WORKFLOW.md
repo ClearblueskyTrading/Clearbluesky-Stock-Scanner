@@ -5,6 +5,7 @@ When you run a scan and have API keys set, this is the flow:
 1. **Scan** → Scanner runs (Finviz API if `finviz_api_key` set), returns qualifying tickers.
 
 2. **Report generation** (`report_generator.generate_combined_report_pdf`):
+   - **Leveraged tickers:** When a stock has a leveraged alternative (e.g. NVDA→NVDU, AAPL→AAPU), the AI suggests it as "Leveraged alt" with 3-day max hold.
    - Per ticker: **Finviz** data (price, RSI, target, etc.).
    - **TA** (yfinance + pandas-ta): SMAs, RSI, MACD, BB, ATR, Fib — if `include_ta_in_report` is true (default).
    - **Alpha Vantage** sentiment: score, label, headlines — if `alpha_vantage_api_key` is set.

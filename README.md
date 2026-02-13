@@ -1,4 +1,12 @@
-# ClearBlueSky Stock Scanner v7.90
+# Cursor Desktop Addons
+
+**Project:** Cursor Desktop Addons — desktop tooling, Agent GUI, and integrations for Cursor AI.
+
+**Sub-project:** [ClearBlueSky Stock Scanner](scanner/) (v7.90) — separate project within this workspace; kept distinct but integrated as needed.
+
+---
+
+## ClearBlueSky Stock Scanner v7.90
 
 **Free desktop app** that scans the market for trading ideas and generates **single .md reports** (YAML + body + 3-model AI consensus) you can use with any AI (in-app via OpenRouter).
 

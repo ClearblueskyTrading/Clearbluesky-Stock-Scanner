@@ -4,6 +4,10 @@ ClearBlueSky-*.zip
 # Local backup (v6.4 before C# port)
 backup-v6.4/
 
+# Large archives / full backups (use cloud or local only)
+cursor-full-backup-*.zip
+_archive_*/
+
 # .NET/WPF build artifacts (ClearBlueSkyWin desktop prototype)
 ClearBlueSkyWin/
 
@@ -54,8 +58,13 @@ mcp-servers/
 # PTM daemon logs (Cursor project only)
 scanner/ptm_logs/
 
+# Scan logs (runtime)
+scanner/scan_*.log
+
 # PTM rotation state (trading positions — do not commit)
 scanner/ptm_rotation_state.json
+scanner/ptm_single_stock_rotation_state.json
+scanner/ptm_trader2_rotation_state.json
 
 # Trading (Cursor project only — not scanner app)
 scanner/alpaca_trades.py

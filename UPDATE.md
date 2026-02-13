@@ -2,8 +2,8 @@
 
 ## In-app updater (v7.0+)
 
-- **Update** – Backs up your current version, then downloads and applies the latest release from GitHub. **Your `user_config.json` is never overwritten** (API keys and preferences are kept).
-- **Rollback** – If an update causes issues, use **Rollback** to restore the previous version from the backup. **Your current `user_config.json` is kept** when you rollback.
+- **Update** – Backs up your current version, downloads and applies the latest release from GitHub, then restarts the app. **Your `user_config.json` is never overwritten** (API keys and preferences are kept).
+- **Rollback** – If an update causes issues, use **Rollback** to restore the previous version from the backup, then restarts the app. **Your current `user_config.json` is kept** when you rollback.
 - **Where** – In the app: **Update** and **Rollback** buttons (below Settings / Help). Rollback is only available after you have run an update at least once (a backup is created before each update).
 
 Backups are stored in `app/update_backups/`. The updater uses the GitHub release source zip (tag `v7.0`, `v7.1`, etc.) and applies only the `app/` folder contents; root files (README, INSTALL.bat, etc.) are in the repo—re-download the full release zip if you need to refresh those.
@@ -16,7 +16,7 @@ Backups are stored in `app/update_backups/`. The updater uses the GitHub release
 - **v7.1–v7.6** – Incremental feature + stability releases.
 - **v7.7** – Scanner consolidation (7→4), ticker enrichment, overnight markets, insider data.
 - **v7.83** – Velocity Trend Growth (sector-first momentum), legacy Trend removed, curated ETFs.
-- Future versions follow strict incremental versioning (`v7.85`, etc.).
+- Future versions follow strict incremental versioning (`v7.89`, etc.).
 
 When you **Update** from the app, you get the latest release. When you **Rollback**, you return to the version you had before that update.
 

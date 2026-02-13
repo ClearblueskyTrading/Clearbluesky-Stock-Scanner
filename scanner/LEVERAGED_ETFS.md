@@ -70,4 +70,4 @@ TQQQ, UPRO, SOXL, FNGU, LABU, FAS, TNA, GUSH, NUGT, TECL, SSO, QLD, ERX, UCO, BO
 
 ---
 
-*ClearBlueSky uses the single-stock mapping in `leveraged_tickers.json` to suggest a bull leveraged play when a stock in the report has a matching bull ETF. Only bull tickers are used; no bear/inverse.*
+*ClearBlueSky suggests leveraged tickers when applicable — in reports, PTM plans, and sector rotation. Single-stock mapping in `leveraged_tickers.json`; sector mapping in `sector_rotation.py`. Only bull tickers; no bear/inverse. Max 3-day hold for leveraged.*

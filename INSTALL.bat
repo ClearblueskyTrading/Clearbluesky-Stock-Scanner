@@ -46,9 +46,9 @@ if not exist "%INSTALL_PATH%" mkdir "%INSTALL_PATH%"
 
 :: Copy files (contents of app folder into INSTALL_PATH so app.py and requirements.txt are at root)
 echo  [1/5] Copying program files...
-xcopy "%~dp0app\*.*" "%INSTALL_PATH\" /E /Y >nul 2>&1
+xcopy "%~dp0scanner\*.*" "%INSTALL_PATH\" /E /Y >nul 2>&1
 if errorlevel 1 (
-    copy /Y "%~dp0app\*.*" "%INSTALL_PATH%\" >nul 2>&1
+    copy /Y "%~dp0scanner\*.*" "%INSTALL_PATH%\" >nul 2>&1
 )
 :: Ensure no saved API keys or user config are installed – blank config on first run
 if exist "%INSTALL_PATH%\user_config.json" del /q "%INSTALL_PATH%\user_config.json" 2>nul

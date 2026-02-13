@@ -1,0 +1,51 @@
+{
+  "hybrid_60_30_10": {
+    "name": "Hybrid 60/30/10",
+    "description": "60% Swing Dip | 30% Sector Rotation | 10% Cash",
+    "ptm_hybrid_mode": true,
+    "ptm_mode": "rotation",
+    "ptm_rotation_capital": 20000,
+    "ptm_rotation_cycle_days": 5,
+    "ptm_rotation_stop_pct": -15,
+    "ptm_rotation_positions": 1,
+    "ptm_rotation_bear": true
+  },
+  "single_stock_rotation": {
+    "name": "3 Stock Rotation",
+    "description": "3 Stock Rotation: 60% Top 3 + 15% GDX + 15% FCX + 10% cash. Always hold GDX/FCX.",
+    "ptm_mode": "single_stock_rotation",
+    "ptm_hybrid_mode": false,
+    "ptm_rotation_capital": 20000,
+    "ptm_single_stock_stop_pct": 5,
+    "ptm_single_stock_top_n": 3,
+    "ptm_single_stock_blended": true,
+    "ptm_single_stock_universe": "full"
+  },
+  "gdx_fcx_swing_dip": {
+    "name": "GDX/FCX Swing Dip (legacy)",
+    "description": "Legacy: 60% Swing + 15% GDX + 15% FCX + 10% cash. Superseded by trader2_combined.",
+    "ptm_mode": "gdx_fcx_swing_dip",
+    "ptm_rotation_capital": 20000,
+    "ptm_stop_pct": -2,
+    "ptm_target_pct": 3,
+    "ptm_max_hold_days": 5,
+    "ptm_min_score": 85,
+    "ptm_max_positions": 5,
+    "ptm_conviction_dollars": [2000, 5000, 10000],
+    "ptm_max_position_dollars": 5000
+  },
+  "trader2_combined": {
+    "name": "Trader 2 Combined",
+    "description": "Trader 2: $10K Rotation + $10K Swing ($20K total). Option A: $3K GDX, $3K FCX, $2K cash, $6K Top 3 rotation (5% stop), $6K swing dip (-2%/+3%, 5d).",
+    "ptm_mode": "trader2_combined",
+    "ptm_trader2_capital": 20000,
+    "ptm_single_stock_stop_pct": 5,
+    "ptm_single_stock_top_n": 3,
+    "ptm_stop_pct": -2,
+    "ptm_target_pct": 3,
+    "ptm_max_hold_days": 5,
+    "ptm_min_score": 85,
+    "ptm_max_positions": 5,
+    "ptm_max_position_dollars": 5000
+  }
+}

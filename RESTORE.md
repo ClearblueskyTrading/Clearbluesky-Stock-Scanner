@@ -10,6 +10,7 @@ Use this when you have a **new PC**, **recover from a crash**, or want to **repl
 ## What's in each backup
 
 ### Agent backup (cursor-agent-backup-*.zip)
+- **`mcp.json.backup`** — Copy of your global MCP config (`%USERPROFILE%\.cursor\mcp.json`). If MCPs break (JSON error), copy this to `C:\Users\<you>\.cursor\mcp.json` and restart Cursor.
 - **`.cursor/rules/`** — All Cursor rules (keyword triggers, conversation backup, screenshots, RAG, session continuity, user preferences, etc.)
 - **`scripts/`** — PowerShell and batch scripts (screenshot, clipboard, active window, time/market, notify, speak clipboard, pick voice, **Build-AgentBackup.ps1**)
 - **`docs/VOICE_MENU.md`** — Full voice menu (say "menu" or "give me the menu")

@@ -1271,7 +1271,7 @@ class TradeBotApp:
                 self.last_scan_time = datetime.now()
                 content_to_send = json.dumps(analysis_package, indent=2) if analysis_package else ""
                 ai_response = ""
-                if self.config.get("openrouter_api_key") and content_to_send:
+                if (self.config.get("openrouter_api_key") or self.config.get("google_ai_api_key")) and content_to_send:
                     progress.set(92, "Report ready")
                     _safe_widget(status, "config", text=f"Preparing AI... • {_elapsed()}")
                     try: self.root.update()
@@ -1290,6 +1290,15 @@ class TradeBotApp:
                                 pass
                         progress.set(95, f"Preparing AI • {_elapsed()}")
                         image_list = None
+                        if self.config.get("use_vision_charts") and analysis_package:
+                            tickers = [s.get("ticker", "") for s in (analysis_package.get("stocks") or [])[:5] if s.get("ticker")]
+                            if tickers:
+                                try:
+                                    from chart_engine import get_charts_for_tickers
+                                    charts = get_charts_for_tickers(tickers, period="3mo", max_charts=5, progress_callback=lambda t: None)
+                                    image_list = [(f"{t} 3mo", b64) for t, b64 in charts] if charts else None
+                                except Exception:
+                                    image_list = None
                         progress.set(97, f"Sending to AI • {_elapsed()}")
                         def _ai_progress(msg):
                             _safe_widget(status, "config", text=f"{msg} • {_elapsed()}")
@@ -1297,7 +1306,7 @@ class TradeBotApp:
                             except tk.TclError: pass
                         ai_response = analyze_with_all_models(self.config, system_prompt, content_to_send, progress_callback=_ai_progress, image_base64_list=image_list) or ""
                         if ai_response:
-                            ai_response = "Consensus from 3 AI models (Llama, OpenAI, DeepSeek).\n\n" + ai_response
+                            ai_response = "Consensus from 6 AI models (5 text + Gemini Vision) + Synthesis.\n\n" + ai_response
                     except Exception as e:
                         log_error(e, "OpenRouter analysis")
                         ai_response = f"AI analysis failed: {e}\n\nDetails in: {LOG_FILE}\n\nSet OpenRouter API key in Settings for analysis."
@@ -1637,6 +1646,29 @@ class TradeBotApp:
                 openrouter_api_entry.config(show="")
         openrouter_api_var.trace("w", openrouter_update_mask)
         openrouter_update_mask()
+
+        # --- Google AI (Gemini) – free tier, adds to consensus ---
+        sep_google = tk.Frame(scroll_frame, bg="#ddd", height=1)
+        sep_google.pack(fill="x", padx=20, pady=8)
+        tk.Label(scroll_frame, text="Google AI (Gemini) – Free Tier", font=("Arial", 10, "bold"),
+                bg="white", fg="#333").pack(anchor="w", padx=20)
+        tk.Label(scroll_frame, text="Optional. Add Google Gemini (free tier) to consensus. Get key at aistudio.google.com/apikey. Best for charts: gemini-2.5-flash (vision).",
+                font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
+        google_f = tk.Frame(scroll_frame, bg="white", padx=20)
+        google_f.pack(fill="x")
+        tk.Label(google_f, text="Google AI API Key:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        google_api_var = tk.StringVar(value=self.config.get("google_ai_api_key", "") or "")
+        google_api_entry = tk.Entry(google_f, textvariable=google_api_var, width=40)
+        google_api_entry.pack(anchor="w", pady=(2, 2))
+        tk.Label(google_f, text="Model:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(4, 0))
+        google_model_var = tk.StringVar(value=self.config.get("google_ai_model", "gemini-2.5-flash") or "gemini-2.5-flash")
+        google_model_entry = tk.Entry(google_f, textvariable=google_model_var, width=30)
+        google_model_entry.pack(anchor="w", pady=(2, 4))
+        def google_mask(*args):
+            google_api_entry.config(show="*" if google_api_var.get() else "")
+        google_api_var.trace("w", google_mask)
+        google_mask()
+
         # --- News / Sentiment (Alpha Vantage) ---
         sep_av = tk.Frame(scroll_frame, bg="#ddd", height=1)
         sep_av.pack(fill="x", padx=20, pady=8)
@@ -1825,6 +1857,8 @@ class TradeBotApp:
         def save():
             self.config['finviz_api_key'] = api_var.get()
             self.config['openrouter_api_key'] = openrouter_api_var.get().strip()
+            self.config['google_ai_api_key'] = google_api_var.get().strip()
+            self.config['google_ai_model'] = (google_model_var.get() or "gemini-2.5-flash").strip()
             self.config['alpha_vantage_api_key'] = av_var.get().strip()
             self.config['alpaca_api_key'] = alpaca_key_var.get().strip()
             self.config['alpaca_secret_key'] = alpaca_secret_var.get().strip()

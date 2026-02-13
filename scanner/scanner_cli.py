@@ -90,10 +90,10 @@ def _generate_report_cli(results, scan_key: str, scan_type_display: str, config:
         return None
 
     ai_response = ""
-    if config.get("openrouter_api_key") and analysis_package:
+    if (config.get("openrouter_api_key") or config.get("google_ai_api_key")) and analysis_package:
         try:
             from openrouter_client import analyze_with_all_models
-            progress_fn("Sending to OpenRouter (3 models)...")
+            progress_fn("Sending to AI (OpenRouter + Google)...")
             system_prompt = (analysis_package.get("instructions") or "").strip() or "You are a professional stock analyst. Analyze the JSON package and produce the report in the required format."
             if config.get("rag_enabled") and config.get("rag_books_folder"):
                 try:
@@ -105,12 +105,21 @@ def _generate_report_cli(results, scan_key: str, scan_type_display: str, config:
                     pass
             content = __import__("json").dumps(analysis_package, indent=2)
             image_list = None
+            if config.get("use_vision_charts") and analysis_package:
+                tickers = [s.get("ticker", "") for s in (analysis_package.get("stocks") or [])[:5] if s.get("ticker")]
+                if tickers:
+                    try:
+                        from chart_engine import get_charts_for_tickers
+                        charts = get_charts_for_tickers(tickers, period="3mo", max_charts=5, progress_callback=progress_fn)
+                        image_list = [(f"{t} 3mo", b64) for t, b64 in charts] if charts else None
+                    except Exception:
+                        image_list = None
             ai_response = analyze_with_all_models(config, system_prompt, content, progress_callback=progress_fn, image_base64_list=image_list) or ""
             if ai_response:
-                ai_response = "Consensus from 3 AI models (Llama, OpenAI, DeepSeek).\n\n" + ai_response
+                ai_response = "Consensus from 7 AI models (OpenRouter + Google Gemini) + Synthesis.\n\n" + ai_response
         except Exception as e:
             progress_fn("AI analysis failed: " + str(e))
-            ai_response = f"AI analysis failed: {e}\n\nSet OpenRouter API key for analysis."
+            ai_response = f"AI analysis failed: {e}\n\nSet OpenRouter or Google AI API key for analysis."
     else:
         ai_response = ""
 

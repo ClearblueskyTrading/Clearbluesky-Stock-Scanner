@@ -1,0 +1,7490 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e6]:
+      - generic [ref=e7]:
+        - link "Skip to Content" [ref=e8] [cursor=pointer]:
+          - /url: javascript:void(0);
+        - generic [ref=e9]:
+          - link "Charles Schwab Homepage" [ref=e10] [cursor=pointer]:
+            - /url: /clientapps/accounts/summary/
+          - generic [ref=e12]:
+            - generic [ref=e13]:
+              - text: 
+              - navigation "primary" [ref=e15]:
+                - list [ref=e16]:
+                  - listitem [ref=e17]:
+                    - button "Accounts." [ref=e18]: Accounts
+                  - listitem [ref=e19]:
+                    - button "Trade." [ref=e20]: Trade
+                  - listitem [ref=e21]:
+                    - button "Research." [ref=e22]: Research
+                  - listitem [ref=e23]:
+                    - button "Move Money." [ref=e24]: Move Money
+                  - listitem [ref=e25]:
+                    - button "Products." [ref=e26]: Products
+                  - listitem [ref=e27]:
+                    - button "Learn." [ref=e28]: Learn
+                  - listitem [ref=e29]:
+                    - link "How To" [ref=e30] [cursor=pointer]:
+                      - /url: /secured/how-to-center
+                  - text: 
+              - list [ref=e32]:
+                - listitem [ref=e33]:
+                  - searchbox "Search" [ref=e35]
+                - listitem [ref=e39]:
+                  - button "Messages" [ref=e40]:
+                    - generic [ref=e44]: 
+                    - generic [ref=e45]: Messages
+                - listitem [ref=e46]:
+                  - button "Support" [ref=e47]:
+                    - generic [ref=e50]: Support
+                - listitem [ref=e51]:
+                  - button "Profile" [ref=e52]:
+                    - generic [ref=e55]: Profile
+                - listitem [ref=e56]:
+                  - link "Log Out" [ref=e57] [cursor=pointer]:
+                    - /url: /logout/logout.aspx?explicit=y
+            - separator [ref=e58]
+        - navigation "secondary level" [ref=e60]:
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - link "All-In-One Trade Ticket" [ref=e63] [cursor=pointer]:
+                - /url: /app/trade/tom/trade
+            - listitem [ref=e64]:
+              - link "Stocks & ETFs" [ref=e65] [cursor=pointer]:
+                - /url: /app/trade/tom?Strategy=S
+            - listitem [ref=e66]:
+              - link "Options" [ref=e67] [cursor=pointer]:
+                - /url: /app/trade/tom?Strategy=O
+            - listitem [ref=e68]:
+              - link "Mutual Funds" [ref=e69] [cursor=pointer]:
+                - /url: /app/trade/tom?Strategy=MF
+            - listitem [ref=e70]:
+              - link "Schwab Stock Slices™" [ref=e71] [cursor=pointer]:
+                - /url: /app/trade/stockslices/#/home
+            - listitem [ref=e72]:
+              - link "Schwab Investing Themes™" [ref=e73] [cursor=pointer]:
+                - /url: /app/trade/thematic
+            - listitem [ref=e74]:
+              - link "Order Status" [ref=e75] [cursor=pointer]:
+                - /url: /app/trade/orderstatus
+            - listitem [ref=e76]:
+              - link "Bonds" [ref=e77] [cursor=pointer]:
+                - /url: /Areas/Trade/FixedIncomeSearch/FISearch.aspx/TradeBondsProductRates
+            - listitem [ref=e78]:
+              - link "CDs" [ref=e79] [cursor=pointer]:
+                - /url: /Areas/Trade/FixedIncomeSearch/FISearch.aspx/TradeCDs
+            - listitem [ref=e80]:
+              - link "Futures" [ref=e81] [cursor=pointer]:
+                - /url: /retail/trade/futures
+            - listitem [ref=e82]:
+              - link "Forex" [ref=e83] [cursor=pointer]:
+                - /url: /retail/trade/forex
+            - listitem [ref=e84]:
+              - link "IPOs" [ref=e85] [cursor=pointer]:
+                - /url: /retail/trade/ipo
+            - listitem [ref=e86]:
+              - link "Trading Platforms" [ref=e87] [cursor=pointer]:
+                - /url: /retail/trade/tradingtools
+            - listitem [ref=e88]:
+              - link "Watchlist" [ref=e89] [cursor=pointer]:
+                - /url: /app/trade/watchlist
+    - generic [ref=e91]:
+      - generic:
+        - generic:
+          - region "Snap Ticket Order Entry Form Container":
+            - button "Launch the SnapTicket order form TRADE" [ref=e92]:
+              - generic [ref=e93]:
+                - generic [ref=e94]: Launch the
+                - text: SnapTicket
+                - superscript [ref=e95]: ®
+                - generic [ref=e96]: order form
+              - generic [ref=e98]: TRADE
+      - main [ref=e101]:
+        - generic [ref=e102]:
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - generic [ref=e124]:
+                - generic [ref=e125]:
+                  - heading "Order Status" [level=1] [ref=e127]
+                  - generic [ref=e128]:
+                    - generic [ref=e129]:
+                      - text: "Updated:"
+                      - time [ref=e131]:
+                        - generic [ref=e132]: 10:02:10 PM Eastern Time, February 11, 2026
+                        - text: 10:02:10 PM ET, 02/11/2026
+                    - generic [ref=e133]:
+                      - button "Refresh" [ref=e135]
+                      - button "Take a Tour" [ref=e139]
+                      - button "Export" [ref=e144]
+                      - button "Print" [ref=e149]
+                - generic [ref=e153]:
+                  - generic [ref=e433]:
+                    - generic [ref=e435]: "Account Selector: SCHWAB Account ending in 1 0 4 Selected"
+                    - generic [ref=e436]:
+                      - 'button "Account Selector: SCHWAB Account ending in 1 0 4 Selected" [ref=e437]':
+                        - generic [ref=e438]: SCHWAB
+                        - generic [ref=e439]: SCHWAB
+                        - generic [ref=e440]: …104
+                        - generic [ref=e441]: Account ending in 1 0 4
+                      - generic [ref=e444]: Selected
+                  - generic [ref=e154]:
+                    - link "View Saved Orders" [ref=e155] [cursor=pointer]:
+                      - /url: /app/trade/savedorders/
+                    - button "What's New" [ref=e157]
+              - generic "Your table data will be updated based on the datapoints you selected." [ref=e448]:
+                - generic [ref=e449]:
+                  - generic [ref=e450]: Status
+                  - button "View more information on order status filters" [ref=e452]
+                  - generic [ref=e456]:
+                    - generic [ref=e457]: Status
+                    - combobox "Status" [ref=e460]:
+                      - option "All orders status filter" [selected]: All
+                      - option "Open order status filter": Open
+                      - option "Filled order status filter": Filled
+                      - option "Cancelled order status filter": Canceled
+                - generic [ref=e461]:
+                  - generic [ref=e462]: Date range
+                  - button "View more information on date range" [ref=e464]
+                  - generic [ref=e468]:
+                    - generic [ref=e469]: Date Range
+                    - combobox "Date Range" [ref=e472]:
+                      - option "All orders date filter" [selected]: All
+                      - option "Today orders date filter": Today
+                      - option "Yesterday orders date filter": Yesterday
+                      - option "All orders from the last seven days date filter": Past 7 days
+                      - option "All orders from the last fourteen days date filter": Past 14 days
+                - generic [ref=e473]:
+                  - generic [ref=e474]: Type
+                  - button "View more information on type" [ref=e476]
+                  - generic [ref=e480]:
+                    - generic [ref=e481]: Securities
+                    - combobox "Securities" [ref=e484]:
+                      - option "All orders Type filter" [selected]: All
+                      - option "Stocks & ETFs Type filter for orders": Stocks & ETFs
+                      - option "Options Type filter for orders": Options
+                      - option "Fixed Income Type filter for orders": Fixed income
+                      - option "Mutual Funds Type filter for orders": Mutual funds
+                      - option "Conditionals Type filter for orders": Conditionals
+                - generic [ref=e485]:
+                  - generic [ref=e486]: Symbol
+                  - button "View more information on symbol filters" [ref=e488]
+                  - generic [ref=e492]:
+                    - generic [ref=e493]: Symbol
+                    - combobox "Symbol" [ref=e496]:
+                      - option "All orders symbol filter" [selected]: All
+                      - option "AEM"
+                      - option "AGQ"
+                      - option "ALB"
+                      - option "AMAT"
+                      - option "APP"
+                      - option "ARKQ"
+                      - option "AVGO"
+                      - option "AXTI"
+                      - option "BTC"
+                      - option "C"
+                      - option "CCJ"
+                      - option "COPX"
+                      - option "CSD"
+                      - option "ELIL"
+                      - option "FCX"
+                      - option "FORM"
+                      - option "GDX"
+                      - option "GDXJ"
+                      - option "GGLL"
+                      - option "GM"
+                      - option "HOOD"
+                      - option "HYMC"
+                      - option "INTW"
+                      - option "JNUG"
+                      - option "KKR"
+                      - option "LRCU"
+                      - option "LRCX"
+                      - option "MU"
+                      - option "MUU"
+                      - option "NUGT"
+                      - option "NVDA"
+                      - option "PAAS"
+                      - option "PLTR"
+                      - option "PPH"
+                      - option "PWR"
+                      - option "SGOL"
+                      - option "SILJ"
+                      - option "SIVR"
+                      - option "SKYT"
+                      - option "SNDK"
+                      - option "SOXL"
+                      - option "SOXX"
+                      - option "SPXL"
+                      - option "TER"
+                      - option "TQQQ"
+                      - option "UAL"
+                      - option "UCTT"
+                      - option "UEC"
+                      - option "URNM"
+                      - option "WDC"
+                - generic "Condense the table view" [ref=e498]:
+                  - generic [ref=e499]:
+                    - generic [ref=e500]: Condensed view
+                    - switch "Condensed view" [checked] [ref=e501]
+                - button "Customize" [ref=e506]:
+                  - generic [ref=e508] [cursor=pointer]: Customize
+            - generic [ref=e512]:
+              - generic [ref=e513]:
+                - table "Order Status Table. To view or update your Streaming Quotes settings, go to My Profile, and then Streaming Quotes. Prices may not reflect actual value." [ref=e517]:
+                  - caption [ref=e518]: Order Status Table. To view or update your Streaming Quotes settings, go to My Profile, and then Streaming Quotes. Prices may not reflect actual value.
+                  - rowgroup [ref=e519]:
+                    - row "Expand/Collapse Icon Column Expand all orders Symbol Left table scroll button. Click or press enter to scroll left Status View information on status Action View information on Action Quantity Order Type Timing View information on timing Fill Price Bid Mark View information on mark Ask Last Created (ET) Last Activity (ET) GTC Exp Change $ Change % Mark Change $ Mark Change % Day Range 52 Week Range Right table scroll button. Click or press enter to scroll right" [ref=e520]:
+                      - columnheader "Expand/Collapse Icon Column Expand all orders" [ref=e521]:
+                        - generic [ref=e522]: Expand/Collapse Icon Column
+                        - button "Expand all orders" [ref=e526]
+                      - columnheader "Symbol Left table scroll button. Click or press enter to scroll left" [ref=e529]:
+                        - generic [ref=e530]:
+                          - button "Symbol" [ref=e531]
+                          - button "Left table scroll button. Click or press enter to scroll left" [ref=e533]
+                      - columnheader "Status View information on status" [ref=e536]:
+                        - generic [ref=e537]:
+                          - generic [ref=e538]: 
+                          - button "Status" [ref=e539]
+                        - button "View information on status" [ref=e541]
+                      - columnheader "Action View information on Action" [ref=e544]:
+                        - text: Action
+                        - button "View information on Action" [ref=e546]
+                      - columnheader "Quantity" [ref=e549]
+                      - columnheader "Order Type" [ref=e550]
+                      - columnheader "Timing View information on timing" [ref=e551]:
+                        - text: Timing
+                        - button "View information on timing" [ref=e553]
+                      - columnheader "Fill Price" [ref=e556]
+                      - columnheader "Bid" [ref=e557]
+                      - columnheader "Mark View information on mark" [ref=e558]:
+                        - text: Mark
+                        - button "View information on mark" [ref=e560]
+                      - columnheader "Ask" [ref=e563]
+                      - columnheader "Last" [ref=e564]
+                      - columnheader "Created (ET)" [ref=e565]:
+                        - button "Created (ET)" [ref=e567]
+                      - columnheader "Last Activity (ET)" [ref=e568]:
+                        - button "Last Activity (ET)" [ref=e570]
+                      - columnheader "GTC Exp" [ref=e571]:
+                        - button "GTC Exp" [ref=e573]
+                      - columnheader "Change $" [ref=e574]
+                      - columnheader "Change %" [ref=e575]
+                      - columnheader "Mark Change $" [ref=e576]
+                      - columnheader "Mark Change %" [ref=e577]
+                      - columnheader "Day Range" [ref=e578]
+                      - columnheader "52 Week Range" [ref=e579]
+                      - columnheader "Right table scroll button. Click or press enter to scroll right" [ref=e580]:
+                        - button "Right table scroll button. Click or press enter to scroll right" [ref=e583]
+                  - rowgroup [ref=e586]:
+                    - row "Expand row GGLL order number 1005409211326 View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF Open Sell 70 Limit $98.00 Day - $94.27 $94.27 $94.60 $94.60 7:47 PM 02/11/2026 7:47 PM 02/11/2026 - -$4.36 -4.4058% -$4.69 -4.7393% View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005409211326" [ref=e587]:
+                      - cell "Expand row GGLL order number 1005409211326" [ref=e588]:
+                        - button "Expand row GGLL order number 1005409211326" [ref=e592]
+                      - cell "View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF" [ref=e596]:
+                        - generic [ref=e597]:
+                          - link "View quote details for DIREXION DAILY GOOGL BULL 2X ETF" [ref=e600] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GGLL
+                            - text: GGLL
+                          - generic "DIREXION DAILY GOOGL BULL 2X ETF" [ref=e601]
+                      - cell "Open" [ref=e602]:
+                        - generic [ref=e605]: Open
+                      - cell "Sell" [ref=e606]:
+                        - generic [ref=e608]: Sell
+                      - cell "70" [ref=e609]:
+                        - generic [ref=e612]: "70"
+                      - cell "Limit $98.00" [ref=e613]:
+                        - generic [ref=e614]: Limit $98.00
+                      - cell "Day" [ref=e615]:
+                        - generic [ref=e616]: Day
+                      - cell "-" [ref=e617]:
+                        - generic [ref=e619]: "-"
+                      - cell "$94.27" [ref=e620]:
+                        - generic [ref=e621]: $94.27
+                      - cell "$94.27" [ref=e622]:
+                        - generic [ref=e623]: $94.27
+                      - cell "$94.60" [ref=e624]:
+                        - generic [ref=e625]: $94.60
+                      - cell "$94.60" [ref=e626]:
+                        - generic [ref=e627]: $94.60
+                      - cell "7:47 PM 02/11/2026" [ref=e628]:
+                        - generic [ref=e630]: 7:47 PM 02/11/2026
+                      - cell "7:47 PM 02/11/2026" [ref=e631]:
+                        - generic [ref=e633]: 7:47 PM 02/11/2026
+                      - cell "-" [ref=e634]:
+                        - generic [ref=e636]: "-"
+                      - cell "-$4.36" [ref=e637]:
+                        - generic [ref=e638]: "-$4.36"
+                      - cell "-4.4058%" [ref=e639]:
+                        - generic [ref=e640]: "-4.4058%"
+                      - cell "-$4.69" [ref=e641]:
+                        - generic [ref=e642]: "-$4.69"
+                      - cell "-4.7393%" [ref=e643]:
+                        - generic [ref=e644]: "-4.7393%"
+                      - cell [ref=e645]:
+                        - figure [ref=e648]:
+                          - generic [ref=e649]:
+                            - generic [ref=e650]:
+                              - generic [ref=e651]: Day Range lowest value
+                              - text: $93.36
+                            - generic [ref=e652]:
+                              - generic [ref=e653]: Day Range highest value
+                              - text: $100.29
+                            - generic [ref=e654]: Day Range current value $94.60
+                          - slider: "94.6"
+                      - cell [ref=e655]:
+                        - figure [ref=e658]:
+                          - generic [ref=e659]:
+                            - generic [ref=e660]:
+                              - generic [ref=e661]: 52 Week Range lowest value
+                              - text: $23.60
+                            - generic [ref=e662]:
+                              - generic [ref=e663]: 52 Week Range highest value
+                              - text: $119.12
+                            - generic [ref=e664]: 52 Week Range current value $94.60
+                          - slider: "94.6"
+                      - cell "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005409211326" [ref=e665]:
+                        - button "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005409211326" [ref=e667]:
+                          - generic [ref=e668]: 
+                    - row "Expand row UAL order number 1005409211316 View quote details for UNITED AIRLINES HLDG UNITED AIRLINES HLDG Open Sell 30 Limit $116.00 Day - $113.95 $113.95 $114.25 $113.96 7:45 PM 02/11/2026 7:45 PM 02/11/2026 - -$2.40 -2.0626% -$2.41 -2.0712% View next steps for UNITED AIRLINES HLDG order number 1005409211316" [ref=e669]:
+                      - cell "Expand row UAL order number 1005409211316" [ref=e670]:
+                        - button "Expand row UAL order number 1005409211316" [ref=e674]
+                      - cell "View quote details for UNITED AIRLINES HLDG UNITED AIRLINES HLDG" [ref=e678]:
+                        - generic [ref=e679]:
+                          - link "View quote details for UNITED AIRLINES HLDG" [ref=e682] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UAL
+                            - text: UAL
+                          - generic "UNITED AIRLINES HLDG" [ref=e683]
+                      - cell "Open" [ref=e684]:
+                        - generic [ref=e687]: Open
+                      - cell "Sell" [ref=e688]:
+                        - generic [ref=e690]: Sell
+                      - cell "30" [ref=e691]:
+                        - generic [ref=e694]: "30"
+                      - cell "Limit $116.00" [ref=e695]:
+                        - generic [ref=e696]: Limit $116.00
+                      - cell "Day" [ref=e697]:
+                        - generic [ref=e698]: Day
+                      - cell "-" [ref=e699]:
+                        - generic [ref=e701]: "-"
+                      - cell "$113.95" [ref=e702]:
+                        - generic [ref=e703]: $113.95
+                      - cell "$113.95" [ref=e704]:
+                        - generic [ref=e705]: $113.95
+                      - cell "$114.25" [ref=e706]:
+                        - generic [ref=e707]: $114.25
+                      - cell "$113.96" [ref=e708]:
+                        - generic [ref=e709]: $113.96
+                      - cell "7:45 PM 02/11/2026" [ref=e710]:
+                        - generic [ref=e712]: 7:45 PM 02/11/2026
+                      - cell "7:45 PM 02/11/2026" [ref=e713]:
+                        - generic [ref=e715]: 7:45 PM 02/11/2026
+                      - cell "-" [ref=e716]:
+                        - generic [ref=e718]: "-"
+                      - cell "-$2.40" [ref=e719]:
+                        - generic [ref=e720]: "-$2.40"
+                      - cell "-2.0626%" [ref=e721]:
+                        - generic [ref=e722]: "-2.0626%"
+                      - cell "-$2.41" [ref=e723]:
+                        - generic [ref=e724]: "-$2.41"
+                      - cell "-2.0712%" [ref=e725]:
+                        - generic [ref=e726]: "-2.0712%"
+                      - cell [ref=e727]:
+                        - figure [ref=e730]:
+                          - generic [ref=e731]:
+                            - generic [ref=e732]:
+                              - generic [ref=e733]: Day Range lowest value
+                              - text: $112.41
+                            - generic [ref=e734]:
+                              - generic [ref=e735]: Day Range highest value
+                              - text: $118.94
+                            - generic [ref=e736]: Day Range current value $113.96
+                          - slider: "113.96"
+                      - cell [ref=e737]:
+                        - figure [ref=e740]:
+                          - generic [ref=e741]:
+                            - generic [ref=e742]:
+                              - generic [ref=e743]: 52 Week Range lowest value
+                              - text: $52.00
+                            - generic [ref=e744]:
+                              - generic [ref=e745]: 52 Week Range highest value
+                              - text: $119.21
+                            - generic [ref=e746]: 52 Week Range current value $113.96
+                          - slider: "113.96"
+                      - cell "View next steps for UNITED AIRLINES HLDG order number 1005409211316" [ref=e747]:
+                        - button "View next steps for UNITED AIRLINES HLDG order number 1005409211316" [ref=e749]:
+                          - generic [ref=e750]: 
+                    - row "Expand row APP order number 1005409211303 View quote details for APPLOVIN CORP CLASS A APPLOVIN CORP CLASS A Open Sell 8 Limit $449.00 Day - $429.00 $430.00 $430.00 $429.30 7:43 PM 02/11/2026 7:43 PM 02/11/2026 - -$43.62 -9.2235% -$42.92 -9.0755% View next steps for APPLOVIN CORP CLASS A order number 1005409211303" [ref=e751]:
+                      - cell "Expand row APP order number 1005409211303" [ref=e752]:
+                        - button "Expand row APP order number 1005409211303" [ref=e756]
+                      - cell "View quote details for APPLOVIN CORP CLASS A APPLOVIN CORP CLASS A" [ref=e760]:
+                        - generic [ref=e761]:
+                          - link "View quote details for APPLOVIN CORP CLASS A" [ref=e764] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=APP
+                            - text: APP
+                          - generic "APPLOVIN CORP CLASS A" [ref=e765]
+                      - cell "Open" [ref=e766]:
+                        - generic [ref=e769]: Open
+                      - cell "Sell" [ref=e770]:
+                        - generic [ref=e772]: Sell
+                      - cell "8" [ref=e773]:
+                        - generic [ref=e776]: "8"
+                      - cell "Limit $449.00" [ref=e777]:
+                        - generic [ref=e778]: Limit $449.00
+                      - cell "Day" [ref=e779]:
+                        - generic [ref=e780]: Day
+                      - cell "-" [ref=e781]:
+                        - generic [ref=e783]: "-"
+                      - cell "$429.00" [ref=e784]:
+                        - generic [ref=e785]: $429.00
+                      - cell "$430.00" [ref=e786]:
+                        - generic [ref=e787]: $430.00
+                      - cell "$430.00" [ref=e788]:
+                        - generic [ref=e789]: $430.00
+                      - cell "$429.30" [ref=e790]:
+                        - generic [ref=e791]: $429.30
+                      - cell "7:43 PM 02/11/2026" [ref=e792]:
+                        - generic [ref=e794]: 7:43 PM 02/11/2026
+                      - cell "7:43 PM 02/11/2026" [ref=e795]:
+                        - generic [ref=e797]: 7:43 PM 02/11/2026
+                      - cell "-" [ref=e798]:
+                        - generic [ref=e800]: "-"
+                      - cell "-$43.62" [ref=e801]:
+                        - generic [ref=e802]: "-$43.62"
+                      - cell "-9.2235%" [ref=e803]:
+                        - generic [ref=e804]: "-9.2235%"
+                      - cell "-$42.92" [ref=e805]:
+                        - generic [ref=e806]: "-$42.92"
+                      - cell "-9.0755%" [ref=e807]:
+                        - generic [ref=e808]: "-9.0755%"
+                      - cell [ref=e809]:
+                        - figure [ref=e812]:
+                          - generic [ref=e813]:
+                            - generic [ref=e814]:
+                              - generic [ref=e815]: Day Range lowest value
+                              - text: $438.18
+                            - generic [ref=e816]:
+                              - generic [ref=e817]: Day Range highest value
+                              - text: $471.97
+                            - generic [ref=e818]: Day Range current value $429.30
+                          - slider: "438.18"
+                      - cell [ref=e819]:
+                        - figure [ref=e822]:
+                          - generic [ref=e823]:
+                            - generic [ref=e824]:
+                              - generic [ref=e825]: 52 Week Range lowest value
+                              - text: $200.50
+                            - generic [ref=e826]:
+                              - generic [ref=e827]: 52 Week Range highest value
+                              - text: $745.61
+                            - generic [ref=e828]: 52 Week Range current value $429.30
+                          - slider: "429.3"
+                      - cell "View next steps for APPLOVIN CORP CLASS A order number 1005409211303" [ref=e829]:
+                        - button "View next steps for APPLOVIN CORP CLASS A order number 1005409211303" [ref=e831]:
+                          - generic [ref=e832]: 
+                    - row "Expand row APP order number 1005409211288 View quote details for APPLOVIN CORP CLASS A APPLOVIN CORP CLASS A Filled Buy 8 Limit $430.50 Day + ext $430.4999 $429.00 $430.00 $430.00 $429.30 7:35 PM 02/11/2026 7:35 PM 02/11/2026 - -$43.62 -9.2235% -$42.92 -9.0755% View next steps for APPLOVIN CORP CLASS A order number 1005409211288" [ref=e833]:
+                      - cell "Expand row APP order number 1005409211288" [ref=e834]:
+                        - button "Expand row APP order number 1005409211288" [ref=e838]
+                      - cell "View quote details for APPLOVIN CORP CLASS A APPLOVIN CORP CLASS A" [ref=e842]:
+                        - generic [ref=e843]:
+                          - link "View quote details for APPLOVIN CORP CLASS A" [ref=e846] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=APP
+                            - text: APP
+                          - generic "APPLOVIN CORP CLASS A" [ref=e847]
+                      - cell "Filled" [ref=e848]:
+                        - generic [ref=e851]: Filled
+                      - cell "Buy" [ref=e852]:
+                        - generic [ref=e854]: Buy
+                      - cell "8" [ref=e855]:
+                        - generic [ref=e858]: "8"
+                      - cell "Limit $430.50" [ref=e859]:
+                        - generic [ref=e860]: Limit $430.50
+                      - cell "Day + ext" [ref=e861]:
+                        - generic [ref=e862]: Day + ext
+                      - cell "$430.4999" [ref=e863]:
+                        - generic [ref=e865]: $430.4999
+                      - cell "$429.00" [ref=e866]:
+                        - generic [ref=e867]: $429.00
+                      - cell "$430.00" [ref=e868]:
+                        - generic [ref=e869]: $430.00
+                      - cell "$430.00" [ref=e870]:
+                        - generic [ref=e871]: $430.00
+                      - cell "$429.30" [ref=e872]:
+                        - generic [ref=e873]: $429.30
+                      - cell "7:35 PM 02/11/2026" [ref=e874]:
+                        - generic [ref=e876]: 7:35 PM 02/11/2026
+                      - cell "7:35 PM 02/11/2026" [ref=e877]:
+                        - generic [ref=e879]: 7:35 PM 02/11/2026
+                      - cell "-" [ref=e880]:
+                        - generic [ref=e882]: "-"
+                      - cell "-$43.62" [ref=e883]:
+                        - generic [ref=e884]: "-$43.62"
+                      - cell "-9.2235%" [ref=e885]:
+                        - generic [ref=e886]: "-9.2235%"
+                      - cell "-$42.92" [ref=e887]:
+                        - generic [ref=e888]: "-$42.92"
+                      - cell "-9.0755%" [ref=e889]:
+                        - generic [ref=e890]: "-9.0755%"
+                      - cell [ref=e891]:
+                        - figure [ref=e894]:
+                          - generic [ref=e895]:
+                            - generic [ref=e896]:
+                              - generic [ref=e897]: Day Range lowest value
+                              - text: $438.18
+                            - generic [ref=e898]:
+                              - generic [ref=e899]: Day Range highest value
+                              - text: $471.97
+                            - generic [ref=e900]: Day Range current value $429.30
+                          - slider: "438.18"
+                      - cell [ref=e901]:
+                        - figure [ref=e904]:
+                          - generic [ref=e905]:
+                            - generic [ref=e906]:
+                              - generic [ref=e907]: 52 Week Range lowest value
+                              - text: $200.50
+                            - generic [ref=e908]:
+                              - generic [ref=e909]: 52 Week Range highest value
+                              - text: $745.61
+                            - generic [ref=e910]: 52 Week Range current value $429.30
+                          - slider: "429.3"
+                      - cell "View next steps for APPLOVIN CORP CLASS A order number 1005409211288" [ref=e911]:
+                        - button "View next steps for APPLOVIN CORP CLASS A order number 1005409211288" [ref=e913]:
+                          - generic [ref=e914]: 
+                    - row "Expand row UAL order number 1005408679532 View quote details for UNITED AIRLINES HLDG UNITED AIRLINES HLDG Filled Buy 30 Market Day $113.68 $113.95 $113.95 $114.25 $113.96 3:52 PM 02/11/2026 3:52 PM 02/11/2026 - -$2.40 -2.0626% -$2.41 -2.0712% View next steps for UNITED AIRLINES HLDG order number 1005408679532" [ref=e915]:
+                      - cell "Expand row UAL order number 1005408679532" [ref=e916]:
+                        - button "Expand row UAL order number 1005408679532" [ref=e920]
+                      - cell "View quote details for UNITED AIRLINES HLDG UNITED AIRLINES HLDG" [ref=e924]:
+                        - generic [ref=e925]:
+                          - link "View quote details for UNITED AIRLINES HLDG" [ref=e928] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UAL
+                            - text: UAL
+                          - generic "UNITED AIRLINES HLDG" [ref=e929]
+                      - cell "Filled" [ref=e930]:
+                        - generic [ref=e933]: Filled
+                      - cell "Buy" [ref=e934]:
+                        - generic [ref=e936]: Buy
+                      - cell "30" [ref=e937]:
+                        - generic [ref=e940]: "30"
+                      - cell "Market" [ref=e941]:
+                        - generic [ref=e942]: Market
+                      - cell "Day" [ref=e943]:
+                        - generic [ref=e944]: Day
+                      - cell "$113.68" [ref=e945]:
+                        - generic [ref=e947]: $113.68
+                      - cell "$113.95" [ref=e948]:
+                        - generic [ref=e949]: $113.95
+                      - cell "$113.95" [ref=e950]:
+                        - generic [ref=e951]: $113.95
+                      - cell "$114.25" [ref=e952]:
+                        - generic [ref=e953]: $114.25
+                      - cell "$113.96" [ref=e954]:
+                        - generic [ref=e955]: $113.96
+                      - cell "3:52 PM 02/11/2026" [ref=e956]:
+                        - generic [ref=e958]: 3:52 PM 02/11/2026
+                      - cell "3:52 PM 02/11/2026" [ref=e959]:
+                        - generic [ref=e961]: 3:52 PM 02/11/2026
+                      - cell "-" [ref=e962]:
+                        - generic [ref=e964]: "-"
+                      - cell "-$2.40" [ref=e965]:
+                        - generic [ref=e966]: "-$2.40"
+                      - cell "-2.0626%" [ref=e967]:
+                        - generic [ref=e968]: "-2.0626%"
+                      - cell "-$2.41" [ref=e969]:
+                        - generic [ref=e970]: "-$2.41"
+                      - cell "-2.0712%" [ref=e971]:
+                        - generic [ref=e972]: "-2.0712%"
+                      - cell [ref=e973]:
+                        - figure [ref=e976]:
+                          - generic [ref=e977]:
+                            - generic [ref=e978]:
+                              - generic [ref=e979]: Day Range lowest value
+                              - text: $112.41
+                            - generic [ref=e980]:
+                              - generic [ref=e981]: Day Range highest value
+                              - text: $118.94
+                            - generic [ref=e982]: Day Range current value $113.96
+                          - slider: "113.96"
+                      - cell [ref=e983]:
+                        - figure [ref=e986]:
+                          - generic [ref=e987]:
+                            - generic [ref=e988]:
+                              - generic [ref=e989]: 52 Week Range lowest value
+                              - text: $52.00
+                            - generic [ref=e990]:
+                              - generic [ref=e991]: 52 Week Range highest value
+                              - text: $119.21
+                            - generic [ref=e992]: 52 Week Range current value $113.96
+                          - slider: "113.96"
+                      - cell "View next steps for UNITED AIRLINES HLDG order number 1005408679532" [ref=e993]:
+                        - button "View next steps for UNITED AIRLINES HLDG order number 1005408679532" [ref=e995]:
+                          - generic [ref=e996]: 
+                    - row "Expand row GGLL order number 1005408678978 View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF Filled Buy 70 Market Day $94.025 $94.27 $94.27 $94.60 $94.60 3:45 PM 02/11/2026 3:45 PM 02/11/2026 - -$4.36 -4.4058% -$4.69 -4.7393% View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005408678978" [ref=e997]:
+                      - cell "Expand row GGLL order number 1005408678978" [ref=e998]:
+                        - button "Expand row GGLL order number 1005408678978" [ref=e1002]
+                      - cell "View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF" [ref=e1006]:
+                        - generic [ref=e1007]:
+                          - link "View quote details for DIREXION DAILY GOOGL BULL 2X ETF" [ref=e1010] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GGLL
+                            - text: GGLL
+                          - generic "DIREXION DAILY GOOGL BULL 2X ETF" [ref=e1011]
+                      - cell "Filled" [ref=e1012]:
+                        - generic [ref=e1015]: Filled
+                      - cell "Buy" [ref=e1016]:
+                        - generic [ref=e1018]: Buy
+                      - cell "70" [ref=e1019]:
+                        - generic [ref=e1022]: "70"
+                      - cell "Market" [ref=e1023]:
+                        - generic [ref=e1024]: Market
+                      - cell "Day" [ref=e1025]:
+                        - generic [ref=e1026]: Day
+                      - cell "$94.025" [ref=e1027]:
+                        - generic [ref=e1029]: $94.025
+                      - cell "$94.27" [ref=e1030]:
+                        - generic [ref=e1031]: $94.27
+                      - cell "$94.27" [ref=e1032]:
+                        - generic [ref=e1033]: $94.27
+                      - cell "$94.60" [ref=e1034]:
+                        - generic [ref=e1035]: $94.60
+                      - cell "$94.60" [ref=e1036]:
+                        - generic [ref=e1037]: $94.60
+                      - cell "3:45 PM 02/11/2026" [ref=e1038]:
+                        - generic [ref=e1040]: 3:45 PM 02/11/2026
+                      - cell "3:45 PM 02/11/2026" [ref=e1041]:
+                        - generic [ref=e1043]: 3:45 PM 02/11/2026
+                      - cell "-" [ref=e1044]:
+                        - generic [ref=e1046]: "-"
+                      - cell "-$4.36" [ref=e1047]:
+                        - generic [ref=e1048]: "-$4.36"
+                      - cell "-4.4058%" [ref=e1049]:
+                        - generic [ref=e1050]: "-4.4058%"
+                      - cell "-$4.69" [ref=e1051]:
+                        - generic [ref=e1052]: "-$4.69"
+                      - cell "-4.7393%" [ref=e1053]:
+                        - generic [ref=e1054]: "-4.7393%"
+                      - cell [ref=e1055]:
+                        - figure [ref=e1058]:
+                          - generic [ref=e1059]:
+                            - generic [ref=e1060]:
+                              - generic [ref=e1061]: Day Range lowest value
+                              - text: $93.36
+                            - generic [ref=e1062]:
+                              - generic [ref=e1063]: Day Range highest value
+                              - text: $100.29
+                            - generic [ref=e1064]: Day Range current value $94.60
+                          - slider: "94.6"
+                      - cell [ref=e1065]:
+                        - figure [ref=e1068]:
+                          - generic [ref=e1069]:
+                            - generic [ref=e1070]:
+                              - generic [ref=e1071]: 52 Week Range lowest value
+                              - text: $23.60
+                            - generic [ref=e1072]:
+                              - generic [ref=e1073]: 52 Week Range highest value
+                              - text: $119.12
+                            - generic [ref=e1074]: 52 Week Range current value $94.60
+                          - slider: "94.6"
+                      - cell "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005408678978" [ref=e1075]:
+                        - button "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005408678978" [ref=e1077]:
+                          - generic [ref=e1078]: 
+                    - row "Expand row SOXL order number 1005399167017 View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF Filled Sell 15 Market Day $64.8005 $68.00 $68.05 $68.08 $68.0675 10:18 AM 02/11/2026 10:18 AM 02/11/2026 - +$4.7275 +7.4637% +$4.71 +7.4361% View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005399167017" [ref=e1079]:
+                      - cell "Expand row SOXL order number 1005399167017" [ref=e1080]:
+                        - button "Expand row SOXL order number 1005399167017" [ref=e1084]
+                      - cell "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1088]:
+                        - generic [ref=e1089]:
+                          - link "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1092] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXL
+                            - text: SOXL
+                          - generic "DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1093]
+                      - cell "Filled" [ref=e1094]:
+                        - generic [ref=e1097]: Filled
+                      - cell "Sell" [ref=e1098]:
+                        - generic [ref=e1100]: Sell
+                      - cell "15" [ref=e1101]:
+                        - generic [ref=e1104]: "15"
+                      - cell "Market" [ref=e1105]:
+                        - generic [ref=e1106]: Market
+                      - cell "Day" [ref=e1107]:
+                        - generic [ref=e1108]: Day
+                      - cell "$64.8005" [ref=e1109]:
+                        - generic [ref=e1111]: $64.8005
+                      - cell "$68.00" [ref=e1112]:
+                        - generic [ref=e1113]: $68.00
+                      - cell "$68.05" [ref=e1114]:
+                        - generic [ref=e1115]: $68.05
+                      - cell "$68.08" [ref=e1116]:
+                        - generic [ref=e1117]: $68.08
+                      - cell "$68.0675" [ref=e1118]:
+                        - generic [ref=e1119]: $68.0675
+                      - cell "10:18 AM 02/11/2026" [ref=e1120]:
+                        - generic [ref=e1122]: 10:18 AM 02/11/2026
+                      - cell "10:18 AM 02/11/2026" [ref=e1123]:
+                        - generic [ref=e1125]: 10:18 AM 02/11/2026
+                      - cell "-" [ref=e1126]:
+                        - generic [ref=e1128]: "-"
+                      - cell "+$4.7275" [ref=e1129]:
+                        - generic [ref=e1130]: +$4.7275
+                      - cell "+7.4637%" [ref=e1131]:
+                        - generic [ref=e1132]: +7.4637%
+                      - cell "+$4.71" [ref=e1133]:
+                        - generic [ref=e1134]: +$4.71
+                      - cell "+7.4361%" [ref=e1135]:
+                        - generic [ref=e1136]: +7.4361%
+                      - cell [ref=e1137]:
+                        - figure [ref=e1140]:
+                          - generic [ref=e1141]:
+                            - generic [ref=e1142]:
+                              - generic [ref=e1143]: Day Range lowest value
+                              - text: $63.2299
+                            - generic [ref=e1144]:
+                              - generic [ref=e1145]: Day Range highest value
+                              - text: $69.095
+                            - generic [ref=e1146]: Day Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell [ref=e1147]:
+                        - figure [ref=e1150]:
+                          - generic [ref=e1151]:
+                            - generic [ref=e1152]:
+                              - generic [ref=e1153]: 52 Week Range lowest value
+                              - text: $7.225
+                            - generic [ref=e1154]:
+                              - generic [ref=e1155]: 52 Week Range highest value
+                              - text: $71.98
+                            - generic [ref=e1156]: 52 Week Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005399167017" [ref=e1157]:
+                        - button "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005399167017" [ref=e1159]:
+                          - generic [ref=e1160]: 
+                    - row "Expand row LRCU order number 1005396525860 View quote details for TRADR 2X LONG LRCX DAILY ETF TRADR 2X LONG LRCX DAILY ETF Filled Sell 10 Market Day $121.375 $114.00 $119.68 $123.10 $119.68 9:36 AM 02/11/2026 9:36 AM 02/11/2026 - +$8.93 +8.0632% +$8.93 +8.0632% View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005396525860" [ref=e1161]:
+                      - cell "Expand row LRCU order number 1005396525860" [ref=e1162]:
+                        - button "Expand row LRCU order number 1005396525860" [ref=e1166]
+                      - cell "View quote details for TRADR 2X LONG LRCX DAILY ETF TRADR 2X LONG LRCX DAILY ETF" [ref=e1170]:
+                        - generic [ref=e1171]:
+                          - link "View quote details for TRADR 2X LONG LRCX DAILY ETF" [ref=e1174] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCU
+                            - text: LRCU
+                          - generic "TRADR 2X LONG LRCX DAILY ETF" [ref=e1175]
+                      - cell "Filled" [ref=e1176]:
+                        - generic [ref=e1179]: Filled
+                      - cell "Sell" [ref=e1180]:
+                        - generic [ref=e1182]: Sell
+                      - cell "10" [ref=e1183]:
+                        - generic [ref=e1186]: "10"
+                      - cell "Market" [ref=e1187]:
+                        - generic [ref=e1188]: Market
+                      - cell "Day" [ref=e1189]:
+                        - generic [ref=e1190]: Day
+                      - cell "$121.375" [ref=e1191]:
+                        - generic [ref=e1193]: $121.375
+                      - cell "$114.00" [ref=e1194]:
+                        - generic [ref=e1195]: $114.00
+                      - cell "$119.68" [ref=e1196]:
+                        - generic [ref=e1197]: $119.68
+                      - cell "$123.10" [ref=e1198]:
+                        - generic [ref=e1199]: $123.10
+                      - cell "$119.68" [ref=e1200]:
+                        - generic [ref=e1201]: $119.68
+                      - cell "9:36 AM 02/11/2026" [ref=e1202]:
+                        - generic [ref=e1204]: 9:36 AM 02/11/2026
+                      - cell "9:36 AM 02/11/2026" [ref=e1205]:
+                        - generic [ref=e1207]: 9:36 AM 02/11/2026
+                      - cell "-" [ref=e1208]:
+                        - generic [ref=e1210]: "-"
+                      - cell "+$8.93" [ref=e1211]:
+                        - generic [ref=e1212]: +$8.93
+                      - cell "+8.0632%" [ref=e1213]:
+                        - generic [ref=e1214]: +8.0632%
+                      - cell "+$8.93" [ref=e1215]:
+                        - generic [ref=e1216]: +$8.93
+                      - cell "+8.0632%" [ref=e1217]:
+                        - generic [ref=e1218]: +8.0632%
+                      - cell [ref=e1219]:
+                        - figure [ref=e1222]:
+                          - generic [ref=e1223]:
+                            - generic [ref=e1224]:
+                              - generic [ref=e1225]: Day Range lowest value
+                              - text: $115.265
+                            - generic [ref=e1226]:
+                              - generic [ref=e1227]: Day Range highest value
+                              - text: $124.25
+                            - generic [ref=e1228]: Day Range current value $119.68
+                          - slider: "119.68"
+                      - cell [ref=e1229]:
+                        - figure [ref=e1232]:
+                          - generic [ref=e1233]:
+                            - generic [ref=e1234]:
+                              - generic [ref=e1235]: 52 Week Range lowest value
+                              - text: $23.05
+                            - generic [ref=e1236]:
+                              - generic [ref=e1237]: 52 Week Range highest value
+                              - text: $140.59
+                            - generic [ref=e1238]: 52 Week Range current value $119.68
+                          - slider: "119.68"
+                      - cell "View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005396525860" [ref=e1239]:
+                        - button "View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005396525860" [ref=e1241]:
+                          - generic [ref=e1242]: 
+                    - row "Expand row GM order number 1005396525769 View quote details for GENERAL MTRS CO GENERAL MTRS CO Filled Sell 25 Market Day $81.5704 $79.40 $79.82 $80.20 $79.82 9:35 AM 02/11/2026 9:35 AM 02/11/2026 - -$0.45 -0.5606% -$0.45 -0.5606% View next steps for GENERAL MTRS CO order number 1005396525769" [ref=e1243]:
+                      - cell "Expand row GM order number 1005396525769" [ref=e1244]:
+                        - button "Expand row GM order number 1005396525769" [ref=e1248]
+                      - cell "View quote details for GENERAL MTRS CO GENERAL MTRS CO" [ref=e1252]:
+                        - generic [ref=e1253]:
+                          - link "View quote details for GENERAL MTRS CO" [ref=e1256] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GM
+                            - text: GM
+                          - generic "GENERAL MTRS CO" [ref=e1257]
+                      - cell "Filled" [ref=e1258]:
+                        - generic [ref=e1261]: Filled
+                      - cell "Sell" [ref=e1262]:
+                        - generic [ref=e1264]: Sell
+                      - cell "25" [ref=e1265]:
+                        - generic [ref=e1268]: "25"
+                      - cell "Market" [ref=e1269]:
+                        - generic [ref=e1270]: Market
+                      - cell "Day" [ref=e1271]:
+                        - generic [ref=e1272]: Day
+                      - cell "$81.5704" [ref=e1273]:
+                        - generic [ref=e1275]: $81.5704
+                      - cell "$79.40" [ref=e1276]:
+                        - generic [ref=e1277]: $79.40
+                      - cell "$79.82" [ref=e1278]:
+                        - generic [ref=e1279]: $79.82
+                      - cell "$80.20" [ref=e1280]:
+                        - generic [ref=e1281]: $80.20
+                      - cell "$79.82" [ref=e1282]:
+                        - generic [ref=e1283]: $79.82
+                      - cell "9:35 AM 02/11/2026" [ref=e1284]:
+                        - generic [ref=e1286]: 9:35 AM 02/11/2026
+                      - cell "9:35 AM 02/11/2026" [ref=e1287]:
+                        - generic [ref=e1289]: 9:35 AM 02/11/2026
+                      - cell "-" [ref=e1290]:
+                        - generic [ref=e1292]: "-"
+                      - cell "-$0.45" [ref=e1293]:
+                        - generic [ref=e1294]: "-$0.45"
+                      - cell "-0.5606%" [ref=e1295]:
+                        - generic [ref=e1296]: "-0.5606%"
+                      - cell "-$0.45" [ref=e1297]:
+                        - generic [ref=e1298]: "-$0.45"
+                      - cell "-0.5606%" [ref=e1299]:
+                        - generic [ref=e1300]: "-0.5606%"
+                      - cell [ref=e1301]:
+                        - figure [ref=e1304]:
+                          - generic [ref=e1305]:
+                            - generic [ref=e1306]:
+                              - generic [ref=e1307]: Day Range lowest value
+                              - text: $79.08
+                            - generic [ref=e1308]:
+                              - generic [ref=e1309]: Day Range highest value
+                              - text: $82.00
+                            - generic [ref=e1310]: Day Range current value $79.82
+                          - slider: "79.82"
+                      - cell [ref=e1311]:
+                        - figure [ref=e1314]:
+                          - generic [ref=e1315]:
+                            - generic [ref=e1316]:
+                              - generic [ref=e1317]: 52 Week Range lowest value
+                              - text: $41.60
+                            - generic [ref=e1318]:
+                              - generic [ref=e1319]: 52 Week Range highest value
+                              - text: $87.62
+                            - generic [ref=e1320]: 52 Week Range current value $79.82
+                          - slider: "79.82"
+                      - cell "View next steps for GENERAL MTRS CO order number 1005396525769" [ref=e1321]:
+                        - button "View next steps for GENERAL MTRS CO order number 1005396525769" [ref=e1323]:
+                          - generic [ref=e1324]: 
+                    - row "Expand row WDC order number 1005395693939 View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP Filled Sell 20 Limit $272.00 Day + ext $272.2991 $274.40 $274.40 $274.90 $274.88 8:48 AM 02/11/2026 8:48 AM 02/11/2026 - +$12.32 +4.6923% +$11.84 +4.5094% View next steps for WESTERN DIGITAL CORP order number 1005395693939" [ref=e1325]:
+                      - cell "Expand row WDC order number 1005395693939" [ref=e1326]:
+                        - button "Expand row WDC order number 1005395693939" [ref=e1330]
+                      - cell "View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP" [ref=e1334]:
+                        - generic [ref=e1335]:
+                          - link "View quote details for WESTERN DIGITAL CORP" [ref=e1338] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=WDC
+                            - text: WDC
+                          - generic "WESTERN DIGITAL CORP" [ref=e1339]
+                      - cell "Filled" [ref=e1340]:
+                        - generic [ref=e1343]: Filled
+                      - cell "Sell" [ref=e1344]:
+                        - generic [ref=e1346]: Sell
+                      - cell "20" [ref=e1347]:
+                        - generic [ref=e1350]: "20"
+                      - cell "Limit $272.00" [ref=e1351]:
+                        - generic [ref=e1352]: Limit $272.00
+                      - cell "Day + ext" [ref=e1353]:
+                        - generic [ref=e1354]: Day + ext
+                      - cell "$272.2991" [ref=e1355]:
+                        - generic [ref=e1357]: $272.2991
+                      - cell "$274.40" [ref=e1358]:
+                        - generic [ref=e1359]: $274.40
+                      - cell "$274.40" [ref=e1360]:
+                        - generic [ref=e1361]: $274.40
+                      - cell "$274.90" [ref=e1362]:
+                        - generic [ref=e1363]: $274.90
+                      - cell "$274.88" [ref=e1364]:
+                        - generic [ref=e1365]: $274.88
+                      - cell "8:48 AM 02/11/2026" [ref=e1366]:
+                        - generic [ref=e1368]: 8:48 AM 02/11/2026
+                      - cell "8:48 AM 02/11/2026" [ref=e1369]:
+                        - generic [ref=e1371]: 8:48 AM 02/11/2026
+                      - cell "-" [ref=e1372]:
+                        - generic [ref=e1374]: "-"
+                      - cell "+$12.32" [ref=e1375]:
+                        - generic [ref=e1376]: +$12.32
+                      - cell "+4.6923%" [ref=e1377]:
+                        - generic [ref=e1378]: +4.6923%
+                      - cell "+$11.84" [ref=e1379]:
+                        - generic [ref=e1380]: +$11.84
+                      - cell "+4.5094%" [ref=e1381]:
+                        - generic [ref=e1382]: +4.5094%
+                      - cell [ref=e1383]:
+                        - figure [ref=e1386]:
+                          - generic [ref=e1387]:
+                            - generic [ref=e1388]:
+                              - generic [ref=e1389]: Day Range lowest value
+                              - text: $266.34
+                            - generic [ref=e1390]:
+                              - generic [ref=e1391]: Day Range highest value
+                              - text: $279.79
+                            - generic [ref=e1392]: Day Range current value $274.88
+                          - slider: "274.88"
+                      - cell [ref=e1393]:
+                        - figure [ref=e1396]:
+                          - generic [ref=e1397]:
+                            - generic [ref=e1398]:
+                              - generic [ref=e1399]: 52 Week Range lowest value
+                              - text: $28.83
+                            - generic [ref=e1400]:
+                              - generic [ref=e1401]: 52 Week Range highest value
+                              - text: $296.50
+                            - generic [ref=e1402]: 52 Week Range current value $274.88
+                          - slider: "274.88"
+                      - cell "View next steps for WESTERN DIGITAL CORP order number 1005395693939" [ref=e1403]:
+                        - button "View next steps for WESTERN DIGITAL CORP order number 1005395693939" [ref=e1405]:
+                          - generic [ref=e1406]: 
+                    - row "Expand row SOXL order number 1005395692017 View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF Filled Buy 15 Limit $63.11 Day + ext $63.065 $68.00 $68.05 $68.08 $68.0675 5:26 PM 02/10/2026 5:26 PM 02/10/2026 - +$4.7275 +7.4637% +$4.71 +7.4361% View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005395692017" [ref=e1407]:
+                      - cell "Expand row SOXL order number 1005395692017" [ref=e1408]:
+                        - button "Expand row SOXL order number 1005395692017" [ref=e1412]
+                      - cell "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1416]:
+                        - generic [ref=e1417]:
+                          - link "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1420] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXL
+                            - text: SOXL
+                          - generic "DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e1421]
+                      - cell "Filled" [ref=e1422]:
+                        - generic [ref=e1425]: Filled
+                      - cell "Buy" [ref=e1426]:
+                        - generic [ref=e1428]: Buy
+                      - cell "15" [ref=e1429]:
+                        - generic [ref=e1432]: "15"
+                      - cell "Limit $63.11" [ref=e1433]:
+                        - generic [ref=e1434]: Limit $63.11
+                      - cell "Day + ext" [ref=e1435]:
+                        - generic [ref=e1436]: Day + ext
+                      - cell "$63.065" [ref=e1437]:
+                        - generic [ref=e1439]: $63.065
+                      - cell "$68.00" [ref=e1440]:
+                        - generic [ref=e1441]: $68.00
+                      - cell "$68.05" [ref=e1442]:
+                        - generic [ref=e1443]: $68.05
+                      - cell "$68.08" [ref=e1444]:
+                        - generic [ref=e1445]: $68.08
+                      - cell "$68.0675" [ref=e1446]:
+                        - generic [ref=e1447]: $68.0675
+                      - cell "5:26 PM 02/10/2026" [ref=e1448]:
+                        - generic [ref=e1450]: 5:26 PM 02/10/2026
+                      - cell "5:26 PM 02/10/2026" [ref=e1451]:
+                        - generic [ref=e1453]: 5:26 PM 02/10/2026
+                      - cell "-" [ref=e1454]:
+                        - generic [ref=e1456]: "-"
+                      - cell "+$4.7275" [ref=e1457]:
+                        - generic [ref=e1458]: +$4.7275
+                      - cell "+7.4637%" [ref=e1459]:
+                        - generic [ref=e1460]: +7.4637%
+                      - cell "+$4.71" [ref=e1461]:
+                        - generic [ref=e1462]: +$4.71
+                      - cell "+7.4361%" [ref=e1463]:
+                        - generic [ref=e1464]: +7.4361%
+                      - cell [ref=e1465]:
+                        - figure [ref=e1468]:
+                          - generic [ref=e1469]:
+                            - generic [ref=e1470]:
+                              - generic [ref=e1471]: Day Range lowest value
+                              - text: $63.2299
+                            - generic [ref=e1472]:
+                              - generic [ref=e1473]: Day Range highest value
+                              - text: $69.095
+                            - generic [ref=e1474]: Day Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell [ref=e1475]:
+                        - figure [ref=e1478]:
+                          - generic [ref=e1479]:
+                            - generic [ref=e1480]:
+                              - generic [ref=e1481]: 52 Week Range lowest value
+                              - text: $7.225
+                            - generic [ref=e1482]:
+                              - generic [ref=e1483]: 52 Week Range highest value
+                              - text: $71.98
+                            - generic [ref=e1484]: 52 Week Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005395692017" [ref=e1485]:
+                        - button "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005395692017" [ref=e1487]:
+                          - generic [ref=e1488]: 
+                    - row "Expand row WDC order number 1005394435138 View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP Filled Buy 20 Market Day $263.48 $274.40 $274.40 $274.90 $274.88 3:34 PM 02/10/2026 3:34 PM 02/10/2026 - +$12.32 +4.6923% +$11.84 +4.5094% View next steps for WESTERN DIGITAL CORP order number 1005394435138" [ref=e1489]:
+                      - cell "Expand row WDC order number 1005394435138" [ref=e1490]:
+                        - button "Expand row WDC order number 1005394435138" [ref=e1494]
+                      - cell "View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP" [ref=e1498]:
+                        - generic [ref=e1499]:
+                          - link "View quote details for WESTERN DIGITAL CORP" [ref=e1502] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=WDC
+                            - text: WDC
+                          - generic "WESTERN DIGITAL CORP" [ref=e1503]
+                      - cell "Filled" [ref=e1504]:
+                        - generic [ref=e1507]: Filled
+                      - cell "Buy" [ref=e1508]:
+                        - generic [ref=e1510]: Buy
+                      - cell "20" [ref=e1511]:
+                        - generic [ref=e1514]: "20"
+                      - cell "Market" [ref=e1515]:
+                        - generic [ref=e1516]: Market
+                      - cell "Day" [ref=e1517]:
+                        - generic [ref=e1518]: Day
+                      - cell "$263.48" [ref=e1519]:
+                        - generic [ref=e1521]: $263.48
+                      - cell "$274.40" [ref=e1522]:
+                        - generic [ref=e1523]: $274.40
+                      - cell "$274.40" [ref=e1524]:
+                        - generic [ref=e1525]: $274.40
+                      - cell "$274.90" [ref=e1526]:
+                        - generic [ref=e1527]: $274.90
+                      - cell "$274.88" [ref=e1528]:
+                        - generic [ref=e1529]: $274.88
+                      - cell "3:34 PM 02/10/2026" [ref=e1530]:
+                        - generic [ref=e1532]: 3:34 PM 02/10/2026
+                      - cell "3:34 PM 02/10/2026" [ref=e1533]:
+                        - generic [ref=e1535]: 3:34 PM 02/10/2026
+                      - cell "-" [ref=e1536]:
+                        - generic [ref=e1538]: "-"
+                      - cell "+$12.32" [ref=e1539]:
+                        - generic [ref=e1540]: +$12.32
+                      - cell "+4.6923%" [ref=e1541]:
+                        - generic [ref=e1542]: +4.6923%
+                      - cell "+$11.84" [ref=e1543]:
+                        - generic [ref=e1544]: +$11.84
+                      - cell "+4.5094%" [ref=e1545]:
+                        - generic [ref=e1546]: +4.5094%
+                      - cell [ref=e1547]:
+                        - figure [ref=e1550]:
+                          - generic [ref=e1551]:
+                            - generic [ref=e1552]:
+                              - generic [ref=e1553]: Day Range lowest value
+                              - text: $266.34
+                            - generic [ref=e1554]:
+                              - generic [ref=e1555]: Day Range highest value
+                              - text: $279.79
+                            - generic [ref=e1556]: Day Range current value $274.88
+                          - slider: "274.88"
+                      - cell [ref=e1557]:
+                        - figure [ref=e1560]:
+                          - generic [ref=e1561]:
+                            - generic [ref=e1562]:
+                              - generic [ref=e1563]: 52 Week Range lowest value
+                              - text: $28.83
+                            - generic [ref=e1564]:
+                              - generic [ref=e1565]: 52 Week Range highest value
+                              - text: $296.50
+                            - generic [ref=e1566]: 52 Week Range current value $274.88
+                          - slider: "274.88"
+                      - cell "View next steps for WESTERN DIGITAL CORP order number 1005394435138" [ref=e1567]:
+                        - button "View next steps for WESTERN DIGITAL CORP order number 1005394435138" [ref=e1569]:
+                          - generic [ref=e1570]: 
+                    - row "Expand row FCX order number 1005390414499 View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC Filled Sell 35 Market Day $63.4235 $65.00 $65.46 $65.67 $65.467 12:39 PM 02/10/2026 12:39 PM 02/10/2026 - +$2.207 +3.4888% +$2.20 +3.4777% View next steps for FREEPORT-MCMORAN INC order number 1005390414499" [ref=e1571]:
+                      - cell "Expand row FCX order number 1005390414499" [ref=e1572]:
+                        - button "Expand row FCX order number 1005390414499" [ref=e1576]
+                      - cell "View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC" [ref=e1580]:
+                        - generic [ref=e1581]:
+                          - link "View quote details for FREEPORT-MCMORAN INC" [ref=e1584] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FCX
+                            - text: FCX
+                          - generic "FREEPORT-MCMORAN INC" [ref=e1585]
+                      - cell "Filled" [ref=e1586]:
+                        - generic [ref=e1589]: Filled
+                      - cell "Sell" [ref=e1590]:
+                        - generic [ref=e1592]: Sell
+                      - cell "35" [ref=e1593]:
+                        - generic [ref=e1596]: "35"
+                      - cell "Market" [ref=e1597]:
+                        - generic [ref=e1598]: Market
+                      - cell "Day" [ref=e1599]:
+                        - generic [ref=e1600]: Day
+                      - cell "$63.4235" [ref=e1601]:
+                        - generic [ref=e1603]: $63.4235
+                      - cell "$65.00" [ref=e1604]:
+                        - generic [ref=e1605]: $65.00
+                      - cell "$65.46" [ref=e1606]:
+                        - generic [ref=e1607]: $65.46
+                      - cell "$65.67" [ref=e1608]:
+                        - generic [ref=e1609]: $65.67
+                      - cell "$65.467" [ref=e1610]:
+                        - generic [ref=e1611]: $65.467
+                      - cell "12:39 PM 02/10/2026" [ref=e1612]:
+                        - generic [ref=e1614]: 12:39 PM 02/10/2026
+                      - cell "12:39 PM 02/10/2026" [ref=e1615]:
+                        - generic [ref=e1617]: 12:39 PM 02/10/2026
+                      - cell "-" [ref=e1618]:
+                        - generic [ref=e1620]: "-"
+                      - cell "+$2.207" [ref=e1621]:
+                        - generic [ref=e1622]: +$2.207
+                      - cell "+3.4888%" [ref=e1623]:
+                        - generic [ref=e1624]: +3.4888%
+                      - cell "+$2.20" [ref=e1625]:
+                        - generic [ref=e1626]: +$2.20
+                      - cell "+3.4777%" [ref=e1627]:
+                        - generic [ref=e1628]: +3.4777%
+                      - cell [ref=e1629]:
+                        - figure [ref=e1632]:
+                          - generic [ref=e1633]:
+                            - generic [ref=e1634]:
+                              - generic [ref=e1635]: Day Range lowest value
+                              - text: $63.07
+                            - generic [ref=e1636]:
+                              - generic [ref=e1637]: Day Range highest value
+                              - text: $65.50
+                            - generic [ref=e1638]: Day Range current value $65.467
+                          - slider: "65.467"
+                      - cell [ref=e1639]:
+                        - figure [ref=e1642]:
+                          - generic [ref=e1643]:
+                            - generic [ref=e1644]:
+                              - generic [ref=e1645]: 52 Week Range lowest value
+                              - text: $27.66
+                            - generic [ref=e1646]:
+                              - generic [ref=e1647]: 52 Week Range highest value
+                              - text: $69.44
+                            - generic [ref=e1648]: 52 Week Range current value $65.467
+                          - slider: "65.467"
+                      - cell "View next steps for FREEPORT-MCMORAN INC order number 1005390414499" [ref=e1649]:
+                        - button "View next steps for FREEPORT-MCMORAN INC order number 1005390414499" [ref=e1651]:
+                          - generic [ref=e1652]: 
+                    - row "Expand row SGOL order number 1005390414510 View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF Filled Sell 100 Market Day $47.9501 $48.15 $48.40 $48.40 $48.14 12:39 PM 02/10/2026 12:39 PM 02/10/2026 - +$0.21 +0.4381% +$0.47 +0.9806% View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005390414510" [ref=e1653]:
+                      - cell "Expand row SGOL order number 1005390414510" [ref=e1654]:
+                        - button "Expand row SGOL order number 1005390414510" [ref=e1658]
+                      - cell "View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF" [ref=e1662]:
+                        - generic [ref=e1663]:
+                          - link "View quote details for ABRDN PHYSICAL GOLD SHARES ETF" [ref=e1666] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SGOL
+                            - text: SGOL
+                          - generic "ABRDN PHYSICAL GOLD SHARES ETF" [ref=e1667]
+                      - cell "Filled" [ref=e1668]:
+                        - generic [ref=e1671]: Filled
+                      - cell "Sell" [ref=e1672]:
+                        - generic [ref=e1674]: Sell
+                      - cell "100" [ref=e1675]:
+                        - generic [ref=e1678]: "100"
+                      - cell "Market" [ref=e1679]:
+                        - generic [ref=e1680]: Market
+                      - cell "Day" [ref=e1681]:
+                        - generic [ref=e1682]: Day
+                      - cell "$47.9501" [ref=e1683]:
+                        - generic [ref=e1685]: $47.9501
+                      - cell "$48.15" [ref=e1686]:
+                        - generic [ref=e1687]: $48.15
+                      - cell "$48.40" [ref=e1688]:
+                        - generic [ref=e1689]: $48.40
+                      - cell "$48.40" [ref=e1690]:
+                        - generic [ref=e1691]: $48.40
+                      - cell "$48.14" [ref=e1692]:
+                        - generic [ref=e1693]: $48.14
+                      - cell "12:39 PM 02/10/2026" [ref=e1694]:
+                        - generic [ref=e1696]: 12:39 PM 02/10/2026
+                      - cell "12:39 PM 02/10/2026" [ref=e1697]:
+                        - generic [ref=e1699]: 12:39 PM 02/10/2026
+                      - cell "-" [ref=e1700]:
+                        - generic [ref=e1702]: "-"
+                      - cell "+$0.21" [ref=e1703]:
+                        - generic [ref=e1704]: +$0.21
+                      - cell "+0.4381%" [ref=e1705]:
+                        - generic [ref=e1706]: +0.4381%
+                      - cell "+$0.47" [ref=e1707]:
+                        - generic [ref=e1708]: +$0.47
+                      - cell "+0.9806%" [ref=e1709]:
+                        - generic [ref=e1710]: +0.9806%
+                      - cell [ref=e1711]:
+                        - figure [ref=e1714]:
+                          - generic [ref=e1715]:
+                            - generic [ref=e1716]:
+                              - generic [ref=e1717]: Day Range lowest value
+                              - text: $47.99
+                            - generic [ref=e1718]:
+                              - generic [ref=e1719]: Day Range highest value
+                              - text: $48.58
+                            - generic [ref=e1720]: Day Range current value $48.14
+                          - slider: "48.14"
+                      - cell [ref=e1721]:
+                        - figure [ref=e1724]:
+                          - generic [ref=e1725]:
+                            - generic [ref=e1726]:
+                              - generic [ref=e1727]: 52 Week Range lowest value
+                              - text: $27.025
+                            - generic [ref=e1728]:
+                              - generic [ref=e1729]: 52 Week Range highest value
+                              - text: $52.84
+                            - generic [ref=e1730]: 52 Week Range current value $48.14
+                          - slider: "48.14"
+                      - cell "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005390414510" [ref=e1731]:
+                        - button "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005390414510" [ref=e1733]:
+                          - generic [ref=e1734]: 
+                    - row "Expand row PWR order number 1005390414424 View quote details for QUANTA SVCS INC QUANTA SVCS INC Filled Sell 4 Market Day $515.685 $522.00 $523.96 $535.00 $534.00 12:38 PM 02/10/2026 12:38 PM 02/10/2026 - +$23.36 +4.5747% +$13.32 +2.6085% View next steps for QUANTA SVCS INC order number 1005390414424" [ref=e1735]:
+                      - cell "Expand row PWR order number 1005390414424" [ref=e1736]:
+                        - button "Expand row PWR order number 1005390414424" [ref=e1740]
+                      - cell "View quote details for QUANTA SVCS INC QUANTA SVCS INC" [ref=e1744]:
+                        - generic [ref=e1745]:
+                          - link "View quote details for QUANTA SVCS INC" [ref=e1748] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PWR
+                            - text: PWR
+                          - generic "QUANTA SVCS INC" [ref=e1749]
+                      - cell "Filled" [ref=e1750]:
+                        - generic [ref=e1753]: Filled
+                      - cell "Sell" [ref=e1754]:
+                        - generic [ref=e1756]: Sell
+                      - cell "4" [ref=e1757]:
+                        - generic [ref=e1760]: "4"
+                      - cell "Market" [ref=e1761]:
+                        - generic [ref=e1762]: Market
+                      - cell "Day" [ref=e1763]:
+                        - generic [ref=e1764]: Day
+                      - cell "$515.685" [ref=e1765]:
+                        - generic [ref=e1767]: $515.685
+                      - cell "$522.00" [ref=e1768]:
+                        - generic [ref=e1769]: $522.00
+                      - cell "$523.96" [ref=e1770]:
+                        - generic [ref=e1771]: $523.96
+                      - cell "$535.00" [ref=e1772]:
+                        - generic [ref=e1773]: $535.00
+                      - cell "$534.00" [ref=e1774]:
+                        - generic [ref=e1775]: $534.00
+                      - cell "12:38 PM 02/10/2026" [ref=e1776]:
+                        - generic [ref=e1778]: 12:38 PM 02/10/2026
+                      - cell "12:38 PM 02/10/2026" [ref=e1779]:
+                        - generic [ref=e1781]: 12:38 PM 02/10/2026
+                      - cell "-" [ref=e1782]:
+                        - generic [ref=e1784]: "-"
+                      - cell "+$23.36" [ref=e1785]:
+                        - generic [ref=e1786]: +$23.36
+                      - cell "+4.5747%" [ref=e1787]:
+                        - generic [ref=e1788]: +4.5747%
+                      - cell "+$13.32" [ref=e1789]:
+                        - generic [ref=e1790]: +$13.32
+                      - cell "+2.6085%" [ref=e1791]:
+                        - generic [ref=e1792]: +2.6085%
+                      - cell [ref=e1793]:
+                        - figure [ref=e1796]:
+                          - generic [ref=e1797]:
+                            - generic [ref=e1798]:
+                              - generic [ref=e1799]: Day Range lowest value
+                              - text: $512.11
+                            - generic [ref=e1800]:
+                              - generic [ref=e1801]: Day Range highest value
+                              - text: $534.50
+                            - generic [ref=e1802]: Day Range current value $534.00
+                          - slider: "534"
+                      - cell [ref=e1803]:
+                        - figure [ref=e1806]:
+                          - generic [ref=e1807]:
+                            - generic [ref=e1808]:
+                              - generic [ref=e1809]: 52 Week Range lowest value
+                              - text: $227.08
+                            - generic [ref=e1810]:
+                              - generic [ref=e1811]: 52 Week Range highest value
+                              - text: $534.50
+                            - generic [ref=e1812]: 52 Week Range current value $534.00
+                          - slider: "534"
+                      - cell "View next steps for QUANTA SVCS INC order number 1005390414424" [ref=e1813]:
+                        - button "View next steps for QUANTA SVCS INC order number 1005390414424" [ref=e1815]:
+                          - generic [ref=e1816]: 
+                    - row "Expand row SPXL order number 1005390414472 View quote details for DIREXION DAILY S&P 500 BULL 3X ETF DIREXION DAILY S&P 500 BULL 3X ETF Filled Sell 10 Market Day $230.1699 $227.28 $227.28 $227.35 $227.39 12:38 PM 02/10/2026 12:38 PM 02/10/2026 - +$0.41 +0.1806% +$0.30 +0.1322% View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005390414472" [ref=e1817]:
+                      - cell "Expand row SPXL order number 1005390414472" [ref=e1818]:
+                        - button "Expand row SPXL order number 1005390414472" [ref=e1822]
+                      - cell "View quote details for DIREXION DAILY S&P 500 BULL 3X ETF DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1826]:
+                        - generic [ref=e1827]:
+                          - link "View quote details for DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1830] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SPXL
+                            - text: SPXL
+                          - generic "DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1831]
+                      - cell "Filled" [ref=e1832]:
+                        - generic [ref=e1835]: Filled
+                      - cell "Sell" [ref=e1836]:
+                        - generic [ref=e1838]: Sell
+                      - cell "10" [ref=e1839]:
+                        - generic [ref=e1842]: "10"
+                      - cell "Market" [ref=e1843]:
+                        - generic [ref=e1844]: Market
+                      - cell "Day" [ref=e1845]:
+                        - generic [ref=e1846]: Day
+                      - cell "$230.1699" [ref=e1847]:
+                        - generic [ref=e1849]: $230.1699
+                      - cell "$227.28" [ref=e1850]:
+                        - generic [ref=e1851]: $227.28
+                      - cell "$227.28" [ref=e1852]:
+                        - generic [ref=e1853]: $227.28
+                      - cell "$227.35" [ref=e1854]:
+                        - generic [ref=e1855]: $227.35
+                      - cell "$227.39" [ref=e1856]:
+                        - generic [ref=e1857]: $227.39
+                      - cell "12:38 PM 02/10/2026" [ref=e1858]:
+                        - generic [ref=e1860]: 12:38 PM 02/10/2026
+                      - cell "12:38 PM 02/10/2026" [ref=e1861]:
+                        - generic [ref=e1863]: 12:38 PM 02/10/2026
+                      - cell "-" [ref=e1864]:
+                        - generic [ref=e1866]: "-"
+                      - cell "+$0.41" [ref=e1867]:
+                        - generic [ref=e1868]: +$0.41
+                      - cell "+0.1806%" [ref=e1869]:
+                        - generic [ref=e1870]: +0.1806%
+                      - cell "+$0.30" [ref=e1871]:
+                        - generic [ref=e1872]: +$0.30
+                      - cell "+0.1322%" [ref=e1873]:
+                        - generic [ref=e1874]: +0.1322%
+                      - cell [ref=e1875]:
+                        - figure [ref=e1878]:
+                          - generic [ref=e1879]:
+                            - generic [ref=e1880]:
+                              - generic [ref=e1881]: Day Range lowest value
+                              - text: $224.15
+                            - generic [ref=e1882]:
+                              - generic [ref=e1883]: Day Range highest value
+                              - text: $231.96
+                            - generic [ref=e1884]: Day Range current value $227.39
+                          - slider: "227.39"
+                      - cell [ref=e1885]:
+                        - figure [ref=e1888]:
+                          - generic [ref=e1889]:
+                            - generic [ref=e1890]:
+                              - generic [ref=e1891]: 52 Week Range lowest value
+                              - text: $87.08
+                            - generic [ref=e1892]:
+                              - generic [ref=e1893]: 52 Week Range highest value
+                              - text: $234.09
+                            - generic [ref=e1894]: 52 Week Range current value $227.39
+                          - slider: "227.39"
+                      - cell "View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005390414472" [ref=e1895]:
+                        - button "View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005390414472" [ref=e1897]:
+                          - generic [ref=e1898]: 
+                    - row "Expand row PWR order number 1005387613339 View quote details for QUANTA SVCS INC QUANTA SVCS INC Filled Buy 4 Market Day $514.0203 $522.00 $523.96 $535.00 $534.00 11:14 AM 02/10/2026 11:14 AM 02/10/2026 - +$23.36 +4.5747% +$13.32 +2.6085% View next steps for QUANTA SVCS INC order number 1005387613339" [ref=e1899]:
+                      - cell "Expand row PWR order number 1005387613339" [ref=e1900]:
+                        - button "Expand row PWR order number 1005387613339" [ref=e1904]
+                      - cell "View quote details for QUANTA SVCS INC QUANTA SVCS INC" [ref=e1908]:
+                        - generic [ref=e1909]:
+                          - link "View quote details for QUANTA SVCS INC" [ref=e1912] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PWR
+                            - text: PWR
+                          - generic "QUANTA SVCS INC" [ref=e1913]
+                      - cell "Filled" [ref=e1914]:
+                        - generic [ref=e1917]: Filled
+                      - cell "Buy" [ref=e1918]:
+                        - generic [ref=e1920]: Buy
+                      - cell "4" [ref=e1921]:
+                        - generic [ref=e1924]: "4"
+                      - cell "Market" [ref=e1925]:
+                        - generic [ref=e1926]: Market
+                      - cell "Day" [ref=e1927]:
+                        - generic [ref=e1928]: Day
+                      - cell "$514.0203" [ref=e1929]:
+                        - generic [ref=e1931]: $514.0203
+                      - cell "$522.00" [ref=e1932]:
+                        - generic [ref=e1933]: $522.00
+                      - cell "$523.96" [ref=e1934]:
+                        - generic [ref=e1935]: $523.96
+                      - cell "$535.00" [ref=e1936]:
+                        - generic [ref=e1937]: $535.00
+                      - cell "$534.00" [ref=e1938]:
+                        - generic [ref=e1939]: $534.00
+                      - cell "11:14 AM 02/10/2026" [ref=e1940]:
+                        - generic [ref=e1942]: 11:14 AM 02/10/2026
+                      - cell "11:14 AM 02/10/2026" [ref=e1943]:
+                        - generic [ref=e1945]: 11:14 AM 02/10/2026
+                      - cell "-" [ref=e1946]:
+                        - generic [ref=e1948]: "-"
+                      - cell "+$23.36" [ref=e1949]:
+                        - generic [ref=e1950]: +$23.36
+                      - cell "+4.5747%" [ref=e1951]:
+                        - generic [ref=e1952]: +4.5747%
+                      - cell "+$13.32" [ref=e1953]:
+                        - generic [ref=e1954]: +$13.32
+                      - cell "+2.6085%" [ref=e1955]:
+                        - generic [ref=e1956]: +2.6085%
+                      - cell [ref=e1957]:
+                        - figure [ref=e1960]:
+                          - generic [ref=e1961]:
+                            - generic [ref=e1962]:
+                              - generic [ref=e1963]: Day Range lowest value
+                              - text: $512.11
+                            - generic [ref=e1964]:
+                              - generic [ref=e1965]: Day Range highest value
+                              - text: $534.50
+                            - generic [ref=e1966]: Day Range current value $534.00
+                          - slider: "534"
+                      - cell [ref=e1967]:
+                        - figure [ref=e1970]:
+                          - generic [ref=e1971]:
+                            - generic [ref=e1972]:
+                              - generic [ref=e1973]: 52 Week Range lowest value
+                              - text: $227.08
+                            - generic [ref=e1974]:
+                              - generic [ref=e1975]: 52 Week Range highest value
+                              - text: $534.50
+                            - generic [ref=e1976]: 52 Week Range current value $534.00
+                          - slider: "534"
+                      - cell "View next steps for QUANTA SVCS INC order number 1005387613339" [ref=e1977]:
+                        - button "View next steps for QUANTA SVCS INC order number 1005387613339" [ref=e1979]:
+                          - generic [ref=e1980]: 
+                    - row "Expand row SPXL order number 1005383288179 View quote details for DIREXION DAILY S&P 500 BULL 3X ETF DIREXION DAILY S&P 500 BULL 3X ETF Filled Buy 10 Limit $229.86 Day + ext $229.86 $227.28 $227.28 $227.35 $227.39 9:24 AM 02/10/2026 9:24 AM 02/10/2026 - +$0.41 +0.1806% +$0.30 +0.1322% View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005383288179" [ref=e1981]:
+                      - cell "Expand row SPXL order number 1005383288179" [ref=e1982]:
+                        - button "Expand row SPXL order number 1005383288179" [ref=e1986]
+                      - cell "View quote details for DIREXION DAILY S&P 500 BULL 3X ETF DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1990]:
+                        - generic [ref=e1991]:
+                          - link "View quote details for DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1994] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SPXL
+                            - text: SPXL
+                          - generic "DIREXION DAILY S&P 500 BULL 3X ETF" [ref=e1995]
+                      - cell "Filled" [ref=e1996]:
+                        - generic [ref=e1999]: Filled
+                      - cell "Buy" [ref=e2000]:
+                        - generic [ref=e2002]: Buy
+                      - cell "10" [ref=e2003]:
+                        - generic [ref=e2006]: "10"
+                      - cell "Limit $229.86" [ref=e2007]:
+                        - generic [ref=e2008]: Limit $229.86
+                      - cell "Day + ext" [ref=e2009]:
+                        - generic [ref=e2010]: Day + ext
+                      - cell "$229.86" [ref=e2011]:
+                        - generic [ref=e2013]: $229.86
+                      - cell "$227.28" [ref=e2014]:
+                        - generic [ref=e2015]: $227.28
+                      - cell "$227.28" [ref=e2016]:
+                        - generic [ref=e2017]: $227.28
+                      - cell "$227.35" [ref=e2018]:
+                        - generic [ref=e2019]: $227.35
+                      - cell "$227.39" [ref=e2020]:
+                        - generic [ref=e2021]: $227.39
+                      - cell "9:24 AM 02/10/2026" [ref=e2022]:
+                        - generic [ref=e2024]: 9:24 AM 02/10/2026
+                      - cell "9:24 AM 02/10/2026" [ref=e2025]:
+                        - generic [ref=e2027]: 9:24 AM 02/10/2026
+                      - cell "-" [ref=e2028]:
+                        - generic [ref=e2030]: "-"
+                      - cell "+$0.41" [ref=e2031]:
+                        - generic [ref=e2032]: +$0.41
+                      - cell "+0.1806%" [ref=e2033]:
+                        - generic [ref=e2034]: +0.1806%
+                      - cell "+$0.30" [ref=e2035]:
+                        - generic [ref=e2036]: +$0.30
+                      - cell "+0.1322%" [ref=e2037]:
+                        - generic [ref=e2038]: +0.1322%
+                      - cell [ref=e2039]:
+                        - figure [ref=e2042]:
+                          - generic [ref=e2043]:
+                            - generic [ref=e2044]:
+                              - generic [ref=e2045]: Day Range lowest value
+                              - text: $224.15
+                            - generic [ref=e2046]:
+                              - generic [ref=e2047]: Day Range highest value
+                              - text: $231.96
+                            - generic [ref=e2048]: Day Range current value $227.39
+                          - slider: "227.39"
+                      - cell [ref=e2049]:
+                        - figure [ref=e2052]:
+                          - generic [ref=e2053]:
+                            - generic [ref=e2054]:
+                              - generic [ref=e2055]: 52 Week Range lowest value
+                              - text: $87.08
+                            - generic [ref=e2056]:
+                              - generic [ref=e2057]: 52 Week Range highest value
+                              - text: $234.09
+                            - generic [ref=e2058]: 52 Week Range current value $227.39
+                          - slider: "227.39"
+                      - cell "View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005383288179" [ref=e2059]:
+                        - button "View next steps for DIREXION DAILY S&P 500 BULL 3X ETF order number 1005383288179" [ref=e2061]:
+                          - generic [ref=e2062]: 
+                    - row "Expand row LRCU order number 1005380804627 View quote details for TRADR 2X LONG LRCX DAILY ETF TRADR 2X LONG LRCX DAILY ETF Filled Buy 10 Market Day $115.1629 $114.00 $119.68 $123.10 $119.68 3:16 PM 02/09/2026 3:16 PM 02/09/2026 - +$8.93 +8.0632% +$8.93 +8.0632% View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005380804627" [ref=e2063]:
+                      - cell "Expand row LRCU order number 1005380804627" [ref=e2064]:
+                        - button "Expand row LRCU order number 1005380804627" [ref=e2068]
+                      - cell "View quote details for TRADR 2X LONG LRCX DAILY ETF TRADR 2X LONG LRCX DAILY ETF" [ref=e2072]:
+                        - generic [ref=e2073]:
+                          - link "View quote details for TRADR 2X LONG LRCX DAILY ETF" [ref=e2076] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCU
+                            - text: LRCU
+                          - generic "TRADR 2X LONG LRCX DAILY ETF" [ref=e2077]
+                      - cell "Filled" [ref=e2078]:
+                        - generic [ref=e2081]: Filled
+                      - cell "Buy" [ref=e2082]:
+                        - generic [ref=e2084]: Buy
+                      - cell "10" [ref=e2085]:
+                        - generic [ref=e2088]: "10"
+                      - cell "Market" [ref=e2089]:
+                        - generic [ref=e2090]: Market
+                      - cell "Day" [ref=e2091]:
+                        - generic [ref=e2092]: Day
+                      - cell "$115.1629" [ref=e2093]:
+                        - generic [ref=e2095]: $115.1629
+                      - cell "$114.00" [ref=e2096]:
+                        - generic [ref=e2097]: $114.00
+                      - cell "$119.68" [ref=e2098]:
+                        - generic [ref=e2099]: $119.68
+                      - cell "$123.10" [ref=e2100]:
+                        - generic [ref=e2101]: $123.10
+                      - cell "$119.68" [ref=e2102]:
+                        - generic [ref=e2103]: $119.68
+                      - cell "3:16 PM 02/09/2026" [ref=e2104]:
+                        - generic [ref=e2106]: 3:16 PM 02/09/2026
+                      - cell "3:16 PM 02/09/2026" [ref=e2107]:
+                        - generic [ref=e2109]: 3:16 PM 02/09/2026
+                      - cell "-" [ref=e2110]:
+                        - generic [ref=e2112]: "-"
+                      - cell "+$8.93" [ref=e2113]:
+                        - generic [ref=e2114]: +$8.93
+                      - cell "+8.0632%" [ref=e2115]:
+                        - generic [ref=e2116]: +8.0632%
+                      - cell "+$8.93" [ref=e2117]:
+                        - generic [ref=e2118]: +$8.93
+                      - cell "+8.0632%" [ref=e2119]:
+                        - generic [ref=e2120]: +8.0632%
+                      - cell [ref=e2121]:
+                        - figure [ref=e2124]:
+                          - generic [ref=e2125]:
+                            - generic [ref=e2126]:
+                              - generic [ref=e2127]: Day Range lowest value
+                              - text: $115.265
+                            - generic [ref=e2128]:
+                              - generic [ref=e2129]: Day Range highest value
+                              - text: $124.25
+                            - generic [ref=e2130]: Day Range current value $119.68
+                          - slider: "119.68"
+                      - cell [ref=e2131]:
+                        - figure [ref=e2134]:
+                          - generic [ref=e2135]:
+                            - generic [ref=e2136]:
+                              - generic [ref=e2137]: 52 Week Range lowest value
+                              - text: $23.05
+                            - generic [ref=e2138]:
+                              - generic [ref=e2139]: 52 Week Range highest value
+                              - text: $140.59
+                            - generic [ref=e2140]: 52 Week Range current value $119.68
+                          - slider: "119.68"
+                      - cell "View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005380804627" [ref=e2141]:
+                        - button "View next steps for TRADR 2X LONG LRCX DAILY ETF order number 1005380804627" [ref=e2143]:
+                          - generic [ref=e2144]: 
+                    - row "Expand row GM order number 1005380804300 View quote details for GENERAL MTRS CO GENERAL MTRS CO Filled Buy 25 Market Day $81.0396 $79.40 $79.82 $80.20 $79.82 3:10 PM 02/09/2026 3:10 PM 02/09/2026 - -$0.45 -0.5606% -$0.45 -0.5606% View next steps for GENERAL MTRS CO order number 1005380804300" [ref=e2145]:
+                      - cell "Expand row GM order number 1005380804300" [ref=e2146]:
+                        - button "Expand row GM order number 1005380804300" [ref=e2150]
+                      - cell "View quote details for GENERAL MTRS CO GENERAL MTRS CO" [ref=e2154]:
+                        - generic [ref=e2155]:
+                          - link "View quote details for GENERAL MTRS CO" [ref=e2158] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GM
+                            - text: GM
+                          - generic "GENERAL MTRS CO" [ref=e2159]
+                      - cell "Filled" [ref=e2160]:
+                        - generic [ref=e2163]: Filled
+                      - cell "Buy" [ref=e2164]:
+                        - generic [ref=e2166]: Buy
+                      - cell "25" [ref=e2167]:
+                        - generic [ref=e2170]: "25"
+                      - cell "Market" [ref=e2171]:
+                        - generic [ref=e2172]: Market
+                      - cell "Day" [ref=e2173]:
+                        - generic [ref=e2174]: Day
+                      - cell "$81.0396" [ref=e2175]:
+                        - generic [ref=e2177]: $81.0396
+                      - cell "$79.40" [ref=e2178]:
+                        - generic [ref=e2179]: $79.40
+                      - cell "$79.82" [ref=e2180]:
+                        - generic [ref=e2181]: $79.82
+                      - cell "$80.20" [ref=e2182]:
+                        - generic [ref=e2183]: $80.20
+                      - cell "$79.82" [ref=e2184]:
+                        - generic [ref=e2185]: $79.82
+                      - cell "3:10 PM 02/09/2026" [ref=e2186]:
+                        - generic [ref=e2188]: 3:10 PM 02/09/2026
+                      - cell "3:10 PM 02/09/2026" [ref=e2189]:
+                        - generic [ref=e2191]: 3:10 PM 02/09/2026
+                      - cell "-" [ref=e2192]:
+                        - generic [ref=e2194]: "-"
+                      - cell "-$0.45" [ref=e2195]:
+                        - generic [ref=e2196]: "-$0.45"
+                      - cell "-0.5606%" [ref=e2197]:
+                        - generic [ref=e2198]: "-0.5606%"
+                      - cell "-$0.45" [ref=e2199]:
+                        - generic [ref=e2200]: "-$0.45"
+                      - cell "-0.5606%" [ref=e2201]:
+                        - generic [ref=e2202]: "-0.5606%"
+                      - cell [ref=e2203]:
+                        - figure [ref=e2206]:
+                          - generic [ref=e2207]:
+                            - generic [ref=e2208]:
+                              - generic [ref=e2209]: Day Range lowest value
+                              - text: $79.08
+                            - generic [ref=e2210]:
+                              - generic [ref=e2211]: Day Range highest value
+                              - text: $82.00
+                            - generic [ref=e2212]: Day Range current value $79.82
+                          - slider: "79.82"
+                      - cell [ref=e2213]:
+                        - figure [ref=e2216]:
+                          - generic [ref=e2217]:
+                            - generic [ref=e2218]:
+                              - generic [ref=e2219]: 52 Week Range lowest value
+                              - text: $41.60
+                            - generic [ref=e2220]:
+                              - generic [ref=e2221]: 52 Week Range highest value
+                              - text: $87.62
+                            - generic [ref=e2222]: 52 Week Range current value $79.82
+                          - slider: "79.82"
+                      - cell "View next steps for GENERAL MTRS CO order number 1005380804300" [ref=e2223]:
+                        - button "View next steps for GENERAL MTRS CO order number 1005380804300" [ref=e2225]:
+                          - generic [ref=e2226]: 
+                    - row "Expand row SGOL order number 1005349021563 View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF Filled Buy 55 Market Day $46.3465 $48.15 $48.40 $48.40 $48.14 1:48 PM 02/05/2026 1:48 PM 02/05/2026 - +$0.21 +0.4381% +$0.47 +0.9806% View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005349021563" [ref=e2227]:
+                      - cell "Expand row SGOL order number 1005349021563" [ref=e2228]:
+                        - button "Expand row SGOL order number 1005349021563" [ref=e2232]
+                      - cell "View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2236]:
+                        - generic [ref=e2237]:
+                          - link "View quote details for ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2240] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SGOL
+                            - text: SGOL
+                          - generic "ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2241]
+                      - cell "Filled" [ref=e2242]:
+                        - generic [ref=e2245]: Filled
+                      - cell "Buy" [ref=e2246]:
+                        - generic [ref=e2248]: Buy
+                      - cell "55" [ref=e2249]:
+                        - generic [ref=e2252]: "55"
+                      - cell "Market" [ref=e2253]:
+                        - generic [ref=e2254]: Market
+                      - cell "Day" [ref=e2255]:
+                        - generic [ref=e2256]: Day
+                      - cell "$46.3465" [ref=e2257]:
+                        - generic [ref=e2259]: $46.3465
+                      - cell "$48.15" [ref=e2260]:
+                        - generic [ref=e2261]: $48.15
+                      - cell "$48.40" [ref=e2262]:
+                        - generic [ref=e2263]: $48.40
+                      - cell "$48.40" [ref=e2264]:
+                        - generic [ref=e2265]: $48.40
+                      - cell "$48.14" [ref=e2266]:
+                        - generic [ref=e2267]: $48.14
+                      - cell "1:48 PM 02/05/2026" [ref=e2268]:
+                        - generic [ref=e2270]: 1:48 PM 02/05/2026
+                      - cell "1:48 PM 02/05/2026" [ref=e2271]:
+                        - generic [ref=e2273]: 1:48 PM 02/05/2026
+                      - cell "-" [ref=e2274]:
+                        - generic [ref=e2276]: "-"
+                      - cell "+$0.21" [ref=e2277]:
+                        - generic [ref=e2278]: +$0.21
+                      - cell "+0.4381%" [ref=e2279]:
+                        - generic [ref=e2280]: +0.4381%
+                      - cell "+$0.47" [ref=e2281]:
+                        - generic [ref=e2282]: +$0.47
+                      - cell "+0.9806%" [ref=e2283]:
+                        - generic [ref=e2284]: +0.9806%
+                      - cell [ref=e2285]:
+                        - figure [ref=e2288]:
+                          - generic [ref=e2289]:
+                            - generic [ref=e2290]:
+                              - generic [ref=e2291]: Day Range lowest value
+                              - text: $47.99
+                            - generic [ref=e2292]:
+                              - generic [ref=e2293]: Day Range highest value
+                              - text: $48.58
+                            - generic [ref=e2294]: Day Range current value $48.14
+                          - slider: "48.14"
+                      - cell [ref=e2295]:
+                        - figure [ref=e2298]:
+                          - generic [ref=e2299]:
+                            - generic [ref=e2300]:
+                              - generic [ref=e2301]: 52 Week Range lowest value
+                              - text: $27.025
+                            - generic [ref=e2302]:
+                              - generic [ref=e2303]: 52 Week Range highest value
+                              - text: $52.84
+                            - generic [ref=e2304]: 52 Week Range current value $48.14
+                          - slider: "48.14"
+                      - cell "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005349021563" [ref=e2305]:
+                        - button "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005349021563" [ref=e2307]:
+                          - generic [ref=e2308]: 
+                    - row "Expand row GDX order number 1005349021524 View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF Filled Sell 50 Market Day $93.5701 $104.80 $105.30 $105.30 $105.272 1:47 PM 02/05/2026 1:47 PM 02/05/2026 - +$2.262 +2.1959% +$2.29 +2.2231% View next steps for VANECK GOLD MINERS ETF order number 1005349021524" [ref=e2309]:
+                      - cell "Expand row GDX order number 1005349021524" [ref=e2310]:
+                        - button "Expand row GDX order number 1005349021524" [ref=e2314]
+                      - cell "View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF" [ref=e2318]:
+                        - generic [ref=e2319]:
+                          - link "View quote details for VANECK GOLD MINERS ETF" [ref=e2322] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GDX
+                            - text: GDX
+                          - generic "VANECK GOLD MINERS ETF" [ref=e2323]
+                      - cell "Filled" [ref=e2324]:
+                        - generic [ref=e2327]: Filled
+                      - cell "Sell" [ref=e2328]:
+                        - generic [ref=e2330]: Sell
+                      - cell "50" [ref=e2331]:
+                        - generic [ref=e2334]: "50"
+                      - cell "Market" [ref=e2335]:
+                        - generic [ref=e2336]: Market
+                      - cell "Day" [ref=e2337]:
+                        - generic [ref=e2338]: Day
+                      - cell "$93.5701" [ref=e2339]:
+                        - generic [ref=e2341]: $93.5701
+                      - cell "$104.80" [ref=e2342]:
+                        - generic [ref=e2343]: $104.80
+                      - cell "$105.30" [ref=e2344]:
+                        - generic [ref=e2345]: $105.30
+                      - cell "$105.30" [ref=e2346]:
+                        - generic [ref=e2347]: $105.30
+                      - cell "$105.272" [ref=e2348]:
+                        - generic [ref=e2349]: $105.272
+                      - cell "1:47 PM 02/05/2026" [ref=e2350]:
+                        - generic [ref=e2352]: 1:47 PM 02/05/2026
+                      - cell "1:47 PM 02/05/2026" [ref=e2353]:
+                        - generic [ref=e2355]: 1:47 PM 02/05/2026
+                      - cell "-" [ref=e2356]:
+                        - generic [ref=e2358]: "-"
+                      - cell "+$2.262" [ref=e2359]:
+                        - generic [ref=e2360]: +$2.262
+                      - cell "+2.1959%" [ref=e2361]:
+                        - generic [ref=e2362]: +2.1959%
+                      - cell "+$2.29" [ref=e2363]:
+                        - generic [ref=e2364]: +$2.29
+                      - cell "+2.2231%" [ref=e2365]:
+                        - generic [ref=e2366]: +2.2231%
+                      - cell [ref=e2367]:
+                        - figure [ref=e2370]:
+                          - generic [ref=e2371]:
+                            - generic [ref=e2372]:
+                              - generic [ref=e2373]: Day Range lowest value
+                              - text: $102.49
+                            - generic [ref=e2374]:
+                              - generic [ref=e2375]: Day Range highest value
+                              - text: $106.47
+                            - generic [ref=e2376]: Day Range current value $105.272
+                          - slider: "105.272"
+                      - cell [ref=e2377]:
+                        - figure [ref=e2380]:
+                          - generic [ref=e2381]:
+                            - generic [ref=e2382]:
+                              - generic [ref=e2383]: 52 Week Range lowest value
+                              - text: $38.581
+                            - generic [ref=e2384]:
+                              - generic [ref=e2385]: 52 Week Range highest value
+                              - text: $113.50
+                            - generic [ref=e2386]: 52 Week Range current value $105.272
+                          - slider: "105.272"
+                      - cell "View next steps for VANECK GOLD MINERS ETF order number 1005349021524" [ref=e2387]:
+                        - button "View next steps for VANECK GOLD MINERS ETF order number 1005349021524" [ref=e2389]:
+                          - generic [ref=e2390]: 
+                    - row "Expand row HYMC order number 1005349021470 View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A Filled Sell 30 Market Day $34.3814 $35.05 $35.14 $35.14 $35.1261 1:46 PM 02/05/2026 1:46 PM 02/05/2026 - -$1.5239 -4.1580% -$1.51 -4.1201% View next steps for HYCROFT MNG HLDG COR A order number 1005349021470" [ref=e2391]:
+                      - cell "Expand row HYMC order number 1005349021470" [ref=e2392]:
+                        - button "Expand row HYMC order number 1005349021470" [ref=e2396]
+                      - cell "View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A" [ref=e2400]:
+                        - generic [ref=e2401]:
+                          - link "View quote details for HYCROFT MNG HLDG COR A" [ref=e2404] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=HYMC
+                            - text: HYMC
+                          - generic "HYCROFT MNG HLDG COR A" [ref=e2405]
+                      - cell "Filled" [ref=e2406]:
+                        - generic [ref=e2409]: Filled
+                      - cell "Sell" [ref=e2410]:
+                        - generic [ref=e2412]: Sell
+                      - cell "30" [ref=e2413]:
+                        - generic [ref=e2416]: "30"
+                      - cell "Market" [ref=e2417]:
+                        - generic [ref=e2418]: Market
+                      - cell "Day" [ref=e2419]:
+                        - generic [ref=e2420]: Day
+                      - cell "$34.3814" [ref=e2421]:
+                        - generic [ref=e2423]: $34.3814
+                      - cell "$35.05" [ref=e2424]:
+                        - generic [ref=e2425]: $35.05
+                      - cell "$35.14" [ref=e2426]:
+                        - generic [ref=e2427]: $35.14
+                      - cell "$35.14" [ref=e2428]:
+                        - generic [ref=e2429]: $35.14
+                      - cell "$35.1261" [ref=e2430]:
+                        - generic [ref=e2431]: $35.1261
+                      - cell "1:46 PM 02/05/2026" [ref=e2432]:
+                        - generic [ref=e2434]: 1:46 PM 02/05/2026
+                      - cell "1:46 PM 02/05/2026" [ref=e2435]:
+                        - generic [ref=e2437]: 1:46 PM 02/05/2026
+                      - cell "-" [ref=e2438]:
+                        - generic [ref=e2440]: "-"
+                      - cell "-$1.5239" [ref=e2441]:
+                        - generic [ref=e2442]: "-$1.5239"
+                      - cell "-4.1580%" [ref=e2443]:
+                        - generic [ref=e2444]: "-4.1580%"
+                      - cell "-$1.51" [ref=e2445]:
+                        - generic [ref=e2446]: "-$1.51"
+                      - cell "-4.1201%" [ref=e2447]:
+                        - generic [ref=e2448]: "-4.1201%"
+                      - cell [ref=e2449]:
+                        - figure [ref=e2452]:
+                          - generic [ref=e2453]:
+                            - generic [ref=e2454]:
+                              - generic [ref=e2455]: Day Range lowest value
+                              - text: $34.14
+                            - generic [ref=e2456]:
+                              - generic [ref=e2457]: Day Range highest value
+                              - text: $38.60
+                            - generic [ref=e2458]: Day Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell [ref=e2459]:
+                        - figure [ref=e2462]:
+                          - generic [ref=e2463]:
+                            - generic [ref=e2464]:
+                              - generic [ref=e2465]: 52 Week Range lowest value
+                              - text: $2.22
+                            - generic [ref=e2466]:
+                              - generic [ref=e2467]: 52 Week Range highest value
+                              - text: $58.7299
+                            - generic [ref=e2468]: 52 Week Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell "View next steps for HYCROFT MNG HLDG COR A order number 1005349021470" [ref=e2469]:
+                        - button "View next steps for HYCROFT MNG HLDG COR A order number 1005349021470" [ref=e2471]:
+                          - generic [ref=e2472]: 
+                    - row "Expand row NVDA order number 1005347932972 View quote details for NVIDIA CORP NVIDIA CORP Filled Sell 2 Market Day $175.595 $190.60 $190.60 $190.61 $190.61 12:45 PM 02/05/2026 12:45 PM 02/05/2026 - +$2.07 +1.0979% +$2.06 +1.0926% View next steps for NVIDIA CORP order number 1005347932972" [ref=e2473]:
+                      - cell "Expand row NVDA order number 1005347932972" [ref=e2474]:
+                        - button "Expand row NVDA order number 1005347932972" [ref=e2478]
+                      - cell "View quote details for NVIDIA CORP NVIDIA CORP" [ref=e2482]:
+                        - generic [ref=e2483]:
+                          - link "View quote details for NVIDIA CORP" [ref=e2486] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NVDA
+                            - text: NVDA
+                          - generic "NVIDIA CORP" [ref=e2487]
+                      - cell "Filled" [ref=e2488]:
+                        - generic [ref=e2491]: Filled
+                      - cell "Sell" [ref=e2492]:
+                        - generic [ref=e2494]: Sell
+                      - cell "2" [ref=e2495]:
+                        - generic [ref=e2498]: "2"
+                      - cell "Market" [ref=e2499]:
+                        - generic [ref=e2500]: Market
+                      - cell "Day" [ref=e2501]:
+                        - generic [ref=e2502]: Day
+                      - cell "$175.595" [ref=e2503]:
+                        - generic [ref=e2505]: $175.595
+                      - cell "$190.60" [ref=e2506]:
+                        - generic [ref=e2507]: $190.60
+                      - cell "$190.60" [ref=e2508]:
+                        - generic [ref=e2509]: $190.60
+                      - cell "$190.61" [ref=e2510]:
+                        - generic [ref=e2511]: $190.61
+                      - cell "$190.61" [ref=e2512]:
+                        - generic [ref=e2513]: $190.61
+                      - cell "12:45 PM 02/05/2026" [ref=e2514]:
+                        - generic [ref=e2516]: 12:45 PM 02/05/2026
+                      - cell "12:45 PM 02/05/2026" [ref=e2517]:
+                        - generic [ref=e2519]: 12:45 PM 02/05/2026
+                      - cell "-" [ref=e2520]:
+                        - generic [ref=e2522]: "-"
+                      - cell "+$2.07" [ref=e2523]:
+                        - generic [ref=e2524]: +$2.07
+                      - cell "+1.0979%" [ref=e2525]:
+                        - generic [ref=e2526]: +1.0979%
+                      - cell "+$2.06" [ref=e2527]:
+                        - generic [ref=e2528]: +$2.06
+                      - cell "+1.0926%" [ref=e2529]:
+                        - generic [ref=e2530]: +1.0926%
+                      - cell [ref=e2531]:
+                        - figure [ref=e2534]:
+                          - generic [ref=e2535]:
+                            - generic [ref=e2536]:
+                              - generic [ref=e2537]: Day Range lowest value
+                              - text: $188.77
+                            - generic [ref=e2538]:
+                              - generic [ref=e2539]: Day Range highest value
+                              - text: $193.26
+                            - generic [ref=e2540]: Day Range current value $190.61
+                          - slider: "190.61"
+                      - cell [ref=e2541]:
+                        - figure [ref=e2544]:
+                          - generic [ref=e2545]:
+                            - generic [ref=e2546]:
+                              - generic [ref=e2547]: 52 Week Range lowest value
+                              - text: $86.62
+                            - generic [ref=e2548]:
+                              - generic [ref=e2549]: 52 Week Range highest value
+                              - text: $212.1899
+                            - generic [ref=e2550]: 52 Week Range current value $190.61
+                          - slider: "190.61"
+                      - cell "View next steps for NVIDIA CORP order number 1005347932972" [ref=e2551]:
+                        - button "View next steps for NVIDIA CORP order number 1005347932972" [ref=e2553]:
+                          - generic [ref=e2554]: 
+                    - row "Expand row HYMC order number 1005343768237 View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A Filled Buy 30 Market Day $34.82 $35.05 $35.14 $35.14 $35.1261 10:25 AM 02/05/2026 10:25 AM 02/05/2026 - -$1.5239 -4.1580% -$1.51 -4.1201% View next steps for HYCROFT MNG HLDG COR A order number 1005343768237" [ref=e2555]:
+                      - cell "Expand row HYMC order number 1005343768237" [ref=e2556]:
+                        - button "Expand row HYMC order number 1005343768237" [ref=e2560]
+                      - cell "View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A" [ref=e2564]:
+                        - generic [ref=e2565]:
+                          - link "View quote details for HYCROFT MNG HLDG COR A" [ref=e2568] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=HYMC
+                            - text: HYMC
+                          - generic "HYCROFT MNG HLDG COR A" [ref=e2569]
+                      - cell "Filled" [ref=e2570]:
+                        - generic [ref=e2573]: Filled
+                      - cell "Buy" [ref=e2574]:
+                        - generic [ref=e2576]: Buy
+                      - cell "30" [ref=e2577]:
+                        - generic [ref=e2580]: "30"
+                      - cell "Market" [ref=e2581]:
+                        - generic [ref=e2582]: Market
+                      - cell "Day" [ref=e2583]:
+                        - generic [ref=e2584]: Day
+                      - cell "$34.82" [ref=e2585]:
+                        - generic [ref=e2587]: $34.82
+                      - cell "$35.05" [ref=e2588]:
+                        - generic [ref=e2589]: $35.05
+                      - cell "$35.14" [ref=e2590]:
+                        - generic [ref=e2591]: $35.14
+                      - cell "$35.14" [ref=e2592]:
+                        - generic [ref=e2593]: $35.14
+                      - cell "$35.1261" [ref=e2594]:
+                        - generic [ref=e2595]: $35.1261
+                      - cell "10:25 AM 02/05/2026" [ref=e2596]:
+                        - generic [ref=e2598]: 10:25 AM 02/05/2026
+                      - cell "10:25 AM 02/05/2026" [ref=e2599]:
+                        - generic [ref=e2601]: 10:25 AM 02/05/2026
+                      - cell "-" [ref=e2602]:
+                        - generic [ref=e2604]: "-"
+                      - cell "-$1.5239" [ref=e2605]:
+                        - generic [ref=e2606]: "-$1.5239"
+                      - cell "-4.1580%" [ref=e2607]:
+                        - generic [ref=e2608]: "-4.1580%"
+                      - cell "-$1.51" [ref=e2609]:
+                        - generic [ref=e2610]: "-$1.51"
+                      - cell "-4.1201%" [ref=e2611]:
+                        - generic [ref=e2612]: "-4.1201%"
+                      - cell [ref=e2613]:
+                        - figure [ref=e2616]:
+                          - generic [ref=e2617]:
+                            - generic [ref=e2618]:
+                              - generic [ref=e2619]: Day Range lowest value
+                              - text: $34.14
+                            - generic [ref=e2620]:
+                              - generic [ref=e2621]: Day Range highest value
+                              - text: $38.60
+                            - generic [ref=e2622]: Day Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell [ref=e2623]:
+                        - figure [ref=e2626]:
+                          - generic [ref=e2627]:
+                            - generic [ref=e2628]:
+                              - generic [ref=e2629]: 52 Week Range lowest value
+                              - text: $2.22
+                            - generic [ref=e2630]:
+                              - generic [ref=e2631]: 52 Week Range highest value
+                              - text: $58.7299
+                            - generic [ref=e2632]: 52 Week Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell "View next steps for HYCROFT MNG HLDG COR A order number 1005343768237" [ref=e2633]:
+                        - button "View next steps for HYCROFT MNG HLDG COR A order number 1005343768237" [ref=e2635]:
+                          - generic [ref=e2636]: 
+                    - row "Expand row FCX order number 1005341694946 View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC Filled Buy 35 Market Day $60.585 $65.00 $65.46 $65.67 $65.467 9:51 AM 02/05/2026 9:51 AM 02/05/2026 - +$2.207 +3.4888% +$2.20 +3.4777% View next steps for FREEPORT-MCMORAN INC order number 1005341694946" [ref=e2637]:
+                      - cell "Expand row FCX order number 1005341694946" [ref=e2638]:
+                        - button "Expand row FCX order number 1005341694946" [ref=e2642]
+                      - cell "View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC" [ref=e2646]:
+                        - generic [ref=e2647]:
+                          - link "View quote details for FREEPORT-MCMORAN INC" [ref=e2650] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FCX
+                            - text: FCX
+                          - generic "FREEPORT-MCMORAN INC" [ref=e2651]
+                      - cell "Filled" [ref=e2652]:
+                        - generic [ref=e2655]: Filled
+                      - cell "Buy" [ref=e2656]:
+                        - generic [ref=e2658]: Buy
+                      - cell "35" [ref=e2659]:
+                        - generic [ref=e2662]: "35"
+                      - cell "Market" [ref=e2663]:
+                        - generic [ref=e2664]: Market
+                      - cell "Day" [ref=e2665]:
+                        - generic [ref=e2666]: Day
+                      - cell "$60.585" [ref=e2667]:
+                        - generic [ref=e2669]: $60.585
+                      - cell "$65.00" [ref=e2670]:
+                        - generic [ref=e2671]: $65.00
+                      - cell "$65.46" [ref=e2672]:
+                        - generic [ref=e2673]: $65.46
+                      - cell "$65.67" [ref=e2674]:
+                        - generic [ref=e2675]: $65.67
+                      - cell "$65.467" [ref=e2676]:
+                        - generic [ref=e2677]: $65.467
+                      - cell "9:51 AM 02/05/2026" [ref=e2678]:
+                        - generic [ref=e2680]: 9:51 AM 02/05/2026
+                      - cell "9:51 AM 02/05/2026" [ref=e2681]:
+                        - generic [ref=e2683]: 9:51 AM 02/05/2026
+                      - cell "-" [ref=e2684]:
+                        - generic [ref=e2686]: "-"
+                      - cell "+$2.207" [ref=e2687]:
+                        - generic [ref=e2688]: +$2.207
+                      - cell "+3.4888%" [ref=e2689]:
+                        - generic [ref=e2690]: +3.4888%
+                      - cell "+$2.20" [ref=e2691]:
+                        - generic [ref=e2692]: +$2.20
+                      - cell "+3.4777%" [ref=e2693]:
+                        - generic [ref=e2694]: +3.4777%
+                      - cell [ref=e2695]:
+                        - figure [ref=e2698]:
+                          - generic [ref=e2699]:
+                            - generic [ref=e2700]:
+                              - generic [ref=e2701]: Day Range lowest value
+                              - text: $63.07
+                            - generic [ref=e2702]:
+                              - generic [ref=e2703]: Day Range highest value
+                              - text: $65.50
+                            - generic [ref=e2704]: Day Range current value $65.467
+                          - slider: "65.467"
+                      - cell [ref=e2705]:
+                        - figure [ref=e2708]:
+                          - generic [ref=e2709]:
+                            - generic [ref=e2710]:
+                              - generic [ref=e2711]: 52 Week Range lowest value
+                              - text: $27.66
+                            - generic [ref=e2712]:
+                              - generic [ref=e2713]: 52 Week Range highest value
+                              - text: $69.44
+                            - generic [ref=e2714]: 52 Week Range current value $65.467
+                          - slider: "65.467"
+                      - cell "View next steps for FREEPORT-MCMORAN INC order number 1005341694946" [ref=e2715]:
+                        - button "View next steps for FREEPORT-MCMORAN INC order number 1005341694946" [ref=e2717]:
+                          - generic [ref=e2718]: 
+                    - row "Expand row LRCX order number 1005341694771 View quote details for LAM RESH CORP LAM RESH CORP Filled Sell 10 Market Day $215.20 $234.50 $235.12 $236.49 $235.25 9:49 AM 02/05/2026 9:49 AM 02/05/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005341694771" [ref=e2719]:
+                      - cell "Expand row LRCX order number 1005341694771" [ref=e2720]:
+                        - button "Expand row LRCX order number 1005341694771" [ref=e2724]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e2728]:
+                        - generic [ref=e2729]:
+                          - link "View quote details for LAM RESH CORP" [ref=e2732] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e2733]
+                      - cell "Filled" [ref=e2734]:
+                        - generic [ref=e2737]: Filled
+                      - cell "Sell" [ref=e2738]:
+                        - generic [ref=e2740]: Sell
+                      - cell "10" [ref=e2741]:
+                        - generic [ref=e2744]: "10"
+                      - cell "Market" [ref=e2745]:
+                        - generic [ref=e2746]: Market
+                      - cell "Day" [ref=e2747]:
+                        - generic [ref=e2748]: Day
+                      - cell "$215.20" [ref=e2749]:
+                        - generic [ref=e2751]: $215.20
+                      - cell "$234.50" [ref=e2752]:
+                        - generic [ref=e2753]: $234.50
+                      - cell "$235.12" [ref=e2754]:
+                        - generic [ref=e2755]: $235.12
+                      - cell "$236.49" [ref=e2756]:
+                        - generic [ref=e2757]: $236.49
+                      - cell "$235.25" [ref=e2758]:
+                        - generic [ref=e2759]: $235.25
+                      - cell "9:49 AM 02/05/2026" [ref=e2760]:
+                        - generic [ref=e2762]: 9:49 AM 02/05/2026
+                      - cell "9:49 AM 02/05/2026" [ref=e2763]:
+                        - generic [ref=e2765]: 9:49 AM 02/05/2026
+                      - cell "-" [ref=e2766]:
+                        - generic [ref=e2768]: "-"
+                      - cell "+$8.64" [ref=e2769]:
+                        - generic [ref=e2770]: +$8.64
+                      - cell "+3.8127%" [ref=e2771]:
+                        - generic [ref=e2772]: +3.8127%
+                      - cell "+$8.51" [ref=e2773]:
+                        - generic [ref=e2774]: +$8.51
+                      - cell "+3.7554%" [ref=e2775]:
+                        - generic [ref=e2776]: +3.7554%
+                      - cell [ref=e2777]:
+                        - figure [ref=e2780]:
+                          - generic [ref=e2781]:
+                            - generic [ref=e2782]:
+                              - generic [ref=e2783]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e2784]:
+                              - generic [ref=e2785]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e2786]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e2787]:
+                        - figure [ref=e2790]:
+                          - generic [ref=e2791]:
+                            - generic [ref=e2792]:
+                              - generic [ref=e2793]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e2794]:
+                              - generic [ref=e2795]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e2796]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005341694771" [ref=e2797]:
+                        - button "View next steps for LAM RESH CORP order number 1005341694771" [ref=e2799]:
+                          - generic [ref=e2800]: 
+                    - row "Expand row SGOL order number 1005341694549 View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF Filled Buy 20 Market Day $46.2259 $48.15 $48.40 $48.40 $48.14 9:47 AM 02/05/2026 9:47 AM 02/05/2026 - +$0.21 +0.4381% +$0.47 +0.9806% View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005341694549" [ref=e2801]:
+                      - cell "Expand row SGOL order number 1005341694549" [ref=e2802]:
+                        - button "Expand row SGOL order number 1005341694549" [ref=e2806]
+                      - cell "View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2810]:
+                        - generic [ref=e2811]:
+                          - link "View quote details for ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2814] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SGOL
+                            - text: SGOL
+                          - generic "ABRDN PHYSICAL GOLD SHARES ETF" [ref=e2815]
+                      - cell "Filled" [ref=e2816]:
+                        - generic [ref=e2819]: Filled
+                      - cell "Buy" [ref=e2820]:
+                        - generic [ref=e2822]: Buy
+                      - cell "20" [ref=e2823]:
+                        - generic [ref=e2826]: "20"
+                      - cell "Market" [ref=e2827]:
+                        - generic [ref=e2828]: Market
+                      - cell "Day" [ref=e2829]:
+                        - generic [ref=e2830]: Day
+                      - cell "$46.2259" [ref=e2831]:
+                        - generic [ref=e2833]: $46.2259
+                      - cell "$48.15" [ref=e2834]:
+                        - generic [ref=e2835]: $48.15
+                      - cell "$48.40" [ref=e2836]:
+                        - generic [ref=e2837]: $48.40
+                      - cell "$48.40" [ref=e2838]:
+                        - generic [ref=e2839]: $48.40
+                      - cell "$48.14" [ref=e2840]:
+                        - generic [ref=e2841]: $48.14
+                      - cell "9:47 AM 02/05/2026" [ref=e2842]:
+                        - generic [ref=e2844]: 9:47 AM 02/05/2026
+                      - cell "9:47 AM 02/05/2026" [ref=e2845]:
+                        - generic [ref=e2847]: 9:47 AM 02/05/2026
+                      - cell "-" [ref=e2848]:
+                        - generic [ref=e2850]: "-"
+                      - cell "+$0.21" [ref=e2851]:
+                        - generic [ref=e2852]: +$0.21
+                      - cell "+0.4381%" [ref=e2853]:
+                        - generic [ref=e2854]: +0.4381%
+                      - cell "+$0.47" [ref=e2855]:
+                        - generic [ref=e2856]: +$0.47
+                      - cell "+0.9806%" [ref=e2857]:
+                        - generic [ref=e2858]: +0.9806%
+                      - cell [ref=e2859]:
+                        - figure [ref=e2862]:
+                          - generic [ref=e2863]:
+                            - generic [ref=e2864]:
+                              - generic [ref=e2865]: Day Range lowest value
+                              - text: $47.99
+                            - generic [ref=e2866]:
+                              - generic [ref=e2867]: Day Range highest value
+                              - text: $48.58
+                            - generic [ref=e2868]: Day Range current value $48.14
+                          - slider: "48.14"
+                      - cell [ref=e2869]:
+                        - figure [ref=e2872]:
+                          - generic [ref=e2873]:
+                            - generic [ref=e2874]:
+                              - generic [ref=e2875]: 52 Week Range lowest value
+                              - text: $27.025
+                            - generic [ref=e2876]:
+                              - generic [ref=e2877]: 52 Week Range highest value
+                              - text: $52.84
+                            - generic [ref=e2878]: 52 Week Range current value $48.14
+                          - slider: "48.14"
+                      - cell "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005341694549" [ref=e2879]:
+                        - button "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005341694549" [ref=e2881]:
+                          - generic [ref=e2882]: 
+                    - row "Expand row SIVR order number 1005339986966 View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF Filled Sell 50 Limit $71.00 Day + ext $71.11 $78.26 $78.68 $78.68 $78.55 8:00 AM 02/05/2026 8:00 AM 02/05/2026 - +$1.48 +1.9203% +$1.61 +2.0890% View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005339986966" [ref=e2883]:
+                      - cell "Expand row SIVR order number 1005339986966" [ref=e2884]:
+                        - button "Expand row SIVR order number 1005339986966" [ref=e2888]
+                      - cell "View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF" [ref=e2892]:
+                        - generic [ref=e2893]:
+                          - link "View quote details for ABRDN PHYSICAL SILVER SHARES ETF" [ref=e2896] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SIVR
+                            - text: SIVR
+                          - generic "ABRDN PHYSICAL SILVER SHARES ETF" [ref=e2897]
+                      - cell "Filled" [ref=e2898]:
+                        - generic [ref=e2901]: Filled
+                      - cell "Sell" [ref=e2902]:
+                        - generic [ref=e2904]: Sell
+                      - cell "50" [ref=e2905]:
+                        - generic [ref=e2908]: "50"
+                      - cell "Limit $71.00" [ref=e2909]:
+                        - generic [ref=e2910]: Limit $71.00
+                      - cell "Day + ext" [ref=e2911]:
+                        - generic [ref=e2912]: Day + ext
+                      - cell "$71.11" [ref=e2913]:
+                        - generic [ref=e2915]: $71.11
+                      - cell "$78.26" [ref=e2916]:
+                        - generic [ref=e2917]: $78.26
+                      - cell "$78.68" [ref=e2918]:
+                        - generic [ref=e2919]: $78.68
+                      - cell "$78.68" [ref=e2920]:
+                        - generic [ref=e2921]: $78.68
+                      - cell "$78.55" [ref=e2922]:
+                        - generic [ref=e2923]: $78.55
+                      - cell "8:00 AM 02/05/2026" [ref=e2924]:
+                        - generic [ref=e2926]: 8:00 AM 02/05/2026
+                      - cell "8:00 AM 02/05/2026" [ref=e2927]:
+                        - generic [ref=e2929]: 8:00 AM 02/05/2026
+                      - cell "-" [ref=e2930]:
+                        - generic [ref=e2932]: "-"
+                      - cell "+$1.48" [ref=e2933]:
+                        - generic [ref=e2934]: +$1.48
+                      - cell "+1.9203%" [ref=e2935]:
+                        - generic [ref=e2936]: +1.9203%
+                      - cell "+$1.61" [ref=e2937]:
+                        - generic [ref=e2938]: +$1.61
+                      - cell "+2.0890%" [ref=e2939]:
+                        - generic [ref=e2940]: +2.0890%
+                      - cell [ref=e2941]:
+                        - figure [ref=e2944]:
+                          - generic [ref=e2945]:
+                            - generic [ref=e2946]:
+                              - generic [ref=e2947]: Day Range lowest value
+                              - text: $78.54
+                            - generic [ref=e2948]:
+                              - generic [ref=e2949]: Day Range highest value
+                              - text: $80.84
+                            - generic [ref=e2950]: Day Range current value $78.55
+                          - slider: "78.55"
+                      - cell [ref=e2951]:
+                        - figure [ref=e2954]:
+                          - generic [ref=e2955]:
+                            - generic [ref=e2956]:
+                              - generic [ref=e2957]: 52 Week Range lowest value
+                              - text: $27.86
+                            - generic [ref=e2958]:
+                              - generic [ref=e2959]: 52 Week Range highest value
+                              - text: $115.26
+                            - generic [ref=e2960]: 52 Week Range current value $78.55
+                          - slider: "78.55"
+                      - cell "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005339986966" [ref=e2961]:
+                        - button "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005339986966" [ref=e2963]:
+                          - generic [ref=e2964]: 
+                    - row "Expand row NUGT order number 1005339143060 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Sell 10 Limit $236.00 Day + ext $236.31 $258.98 $263.00 $263.00 $259.73 5:27 PM 02/04/2026 5:27 PM 02/04/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005339143060" [ref=e2965]:
+                      - cell "Expand row NUGT order number 1005339143060" [ref=e2966]:
+                        - button "Expand row NUGT order number 1005339143060" [ref=e2970]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e2974]:
+                        - generic [ref=e2975]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e2978] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e2979]
+                      - cell "Filled" [ref=e2980]:
+                        - generic [ref=e2983]: Filled
+                      - cell "Sell" [ref=e2984]:
+                        - generic [ref=e2986]: Sell
+                      - cell "10" [ref=e2987]:
+                        - generic [ref=e2990]: "10"
+                      - cell "Limit $236.00" [ref=e2991]:
+                        - generic [ref=e2992]: Limit $236.00
+                      - cell "Day + ext" [ref=e2993]:
+                        - generic [ref=e2994]: Day + ext
+                      - cell "$236.31" [ref=e2995]:
+                        - generic [ref=e2997]: $236.31
+                      - cell "$258.98" [ref=e2998]:
+                        - generic [ref=e2999]: $258.98
+                      - cell "$263.00" [ref=e3000]:
+                        - generic [ref=e3001]: $263.00
+                      - cell "$263.00" [ref=e3002]:
+                        - generic [ref=e3003]: $263.00
+                      - cell "$259.73" [ref=e3004]:
+                        - generic [ref=e3005]: $259.73
+                      - cell "5:27 PM 02/04/2026" [ref=e3006]:
+                        - generic [ref=e3008]: 5:27 PM 02/04/2026
+                      - cell "5:27 PM 02/04/2026" [ref=e3009]:
+                        - generic [ref=e3011]: 5:27 PM 02/04/2026
+                      - cell "-" [ref=e3012]:
+                        - generic [ref=e3014]: "-"
+                      - cell "+$7.01" [ref=e3015]:
+                        - generic [ref=e3016]: +$7.01
+                      - cell "+2.7738%" [ref=e3017]:
+                        - generic [ref=e3018]: +2.7738%
+                      - cell "+$10.28" [ref=e3019]:
+                        - generic [ref=e3020]: +$10.28
+                      - cell "+4.0677%" [ref=e3021]:
+                        - generic [ref=e3022]: +4.0677%
+                      - cell [ref=e3023]:
+                        - figure [ref=e3026]:
+                          - generic [ref=e3027]:
+                            - generic [ref=e3028]:
+                              - generic [ref=e3029]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e3030]:
+                              - generic [ref=e3031]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e3032]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e3033]:
+                        - figure [ref=e3036]:
+                          - generic [ref=e3037]:
+                            - generic [ref=e3038]:
+                              - generic [ref=e3039]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e3040]:
+                              - generic [ref=e3041]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e3042]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005339143060" [ref=e3043]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005339143060" [ref=e3045]:
+                          - generic [ref=e3046]: 
+                    - row "Expand row AVGO order number 1005338460024 View quote details for BROADCOM INC BROADCOM INC Filled Sell 2 Market Day $308.69 $341.35 $341.45 $341.45 $341.35 3:33 PM 02/04/2026 3:33 PM 02/04/2026 - +$0.91 +0.2673% +$1.01 +0.2967% View next steps for BROADCOM INC order number 1005338460024" [ref=e3047]:
+                      - cell "Expand row AVGO order number 1005338460024" [ref=e3048]:
+                        - button "Expand row AVGO order number 1005338460024" [ref=e3052]
+                      - cell "View quote details for BROADCOM INC BROADCOM INC" [ref=e3056]:
+                        - generic [ref=e3057]:
+                          - link "View quote details for BROADCOM INC" [ref=e3060] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AVGO
+                            - text: AVGO
+                          - generic "BROADCOM INC" [ref=e3061]
+                      - cell "Filled" [ref=e3062]:
+                        - generic [ref=e3065]: Filled
+                      - cell "Sell" [ref=e3066]:
+                        - generic [ref=e3068]: Sell
+                      - cell "2" [ref=e3069]:
+                        - generic [ref=e3072]: "2"
+                      - cell "Market" [ref=e3073]:
+                        - generic [ref=e3074]: Market
+                      - cell "Day" [ref=e3075]:
+                        - generic [ref=e3076]: Day
+                      - cell "$308.69" [ref=e3077]:
+                        - generic [ref=e3079]: $308.69
+                      - cell "$341.35" [ref=e3080]:
+                        - generic [ref=e3081]: $341.35
+                      - cell "$341.45" [ref=e3082]:
+                        - generic [ref=e3083]: $341.45
+                      - cell "$341.45" [ref=e3084]:
+                        - generic [ref=e3085]: $341.45
+                      - cell "$341.35" [ref=e3086]:
+                        - generic [ref=e3087]: $341.35
+                      - cell "3:33 PM 02/04/2026" [ref=e3088]:
+                        - generic [ref=e3090]: 3:33 PM 02/04/2026
+                      - cell "3:33 PM 02/04/2026" [ref=e3091]:
+                        - generic [ref=e3093]: 3:33 PM 02/04/2026
+                      - cell "-" [ref=e3094]:
+                        - generic [ref=e3096]: "-"
+                      - cell "+$0.91" [ref=e3097]:
+                        - generic [ref=e3098]: +$0.91
+                      - cell "+0.2673%" [ref=e3099]:
+                        - generic [ref=e3100]: +0.2673%
+                      - cell "+$1.01" [ref=e3101]:
+                        - generic [ref=e3102]: +$1.01
+                      - cell "+0.2967%" [ref=e3103]:
+                        - generic [ref=e3104]: +0.2967%
+                      - cell [ref=e3105]:
+                        - figure [ref=e3108]:
+                          - generic [ref=e3109]:
+                            - generic [ref=e3110]:
+                              - generic [ref=e3111]: Day Range lowest value
+                              - text: $333.74
+                            - generic [ref=e3112]:
+                              - generic [ref=e3113]: Day Range highest value
+                              - text: $347.20
+                            - generic [ref=e3114]: Day Range current value $341.35
+                          - slider: "341.35"
+                      - cell [ref=e3115]:
+                        - figure [ref=e3118]:
+                          - generic [ref=e3119]:
+                            - generic [ref=e3120]:
+                              - generic [ref=e3121]: 52 Week Range lowest value
+                              - text: $138.10
+                            - generic [ref=e3122]:
+                              - generic [ref=e3123]: 52 Week Range highest value
+                              - text: $414.61
+                            - generic [ref=e3124]: 52 Week Range current value $341.35
+                          - slider: "341.35"
+                      - cell "View next steps for BROADCOM INC order number 1005338460024" [ref=e3125]:
+                        - button "View next steps for BROADCOM INC order number 1005338460024" [ref=e3127]:
+                          - generic [ref=e3128]: 
+                    - row "Expand row LRCX order number 1005337427947 View quote details for LAM RESH CORP LAM RESH CORP Filled Buy 10 Market Day $209.52 $234.50 $235.12 $236.49 $235.25 3:31 PM 02/04/2026 3:31 PM 02/04/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005337427947" [ref=e3129]:
+                      - cell "Expand row LRCX order number 1005337427947" [ref=e3130]:
+                        - button "Expand row LRCX order number 1005337427947" [ref=e3134]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e3138]:
+                        - generic [ref=e3139]:
+                          - link "View quote details for LAM RESH CORP" [ref=e3142] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e3143]
+                      - cell "Filled" [ref=e3144]:
+                        - generic [ref=e3147]: Filled
+                      - cell "Buy" [ref=e3148]:
+                        - generic [ref=e3150]: Buy
+                      - cell "10" [ref=e3151]:
+                        - generic [ref=e3154]: "10"
+                      - cell "Market" [ref=e3155]:
+                        - generic [ref=e3156]: Market
+                      - cell "Day" [ref=e3157]:
+                        - generic [ref=e3158]: Day
+                      - cell "$209.52" [ref=e3159]:
+                        - generic [ref=e3161]: $209.52
+                      - cell "$234.50" [ref=e3162]:
+                        - generic [ref=e3163]: $234.50
+                      - cell "$235.12" [ref=e3164]:
+                        - generic [ref=e3165]: $235.12
+                      - cell "$236.49" [ref=e3166]:
+                        - generic [ref=e3167]: $236.49
+                      - cell "$235.25" [ref=e3168]:
+                        - generic [ref=e3169]: $235.25
+                      - cell "3:31 PM 02/04/2026" [ref=e3170]:
+                        - generic [ref=e3172]: 3:31 PM 02/04/2026
+                      - cell "3:31 PM 02/04/2026" [ref=e3173]:
+                        - generic [ref=e3175]: 3:31 PM 02/04/2026
+                      - cell "-" [ref=e3176]:
+                        - generic [ref=e3178]: "-"
+                      - cell "+$8.64" [ref=e3179]:
+                        - generic [ref=e3180]: +$8.64
+                      - cell "+3.8127%" [ref=e3181]:
+                        - generic [ref=e3182]: +3.8127%
+                      - cell "+$8.51" [ref=e3183]:
+                        - generic [ref=e3184]: +$8.51
+                      - cell "+3.7554%" [ref=e3185]:
+                        - generic [ref=e3186]: +3.7554%
+                      - cell [ref=e3187]:
+                        - figure [ref=e3190]:
+                          - generic [ref=e3191]:
+                            - generic [ref=e3192]:
+                              - generic [ref=e3193]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e3194]:
+                              - generic [ref=e3195]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e3196]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e3197]:
+                        - figure [ref=e3200]:
+                          - generic [ref=e3201]:
+                            - generic [ref=e3202]:
+                              - generic [ref=e3203]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e3204]:
+                              - generic [ref=e3205]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e3206]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005337427947" [ref=e3207]:
+                        - button "View next steps for LAM RESH CORP order number 1005337427947" [ref=e3209]:
+                          - generic [ref=e3210]: 
+                    - row "Expand row SNDK order number 1005337427907 View quote details for SANDISK CORP SANDISK CORP Filled Sell 5 Market Day $594.275 $611.00 $611.00 $612.52 $611.53 3:30 PM 02/04/2026 3:30 PM 02/04/2026 - +$69.89 +12.9034% +$69.36 +12.8056% View next steps for SANDISK CORP order number 1005337427907" [ref=e3211]:
+                      - cell "Expand row SNDK order number 1005337427907" [ref=e3212]:
+                        - button "Expand row SNDK order number 1005337427907" [ref=e3216]
+                      - cell "View quote details for SANDISK CORP SANDISK CORP" [ref=e3220]:
+                        - generic [ref=e3221]:
+                          - link "View quote details for SANDISK CORP" [ref=e3224] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SNDK
+                            - text: SNDK
+                          - generic "SANDISK CORP" [ref=e3225]
+                      - cell "Filled" [ref=e3226]:
+                        - generic [ref=e3229]: Filled
+                      - cell "Sell" [ref=e3230]:
+                        - generic [ref=e3232]: Sell
+                      - cell "5" [ref=e3233]:
+                        - generic [ref=e3236]: "5"
+                      - cell "Market" [ref=e3237]:
+                        - generic [ref=e3238]: Market
+                      - cell "Day" [ref=e3239]:
+                        - generic [ref=e3240]: Day
+                      - cell "$594.275" [ref=e3241]:
+                        - generic [ref=e3243]: $594.275
+                      - cell "$611.00" [ref=e3244]:
+                        - generic [ref=e3245]: $611.00
+                      - cell "$611.00" [ref=e3246]:
+                        - generic [ref=e3247]: $611.00
+                      - cell "$612.52" [ref=e3248]:
+                        - generic [ref=e3249]: $612.52
+                      - cell "$611.53" [ref=e3250]:
+                        - generic [ref=e3251]: $611.53
+                      - cell "3:30 PM 02/04/2026" [ref=e3252]:
+                        - generic [ref=e3254]: 3:30 PM 02/04/2026
+                      - cell "3:30 PM 02/04/2026" [ref=e3255]:
+                        - generic [ref=e3257]: 3:30 PM 02/04/2026
+                      - cell "-" [ref=e3258]:
+                        - generic [ref=e3260]: "-"
+                      - cell "+$69.89" [ref=e3261]:
+                        - generic [ref=e3262]: +$69.89
+                      - cell "+12.9034%" [ref=e3263]:
+                        - generic [ref=e3264]: +12.9034%
+                      - cell "+$69.36" [ref=e3265]:
+                        - generic [ref=e3266]: +$69.36
+                      - cell "+12.8056%" [ref=e3267]:
+                        - generic [ref=e3268]: +12.8056%
+                      - cell [ref=e3269]:
+                        - figure [ref=e3272]:
+                          - generic [ref=e3273]:
+                            - generic [ref=e3274]:
+                              - generic [ref=e3275]: Day Range lowest value
+                              - text: $575.00
+                            - generic [ref=e3276]:
+                              - generic [ref=e3277]: Day Range highest value
+                              - text: $612.80
+                            - generic [ref=e3278]: Day Range current value $611.53
+                          - slider: "611.53"
+                      - cell [ref=e3279]:
+                        - figure [ref=e3282]:
+                          - generic [ref=e3283]:
+                            - generic [ref=e3284]:
+                              - generic [ref=e3285]: 52 Week Range lowest value
+                              - text: $27.885
+                            - generic [ref=e3286]:
+                              - generic [ref=e3287]: 52 Week Range highest value
+                              - text: $725.00
+                            - generic [ref=e3288]: 52 Week Range current value $611.53
+                          - slider: "611.53"
+                      - cell "View next steps for SANDISK CORP order number 1005337427907" [ref=e3289]:
+                        - button "View next steps for SANDISK CORP order number 1005337427907" [ref=e3291]:
+                          - generic [ref=e3292]: 
+                    - row "Expand row SNDK order number 1005337427780 View quote details for SANDISK CORP SANDISK CORP Filled Buy 5 Market Day $595.505 $611.00 $611.00 $612.52 $611.53 3:26 PM 02/04/2026 3:26 PM 02/04/2026 - +$69.89 +12.9034% +$69.36 +12.8056% View next steps for SANDISK CORP order number 1005337427780" [ref=e3293]:
+                      - cell "Expand row SNDK order number 1005337427780" [ref=e3294]:
+                        - button "Expand row SNDK order number 1005337427780" [ref=e3298]
+                      - cell "View quote details for SANDISK CORP SANDISK CORP" [ref=e3302]:
+                        - generic [ref=e3303]:
+                          - link "View quote details for SANDISK CORP" [ref=e3306] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SNDK
+                            - text: SNDK
+                          - generic "SANDISK CORP" [ref=e3307]
+                      - cell "Filled" [ref=e3308]:
+                        - generic [ref=e3311]: Filled
+                      - cell "Buy" [ref=e3312]:
+                        - generic [ref=e3314]: Buy
+                      - cell "5" [ref=e3315]:
+                        - generic [ref=e3318]: "5"
+                      - cell "Market" [ref=e3319]:
+                        - generic [ref=e3320]: Market
+                      - cell "Day" [ref=e3321]:
+                        - generic [ref=e3322]: Day
+                      - cell "$595.505" [ref=e3323]:
+                        - generic [ref=e3325]: $595.505
+                      - cell "$611.00" [ref=e3326]:
+                        - generic [ref=e3327]: $611.00
+                      - cell "$611.00" [ref=e3328]:
+                        - generic [ref=e3329]: $611.00
+                      - cell "$612.52" [ref=e3330]:
+                        - generic [ref=e3331]: $612.52
+                      - cell "$611.53" [ref=e3332]:
+                        - generic [ref=e3333]: $611.53
+                      - cell "3:26 PM 02/04/2026" [ref=e3334]:
+                        - generic [ref=e3336]: 3:26 PM 02/04/2026
+                      - cell "3:26 PM 02/04/2026" [ref=e3337]:
+                        - generic [ref=e3339]: 3:26 PM 02/04/2026
+                      - cell "-" [ref=e3340]:
+                        - generic [ref=e3342]: "-"
+                      - cell "+$69.89" [ref=e3343]:
+                        - generic [ref=e3344]: +$69.89
+                      - cell "+12.9034%" [ref=e3345]:
+                        - generic [ref=e3346]: +12.9034%
+                      - cell "+$69.36" [ref=e3347]:
+                        - generic [ref=e3348]: +$69.36
+                      - cell "+12.8056%" [ref=e3349]:
+                        - generic [ref=e3350]: +12.8056%
+                      - cell [ref=e3351]:
+                        - figure [ref=e3354]:
+                          - generic [ref=e3355]:
+                            - generic [ref=e3356]:
+                              - generic [ref=e3357]: Day Range lowest value
+                              - text: $575.00
+                            - generic [ref=e3358]:
+                              - generic [ref=e3359]: Day Range highest value
+                              - text: $612.80
+                            - generic [ref=e3360]: Day Range current value $611.53
+                          - slider: "611.53"
+                      - cell [ref=e3361]:
+                        - figure [ref=e3364]:
+                          - generic [ref=e3365]:
+                            - generic [ref=e3366]:
+                              - generic [ref=e3367]: 52 Week Range lowest value
+                              - text: $27.885
+                            - generic [ref=e3368]:
+                              - generic [ref=e3369]: 52 Week Range highest value
+                              - text: $725.00
+                            - generic [ref=e3370]: 52 Week Range current value $611.53
+                          - slider: "611.53"
+                      - cell "View next steps for SANDISK CORP order number 1005337427780" [ref=e3371]:
+                        - button "View next steps for SANDISK CORP order number 1005337427780" [ref=e3373]:
+                          - generic [ref=e3374]: 
+                    - 'row "Expand row MUU order number 1005325164217 View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF Filled Sell 3 Trailing stop mark 3.00 % mark (Trigger: $192.84) GTC Exp 07/31/2026 $191.00 $196.57 $196.57 $197.89 $197.67 7:13 PM 02/03/2026 9:30 AM 02/04/2026 07/31/2026 +$37.22 +23.1973% +$36.12 +22.5117% View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164217" [ref=e3375]':
+                      - cell "Expand row MUU order number 1005325164217" [ref=e3376]:
+                        - button "Expand row MUU order number 1005325164217" [ref=e3380]
+                      - cell "View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF" [ref=e3384]:
+                        - generic [ref=e3385]:
+                          - link "View quote details for DIREXION DAILY MU BULL 2X ETF" [ref=e3388] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MUU
+                            - text: MUU
+                          - generic "DIREXION DAILY MU BULL 2X ETF" [ref=e3389]
+                      - cell "Filled" [ref=e3390]:
+                        - generic [ref=e3393]: Filled
+                      - cell "Sell" [ref=e3394]:
+                        - generic [ref=e3396]: Sell
+                      - cell "3" [ref=e3397]:
+                        - generic [ref=e3400]: "3"
+                      - 'cell "Trailing stop mark 3.00 % mark (Trigger: $192.84)" [ref=e3401]':
+                        - generic [ref=e3402]:
+                          - text: Trailing stop mark 3.00 % mark
+                          - generic [ref=e3404]: "(Trigger: $192.84)"
+                      - cell "GTC Exp 07/31/2026" [ref=e3405]:
+                        - generic [ref=e3406]:
+                          - text: GTC
+                          - generic [ref=e3407]: Exp 07/31/2026
+                      - cell "$191.00" [ref=e3408]:
+                        - generic [ref=e3410]: $191.00
+                      - cell "$196.57" [ref=e3411]:
+                        - generic [ref=e3412]: $196.57
+                      - cell "$196.57" [ref=e3413]:
+                        - generic [ref=e3414]: $196.57
+                      - cell "$197.89" [ref=e3415]:
+                        - generic [ref=e3416]: $197.89
+                      - cell "$197.67" [ref=e3417]:
+                        - generic [ref=e3418]: $197.67
+                      - cell "7:13 PM 02/03/2026" [ref=e3419]:
+                        - generic [ref=e3421]: 7:13 PM 02/03/2026
+                      - cell "9:30 AM 02/04/2026" [ref=e3422]:
+                        - generic [ref=e3424]: 9:30 AM 02/04/2026
+                      - cell "07/31/2026" [ref=e3425]:
+                        - generic [ref=e3427]: 07/31/2026
+                      - cell "+$37.22" [ref=e3428]:
+                        - generic [ref=e3429]: +$37.22
+                      - cell "+23.1973%" [ref=e3430]:
+                        - generic [ref=e3431]: +23.1973%
+                      - cell "+$36.12" [ref=e3432]:
+                        - generic [ref=e3433]: +$36.12
+                      - cell "+22.5117%" [ref=e3434]:
+                        - generic [ref=e3435]: +22.5117%
+                      - cell [ref=e3436]:
+                        - figure [ref=e3439]:
+                          - generic [ref=e3440]:
+                            - generic [ref=e3441]:
+                              - generic [ref=e3442]: Day Range lowest value
+                              - text: $171.89
+                            - generic [ref=e3443]:
+                              - generic [ref=e3444]: Day Range highest value
+                              - text: $195.3999
+                            - generic [ref=e3445]: Day Range current value $197.67
+                          - slider: "195.3999"
+                      - cell [ref=e3446]:
+                        - figure [ref=e3449]:
+                          - generic [ref=e3450]:
+                            - generic [ref=e3451]:
+                              - generic [ref=e3452]: 52 Week Range lowest value
+                              - text: $6.7727
+                            - generic [ref=e3453]:
+                              - generic [ref=e3454]: 52 Week Range highest value
+                              - text: $249.10
+                            - generic [ref=e3455]: 52 Week Range current value $197.67
+                          - slider: "197.67"
+                      - cell "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164217" [ref=e3456]:
+                        - button "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164217" [ref=e3458]:
+                          - generic [ref=e3459]: 
+                    - row "Expand row MUU order number 1005325164211 View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF Filled Buy 3 Limit $203.00 Day + ext $202.923 $196.57 $196.57 $197.89 $197.67 7:12 PM 02/03/2026 7:12 PM 02/03/2026 - +$37.22 +23.1973% +$36.12 +22.5117% View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164211" [ref=e3460]:
+                      - cell "Expand row MUU order number 1005325164211" [ref=e3461]:
+                        - button "Expand row MUU order number 1005325164211" [ref=e3465]
+                      - cell "View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF" [ref=e3469]:
+                        - generic [ref=e3470]:
+                          - link "View quote details for DIREXION DAILY MU BULL 2X ETF" [ref=e3473] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MUU
+                            - text: MUU
+                          - generic "DIREXION DAILY MU BULL 2X ETF" [ref=e3474]
+                      - cell "Filled" [ref=e3475]:
+                        - generic [ref=e3478]: Filled
+                      - cell "Buy" [ref=e3479]:
+                        - generic [ref=e3481]: Buy
+                      - cell "3" [ref=e3482]:
+                        - generic [ref=e3485]: "3"
+                      - cell "Limit $203.00" [ref=e3486]:
+                        - generic [ref=e3487]: Limit $203.00
+                      - cell "Day + ext" [ref=e3488]:
+                        - generic [ref=e3489]: Day + ext
+                      - cell "$202.923" [ref=e3490]:
+                        - generic [ref=e3492]: $202.923
+                      - cell "$196.57" [ref=e3493]:
+                        - generic [ref=e3494]: $196.57
+                      - cell "$196.57" [ref=e3495]:
+                        - generic [ref=e3496]: $196.57
+                      - cell "$197.89" [ref=e3497]:
+                        - generic [ref=e3498]: $197.89
+                      - cell "$197.67" [ref=e3499]:
+                        - generic [ref=e3500]: $197.67
+                      - cell "7:12 PM 02/03/2026" [ref=e3501]:
+                        - generic [ref=e3503]: 7:12 PM 02/03/2026
+                      - cell "7:12 PM 02/03/2026" [ref=e3504]:
+                        - generic [ref=e3506]: 7:12 PM 02/03/2026
+                      - cell "-" [ref=e3507]:
+                        - generic [ref=e3509]: "-"
+                      - cell "+$37.22" [ref=e3510]:
+                        - generic [ref=e3511]: +$37.22
+                      - cell "+23.1973%" [ref=e3512]:
+                        - generic [ref=e3513]: +23.1973%
+                      - cell "+$36.12" [ref=e3514]:
+                        - generic [ref=e3515]: +$36.12
+                      - cell "+22.5117%" [ref=e3516]:
+                        - generic [ref=e3517]: +22.5117%
+                      - cell [ref=e3518]:
+                        - figure [ref=e3521]:
+                          - generic [ref=e3522]:
+                            - generic [ref=e3523]:
+                              - generic [ref=e3524]: Day Range lowest value
+                              - text: $171.89
+                            - generic [ref=e3525]:
+                              - generic [ref=e3526]: Day Range highest value
+                              - text: $195.3999
+                            - generic [ref=e3527]: Day Range current value $197.67
+                          - slider: "195.3999"
+                      - cell [ref=e3528]:
+                        - figure [ref=e3531]:
+                          - generic [ref=e3532]:
+                            - generic [ref=e3533]:
+                              - generic [ref=e3534]: 52 Week Range lowest value
+                              - text: $6.7727
+                            - generic [ref=e3535]:
+                              - generic [ref=e3536]: 52 Week Range highest value
+                              - text: $249.10
+                            - generic [ref=e3537]: 52 Week Range current value $197.67
+                          - slider: "197.67"
+                      - cell "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164211" [ref=e3538]:
+                        - button "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005325164211" [ref=e3540]:
+                          - generic [ref=e3541]: 
+                    - row "Expand row AVGO order number 1005325164185 View quote details for BROADCOM INC BROADCOM INC Filled Buy 2 Limit $317.00 Day + ext $316.9241 $341.35 $341.45 $341.45 $341.35 7:01 PM 02/03/2026 7:01 PM 02/03/2026 - +$0.91 +0.2673% +$1.01 +0.2967% View next steps for BROADCOM INC order number 1005325164185" [ref=e3542]:
+                      - cell "Expand row AVGO order number 1005325164185" [ref=e3543]:
+                        - button "Expand row AVGO order number 1005325164185" [ref=e3547]
+                      - cell "View quote details for BROADCOM INC BROADCOM INC" [ref=e3551]:
+                        - generic [ref=e3552]:
+                          - link "View quote details for BROADCOM INC" [ref=e3555] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AVGO
+                            - text: AVGO
+                          - generic "BROADCOM INC" [ref=e3556]
+                      - cell "Filled" [ref=e3557]:
+                        - generic [ref=e3560]: Filled
+                      - cell "Buy" [ref=e3561]:
+                        - generic [ref=e3563]: Buy
+                      - cell "2" [ref=e3564]:
+                        - generic [ref=e3567]: "2"
+                      - cell "Limit $317.00" [ref=e3568]:
+                        - generic [ref=e3569]: Limit $317.00
+                      - cell "Day + ext" [ref=e3570]:
+                        - generic [ref=e3571]: Day + ext
+                      - cell "$316.9241" [ref=e3572]:
+                        - generic [ref=e3574]: $316.9241
+                      - cell "$341.35" [ref=e3575]:
+                        - generic [ref=e3576]: $341.35
+                      - cell "$341.45" [ref=e3577]:
+                        - generic [ref=e3578]: $341.45
+                      - cell "$341.45" [ref=e3579]:
+                        - generic [ref=e3580]: $341.45
+                      - cell "$341.35" [ref=e3581]:
+                        - generic [ref=e3582]: $341.35
+                      - cell "7:01 PM 02/03/2026" [ref=e3583]:
+                        - generic [ref=e3585]: 7:01 PM 02/03/2026
+                      - cell "7:01 PM 02/03/2026" [ref=e3586]:
+                        - generic [ref=e3588]: 7:01 PM 02/03/2026
+                      - cell "-" [ref=e3589]:
+                        - generic [ref=e3591]: "-"
+                      - cell "+$0.91" [ref=e3592]:
+                        - generic [ref=e3593]: +$0.91
+                      - cell "+0.2673%" [ref=e3594]:
+                        - generic [ref=e3595]: +0.2673%
+                      - cell "+$1.01" [ref=e3596]:
+                        - generic [ref=e3597]: +$1.01
+                      - cell "+0.2967%" [ref=e3598]:
+                        - generic [ref=e3599]: +0.2967%
+                      - cell [ref=e3600]:
+                        - figure [ref=e3603]:
+                          - generic [ref=e3604]:
+                            - generic [ref=e3605]:
+                              - generic [ref=e3606]: Day Range lowest value
+                              - text: $333.74
+                            - generic [ref=e3607]:
+                              - generic [ref=e3608]: Day Range highest value
+                              - text: $347.20
+                            - generic [ref=e3609]: Day Range current value $341.35
+                          - slider: "341.35"
+                      - cell [ref=e3610]:
+                        - figure [ref=e3613]:
+                          - generic [ref=e3614]:
+                            - generic [ref=e3615]:
+                              - generic [ref=e3616]: 52 Week Range lowest value
+                              - text: $138.10
+                            - generic [ref=e3617]:
+                              - generic [ref=e3618]: 52 Week Range highest value
+                              - text: $414.61
+                            - generic [ref=e3619]: 52 Week Range current value $341.35
+                          - slider: "341.35"
+                      - cell "View next steps for BROADCOM INC order number 1005325164185" [ref=e3620]:
+                        - button "View next steps for BROADCOM INC order number 1005325164185" [ref=e3622]:
+                          - generic [ref=e3623]: 
+                    - row "Expand row NVDA order number 1005325164163 View quote details for NVIDIA CORP NVIDIA CORP Filled Buy 2 Limit $179.20 Day + ext $179.1999 $190.60 $190.60 $190.61 $190.61 6:55 PM 02/03/2026 6:55 PM 02/03/2026 - +$2.07 +1.0979% +$2.06 +1.0926% View next steps for NVIDIA CORP order number 1005325164163" [ref=e3624]:
+                      - cell "Expand row NVDA order number 1005325164163" [ref=e3625]:
+                        - button "Expand row NVDA order number 1005325164163" [ref=e3629]
+                      - cell "View quote details for NVIDIA CORP NVIDIA CORP" [ref=e3633]:
+                        - generic [ref=e3634]:
+                          - link "View quote details for NVIDIA CORP" [ref=e3637] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NVDA
+                            - text: NVDA
+                          - generic "NVIDIA CORP" [ref=e3638]
+                      - cell "Filled" [ref=e3639]:
+                        - generic [ref=e3642]: Filled
+                      - cell "Buy" [ref=e3643]:
+                        - generic [ref=e3645]: Buy
+                      - cell "2" [ref=e3646]:
+                        - generic [ref=e3649]: "2"
+                      - cell "Limit $179.20" [ref=e3650]:
+                        - generic [ref=e3651]: Limit $179.20
+                      - cell "Day + ext" [ref=e3652]:
+                        - generic [ref=e3653]: Day + ext
+                      - cell "$179.1999" [ref=e3654]:
+                        - generic [ref=e3656]: $179.1999
+                      - cell "$190.60" [ref=e3657]:
+                        - generic [ref=e3658]: $190.60
+                      - cell "$190.60" [ref=e3659]:
+                        - generic [ref=e3660]: $190.60
+                      - cell "$190.61" [ref=e3661]:
+                        - generic [ref=e3662]: $190.61
+                      - cell "$190.61" [ref=e3663]:
+                        - generic [ref=e3664]: $190.61
+                      - cell "6:55 PM 02/03/2026" [ref=e3665]:
+                        - generic [ref=e3667]: 6:55 PM 02/03/2026
+                      - cell "6:55 PM 02/03/2026" [ref=e3668]:
+                        - generic [ref=e3670]: 6:55 PM 02/03/2026
+                      - cell "-" [ref=e3671]:
+                        - generic [ref=e3673]: "-"
+                      - cell "+$2.07" [ref=e3674]:
+                        - generic [ref=e3675]: +$2.07
+                      - cell "+1.0979%" [ref=e3676]:
+                        - generic [ref=e3677]: +1.0979%
+                      - cell "+$2.06" [ref=e3678]:
+                        - generic [ref=e3679]: +$2.06
+                      - cell "+1.0926%" [ref=e3680]:
+                        - generic [ref=e3681]: +1.0926%
+                      - cell [ref=e3682]:
+                        - figure [ref=e3685]:
+                          - generic [ref=e3686]:
+                            - generic [ref=e3687]:
+                              - generic [ref=e3688]: Day Range lowest value
+                              - text: $188.77
+                            - generic [ref=e3689]:
+                              - generic [ref=e3690]: Day Range highest value
+                              - text: $193.26
+                            - generic [ref=e3691]: Day Range current value $190.61
+                          - slider: "190.61"
+                      - cell [ref=e3692]:
+                        - figure [ref=e3695]:
+                          - generic [ref=e3696]:
+                            - generic [ref=e3697]:
+                              - generic [ref=e3698]: 52 Week Range lowest value
+                              - text: $86.62
+                            - generic [ref=e3699]:
+                              - generic [ref=e3700]: 52 Week Range highest value
+                              - text: $212.1899
+                            - generic [ref=e3701]: 52 Week Range current value $190.61
+                          - slider: "190.61"
+                      - cell "View next steps for NVIDIA CORP order number 1005325164163" [ref=e3702]:
+                        - button "View next steps for NVIDIA CORP order number 1005325164163" [ref=e3704]:
+                          - generic [ref=e3705]: 
+                    - row "Expand row PAAS order number 1005310677351 View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR Filled Sell 75 Limit $57.64 Day + ext $57.6775 $59.20 $59.60 $59.60 $59.56 7:42 AM 02/03/2026 7:42 AM 02/03/2026 - +$0.27 +0.4554% +$0.31 +0.5229% View next steps for PAN AMERN SILVER COR order number 1005310677351" [ref=e3706]:
+                      - cell "Expand row PAAS order number 1005310677351" [ref=e3707]:
+                        - button "Expand row PAAS order number 1005310677351" [ref=e3711]
+                      - cell "View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR" [ref=e3715]:
+                        - generic [ref=e3716]:
+                          - link "View quote details for PAN AMERN SILVER COR" [ref=e3719] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PAAS
+                            - text: PAAS
+                          - generic "PAN AMERN SILVER COR" [ref=e3720]
+                      - cell "Filled" [ref=e3721]:
+                        - generic [ref=e3724]: Filled
+                      - cell "Sell" [ref=e3725]:
+                        - generic [ref=e3727]: Sell
+                      - cell "75" [ref=e3728]:
+                        - generic [ref=e3731]: "75"
+                      - cell "Limit $57.64" [ref=e3732]:
+                        - generic [ref=e3733]: Limit $57.64
+                      - cell "Day + ext" [ref=e3734]:
+                        - generic [ref=e3735]: Day + ext
+                      - cell "$57.6775" [ref=e3736]:
+                        - generic [ref=e3738]: $57.6775
+                      - cell "$59.20" [ref=e3739]:
+                        - generic [ref=e3740]: $59.20
+                      - cell "$59.60" [ref=e3741]:
+                        - generic [ref=e3742]: $59.60
+                      - cell "$59.60" [ref=e3743]:
+                        - generic [ref=e3744]: $59.60
+                      - cell "$59.56" [ref=e3745]:
+                        - generic [ref=e3746]: $59.56
+                      - cell "7:42 AM 02/03/2026" [ref=e3747]:
+                        - generic [ref=e3749]: 7:42 AM 02/03/2026
+                      - cell "7:42 AM 02/03/2026" [ref=e3750]:
+                        - generic [ref=e3752]: 7:42 AM 02/03/2026
+                      - cell "-" [ref=e3753]:
+                        - generic [ref=e3755]: "-"
+                      - cell "+$0.27" [ref=e3756]:
+                        - generic [ref=e3757]: +$0.27
+                      - cell "+0.4554%" [ref=e3758]:
+                        - generic [ref=e3759]: +0.4554%
+                      - cell "+$0.31" [ref=e3760]:
+                        - generic [ref=e3761]: +$0.31
+                      - cell "+0.5229%" [ref=e3762]:
+                        - generic [ref=e3763]: +0.5229%
+                      - cell [ref=e3764]:
+                        - figure [ref=e3767]:
+                          - generic [ref=e3768]:
+                            - generic [ref=e3769]:
+                              - generic [ref=e3770]: Day Range lowest value
+                              - text: $58.54
+                            - generic [ref=e3771]:
+                              - generic [ref=e3772]: Day Range highest value
+                              - text: $61.49
+                            - generic [ref=e3773]: Day Range current value $59.56
+                          - slider: "59.56"
+                      - cell [ref=e3774]:
+                        - figure [ref=e3777]:
+                          - generic [ref=e3778]:
+                            - generic [ref=e3779]:
+                              - generic [ref=e3780]: 52 Week Range lowest value
+                              - text: $20.55
+                            - generic [ref=e3781]:
+                              - generic [ref=e3782]: 52 Week Range highest value
+                              - text: $69.99
+                            - generic [ref=e3783]: 52 Week Range current value $59.56
+                          - slider: "59.56"
+                      - cell "View next steps for PAN AMERN SILVER COR order number 1005310677351" [ref=e3784]:
+                        - button "View next steps for PAN AMERN SILVER COR order number 1005310677351" [ref=e3786]:
+                          - generic [ref=e3787]: 
+                    - row "Expand row COPX order number 1005297141484 View quote details for GLOBAL X COPPER MINERS ETF GLOBAL X COPPER MINERS ETF Filled Sell 15 Limit $85.97 Day + ext $86.049 $89.71 $90.12 $90.75 $90.28 7:51 AM 02/02/2026 7:51 AM 02/02/2026 - +$2.05 +2.3235% +$1.89 +2.1421% View next steps for GLOBAL X COPPER MINERS ETF order number 1005297141484" [ref=e3788]:
+                      - cell "Expand row COPX order number 1005297141484" [ref=e3789]:
+                        - button "Expand row COPX order number 1005297141484" [ref=e3793]
+                      - cell "View quote details for GLOBAL X COPPER MINERS ETF GLOBAL X COPPER MINERS ETF" [ref=e3797]:
+                        - generic [ref=e3798]:
+                          - link "View quote details for GLOBAL X COPPER MINERS ETF" [ref=e3801] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=COPX
+                            - text: COPX
+                          - generic "GLOBAL X COPPER MINERS ETF" [ref=e3802]
+                      - cell "Filled" [ref=e3803]:
+                        - generic [ref=e3806]: Filled
+                      - cell "Sell" [ref=e3807]:
+                        - generic [ref=e3809]: Sell
+                      - cell "15" [ref=e3810]:
+                        - generic [ref=e3813]: "15"
+                      - cell "Limit $85.97" [ref=e3814]:
+                        - generic [ref=e3815]: Limit $85.97
+                      - cell "Day + ext" [ref=e3816]:
+                        - generic [ref=e3817]: Day + ext
+                      - cell "$86.049" [ref=e3818]:
+                        - generic [ref=e3820]: $86.049
+                      - cell "$89.71" [ref=e3821]:
+                        - generic [ref=e3822]: $89.71
+                      - cell "$90.12" [ref=e3823]:
+                        - generic [ref=e3824]: $90.12
+                      - cell "$90.75" [ref=e3825]:
+                        - generic [ref=e3826]: $90.75
+                      - cell "$90.28" [ref=e3827]:
+                        - generic [ref=e3828]: $90.28
+                      - cell "7:51 AM 02/02/2026" [ref=e3829]:
+                        - generic [ref=e3831]: 7:51 AM 02/02/2026
+                      - cell "7:51 AM 02/02/2026" [ref=e3832]:
+                        - generic [ref=e3834]: 7:51 AM 02/02/2026
+                      - cell "-" [ref=e3835]:
+                        - generic [ref=e3837]: "-"
+                      - cell "+$2.05" [ref=e3838]:
+                        - generic [ref=e3839]: +$2.05
+                      - cell "+2.3235%" [ref=e3840]:
+                        - generic [ref=e3841]: +2.3235%
+                      - cell "+$1.89" [ref=e3842]:
+                        - generic [ref=e3843]: +$1.89
+                      - cell "+2.1421%" [ref=e3844]:
+                        - generic [ref=e3845]: +2.1421%
+                      - cell [ref=e3846]:
+                        - figure [ref=e3849]:
+                          - generic [ref=e3850]:
+                            - generic [ref=e3851]:
+                              - generic [ref=e3852]: Day Range lowest value
+                              - text: $88.30
+                            - generic [ref=e3853]:
+                              - generic [ref=e3854]: Day Range highest value
+                              - text: $91.3372
+                            - generic [ref=e3855]: Day Range current value $90.28
+                          - slider: "90.28"
+                      - cell [ref=e3856]:
+                        - figure [ref=e3859]:
+                          - generic [ref=e3860]:
+                            - generic [ref=e3861]:
+                              - generic [ref=e3862]: 52 Week Range lowest value
+                              - text: $30.77
+                            - generic [ref=e3863]:
+                              - generic [ref=e3864]: 52 Week Range highest value
+                              - text: $99.99
+                            - generic [ref=e3865]: 52 Week Range current value $90.28
+                          - slider: "90.28"
+                      - cell "View next steps for GLOBAL X COPPER MINERS ETF order number 1005297141484" [ref=e3866]:
+                        - button "View next steps for GLOBAL X COPPER MINERS ETF order number 1005297141484" [ref=e3868]:
+                          - generic [ref=e3869]: 
+                    - row "Expand row FCX order number 1005297141479 View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC Filled Sell 20 Limit $60.51 Day + ext $60.606 $65.00 $65.46 $65.67 $65.467 7:51 AM 02/02/2026 7:51 AM 02/02/2026 - +$2.207 +3.4888% +$2.20 +3.4777% View next steps for FREEPORT-MCMORAN INC order number 1005297141479" [ref=e3870]:
+                      - cell "Expand row FCX order number 1005297141479" [ref=e3871]:
+                        - button "Expand row FCX order number 1005297141479" [ref=e3875]
+                      - cell "View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC" [ref=e3879]:
+                        - generic [ref=e3880]:
+                          - link "View quote details for FREEPORT-MCMORAN INC" [ref=e3883] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FCX
+                            - text: FCX
+                          - generic "FREEPORT-MCMORAN INC" [ref=e3884]
+                      - cell "Filled" [ref=e3885]:
+                        - generic [ref=e3888]: Filled
+                      - cell "Sell" [ref=e3889]:
+                        - generic [ref=e3891]: Sell
+                      - cell "20" [ref=e3892]:
+                        - generic [ref=e3895]: "20"
+                      - cell "Limit $60.51" [ref=e3896]:
+                        - generic [ref=e3897]: Limit $60.51
+                      - cell "Day + ext" [ref=e3898]:
+                        - generic [ref=e3899]: Day + ext
+                      - cell "$60.606" [ref=e3900]:
+                        - generic [ref=e3902]: $60.606
+                      - cell "$65.00" [ref=e3903]:
+                        - generic [ref=e3904]: $65.00
+                      - cell "$65.46" [ref=e3905]:
+                        - generic [ref=e3906]: $65.46
+                      - cell "$65.67" [ref=e3907]:
+                        - generic [ref=e3908]: $65.67
+                      - cell "$65.467" [ref=e3909]:
+                        - generic [ref=e3910]: $65.467
+                      - cell "7:51 AM 02/02/2026" [ref=e3911]:
+                        - generic [ref=e3913]: 7:51 AM 02/02/2026
+                      - cell "7:51 AM 02/02/2026" [ref=e3914]:
+                        - generic [ref=e3916]: 7:51 AM 02/02/2026
+                      - cell "-" [ref=e3917]:
+                        - generic [ref=e3919]: "-"
+                      - cell "+$2.207" [ref=e3920]:
+                        - generic [ref=e3921]: +$2.207
+                      - cell "+3.4888%" [ref=e3922]:
+                        - generic [ref=e3923]: +3.4888%
+                      - cell "+$2.20" [ref=e3924]:
+                        - generic [ref=e3925]: +$2.20
+                      - cell "+3.4777%" [ref=e3926]:
+                        - generic [ref=e3927]: +3.4777%
+                      - cell [ref=e3928]:
+                        - figure [ref=e3931]:
+                          - generic [ref=e3932]:
+                            - generic [ref=e3933]:
+                              - generic [ref=e3934]: Day Range lowest value
+                              - text: $63.07
+                            - generic [ref=e3935]:
+                              - generic [ref=e3936]: Day Range highest value
+                              - text: $65.50
+                            - generic [ref=e3937]: Day Range current value $65.467
+                          - slider: "65.467"
+                      - cell [ref=e3938]:
+                        - figure [ref=e3941]:
+                          - generic [ref=e3942]:
+                            - generic [ref=e3943]:
+                              - generic [ref=e3944]: 52 Week Range lowest value
+                              - text: $27.66
+                            - generic [ref=e3945]:
+                              - generic [ref=e3946]: 52 Week Range highest value
+                              - text: $69.44
+                            - generic [ref=e3947]: 52 Week Range current value $65.467
+                          - slider: "65.467"
+                      - cell "View next steps for FREEPORT-MCMORAN INC order number 1005297141479" [ref=e3948]:
+                        - button "View next steps for FREEPORT-MCMORAN INC order number 1005297141479" [ref=e3950]:
+                          - generic [ref=e3951]: 
+                    - row "Expand row NUGT order number 1005271074154 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Buy 5 Market Day $285.605 $258.98 $263.00 $263.00 $259.73 10:25 AM 01/29/2026 10:25 AM 01/29/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005271074154" [ref=e3952]:
+                      - cell "Expand row NUGT order number 1005271074154" [ref=e3953]:
+                        - button "Expand row NUGT order number 1005271074154" [ref=e3957]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e3961]:
+                        - generic [ref=e3962]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e3965] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e3966]
+                      - cell "Filled" [ref=e3967]:
+                        - generic [ref=e3970]: Filled
+                      - cell "Buy" [ref=e3971]:
+                        - generic [ref=e3973]: Buy
+                      - cell "5" [ref=e3974]:
+                        - generic [ref=e3977]: "5"
+                      - cell "Market" [ref=e3978]:
+                        - generic [ref=e3979]: Market
+                      - cell "Day" [ref=e3980]:
+                        - generic [ref=e3981]: Day
+                      - cell "$285.605" [ref=e3982]:
+                        - generic [ref=e3984]: $285.605
+                      - cell "$258.98" [ref=e3985]:
+                        - generic [ref=e3986]: $258.98
+                      - cell "$263.00" [ref=e3987]:
+                        - generic [ref=e3988]: $263.00
+                      - cell "$263.00" [ref=e3989]:
+                        - generic [ref=e3990]: $263.00
+                      - cell "$259.73" [ref=e3991]:
+                        - generic [ref=e3992]: $259.73
+                      - cell "10:25 AM 01/29/2026" [ref=e3993]:
+                        - generic [ref=e3995]: 10:25 AM 01/29/2026
+                      - cell "10:25 AM 01/29/2026" [ref=e3996]:
+                        - generic [ref=e3998]: 10:25 AM 01/29/2026
+                      - cell "-" [ref=e3999]:
+                        - generic [ref=e4001]: "-"
+                      - cell "+$7.01" [ref=e4002]:
+                        - generic [ref=e4003]: +$7.01
+                      - cell "+2.7738%" [ref=e4004]:
+                        - generic [ref=e4005]: +2.7738%
+                      - cell "+$10.28" [ref=e4006]:
+                        - generic [ref=e4007]: +$10.28
+                      - cell "+4.0677%" [ref=e4008]:
+                        - generic [ref=e4009]: +4.0677%
+                      - cell [ref=e4010]:
+                        - figure [ref=e4013]:
+                          - generic [ref=e4014]:
+                            - generic [ref=e4015]:
+                              - generic [ref=e4016]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e4017]:
+                              - generic [ref=e4018]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e4019]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e4020]:
+                        - figure [ref=e4023]:
+                          - generic [ref=e4024]:
+                            - generic [ref=e4025]:
+                              - generic [ref=e4026]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e4027]:
+                              - generic [ref=e4028]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e4029]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005271074154" [ref=e4030]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005271074154" [ref=e4032]:
+                          - generic [ref=e4033]: 
+                    - row "Expand row GDX order number 1005269913956 View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF Filled Buy 20 Market Day $107.76 $104.80 $105.30 $105.30 $105.272 10:23 AM 01/29/2026 10:23 AM 01/29/2026 - +$2.262 +2.1959% +$2.29 +2.2231% View next steps for VANECK GOLD MINERS ETF order number 1005269913956" [ref=e4034]:
+                      - cell "Expand row GDX order number 1005269913956" [ref=e4035]:
+                        - button "Expand row GDX order number 1005269913956" [ref=e4039]
+                      - cell "View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF" [ref=e4043]:
+                        - generic [ref=e4044]:
+                          - link "View quote details for VANECK GOLD MINERS ETF" [ref=e4047] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GDX
+                            - text: GDX
+                          - generic "VANECK GOLD MINERS ETF" [ref=e4048]
+                      - cell "Filled" [ref=e4049]:
+                        - generic [ref=e4052]: Filled
+                      - cell "Buy" [ref=e4053]:
+                        - generic [ref=e4055]: Buy
+                      - cell "20" [ref=e4056]:
+                        - generic [ref=e4059]: "20"
+                      - cell "Market" [ref=e4060]:
+                        - generic [ref=e4061]: Market
+                      - cell "Day" [ref=e4062]:
+                        - generic [ref=e4063]: Day
+                      - cell "$107.76" [ref=e4064]:
+                        - generic [ref=e4066]: $107.76
+                      - cell "$104.80" [ref=e4067]:
+                        - generic [ref=e4068]: $104.80
+                      - cell "$105.30" [ref=e4069]:
+                        - generic [ref=e4070]: $105.30
+                      - cell "$105.30" [ref=e4071]:
+                        - generic [ref=e4072]: $105.30
+                      - cell "$105.272" [ref=e4073]:
+                        - generic [ref=e4074]: $105.272
+                      - cell "10:23 AM 01/29/2026" [ref=e4075]:
+                        - generic [ref=e4077]: 10:23 AM 01/29/2026
+                      - cell "10:23 AM 01/29/2026" [ref=e4078]:
+                        - generic [ref=e4080]: 10:23 AM 01/29/2026
+                      - cell "-" [ref=e4081]:
+                        - generic [ref=e4083]: "-"
+                      - cell "+$2.262" [ref=e4084]:
+                        - generic [ref=e4085]: +$2.262
+                      - cell "+2.1959%" [ref=e4086]:
+                        - generic [ref=e4087]: +2.1959%
+                      - cell "+$2.29" [ref=e4088]:
+                        - generic [ref=e4089]: +$2.29
+                      - cell "+2.2231%" [ref=e4090]:
+                        - generic [ref=e4091]: +2.2231%
+                      - cell [ref=e4092]:
+                        - figure [ref=e4095]:
+                          - generic [ref=e4096]:
+                            - generic [ref=e4097]:
+                              - generic [ref=e4098]: Day Range lowest value
+                              - text: $102.49
+                            - generic [ref=e4099]:
+                              - generic [ref=e4100]: Day Range highest value
+                              - text: $106.47
+                            - generic [ref=e4101]: Day Range current value $105.272
+                          - slider: "105.272"
+                      - cell [ref=e4102]:
+                        - figure [ref=e4105]:
+                          - generic [ref=e4106]:
+                            - generic [ref=e4107]:
+                              - generic [ref=e4108]: 52 Week Range lowest value
+                              - text: $38.581
+                            - generic [ref=e4109]:
+                              - generic [ref=e4110]: 52 Week Range highest value
+                              - text: $113.50
+                            - generic [ref=e4111]: 52 Week Range current value $105.272
+                          - slider: "105.272"
+                      - cell "View next steps for VANECK GOLD MINERS ETF order number 1005269913956" [ref=e4112]:
+                        - button "View next steps for VANECK GOLD MINERS ETF order number 1005269913956" [ref=e4114]:
+                          - generic [ref=e4115]: 
+                    - row "Expand row NUGT order number 1005269913853 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Buy 5 Market Day $290.4558 $258.98 $263.00 $263.00 $259.73 10:21 AM 01/29/2026 10:21 AM 01/29/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005269913853" [ref=e4116]:
+                      - cell "Expand row NUGT order number 1005269913853" [ref=e4117]:
+                        - button "Expand row NUGT order number 1005269913853" [ref=e4121]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e4125]:
+                        - generic [ref=e4126]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e4129] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e4130]
+                      - cell "Filled" [ref=e4131]:
+                        - generic [ref=e4134]: Filled
+                      - cell "Buy" [ref=e4135]:
+                        - generic [ref=e4137]: Buy
+                      - cell "5" [ref=e4138]:
+                        - generic [ref=e4141]: "5"
+                      - cell "Market" [ref=e4142]:
+                        - generic [ref=e4143]: Market
+                      - cell "Day" [ref=e4144]:
+                        - generic [ref=e4145]: Day
+                      - cell "$290.4558" [ref=e4146]:
+                        - generic [ref=e4148]: $290.4558
+                      - cell "$258.98" [ref=e4149]:
+                        - generic [ref=e4150]: $258.98
+                      - cell "$263.00" [ref=e4151]:
+                        - generic [ref=e4152]: $263.00
+                      - cell "$263.00" [ref=e4153]:
+                        - generic [ref=e4154]: $263.00
+                      - cell "$259.73" [ref=e4155]:
+                        - generic [ref=e4156]: $259.73
+                      - cell "10:21 AM 01/29/2026" [ref=e4157]:
+                        - generic [ref=e4159]: 10:21 AM 01/29/2026
+                      - cell "10:21 AM 01/29/2026" [ref=e4160]:
+                        - generic [ref=e4162]: 10:21 AM 01/29/2026
+                      - cell "-" [ref=e4163]:
+                        - generic [ref=e4165]: "-"
+                      - cell "+$7.01" [ref=e4166]:
+                        - generic [ref=e4167]: +$7.01
+                      - cell "+2.7738%" [ref=e4168]:
+                        - generic [ref=e4169]: +2.7738%
+                      - cell "+$10.28" [ref=e4170]:
+                        - generic [ref=e4171]: +$10.28
+                      - cell "+4.0677%" [ref=e4172]:
+                        - generic [ref=e4173]: +4.0677%
+                      - cell [ref=e4174]:
+                        - figure [ref=e4177]:
+                          - generic [ref=e4178]:
+                            - generic [ref=e4179]:
+                              - generic [ref=e4180]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e4181]:
+                              - generic [ref=e4182]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e4183]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e4184]:
+                        - figure [ref=e4187]:
+                          - generic [ref=e4188]:
+                            - generic [ref=e4189]:
+                              - generic [ref=e4190]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e4191]:
+                              - generic [ref=e4192]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e4193]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005269913853" [ref=e4194]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005269913853" [ref=e4196]:
+                          - generic [ref=e4197]: 
+                    - 'row "Expand row SIVR order number 1005252759511 View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF Filled Sell 15 Trailing stop mark 5.00 % mark (Trigger: $109.50) GTC Exp 07/24/2026 $109.615 $78.26 $78.68 $78.68 $78.55 8:09 AM 01/28/2026 10:16 AM 01/29/2026 07/24/2026 +$1.48 +1.9203% +$1.61 +2.0890% View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005252759511" [ref=e4198]':
+                      - cell "Expand row SIVR order number 1005252759511" [ref=e4199]:
+                        - button "Expand row SIVR order number 1005252759511" [ref=e4203]
+                      - cell "View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4207]:
+                        - generic [ref=e4208]:
+                          - link "View quote details for ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4211] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SIVR
+                            - text: SIVR
+                          - generic "ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4212]
+                      - cell "Filled" [ref=e4213]:
+                        - generic [ref=e4216]: Filled
+                      - cell "Sell" [ref=e4217]:
+                        - generic [ref=e4219]: Sell
+                      - cell "15" [ref=e4220]:
+                        - generic [ref=e4223]: "15"
+                      - 'cell "Trailing stop mark 5.00 % mark (Trigger: $109.50)" [ref=e4224]':
+                        - generic [ref=e4225]:
+                          - text: Trailing stop mark 5.00 % mark
+                          - generic [ref=e4227]: "(Trigger: $109.50)"
+                      - cell "GTC Exp 07/24/2026" [ref=e4228]:
+                        - generic [ref=e4229]:
+                          - text: GTC
+                          - generic [ref=e4230]: Exp 07/24/2026
+                      - cell "$109.615" [ref=e4231]:
+                        - generic [ref=e4233]: $109.615
+                      - cell "$78.26" [ref=e4234]:
+                        - generic [ref=e4235]: $78.26
+                      - cell "$78.68" [ref=e4236]:
+                        - generic [ref=e4237]: $78.68
+                      - cell "$78.68" [ref=e4238]:
+                        - generic [ref=e4239]: $78.68
+                      - cell "$78.55" [ref=e4240]:
+                        - generic [ref=e4241]: $78.55
+                      - cell "8:09 AM 01/28/2026" [ref=e4242]:
+                        - generic [ref=e4244]: 8:09 AM 01/28/2026
+                      - cell "10:16 AM 01/29/2026" [ref=e4245]:
+                        - generic [ref=e4247]: 10:16 AM 01/29/2026
+                      - cell "07/24/2026" [ref=e4248]:
+                        - generic [ref=e4250]: 07/24/2026
+                      - cell "+$1.48" [ref=e4251]:
+                        - generic [ref=e4252]: +$1.48
+                      - cell "+1.9203%" [ref=e4253]:
+                        - generic [ref=e4254]: +1.9203%
+                      - cell "+$1.61" [ref=e4255]:
+                        - generic [ref=e4256]: +$1.61
+                      - cell "+2.0890%" [ref=e4257]:
+                        - generic [ref=e4258]: +2.0890%
+                      - cell [ref=e4259]:
+                        - figure [ref=e4262]:
+                          - generic [ref=e4263]:
+                            - generic [ref=e4264]:
+                              - generic [ref=e4265]: Day Range lowest value
+                              - text: $78.54
+                            - generic [ref=e4266]:
+                              - generic [ref=e4267]: Day Range highest value
+                              - text: $80.84
+                            - generic [ref=e4268]: Day Range current value $78.55
+                          - slider: "78.55"
+                      - cell [ref=e4269]:
+                        - figure [ref=e4272]:
+                          - generic [ref=e4273]:
+                            - generic [ref=e4274]:
+                              - generic [ref=e4275]: 52 Week Range lowest value
+                              - text: $27.86
+                            - generic [ref=e4276]:
+                              - generic [ref=e4277]: 52 Week Range highest value
+                              - text: $115.26
+                            - generic [ref=e4278]: 52 Week Range current value $78.55
+                          - slider: "78.55"
+                      - cell "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005252759511" [ref=e4279]:
+                        - button "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005252759511" [ref=e4281]:
+                          - generic [ref=e4282]: 
+                    - 'row "Expand row PAAS order number 1005252759504 View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR Filled Sell 25 Trailing stop mark 5.00 % mark (Trigger: $64.03) GTC Exp 07/24/2026 $64.0208 $59.20 $59.60 $59.60 $59.56 8:08 AM 01/28/2026 10:10 AM 01/29/2026 07/24/2026 +$0.27 +0.4554% +$0.31 +0.5229% View next steps for PAN AMERN SILVER COR order number 1005252759504" [ref=e4283]':
+                      - cell "Expand row PAAS order number 1005252759504" [ref=e4284]:
+                        - button "Expand row PAAS order number 1005252759504" [ref=e4288]
+                      - cell "View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR" [ref=e4292]:
+                        - generic [ref=e4293]:
+                          - link "View quote details for PAN AMERN SILVER COR" [ref=e4296] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PAAS
+                            - text: PAAS
+                          - generic "PAN AMERN SILVER COR" [ref=e4297]
+                      - cell "Filled" [ref=e4298]:
+                        - generic [ref=e4301]: Filled
+                      - cell "Sell" [ref=e4302]:
+                        - generic [ref=e4304]: Sell
+                      - cell "25" [ref=e4305]:
+                        - generic [ref=e4308]: "25"
+                      - 'cell "Trailing stop mark 5.00 % mark (Trigger: $64.03)" [ref=e4309]':
+                        - generic [ref=e4310]:
+                          - text: Trailing stop mark 5.00 % mark
+                          - generic [ref=e4312]: "(Trigger: $64.03)"
+                      - cell "GTC Exp 07/24/2026" [ref=e4313]:
+                        - generic [ref=e4314]:
+                          - text: GTC
+                          - generic [ref=e4315]: Exp 07/24/2026
+                      - cell "$64.0208" [ref=e4316]:
+                        - generic [ref=e4318]: $64.0208
+                      - cell "$59.20" [ref=e4319]:
+                        - generic [ref=e4320]: $59.20
+                      - cell "$59.60" [ref=e4321]:
+                        - generic [ref=e4322]: $59.60
+                      - cell "$59.60" [ref=e4323]:
+                        - generic [ref=e4324]: $59.60
+                      - cell "$59.56" [ref=e4325]:
+                        - generic [ref=e4326]: $59.56
+                      - cell "8:08 AM 01/28/2026" [ref=e4327]:
+                        - generic [ref=e4329]: 8:08 AM 01/28/2026
+                      - cell "10:10 AM 01/29/2026" [ref=e4330]:
+                        - generic [ref=e4332]: 10:10 AM 01/29/2026
+                      - cell "07/24/2026" [ref=e4333]:
+                        - generic [ref=e4335]: 07/24/2026
+                      - cell "+$0.27" [ref=e4336]:
+                        - generic [ref=e4337]: +$0.27
+                      - cell "+0.4554%" [ref=e4338]:
+                        - generic [ref=e4339]: +0.4554%
+                      - cell "+$0.31" [ref=e4340]:
+                        - generic [ref=e4341]: +$0.31
+                      - cell "+0.5229%" [ref=e4342]:
+                        - generic [ref=e4343]: +0.5229%
+                      - cell [ref=e4344]:
+                        - figure [ref=e4347]:
+                          - generic [ref=e4348]:
+                            - generic [ref=e4349]:
+                              - generic [ref=e4350]: Day Range lowest value
+                              - text: $58.54
+                            - generic [ref=e4351]:
+                              - generic [ref=e4352]: Day Range highest value
+                              - text: $61.49
+                            - generic [ref=e4353]: Day Range current value $59.56
+                          - slider: "59.56"
+                      - cell [ref=e4354]:
+                        - figure [ref=e4357]:
+                          - generic [ref=e4358]:
+                            - generic [ref=e4359]:
+                              - generic [ref=e4360]: 52 Week Range lowest value
+                              - text: $20.55
+                            - generic [ref=e4361]:
+                              - generic [ref=e4362]: 52 Week Range highest value
+                              - text: $69.99
+                            - generic [ref=e4363]: 52 Week Range current value $59.56
+                          - slider: "59.56"
+                      - cell "View next steps for PAN AMERN SILVER COR order number 1005252759504" [ref=e4364]:
+                        - button "View next steps for PAN AMERN SILVER COR order number 1005252759504" [ref=e4366]:
+                          - generic [ref=e4367]: 
+                    - row "Expand row HOOD order number 1005255784911 View quote details for ROBINHOOD MKTS INC CLASS A ROBINHOOD MKTS INC CLASS A Filled Sell 24 Market Day $105.145 $77.77 $77.97 $78.00 $78.00 10:14 AM 01/28/2026 10:14 AM 01/28/2026 - -$7.60 -8.8785% -$7.63 -8.9136% View next steps for ROBINHOOD MKTS INC CLASS A order number 1005255784911" [ref=e4368]:
+                      - cell "Expand row HOOD order number 1005255784911" [ref=e4369]:
+                        - button "Expand row HOOD order number 1005255784911" [ref=e4373]
+                      - cell "View quote details for ROBINHOOD MKTS INC CLASS A ROBINHOOD MKTS INC CLASS A" [ref=e4377]:
+                        - generic [ref=e4378]:
+                          - link "View quote details for ROBINHOOD MKTS INC CLASS A" [ref=e4381] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=HOOD
+                            - text: HOOD
+                          - generic "ROBINHOOD MKTS INC CLASS A" [ref=e4382]
+                      - cell "Filled" [ref=e4383]:
+                        - generic [ref=e4386]: Filled
+                      - cell "Sell" [ref=e4387]:
+                        - generic [ref=e4389]: Sell
+                      - cell "24" [ref=e4390]:
+                        - generic [ref=e4393]: "24"
+                      - cell "Market" [ref=e4394]:
+                        - generic [ref=e4395]: Market
+                      - cell "Day" [ref=e4396]:
+                        - generic [ref=e4397]: Day
+                      - cell "$105.145" [ref=e4398]:
+                        - generic [ref=e4400]: $105.145
+                      - cell "$77.77" [ref=e4401]:
+                        - generic [ref=e4402]: $77.77
+                      - cell "$77.97" [ref=e4403]:
+                        - generic [ref=e4404]: $77.97
+                      - cell "$78.00" [ref=e4405]:
+                        - generic [ref=e4406]: $78.00
+                      - cell "$78.00" [ref=e4407]:
+                        - generic [ref=e4408]: $78.00
+                      - cell "10:14 AM 01/28/2026" [ref=e4409]:
+                        - generic [ref=e4411]: 10:14 AM 01/28/2026
+                      - cell "10:14 AM 01/28/2026" [ref=e4412]:
+                        - generic [ref=e4414]: 10:14 AM 01/28/2026
+                      - cell "-" [ref=e4415]:
+                        - generic [ref=e4417]: "-"
+                      - cell "-$7.60" [ref=e4418]:
+                        - generic [ref=e4419]: "-$7.60"
+                      - cell "-8.8785%" [ref=e4420]:
+                        - generic [ref=e4421]: "-8.8785%"
+                      - cell "-$7.63" [ref=e4422]:
+                        - generic [ref=e4423]: "-$7.63"
+                      - cell "-8.9136%" [ref=e4424]:
+                        - generic [ref=e4425]: "-8.9136%"
+                      - cell [ref=e4426]:
+                        - figure [ref=e4429]:
+                          - generic [ref=e4430]:
+                            - generic [ref=e4431]:
+                              - generic [ref=e4432]: Day Range lowest value
+                              - text: $74.25
+                            - generic [ref=e4433]:
+                              - generic [ref=e4434]: Day Range highest value
+                              - text: $79.90
+                            - generic [ref=e4435]: Day Range current value $78.00
+                          - slider: "78"
+                      - cell [ref=e4436]:
+                        - figure [ref=e4439]:
+                          - generic [ref=e4440]:
+                            - generic [ref=e4441]:
+                              - generic [ref=e4442]: 52 Week Range lowest value
+                              - text: $29.66
+                            - generic [ref=e4443]:
+                              - generic [ref=e4444]: 52 Week Range highest value
+                              - text: $153.8599
+                            - generic [ref=e4445]: 52 Week Range current value $78.00
+                          - slider: "78"
+                      - cell "View next steps for ROBINHOOD MKTS INC CLASS A order number 1005255784911" [ref=e4446]:
+                        - button "View next steps for ROBINHOOD MKTS INC CLASS A order number 1005255784911" [ref=e4448]:
+                          - generic [ref=e4449]: 
+                    - row "Expand row KKR order number 1005255784874 View quote details for KKR & CO INC KKR & CO INC Filled Sell 21 Market Day $117.03 $105.52 $105.52 $107.35 $105.52 10:14 AM 01/28/2026 10:14 AM 01/28/2026 - -$1.69 -1.5763% -$1.69 -1.5763% View next steps for KKR & CO INC order number 1005255784874" [ref=e4450]:
+                      - cell "Expand row KKR order number 1005255784874" [ref=e4451]:
+                        - button "Expand row KKR order number 1005255784874" [ref=e4455]
+                      - cell "View quote details for KKR & CO INC KKR & CO INC" [ref=e4459]:
+                        - generic [ref=e4460]:
+                          - link "View quote details for KKR & CO INC" [ref=e4463] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=KKR
+                            - text: KKR
+                          - generic "KKR & CO INC" [ref=e4464]
+                      - cell "Filled" [ref=e4465]:
+                        - generic [ref=e4468]: Filled
+                      - cell "Sell" [ref=e4469]:
+                        - generic [ref=e4471]: Sell
+                      - cell "21" [ref=e4472]:
+                        - generic [ref=e4475]: "21"
+                      - cell "Market" [ref=e4476]:
+                        - generic [ref=e4477]: Market
+                      - cell "Day" [ref=e4478]:
+                        - generic [ref=e4479]: Day
+                      - cell "$117.03" [ref=e4480]:
+                        - generic [ref=e4482]: $117.03
+                      - cell "$105.52" [ref=e4483]:
+                        - generic [ref=e4484]: $105.52
+                      - cell "$105.52" [ref=e4485]:
+                        - generic [ref=e4486]: $105.52
+                      - cell "$107.35" [ref=e4487]:
+                        - generic [ref=e4488]: $107.35
+                      - cell "$105.52" [ref=e4489]:
+                        - generic [ref=e4490]: $105.52
+                      - cell "10:14 AM 01/28/2026" [ref=e4491]:
+                        - generic [ref=e4493]: 10:14 AM 01/28/2026
+                      - cell "10:14 AM 01/28/2026" [ref=e4494]:
+                        - generic [ref=e4496]: 10:14 AM 01/28/2026
+                      - cell "-" [ref=e4497]:
+                        - generic [ref=e4499]: "-"
+                      - cell "-$1.69" [ref=e4500]:
+                        - generic [ref=e4501]: "-$1.69"
+                      - cell "-1.5763%" [ref=e4502]:
+                        - generic [ref=e4503]: "-1.5763%"
+                      - cell "-$1.69" [ref=e4504]:
+                        - generic [ref=e4505]: "-$1.69"
+                      - cell "-1.5763%" [ref=e4506]:
+                        - generic [ref=e4507]: "-1.5763%"
+                      - cell [ref=e4508]:
+                        - figure [ref=e4511]:
+                          - generic [ref=e4512]:
+                            - generic [ref=e4513]:
+                              - generic [ref=e4514]: Day Range lowest value
+                              - text: $104.2801
+                            - generic [ref=e4515]:
+                              - generic [ref=e4516]: Day Range highest value
+                              - text: $109.25
+                            - generic [ref=e4517]: Day Range current value $105.52
+                          - slider: "105.52"
+                      - cell [ref=e4518]:
+                        - figure [ref=e4521]:
+                          - generic [ref=e4522]:
+                            - generic [ref=e4523]:
+                              - generic [ref=e4524]: 52 Week Range lowest value
+                              - text: $86.15
+                            - generic [ref=e4525]:
+                              - generic [ref=e4526]: 52 Week Range highest value
+                              - text: $153.87
+                            - generic [ref=e4527]: 52 Week Range current value $105.52
+                          - slider: "105.52"
+                      - cell "View next steps for KKR & CO INC order number 1005255784874" [ref=e4528]:
+                        - button "View next steps for KKR & CO INC order number 1005255784874" [ref=e4530]:
+                          - generic [ref=e4531]: 
+                    - row "Expand row HOOD order number 1005250911402 View quote details for ROBINHOOD MKTS INC CLASS A ROBINHOOD MKTS INC CLASS A Filled Buy 24 Market Day $105.19 $77.77 $77.97 $78.00 $78.00 3:38 PM 01/27/2026 3:38 PM 01/27/2026 - -$7.60 -8.8785% -$7.63 -8.9136% View next steps for ROBINHOOD MKTS INC CLASS A order number 1005250911402" [ref=e4532]:
+                      - cell "Expand row HOOD order number 1005250911402" [ref=e4533]:
+                        - button "Expand row HOOD order number 1005250911402" [ref=e4537]
+                      - cell "View quote details for ROBINHOOD MKTS INC CLASS A ROBINHOOD MKTS INC CLASS A" [ref=e4541]:
+                        - generic [ref=e4542]:
+                          - link "View quote details for ROBINHOOD MKTS INC CLASS A" [ref=e4545] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=HOOD
+                            - text: HOOD
+                          - generic "ROBINHOOD MKTS INC CLASS A" [ref=e4546]
+                      - cell "Filled" [ref=e4547]:
+                        - generic [ref=e4550]: Filled
+                      - cell "Buy" [ref=e4551]:
+                        - generic [ref=e4553]: Buy
+                      - cell "24" [ref=e4554]:
+                        - generic [ref=e4557]: "24"
+                      - cell "Market" [ref=e4558]:
+                        - generic [ref=e4559]: Market
+                      - cell "Day" [ref=e4560]:
+                        - generic [ref=e4561]: Day
+                      - cell "$105.19" [ref=e4562]:
+                        - generic [ref=e4564]: $105.19
+                      - cell "$77.77" [ref=e4565]:
+                        - generic [ref=e4566]: $77.77
+                      - cell "$77.97" [ref=e4567]:
+                        - generic [ref=e4568]: $77.97
+                      - cell "$78.00" [ref=e4569]:
+                        - generic [ref=e4570]: $78.00
+                      - cell "$78.00" [ref=e4571]:
+                        - generic [ref=e4572]: $78.00
+                      - cell "3:38 PM 01/27/2026" [ref=e4573]:
+                        - generic [ref=e4575]: 3:38 PM 01/27/2026
+                      - cell "3:38 PM 01/27/2026" [ref=e4576]:
+                        - generic [ref=e4578]: 3:38 PM 01/27/2026
+                      - cell "-" [ref=e4579]:
+                        - generic [ref=e4581]: "-"
+                      - cell "-$7.60" [ref=e4582]:
+                        - generic [ref=e4583]: "-$7.60"
+                      - cell "-8.8785%" [ref=e4584]:
+                        - generic [ref=e4585]: "-8.8785%"
+                      - cell "-$7.63" [ref=e4586]:
+                        - generic [ref=e4587]: "-$7.63"
+                      - cell "-8.9136%" [ref=e4588]:
+                        - generic [ref=e4589]: "-8.9136%"
+                      - cell [ref=e4590]:
+                        - figure [ref=e4593]:
+                          - generic [ref=e4594]:
+                            - generic [ref=e4595]:
+                              - generic [ref=e4596]: Day Range lowest value
+                              - text: $74.25
+                            - generic [ref=e4597]:
+                              - generic [ref=e4598]: Day Range highest value
+                              - text: $79.90
+                            - generic [ref=e4599]: Day Range current value $78.00
+                          - slider: "78"
+                      - cell [ref=e4600]:
+                        - figure [ref=e4603]:
+                          - generic [ref=e4604]:
+                            - generic [ref=e4605]:
+                              - generic [ref=e4606]: 52 Week Range lowest value
+                              - text: $29.66
+                            - generic [ref=e4607]:
+                              - generic [ref=e4608]: 52 Week Range highest value
+                              - text: $153.8599
+                            - generic [ref=e4609]: 52 Week Range current value $78.00
+                          - slider: "78"
+                      - cell "View next steps for ROBINHOOD MKTS INC CLASS A order number 1005250911402" [ref=e4610]:
+                        - button "View next steps for ROBINHOOD MKTS INC CLASS A order number 1005250911402" [ref=e4612]:
+                          - generic [ref=e4613]: 
+                    - row "Expand row KKR order number 1005250911087 View quote details for KKR & CO INC KKR & CO INC Filled Buy 21 Market Day $116.555 $105.52 $105.52 $107.35 $105.52 3:32 PM 01/27/2026 3:32 PM 01/27/2026 - -$1.69 -1.5763% -$1.69 -1.5763% View next steps for KKR & CO INC order number 1005250911087" [ref=e4614]:
+                      - cell "Expand row KKR order number 1005250911087" [ref=e4615]:
+                        - button "Expand row KKR order number 1005250911087" [ref=e4619]
+                      - cell "View quote details for KKR & CO INC KKR & CO INC" [ref=e4623]:
+                        - generic [ref=e4624]:
+                          - link "View quote details for KKR & CO INC" [ref=e4627] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=KKR
+                            - text: KKR
+                          - generic "KKR & CO INC" [ref=e4628]
+                      - cell "Filled" [ref=e4629]:
+                        - generic [ref=e4632]: Filled
+                      - cell "Buy" [ref=e4633]:
+                        - generic [ref=e4635]: Buy
+                      - cell "21" [ref=e4636]:
+                        - generic [ref=e4639]: "21"
+                      - cell "Market" [ref=e4640]:
+                        - generic [ref=e4641]: Market
+                      - cell "Day" [ref=e4642]:
+                        - generic [ref=e4643]: Day
+                      - cell "$116.555" [ref=e4644]:
+                        - generic [ref=e4646]: $116.555
+                      - cell "$105.52" [ref=e4647]:
+                        - generic [ref=e4648]: $105.52
+                      - cell "$105.52" [ref=e4649]:
+                        - generic [ref=e4650]: $105.52
+                      - cell "$107.35" [ref=e4651]:
+                        - generic [ref=e4652]: $107.35
+                      - cell "$105.52" [ref=e4653]:
+                        - generic [ref=e4654]: $105.52
+                      - cell "3:32 PM 01/27/2026" [ref=e4655]:
+                        - generic [ref=e4657]: 3:32 PM 01/27/2026
+                      - cell "3:32 PM 01/27/2026" [ref=e4658]:
+                        - generic [ref=e4660]: 3:32 PM 01/27/2026
+                      - cell "-" [ref=e4661]:
+                        - generic [ref=e4663]: "-"
+                      - cell "-$1.69" [ref=e4664]:
+                        - generic [ref=e4665]: "-$1.69"
+                      - cell "-1.5763%" [ref=e4666]:
+                        - generic [ref=e4667]: "-1.5763%"
+                      - cell "-$1.69" [ref=e4668]:
+                        - generic [ref=e4669]: "-$1.69"
+                      - cell "-1.5763%" [ref=e4670]:
+                        - generic [ref=e4671]: "-1.5763%"
+                      - cell [ref=e4672]:
+                        - figure [ref=e4675]:
+                          - generic [ref=e4676]:
+                            - generic [ref=e4677]:
+                              - generic [ref=e4678]: Day Range lowest value
+                              - text: $104.2801
+                            - generic [ref=e4679]:
+                              - generic [ref=e4680]: Day Range highest value
+                              - text: $109.25
+                            - generic [ref=e4681]: Day Range current value $105.52
+                          - slider: "105.52"
+                      - cell [ref=e4682]:
+                        - figure [ref=e4685]:
+                          - generic [ref=e4686]:
+                            - generic [ref=e4687]:
+                              - generic [ref=e4688]: 52 Week Range lowest value
+                              - text: $86.15
+                            - generic [ref=e4689]:
+                              - generic [ref=e4690]: 52 Week Range highest value
+                              - text: $153.87
+                            - generic [ref=e4691]: 52 Week Range current value $105.52
+                          - slider: "105.52"
+                      - cell "View next steps for KKR & CO INC order number 1005250911087" [ref=e4692]:
+                        - button "View next steps for KKR & CO INC order number 1005250911087" [ref=e4694]:
+                          - generic [ref=e4695]: 
+                    - row "Expand row PAAS order number 1005242101623 View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR Filled Buy 40 Market Day $61.9499 $59.20 $59.60 $59.60 $59.56 10:23 AM 01/27/2026 10:23 AM 01/27/2026 - +$0.27 +0.4554% +$0.31 +0.5229% View next steps for PAN AMERN SILVER COR order number 1005242101623" [ref=e4696]:
+                      - cell "Expand row PAAS order number 1005242101623" [ref=e4697]:
+                        - button "Expand row PAAS order number 1005242101623" [ref=e4701]
+                      - cell "View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR" [ref=e4705]:
+                        - generic [ref=e4706]:
+                          - link "View quote details for PAN AMERN SILVER COR" [ref=e4709] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PAAS
+                            - text: PAAS
+                          - generic "PAN AMERN SILVER COR" [ref=e4710]
+                      - cell "Filled" [ref=e4711]:
+                        - generic [ref=e4714]: Filled
+                      - cell "Buy" [ref=e4715]:
+                        - generic [ref=e4717]: Buy
+                      - cell "40" [ref=e4718]:
+                        - generic [ref=e4721]: "40"
+                      - cell "Market" [ref=e4722]:
+                        - generic [ref=e4723]: Market
+                      - cell "Day" [ref=e4724]:
+                        - generic [ref=e4725]: Day
+                      - cell "$61.9499" [ref=e4726]:
+                        - generic [ref=e4728]: $61.9499
+                      - cell "$59.20" [ref=e4729]:
+                        - generic [ref=e4730]: $59.20
+                      - cell "$59.60" [ref=e4731]:
+                        - generic [ref=e4732]: $59.60
+                      - cell "$59.60" [ref=e4733]:
+                        - generic [ref=e4734]: $59.60
+                      - cell "$59.56" [ref=e4735]:
+                        - generic [ref=e4736]: $59.56
+                      - cell "10:23 AM 01/27/2026" [ref=e4737]:
+                        - generic [ref=e4739]: 10:23 AM 01/27/2026
+                      - cell "10:23 AM 01/27/2026" [ref=e4740]:
+                        - generic [ref=e4742]: 10:23 AM 01/27/2026
+                      - cell "-" [ref=e4743]:
+                        - generic [ref=e4745]: "-"
+                      - cell "+$0.27" [ref=e4746]:
+                        - generic [ref=e4747]: +$0.27
+                      - cell "+0.4554%" [ref=e4748]:
+                        - generic [ref=e4749]: +0.4554%
+                      - cell "+$0.31" [ref=e4750]:
+                        - generic [ref=e4751]: +$0.31
+                      - cell "+0.5229%" [ref=e4752]:
+                        - generic [ref=e4753]: +0.5229%
+                      - cell [ref=e4754]:
+                        - figure [ref=e4757]:
+                          - generic [ref=e4758]:
+                            - generic [ref=e4759]:
+                              - generic [ref=e4760]: Day Range lowest value
+                              - text: $58.54
+                            - generic [ref=e4761]:
+                              - generic [ref=e4762]: Day Range highest value
+                              - text: $61.49
+                            - generic [ref=e4763]: Day Range current value $59.56
+                          - slider: "59.56"
+                      - cell [ref=e4764]:
+                        - figure [ref=e4767]:
+                          - generic [ref=e4768]:
+                            - generic [ref=e4769]:
+                              - generic [ref=e4770]: 52 Week Range lowest value
+                              - text: $20.55
+                            - generic [ref=e4771]:
+                              - generic [ref=e4772]: 52 Week Range highest value
+                              - text: $69.99
+                            - generic [ref=e4773]: 52 Week Range current value $59.56
+                          - slider: "59.56"
+                      - cell "View next steps for PAN AMERN SILVER COR order number 1005242101623" [ref=e4774]:
+                        - button "View next steps for PAN AMERN SILVER COR order number 1005242101623" [ref=e4776]:
+                          - generic [ref=e4777]: 
+                    - row "Expand row SIVR order number 1005242101682 View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF Filled Buy 10 Market Day $101.125 $78.26 $78.68 $78.68 $78.55 10:23 AM 01/27/2026 10:23 AM 01/27/2026 - +$1.48 +1.9203% +$1.61 +2.0890% View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242101682" [ref=e4778]:
+                      - cell "Expand row SIVR order number 1005242101682" [ref=e4779]:
+                        - button "Expand row SIVR order number 1005242101682" [ref=e4783]
+                      - cell "View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4787]:
+                        - generic [ref=e4788]:
+                          - link "View quote details for ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4791] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SIVR
+                            - text: SIVR
+                          - generic "ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4792]
+                      - cell "Filled" [ref=e4793]:
+                        - generic [ref=e4796]: Filled
+                      - cell "Buy" [ref=e4797]:
+                        - generic [ref=e4799]: Buy
+                      - cell "10" [ref=e4800]:
+                        - generic [ref=e4803]: "10"
+                      - cell "Market" [ref=e4804]:
+                        - generic [ref=e4805]: Market
+                      - cell "Day" [ref=e4806]:
+                        - generic [ref=e4807]: Day
+                      - cell "$101.125" [ref=e4808]:
+                        - generic [ref=e4810]: $101.125
+                      - cell "$78.26" [ref=e4811]:
+                        - generic [ref=e4812]: $78.26
+                      - cell "$78.68" [ref=e4813]:
+                        - generic [ref=e4814]: $78.68
+                      - cell "$78.68" [ref=e4815]:
+                        - generic [ref=e4816]: $78.68
+                      - cell "$78.55" [ref=e4817]:
+                        - generic [ref=e4818]: $78.55
+                      - cell "10:23 AM 01/27/2026" [ref=e4819]:
+                        - generic [ref=e4821]: 10:23 AM 01/27/2026
+                      - cell "10:23 AM 01/27/2026" [ref=e4822]:
+                        - generic [ref=e4824]: 10:23 AM 01/27/2026
+                      - cell "-" [ref=e4825]:
+                        - generic [ref=e4827]: "-"
+                      - cell "+$1.48" [ref=e4828]:
+                        - generic [ref=e4829]: +$1.48
+                      - cell "+1.9203%" [ref=e4830]:
+                        - generic [ref=e4831]: +1.9203%
+                      - cell "+$1.61" [ref=e4832]:
+                        - generic [ref=e4833]: +$1.61
+                      - cell "+2.0890%" [ref=e4834]:
+                        - generic [ref=e4835]: +2.0890%
+                      - cell [ref=e4836]:
+                        - figure [ref=e4839]:
+                          - generic [ref=e4840]:
+                            - generic [ref=e4841]:
+                              - generic [ref=e4842]: Day Range lowest value
+                              - text: $78.54
+                            - generic [ref=e4843]:
+                              - generic [ref=e4844]: Day Range highest value
+                              - text: $80.84
+                            - generic [ref=e4845]: Day Range current value $78.55
+                          - slider: "78.55"
+                      - cell [ref=e4846]:
+                        - figure [ref=e4849]:
+                          - generic [ref=e4850]:
+                            - generic [ref=e4851]:
+                              - generic [ref=e4852]: 52 Week Range lowest value
+                              - text: $27.86
+                            - generic [ref=e4853]:
+                              - generic [ref=e4854]: 52 Week Range highest value
+                              - text: $115.26
+                            - generic [ref=e4855]: 52 Week Range current value $78.55
+                          - slider: "78.55"
+                      - cell "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242101682" [ref=e4856]:
+                        - button "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242101682" [ref=e4858]:
+                          - generic [ref=e4859]: 
+                    - row "Expand row PAAS order number 1005242101006 View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR Filled Buy 8 Market Day $62.45 $59.20 $59.60 $59.60 $59.56 10:15 AM 01/27/2026 10:15 AM 01/27/2026 - +$0.27 +0.4554% +$0.31 +0.5229% View next steps for PAN AMERN SILVER COR order number 1005242101006" [ref=e4860]:
+                      - cell "Expand row PAAS order number 1005242101006" [ref=e4861]:
+                        - button "Expand row PAAS order number 1005242101006" [ref=e4865]
+                      - cell "View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR" [ref=e4869]:
+                        - generic [ref=e4870]:
+                          - link "View quote details for PAN AMERN SILVER COR" [ref=e4873] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PAAS
+                            - text: PAAS
+                          - generic "PAN AMERN SILVER COR" [ref=e4874]
+                      - cell "Filled" [ref=e4875]:
+                        - generic [ref=e4878]: Filled
+                      - cell "Buy" [ref=e4879]:
+                        - generic [ref=e4881]: Buy
+                      - cell "8" [ref=e4882]:
+                        - generic [ref=e4885]: "8"
+                      - cell "Market" [ref=e4886]:
+                        - generic [ref=e4887]: Market
+                      - cell "Day" [ref=e4888]:
+                        - generic [ref=e4889]: Day
+                      - cell "$62.45" [ref=e4890]:
+                        - generic [ref=e4892]: $62.45
+                      - cell "$59.20" [ref=e4893]:
+                        - generic [ref=e4894]: $59.20
+                      - cell "$59.60" [ref=e4895]:
+                        - generic [ref=e4896]: $59.60
+                      - cell "$59.60" [ref=e4897]:
+                        - generic [ref=e4898]: $59.60
+                      - cell "$59.56" [ref=e4899]:
+                        - generic [ref=e4900]: $59.56
+                      - cell "10:15 AM 01/27/2026" [ref=e4901]:
+                        - generic [ref=e4903]: 10:15 AM 01/27/2026
+                      - cell "10:15 AM 01/27/2026" [ref=e4904]:
+                        - generic [ref=e4906]: 10:15 AM 01/27/2026
+                      - cell "-" [ref=e4907]:
+                        - generic [ref=e4909]: "-"
+                      - cell "+$0.27" [ref=e4910]:
+                        - generic [ref=e4911]: +$0.27
+                      - cell "+0.4554%" [ref=e4912]:
+                        - generic [ref=e4913]: +0.4554%
+                      - cell "+$0.31" [ref=e4914]:
+                        - generic [ref=e4915]: +$0.31
+                      - cell "+0.5229%" [ref=e4916]:
+                        - generic [ref=e4917]: +0.5229%
+                      - cell [ref=e4918]:
+                        - figure [ref=e4921]:
+                          - generic [ref=e4922]:
+                            - generic [ref=e4923]:
+                              - generic [ref=e4924]: Day Range lowest value
+                              - text: $58.54
+                            - generic [ref=e4925]:
+                              - generic [ref=e4926]: Day Range highest value
+                              - text: $61.49
+                            - generic [ref=e4927]: Day Range current value $59.56
+                          - slider: "59.56"
+                      - cell [ref=e4928]:
+                        - figure [ref=e4931]:
+                          - generic [ref=e4932]:
+                            - generic [ref=e4933]:
+                              - generic [ref=e4934]: 52 Week Range lowest value
+                              - text: $20.55
+                            - generic [ref=e4935]:
+                              - generic [ref=e4936]: 52 Week Range highest value
+                              - text: $69.99
+                            - generic [ref=e4937]: 52 Week Range current value $59.56
+                          - slider: "59.56"
+                      - cell "View next steps for PAN AMERN SILVER COR order number 1005242101006" [ref=e4938]:
+                        - button "View next steps for PAN AMERN SILVER COR order number 1005242101006" [ref=e4940]:
+                          - generic [ref=e4941]: 
+                    - row "Expand row SIVR order number 1005242100708 View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF Filled Buy 20 Market Day $100.57 $78.26 $78.68 $78.68 $78.55 10:12 AM 01/27/2026 10:12 AM 01/27/2026 - +$1.48 +1.9203% +$1.61 +2.0890% View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242100708" [ref=e4942]:
+                      - cell "Expand row SIVR order number 1005242100708" [ref=e4943]:
+                        - button "Expand row SIVR order number 1005242100708" [ref=e4947]
+                      - cell "View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4951]:
+                        - generic [ref=e4952]:
+                          - link "View quote details for ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4955] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SIVR
+                            - text: SIVR
+                          - generic "ABRDN PHYSICAL SILVER SHARES ETF" [ref=e4956]
+                      - cell "Filled" [ref=e4957]:
+                        - generic [ref=e4960]: Filled
+                      - cell "Buy" [ref=e4961]:
+                        - generic [ref=e4963]: Buy
+                      - cell "20" [ref=e4964]:
+                        - generic [ref=e4967]: "20"
+                      - cell "Market" [ref=e4968]:
+                        - generic [ref=e4969]: Market
+                      - cell "Day" [ref=e4970]:
+                        - generic [ref=e4971]: Day
+                      - cell "$100.57" [ref=e4972]:
+                        - generic [ref=e4974]: $100.57
+                      - cell "$78.26" [ref=e4975]:
+                        - generic [ref=e4976]: $78.26
+                      - cell "$78.68" [ref=e4977]:
+                        - generic [ref=e4978]: $78.68
+                      - cell "$78.68" [ref=e4979]:
+                        - generic [ref=e4980]: $78.68
+                      - cell "$78.55" [ref=e4981]:
+                        - generic [ref=e4982]: $78.55
+                      - cell "10:12 AM 01/27/2026" [ref=e4983]:
+                        - generic [ref=e4985]: 10:12 AM 01/27/2026
+                      - cell "10:12 AM 01/27/2026" [ref=e4986]:
+                        - generic [ref=e4988]: 10:12 AM 01/27/2026
+                      - cell "-" [ref=e4989]:
+                        - generic [ref=e4991]: "-"
+                      - cell "+$1.48" [ref=e4992]:
+                        - generic [ref=e4993]: +$1.48
+                      - cell "+1.9203%" [ref=e4994]:
+                        - generic [ref=e4995]: +1.9203%
+                      - cell "+$1.61" [ref=e4996]:
+                        - generic [ref=e4997]: +$1.61
+                      - cell "+2.0890%" [ref=e4998]:
+                        - generic [ref=e4999]: +2.0890%
+                      - cell [ref=e5000]:
+                        - figure [ref=e5003]:
+                          - generic [ref=e5004]:
+                            - generic [ref=e5005]:
+                              - generic [ref=e5006]: Day Range lowest value
+                              - text: $78.54
+                            - generic [ref=e5007]:
+                              - generic [ref=e5008]: Day Range highest value
+                              - text: $80.84
+                            - generic [ref=e5009]: Day Range current value $78.55
+                          - slider: "78.55"
+                      - cell [ref=e5010]:
+                        - figure [ref=e5013]:
+                          - generic [ref=e5014]:
+                            - generic [ref=e5015]:
+                              - generic [ref=e5016]: 52 Week Range lowest value
+                              - text: $27.86
+                            - generic [ref=e5017]:
+                              - generic [ref=e5018]: 52 Week Range highest value
+                              - text: $115.26
+                            - generic [ref=e5019]: 52 Week Range current value $78.55
+                          - slider: "78.55"
+                      - cell "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242100708" [ref=e5020]:
+                        - button "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005242100708" [ref=e5022]:
+                          - generic [ref=e5023]: 
+                    - row "Expand row GDX order number 1005242100658 View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF Filled Buy 7 Market Day $104.855 $104.80 $105.30 $105.30 $105.272 10:11 AM 01/27/2026 10:11 AM 01/27/2026 - +$2.262 +2.1959% +$2.29 +2.2231% View next steps for VANECK GOLD MINERS ETF order number 1005242100658" [ref=e5024]:
+                      - cell "Expand row GDX order number 1005242100658" [ref=e5025]:
+                        - button "Expand row GDX order number 1005242100658" [ref=e5029]
+                      - cell "View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF" [ref=e5033]:
+                        - generic [ref=e5034]:
+                          - link "View quote details for VANECK GOLD MINERS ETF" [ref=e5037] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GDX
+                            - text: GDX
+                          - generic "VANECK GOLD MINERS ETF" [ref=e5038]
+                      - cell "Filled" [ref=e5039]:
+                        - generic [ref=e5042]: Filled
+                      - cell "Buy" [ref=e5043]:
+                        - generic [ref=e5045]: Buy
+                      - cell "7" [ref=e5046]:
+                        - generic [ref=e5049]: "7"
+                      - cell "Market" [ref=e5050]:
+                        - generic [ref=e5051]: Market
+                      - cell "Day" [ref=e5052]:
+                        - generic [ref=e5053]: Day
+                      - cell "$104.855" [ref=e5054]:
+                        - generic [ref=e5056]: $104.855
+                      - cell "$104.80" [ref=e5057]:
+                        - generic [ref=e5058]: $104.80
+                      - cell "$105.30" [ref=e5059]:
+                        - generic [ref=e5060]: $105.30
+                      - cell "$105.30" [ref=e5061]:
+                        - generic [ref=e5062]: $105.30
+                      - cell "$105.272" [ref=e5063]:
+                        - generic [ref=e5064]: $105.272
+                      - cell "10:11 AM 01/27/2026" [ref=e5065]:
+                        - generic [ref=e5067]: 10:11 AM 01/27/2026
+                      - cell "10:11 AM 01/27/2026" [ref=e5068]:
+                        - generic [ref=e5070]: 10:11 AM 01/27/2026
+                      - cell "-" [ref=e5071]:
+                        - generic [ref=e5073]: "-"
+                      - cell "+$2.262" [ref=e5074]:
+                        - generic [ref=e5075]: +$2.262
+                      - cell "+2.1959%" [ref=e5076]:
+                        - generic [ref=e5077]: +2.1959%
+                      - cell "+$2.29" [ref=e5078]:
+                        - generic [ref=e5079]: +$2.29
+                      - cell "+2.2231%" [ref=e5080]:
+                        - generic [ref=e5081]: +2.2231%
+                      - cell [ref=e5082]:
+                        - figure [ref=e5085]:
+                          - generic [ref=e5086]:
+                            - generic [ref=e5087]:
+                              - generic [ref=e5088]: Day Range lowest value
+                              - text: $102.49
+                            - generic [ref=e5089]:
+                              - generic [ref=e5090]: Day Range highest value
+                              - text: $106.47
+                            - generic [ref=e5091]: Day Range current value $105.272
+                          - slider: "105.272"
+                      - cell [ref=e5092]:
+                        - figure [ref=e5095]:
+                          - generic [ref=e5096]:
+                            - generic [ref=e5097]:
+                              - generic [ref=e5098]: 52 Week Range lowest value
+                              - text: $38.581
+                            - generic [ref=e5099]:
+                              - generic [ref=e5100]: 52 Week Range highest value
+                              - text: $113.50
+                            - generic [ref=e5101]: 52 Week Range current value $105.272
+                          - slider: "105.272"
+                      - cell "View next steps for VANECK GOLD MINERS ETF order number 1005242100658" [ref=e5102]:
+                        - button "View next steps for VANECK GOLD MINERS ETF order number 1005242100658" [ref=e5104]:
+                          - generic [ref=e5105]: 
+                    - row "Expand row SGOL order number 1005239396968 View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF Filled Buy 25 Limit $48.45 Day + ext $48.445 $48.15 $48.40 $48.40 $48.14 7:55 AM 01/27/2026 7:55 AM 01/27/2026 - +$0.21 +0.4381% +$0.47 +0.9806% View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005239396968" [ref=e5106]:
+                      - cell "Expand row SGOL order number 1005239396968" [ref=e5107]:
+                        - button "Expand row SGOL order number 1005239396968" [ref=e5111]
+                      - cell "View quote details for ABRDN PHYSICAL GOLD SHARES ETF ABRDN PHYSICAL GOLD SHARES ETF" [ref=e5115]:
+                        - generic [ref=e5116]:
+                          - link "View quote details for ABRDN PHYSICAL GOLD SHARES ETF" [ref=e5119] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SGOL
+                            - text: SGOL
+                          - generic "ABRDN PHYSICAL GOLD SHARES ETF" [ref=e5120]
+                      - cell "Filled" [ref=e5121]:
+                        - generic [ref=e5124]: Filled
+                      - cell "Buy" [ref=e5125]:
+                        - generic [ref=e5127]: Buy
+                      - cell "25" [ref=e5128]:
+                        - generic [ref=e5131]: "25"
+                      - cell "Limit $48.45" [ref=e5132]:
+                        - generic [ref=e5133]: Limit $48.45
+                      - cell "Day + ext" [ref=e5134]:
+                        - generic [ref=e5135]: Day + ext
+                      - cell "$48.445" [ref=e5136]:
+                        - generic [ref=e5138]: $48.445
+                      - cell "$48.15" [ref=e5139]:
+                        - generic [ref=e5140]: $48.15
+                      - cell "$48.40" [ref=e5141]:
+                        - generic [ref=e5142]: $48.40
+                      - cell "$48.40" [ref=e5143]:
+                        - generic [ref=e5144]: $48.40
+                      - cell "$48.14" [ref=e5145]:
+                        - generic [ref=e5146]: $48.14
+                      - cell "7:55 AM 01/27/2026" [ref=e5147]:
+                        - generic [ref=e5149]: 7:55 AM 01/27/2026
+                      - cell "7:55 AM 01/27/2026" [ref=e5150]:
+                        - generic [ref=e5152]: 7:55 AM 01/27/2026
+                      - cell "-" [ref=e5153]:
+                        - generic [ref=e5155]: "-"
+                      - cell "+$0.21" [ref=e5156]:
+                        - generic [ref=e5157]: +$0.21
+                      - cell "+0.4381%" [ref=e5158]:
+                        - generic [ref=e5159]: +0.4381%
+                      - cell "+$0.47" [ref=e5160]:
+                        - generic [ref=e5161]: +$0.47
+                      - cell "+0.9806%" [ref=e5162]:
+                        - generic [ref=e5163]: +0.9806%
+                      - cell [ref=e5164]:
+                        - figure [ref=e5167]:
+                          - generic [ref=e5168]:
+                            - generic [ref=e5169]:
+                              - generic [ref=e5170]: Day Range lowest value
+                              - text: $47.99
+                            - generic [ref=e5171]:
+                              - generic [ref=e5172]: Day Range highest value
+                              - text: $48.58
+                            - generic [ref=e5173]: Day Range current value $48.14
+                          - slider: "48.14"
+                      - cell [ref=e5174]:
+                        - figure [ref=e5177]:
+                          - generic [ref=e5178]:
+                            - generic [ref=e5179]:
+                              - generic [ref=e5180]: 52 Week Range lowest value
+                              - text: $27.025
+                            - generic [ref=e5181]:
+                              - generic [ref=e5182]: 52 Week Range highest value
+                              - text: $52.84
+                            - generic [ref=e5183]: 52 Week Range current value $48.14
+                          - slider: "48.14"
+                      - cell "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005239396968" [ref=e5184]:
+                        - button "View next steps for ABRDN PHYSICAL GOLD SHARES ETF order number 1005239396968" [ref=e5186]:
+                          - generic [ref=e5187]: 
+                    - row "Expand row MUU order number 1005239396694 View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF Filled Sell 11 Limit $195.75 Day + ext $196.20 $196.57 $196.57 $197.89 $197.67 7:22 AM 01/27/2026 7:22 AM 01/27/2026 - +$37.22 +23.1973% +$36.12 +22.5117% View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005239396694" [ref=e5188]:
+                      - cell "Expand row MUU order number 1005239396694" [ref=e5189]:
+                        - button "Expand row MUU order number 1005239396694" [ref=e5193]
+                      - cell "View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF" [ref=e5197]:
+                        - generic [ref=e5198]:
+                          - link "View quote details for DIREXION DAILY MU BULL 2X ETF" [ref=e5201] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MUU
+                            - text: MUU
+                          - generic "DIREXION DAILY MU BULL 2X ETF" [ref=e5202]
+                      - cell "Filled" [ref=e5203]:
+                        - generic [ref=e5206]: Filled
+                      - cell "Sell" [ref=e5207]:
+                        - generic [ref=e5209]: Sell
+                      - cell "11" [ref=e5210]:
+                        - generic [ref=e5213]: "11"
+                      - cell "Limit $195.75" [ref=e5214]:
+                        - generic [ref=e5215]: Limit $195.75
+                      - cell "Day + ext" [ref=e5216]:
+                        - generic [ref=e5217]: Day + ext
+                      - cell "$196.20" [ref=e5218]:
+                        - generic [ref=e5220]: $196.20
+                      - cell "$196.57" [ref=e5221]:
+                        - generic [ref=e5222]: $196.57
+                      - cell "$196.57" [ref=e5223]:
+                        - generic [ref=e5224]: $196.57
+                      - cell "$197.89" [ref=e5225]:
+                        - generic [ref=e5226]: $197.89
+                      - cell "$197.67" [ref=e5227]:
+                        - generic [ref=e5228]: $197.67
+                      - cell "7:22 AM 01/27/2026" [ref=e5229]:
+                        - generic [ref=e5231]: 7:22 AM 01/27/2026
+                      - cell "7:22 AM 01/27/2026" [ref=e5232]:
+                        - generic [ref=e5234]: 7:22 AM 01/27/2026
+                      - cell "-" [ref=e5235]:
+                        - generic [ref=e5237]: "-"
+                      - cell "+$37.22" [ref=e5238]:
+                        - generic [ref=e5239]: +$37.22
+                      - cell "+23.1973%" [ref=e5240]:
+                        - generic [ref=e5241]: +23.1973%
+                      - cell "+$36.12" [ref=e5242]:
+                        - generic [ref=e5243]: +$36.12
+                      - cell "+22.5117%" [ref=e5244]:
+                        - generic [ref=e5245]: +22.5117%
+                      - cell [ref=e5246]:
+                        - figure [ref=e5249]:
+                          - generic [ref=e5250]:
+                            - generic [ref=e5251]:
+                              - generic [ref=e5252]: Day Range lowest value
+                              - text: $171.89
+                            - generic [ref=e5253]:
+                              - generic [ref=e5254]: Day Range highest value
+                              - text: $195.3999
+                            - generic [ref=e5255]: Day Range current value $197.67
+                          - slider: "195.3999"
+                      - cell [ref=e5256]:
+                        - figure [ref=e5259]:
+                          - generic [ref=e5260]:
+                            - generic [ref=e5261]:
+                              - generic [ref=e5262]: 52 Week Range lowest value
+                              - text: $6.7727
+                            - generic [ref=e5263]:
+                              - generic [ref=e5264]: 52 Week Range highest value
+                              - text: $249.10
+                            - generic [ref=e5265]: 52 Week Range current value $197.67
+                          - slider: "197.67"
+                      - cell "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005239396694" [ref=e5266]:
+                        - button "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005239396694" [ref=e5268]:
+                          - generic [ref=e5269]: 
+                    - row "Expand row UEC order number 1005238633054 View quote details for URANIUM ENERGY CORP URANIUM ENERGY CORP Filled Sell 70 Limit $18.10 Day + ext $18.1094 $15.89 $15.90 $15.98 $15.95 6:04 PM 01/26/2026 6:04 PM 01/26/2026 - -$0.39 -2.3868% -$0.44 -2.6928% View next steps for URANIUM ENERGY CORP order number 1005238633054" [ref=e5270]:
+                      - cell "Expand row UEC order number 1005238633054" [ref=e5271]:
+                        - button "Expand row UEC order number 1005238633054" [ref=e5275]
+                      - cell "View quote details for URANIUM ENERGY CORP URANIUM ENERGY CORP" [ref=e5279]:
+                        - generic [ref=e5280]:
+                          - link "View quote details for URANIUM ENERGY CORP" [ref=e5283] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UEC
+                            - text: UEC
+                          - generic "URANIUM ENERGY CORP" [ref=e5284]
+                      - cell "Filled" [ref=e5285]:
+                        - generic [ref=e5288]: Filled
+                      - cell "Sell" [ref=e5289]:
+                        - generic [ref=e5291]: Sell
+                      - cell "70" [ref=e5292]:
+                        - generic [ref=e5295]: "70"
+                      - cell "Limit $18.10" [ref=e5296]:
+                        - generic [ref=e5297]: Limit $18.10
+                      - cell "Day + ext" [ref=e5298]:
+                        - generic [ref=e5299]: Day + ext
+                      - cell "$18.1094" [ref=e5300]:
+                        - generic [ref=e5302]: $18.1094
+                      - cell "$15.89" [ref=e5303]:
+                        - generic [ref=e5304]: $15.89
+                      - cell "$15.90" [ref=e5305]:
+                        - generic [ref=e5306]: $15.90
+                      - cell "$15.98" [ref=e5307]:
+                        - generic [ref=e5308]: $15.98
+                      - cell "$15.95" [ref=e5309]:
+                        - generic [ref=e5310]: $15.95
+                      - cell "6:04 PM 01/26/2026" [ref=e5311]:
+                        - generic [ref=e5313]: 6:04 PM 01/26/2026
+                      - cell "6:04 PM 01/26/2026" [ref=e5314]:
+                        - generic [ref=e5316]: 6:04 PM 01/26/2026
+                      - cell "-" [ref=e5317]:
+                        - generic [ref=e5319]: "-"
+                      - cell "-$0.39" [ref=e5320]:
+                        - generic [ref=e5321]: "-$0.39"
+                      - cell "-2.3868%" [ref=e5322]:
+                        - generic [ref=e5323]: "-2.3868%"
+                      - cell "-$0.44" [ref=e5324]:
+                        - generic [ref=e5325]: "-$0.44"
+                      - cell "-2.6928%" [ref=e5326]:
+                        - generic [ref=e5327]: "-2.6928%"
+                      - cell [ref=e5328]:
+                        - figure [ref=e5331]:
+                          - generic [ref=e5332]:
+                            - generic [ref=e5333]:
+                              - generic [ref=e5334]: Day Range lowest value
+                              - text: $15.34
+                            - generic [ref=e5335]:
+                              - generic [ref=e5336]: Day Range highest value
+                              - text: $17.00
+                            - generic [ref=e5337]: Day Range current value $15.95
+                          - slider: "15.95"
+                      - cell [ref=e5338]:
+                        - figure [ref=e5341]:
+                          - generic [ref=e5342]:
+                            - generic [ref=e5343]:
+                              - generic [ref=e5344]: 52 Week Range lowest value
+                              - text: $3.85
+                            - generic [ref=e5345]:
+                              - generic [ref=e5346]: 52 Week Range highest value
+                              - text: $20.34
+                            - generic [ref=e5347]: 52 Week Range current value $15.95
+                          - slider: "15.95"
+                      - cell "View next steps for URANIUM ENERGY CORP order number 1005238633054" [ref=e5348]:
+                        - button "View next steps for URANIUM ENERGY CORP order number 1005238633054" [ref=e5350]:
+                          - generic [ref=e5351]: 
+                    - row "Expand row NUGT order number 1005238633049 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Sell 20 Limit $282.00 Day + ext $282.50 $258.98 $263.00 $263.00 $259.73 6:03 PM 01/26/2026 6:03 PM 01/26/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005238633049" [ref=e5352]:
+                      - cell "Expand row NUGT order number 1005238633049" [ref=e5353]:
+                        - button "Expand row NUGT order number 1005238633049" [ref=e5357]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e5361]:
+                        - generic [ref=e5362]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e5365] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e5366]
+                      - cell "Filled" [ref=e5367]:
+                        - generic [ref=e5370]: Filled
+                      - cell "Sell" [ref=e5371]:
+                        - generic [ref=e5373]: Sell
+                      - cell "20" [ref=e5374]:
+                        - generic [ref=e5377]: "20"
+                      - cell "Limit $282.00" [ref=e5378]:
+                        - generic [ref=e5379]: Limit $282.00
+                      - cell "Day + ext" [ref=e5380]:
+                        - generic [ref=e5381]: Day + ext
+                      - cell "$282.50" [ref=e5382]:
+                        - generic [ref=e5384]: $282.50
+                      - cell "$258.98" [ref=e5385]:
+                        - generic [ref=e5386]: $258.98
+                      - cell "$263.00" [ref=e5387]:
+                        - generic [ref=e5388]: $263.00
+                      - cell "$263.00" [ref=e5389]:
+                        - generic [ref=e5390]: $263.00
+                      - cell "$259.73" [ref=e5391]:
+                        - generic [ref=e5392]: $259.73
+                      - cell "6:03 PM 01/26/2026" [ref=e5393]:
+                        - generic [ref=e5395]: 6:03 PM 01/26/2026
+                      - cell "6:03 PM 01/26/2026" [ref=e5396]:
+                        - generic [ref=e5398]: 6:03 PM 01/26/2026
+                      - cell "-" [ref=e5399]:
+                        - generic [ref=e5401]: "-"
+                      - cell "+$7.01" [ref=e5402]:
+                        - generic [ref=e5403]: +$7.01
+                      - cell "+2.7738%" [ref=e5404]:
+                        - generic [ref=e5405]: +2.7738%
+                      - cell "+$10.28" [ref=e5406]:
+                        - generic [ref=e5407]: +$10.28
+                      - cell "+4.0677%" [ref=e5408]:
+                        - generic [ref=e5409]: +4.0677%
+                      - cell [ref=e5410]:
+                        - figure [ref=e5413]:
+                          - generic [ref=e5414]:
+                            - generic [ref=e5415]:
+                              - generic [ref=e5416]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e5417]:
+                              - generic [ref=e5418]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e5419]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e5420]:
+                        - figure [ref=e5423]:
+                          - generic [ref=e5424]:
+                            - generic [ref=e5425]:
+                              - generic [ref=e5426]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e5427]:
+                              - generic [ref=e5428]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e5429]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005238633049" [ref=e5430]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005238633049" [ref=e5432]:
+                          - generic [ref=e5433]: 
+                    - row "Expand row PAAS order number 1005238632904 View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR Filled Buy 12 Limit $63.60 Day + ext $63.60 $59.20 $59.60 $59.60 $59.56 5:11 PM 01/26/2026 5:11 PM 01/26/2026 - +$0.27 +0.4554% +$0.31 +0.5229% View next steps for PAN AMERN SILVER COR order number 1005238632904" [ref=e5434]:
+                      - cell "Expand row PAAS order number 1005238632904" [ref=e5435]:
+                        - button "Expand row PAAS order number 1005238632904" [ref=e5439]
+                      - cell "View quote details for PAN AMERN SILVER COR PAN AMERN SILVER COR" [ref=e5443]:
+                        - generic [ref=e5444]:
+                          - link "View quote details for PAN AMERN SILVER COR" [ref=e5447] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=PAAS
+                            - text: PAAS
+                          - generic "PAN AMERN SILVER COR" [ref=e5448]
+                      - cell "Filled" [ref=e5449]:
+                        - generic [ref=e5452]: Filled
+                      - cell "Buy" [ref=e5453]:
+                        - generic [ref=e5455]: Buy
+                      - cell "12" [ref=e5456]:
+                        - generic [ref=e5459]: "12"
+                      - cell "Limit $63.60" [ref=e5460]:
+                        - generic [ref=e5461]: Limit $63.60
+                      - cell "Day + ext" [ref=e5462]:
+                        - generic [ref=e5463]: Day + ext
+                      - cell "$63.60" [ref=e5464]:
+                        - generic [ref=e5466]: $63.60
+                      - cell "$59.20" [ref=e5467]:
+                        - generic [ref=e5468]: $59.20
+                      - cell "$59.60" [ref=e5469]:
+                        - generic [ref=e5470]: $59.60
+                      - cell "$59.60" [ref=e5471]:
+                        - generic [ref=e5472]: $59.60
+                      - cell "$59.56" [ref=e5473]:
+                        - generic [ref=e5474]: $59.56
+                      - cell "5:11 PM 01/26/2026" [ref=e5475]:
+                        - generic [ref=e5477]: 5:11 PM 01/26/2026
+                      - cell "5:11 PM 01/26/2026" [ref=e5478]:
+                        - generic [ref=e5480]: 5:11 PM 01/26/2026
+                      - cell "-" [ref=e5481]:
+                        - generic [ref=e5483]: "-"
+                      - cell "+$0.27" [ref=e5484]:
+                        - generic [ref=e5485]: +$0.27
+                      - cell "+0.4554%" [ref=e5486]:
+                        - generic [ref=e5487]: +0.4554%
+                      - cell "+$0.31" [ref=e5488]:
+                        - generic [ref=e5489]: +$0.31
+                      - cell "+0.5229%" [ref=e5490]:
+                        - generic [ref=e5491]: +0.5229%
+                      - cell [ref=e5492]:
+                        - figure [ref=e5495]:
+                          - generic [ref=e5496]:
+                            - generic [ref=e5497]:
+                              - generic [ref=e5498]: Day Range lowest value
+                              - text: $58.54
+                            - generic [ref=e5499]:
+                              - generic [ref=e5500]: Day Range highest value
+                              - text: $61.49
+                            - generic [ref=e5501]: Day Range current value $59.56
+                          - slider: "59.56"
+                      - cell [ref=e5502]:
+                        - figure [ref=e5505]:
+                          - generic [ref=e5506]:
+                            - generic [ref=e5507]:
+                              - generic [ref=e5508]: 52 Week Range lowest value
+                              - text: $20.55
+                            - generic [ref=e5509]:
+                              - generic [ref=e5510]: 52 Week Range highest value
+                              - text: $69.99
+                            - generic [ref=e5511]: 52 Week Range current value $59.56
+                          - slider: "59.56"
+                      - cell "View next steps for PAN AMERN SILVER COR order number 1005238632904" [ref=e5512]:
+                        - button "View next steps for PAN AMERN SILVER COR order number 1005238632904" [ref=e5514]:
+                          - generic [ref=e5515]: 
+                    - row "Expand row MUU order number 1005230201963 View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF Filled Buy 11 Market Day $180.8837 $196.57 $196.57 $197.89 $197.67 11:29 AM 01/26/2026 11:29 AM 01/26/2026 - +$37.22 +23.1973% +$36.12 +22.5117% View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005230201963" [ref=e5516]:
+                      - cell "Expand row MUU order number 1005230201963" [ref=e5517]:
+                        - button "Expand row MUU order number 1005230201963" [ref=e5521]
+                      - cell "View quote details for DIREXION DAILY MU BULL 2X ETF DIREXION DAILY MU BULL 2X ETF" [ref=e5525]:
+                        - generic [ref=e5526]:
+                          - link "View quote details for DIREXION DAILY MU BULL 2X ETF" [ref=e5529] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MUU
+                            - text: MUU
+                          - generic "DIREXION DAILY MU BULL 2X ETF" [ref=e5530]
+                      - cell "Filled" [ref=e5531]:
+                        - generic [ref=e5534]: Filled
+                      - cell "Buy" [ref=e5535]:
+                        - generic [ref=e5537]: Buy
+                      - cell "11" [ref=e5538]:
+                        - generic [ref=e5541]: "11"
+                      - cell "Market" [ref=e5542]:
+                        - generic [ref=e5543]: Market
+                      - cell "Day" [ref=e5544]:
+                        - generic [ref=e5545]: Day
+                      - cell "$180.8837" [ref=e5546]:
+                        - generic [ref=e5548]: $180.8837
+                      - cell "$196.57" [ref=e5549]:
+                        - generic [ref=e5550]: $196.57
+                      - cell "$196.57" [ref=e5551]:
+                        - generic [ref=e5552]: $196.57
+                      - cell "$197.89" [ref=e5553]:
+                        - generic [ref=e5554]: $197.89
+                      - cell "$197.67" [ref=e5555]:
+                        - generic [ref=e5556]: $197.67
+                      - cell "11:29 AM 01/26/2026" [ref=e5557]:
+                        - generic [ref=e5559]: 11:29 AM 01/26/2026
+                      - cell "11:29 AM 01/26/2026" [ref=e5560]:
+                        - generic [ref=e5562]: 11:29 AM 01/26/2026
+                      - cell "-" [ref=e5563]:
+                        - generic [ref=e5565]: "-"
+                      - cell "+$37.22" [ref=e5566]:
+                        - generic [ref=e5567]: +$37.22
+                      - cell "+23.1973%" [ref=e5568]:
+                        - generic [ref=e5569]: +23.1973%
+                      - cell "+$36.12" [ref=e5570]:
+                        - generic [ref=e5571]: +$36.12
+                      - cell "+22.5117%" [ref=e5572]:
+                        - generic [ref=e5573]: +22.5117%
+                      - cell [ref=e5574]:
+                        - figure [ref=e5577]:
+                          - generic [ref=e5578]:
+                            - generic [ref=e5579]:
+                              - generic [ref=e5580]: Day Range lowest value
+                              - text: $171.89
+                            - generic [ref=e5581]:
+                              - generic [ref=e5582]: Day Range highest value
+                              - text: $195.3999
+                            - generic [ref=e5583]: Day Range current value $197.67
+                          - slider: "195.3999"
+                      - cell [ref=e5584]:
+                        - figure [ref=e5587]:
+                          - generic [ref=e5588]:
+                            - generic [ref=e5589]:
+                              - generic [ref=e5590]: 52 Week Range lowest value
+                              - text: $6.7727
+                            - generic [ref=e5591]:
+                              - generic [ref=e5592]: 52 Week Range highest value
+                              - text: $249.10
+                            - generic [ref=e5593]: 52 Week Range current value $197.67
+                          - slider: "197.67"
+                      - cell "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005230201963" [ref=e5594]:
+                        - button "View next steps for DIREXION DAILY MU BULL 2X ETF order number 1005230201963" [ref=e5596]:
+                          - generic [ref=e5597]: 
+                    - row "Expand row MU order number 1005225764205 View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN Filled Sell 5 Limit $392.42 Day + ext $392.52 $415.95 $415.95 $416.18 $416.00 8:42 AM 01/26/2026 8:42 AM 01/26/2026 - +$42.75 +11.4534% +$42.70 +11.4401% View next steps for MICRON TECHNOLOGY IN order number 1005225764205" [ref=e5598]:
+                      - cell "Expand row MU order number 1005225764205" [ref=e5599]:
+                        - button "Expand row MU order number 1005225764205" [ref=e5603]
+                      - cell "View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN" [ref=e5607]:
+                        - generic [ref=e5608]:
+                          - link "View quote details for MICRON TECHNOLOGY IN" [ref=e5611] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MU
+                            - text: MU
+                          - generic "MICRON TECHNOLOGY IN" [ref=e5612]
+                      - cell "Filled" [ref=e5613]:
+                        - generic [ref=e5616]: Filled
+                      - cell "Sell" [ref=e5617]:
+                        - generic [ref=e5619]: Sell
+                      - cell "5" [ref=e5620]:
+                        - generic [ref=e5623]: "5"
+                      - cell "Limit $392.42" [ref=e5624]:
+                        - generic [ref=e5625]: Limit $392.42
+                      - cell "Day + ext" [ref=e5626]:
+                        - generic [ref=e5627]: Day + ext
+                      - cell "$392.52" [ref=e5628]:
+                        - generic [ref=e5630]: $392.52
+                      - cell "$415.95" [ref=e5631]:
+                        - generic [ref=e5632]: $415.95
+                      - cell "$415.95" [ref=e5633]:
+                        - generic [ref=e5634]: $415.95
+                      - cell "$416.18" [ref=e5635]:
+                        - generic [ref=e5636]: $416.18
+                      - cell "$416.00" [ref=e5637]:
+                        - generic [ref=e5638]: $416.00
+                      - cell "8:42 AM 01/26/2026" [ref=e5639]:
+                        - generic [ref=e5641]: 8:42 AM 01/26/2026
+                      - cell "8:42 AM 01/26/2026" [ref=e5642]:
+                        - generic [ref=e5644]: 8:42 AM 01/26/2026
+                      - cell "-" [ref=e5645]:
+                        - generic [ref=e5647]: "-"
+                      - cell "+$42.75" [ref=e5648]:
+                        - generic [ref=e5649]: +$42.75
+                      - cell "+11.4534%" [ref=e5650]:
+                        - generic [ref=e5651]: +11.4534%
+                      - cell "+$42.70" [ref=e5652]:
+                        - generic [ref=e5653]: +$42.70
+                      - cell "+11.4401%" [ref=e5654]:
+                        - generic [ref=e5655]: +11.4401%
+                      - cell [ref=e5656]:
+                        - figure [ref=e5659]:
+                          - generic [ref=e5660]:
+                            - generic [ref=e5661]:
+                              - generic [ref=e5662]: Day Range lowest value
+                              - text: $386.57
+                            - generic [ref=e5663]:
+                              - generic [ref=e5664]: Day Range highest value
+                              - text: $414.16
+                            - generic [ref=e5665]: Day Range current value $416.00
+                          - slider: "414.16"
+                      - cell [ref=e5666]:
+                        - figure [ref=e5669]:
+                          - generic [ref=e5670]:
+                            - generic [ref=e5671]:
+                              - generic [ref=e5672]: 52 Week Range lowest value
+                              - text: $61.54
+                            - generic [ref=e5673]:
+                              - generic [ref=e5674]: 52 Week Range highest value
+                              - text: $455.50
+                            - generic [ref=e5675]: 52 Week Range current value $416.00
+                          - slider: "416"
+                      - cell "View next steps for MICRON TECHNOLOGY IN order number 1005225764205" [ref=e5676]:
+                        - button "View next steps for MICRON TECHNOLOGY IN order number 1005225764205" [ref=e5678]:
+                          - generic [ref=e5679]: 
+                    - row "Expand row SOXL order number 1005225764208 View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF Filled Sell 15 Limit $59.86 Day + ext $59.86 $68.00 $68.05 $68.08 $68.0675 8:42 AM 01/26/2026 8:42 AM 01/26/2026 - +$4.7275 +7.4637% +$4.71 +7.4361% View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005225764208" [ref=e5680]:
+                      - cell "Expand row SOXL order number 1005225764208" [ref=e5681]:
+                        - button "Expand row SOXL order number 1005225764208" [ref=e5685]
+                      - cell "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e5689]:
+                        - generic [ref=e5690]:
+                          - link "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e5693] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXL
+                            - text: SOXL
+                          - generic "DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e5694]
+                      - cell "Filled" [ref=e5695]:
+                        - generic [ref=e5698]: Filled
+                      - cell "Sell" [ref=e5699]:
+                        - generic [ref=e5701]: Sell
+                      - cell "15" [ref=e5702]:
+                        - generic [ref=e5705]: "15"
+                      - cell "Limit $59.86" [ref=e5706]:
+                        - generic [ref=e5707]: Limit $59.86
+                      - cell "Day + ext" [ref=e5708]:
+                        - generic [ref=e5709]: Day + ext
+                      - cell "$59.86" [ref=e5710]:
+                        - generic [ref=e5712]: $59.86
+                      - cell "$68.00" [ref=e5713]:
+                        - generic [ref=e5714]: $68.00
+                      - cell "$68.05" [ref=e5715]:
+                        - generic [ref=e5716]: $68.05
+                      - cell "$68.08" [ref=e5717]:
+                        - generic [ref=e5718]: $68.08
+                      - cell "$68.0675" [ref=e5719]:
+                        - generic [ref=e5720]: $68.0675
+                      - cell "8:42 AM 01/26/2026" [ref=e5721]:
+                        - generic [ref=e5723]: 8:42 AM 01/26/2026
+                      - cell "8:42 AM 01/26/2026" [ref=e5724]:
+                        - generic [ref=e5726]: 8:42 AM 01/26/2026
+                      - cell "-" [ref=e5727]:
+                        - generic [ref=e5729]: "-"
+                      - cell "+$4.7275" [ref=e5730]:
+                        - generic [ref=e5731]: +$4.7275
+                      - cell "+7.4637%" [ref=e5732]:
+                        - generic [ref=e5733]: +7.4637%
+                      - cell "+$4.71" [ref=e5734]:
+                        - generic [ref=e5735]: +$4.71
+                      - cell "+7.4361%" [ref=e5736]:
+                        - generic [ref=e5737]: +7.4361%
+                      - cell [ref=e5738]:
+                        - figure [ref=e5741]:
+                          - generic [ref=e5742]:
+                            - generic [ref=e5743]:
+                              - generic [ref=e5744]: Day Range lowest value
+                              - text: $63.2299
+                            - generic [ref=e5745]:
+                              - generic [ref=e5746]: Day Range highest value
+                              - text: $69.095
+                            - generic [ref=e5747]: Day Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell [ref=e5748]:
+                        - figure [ref=e5751]:
+                          - generic [ref=e5752]:
+                            - generic [ref=e5753]:
+                              - generic [ref=e5754]: 52 Week Range lowest value
+                              - text: $7.225
+                            - generic [ref=e5755]:
+                              - generic [ref=e5756]: 52 Week Range highest value
+                              - text: $71.98
+                            - generic [ref=e5757]: 52 Week Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005225764208" [ref=e5758]:
+                        - button "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005225764208" [ref=e5760]:
+                          - generic [ref=e5761]: 
+                    - row "Expand row LRCX order number 1005225764204 View quote details for LAM RESH CORP LAM RESH CORP Filled Sell 5 Limit $216.00 Day + ext $216.1085 $234.50 $235.12 $236.49 $235.25 8:41 AM 01/26/2026 8:41 AM 01/26/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005225764204" [ref=e5762]:
+                      - cell "Expand row LRCX order number 1005225764204" [ref=e5763]:
+                        - button "Expand row LRCX order number 1005225764204" [ref=e5767]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e5771]:
+                        - generic [ref=e5772]:
+                          - link "View quote details for LAM RESH CORP" [ref=e5775] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e5776]
+                      - cell "Filled" [ref=e5777]:
+                        - generic [ref=e5780]: Filled
+                      - cell "Sell" [ref=e5781]:
+                        - generic [ref=e5783]: Sell
+                      - cell "5" [ref=e5784]:
+                        - generic [ref=e5787]: "5"
+                      - cell "Limit $216.00" [ref=e5788]:
+                        - generic [ref=e5789]: Limit $216.00
+                      - cell "Day + ext" [ref=e5790]:
+                        - generic [ref=e5791]: Day + ext
+                      - cell "$216.1085" [ref=e5792]:
+                        - generic [ref=e5794]: $216.1085
+                      - cell "$234.50" [ref=e5795]:
+                        - generic [ref=e5796]: $234.50
+                      - cell "$235.12" [ref=e5797]:
+                        - generic [ref=e5798]: $235.12
+                      - cell "$236.49" [ref=e5799]:
+                        - generic [ref=e5800]: $236.49
+                      - cell "$235.25" [ref=e5801]:
+                        - generic [ref=e5802]: $235.25
+                      - cell "8:41 AM 01/26/2026" [ref=e5803]:
+                        - generic [ref=e5805]: 8:41 AM 01/26/2026
+                      - cell "8:41 AM 01/26/2026" [ref=e5806]:
+                        - generic [ref=e5808]: 8:41 AM 01/26/2026
+                      - cell "-" [ref=e5809]:
+                        - generic [ref=e5811]: "-"
+                      - cell "+$8.64" [ref=e5812]:
+                        - generic [ref=e5813]: +$8.64
+                      - cell "+3.8127%" [ref=e5814]:
+                        - generic [ref=e5815]: +3.8127%
+                      - cell "+$8.51" [ref=e5816]:
+                        - generic [ref=e5817]: +$8.51
+                      - cell "+3.7554%" [ref=e5818]:
+                        - generic [ref=e5819]: +3.7554%
+                      - cell [ref=e5820]:
+                        - figure [ref=e5823]:
+                          - generic [ref=e5824]:
+                            - generic [ref=e5825]:
+                              - generic [ref=e5826]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e5827]:
+                              - generic [ref=e5828]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e5829]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e5830]:
+                        - figure [ref=e5833]:
+                          - generic [ref=e5834]:
+                            - generic [ref=e5835]:
+                              - generic [ref=e5836]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e5837]:
+                              - generic [ref=e5838]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e5839]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005225764204" [ref=e5840]:
+                        - button "View next steps for LAM RESH CORP order number 1005225764204" [ref=e5842]:
+                          - generic [ref=e5843]: 
+                    - row "Expand row FORM order number 1005225219827 View quote details for FORMFACTOR INC FORMFACTOR INC Filled Sell 15 Limit $72.03 Day + ext $72.1245 $95.30 $96.07 $97.00 $96.30 7:45 AM 01/26/2026 7:45 AM 01/26/2026 - +$3.00 +3.2154% +$2.77 +2.9689% View next steps for FORMFACTOR INC order number 1005225219827" [ref=e5844]:
+                      - cell "Expand row FORM order number 1005225219827" [ref=e5845]:
+                        - button "Expand row FORM order number 1005225219827" [ref=e5849]
+                      - cell "View quote details for FORMFACTOR INC FORMFACTOR INC" [ref=e5853]:
+                        - generic [ref=e5854]:
+                          - link "View quote details for FORMFACTOR INC" [ref=e5857] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FORM
+                            - text: FORM
+                          - generic "FORMFACTOR INC" [ref=e5858]
+                      - cell "Filled" [ref=e5859]:
+                        - generic [ref=e5862]: Filled
+                      - cell "Sell" [ref=e5863]:
+                        - generic [ref=e5865]: Sell
+                      - cell "15" [ref=e5866]:
+                        - generic [ref=e5869]: "15"
+                      - cell "Limit $72.03" [ref=e5870]:
+                        - generic [ref=e5871]: Limit $72.03
+                      - cell "Day + ext" [ref=e5872]:
+                        - generic [ref=e5873]: Day + ext
+                      - cell "$72.1245" [ref=e5874]:
+                        - generic [ref=e5876]: $72.1245
+                      - cell "$95.30" [ref=e5877]:
+                        - generic [ref=e5878]: $95.30
+                      - cell "$96.07" [ref=e5879]:
+                        - generic [ref=e5880]: $96.07
+                      - cell "$97.00" [ref=e5881]:
+                        - generic [ref=e5882]: $97.00
+                      - cell "$96.30" [ref=e5883]:
+                        - generic [ref=e5884]: $96.30
+                      - cell "7:45 AM 01/26/2026" [ref=e5885]:
+                        - generic [ref=e5887]: 7:45 AM 01/26/2026
+                      - cell "7:45 AM 01/26/2026" [ref=e5888]:
+                        - generic [ref=e5890]: 7:45 AM 01/26/2026
+                      - cell "-" [ref=e5891]:
+                        - generic [ref=e5893]: "-"
+                      - cell "+$3.00" [ref=e5894]:
+                        - generic [ref=e5895]: +$3.00
+                      - cell "+3.2154%" [ref=e5896]:
+                        - generic [ref=e5897]: +3.2154%
+                      - cell "+$2.77" [ref=e5898]:
+                        - generic [ref=e5899]: +$2.77
+                      - cell "+2.9689%" [ref=e5900]:
+                        - generic [ref=e5901]: +2.9689%
+                      - cell [ref=e5902]:
+                        - figure [ref=e5905]:
+                          - generic [ref=e5906]:
+                            - generic [ref=e5907]:
+                              - generic [ref=e5908]: Day Range lowest value
+                              - text: $93.05
+                            - generic [ref=e5909]:
+                              - generic [ref=e5910]: Day Range highest value
+                              - text: $97.3788
+                            - generic [ref=e5911]: Day Range current value $96.30
+                          - slider: "96.3"
+                      - cell [ref=e5912]:
+                        - figure [ref=e5915]:
+                          - generic [ref=e5916]:
+                            - generic [ref=e5917]:
+                              - generic [ref=e5918]: 52 Week Range lowest value
+                              - text: $22.58
+                            - generic [ref=e5919]:
+                              - generic [ref=e5920]: 52 Week Range highest value
+                              - text: $97.3788
+                            - generic [ref=e5921]: 52 Week Range current value $96.30
+                          - slider: "96.3"
+                      - cell "View next steps for FORMFACTOR INC order number 1005225219827" [ref=e5922]:
+                        - button "View next steps for FORMFACTOR INC order number 1005225219827" [ref=e5924]:
+                          - generic [ref=e5925]: 
+                    - row "Expand row UCTT order number 1005225219828 View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN Filled Sell 30 Limit $40.00 Day + ext $42.4533 $53.02 $55.93 $57.00 $56.3831 7:45 AM 01/26/2026 7:45 AM 01/26/2026 - +$2.0531 +3.7789% +$1.60 +2.9450% View next steps for ULTRA CLEAN HLDGS IN order number 1005225219828" [ref=e5926]:
+                      - cell "Expand row UCTT order number 1005225219828" [ref=e5927]:
+                        - button "Expand row UCTT order number 1005225219828" [ref=e5931]
+                      - cell "View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN" [ref=e5935]:
+                        - generic [ref=e5936]:
+                          - link "View quote details for ULTRA CLEAN HLDGS IN" [ref=e5939] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UCTT
+                            - text: UCTT
+                          - generic "ULTRA CLEAN HLDGS IN" [ref=e5940]
+                      - cell "Filled" [ref=e5941]:
+                        - generic [ref=e5944]: Filled
+                      - cell "Sell" [ref=e5945]:
+                        - generic [ref=e5947]: Sell
+                      - cell "30" [ref=e5948]:
+                        - generic [ref=e5951]: "30"
+                      - cell "Limit $40.00" [ref=e5952]:
+                        - generic [ref=e5953]: Limit $40.00
+                      - cell "Day + ext" [ref=e5954]:
+                        - generic [ref=e5955]: Day + ext
+                      - cell "$42.4533" [ref=e5956]:
+                        - generic [ref=e5958]: $42.4533
+                      - cell "$53.02" [ref=e5959]:
+                        - generic [ref=e5960]: $53.02
+                      - cell "$55.93" [ref=e5961]:
+                        - generic [ref=e5962]: $55.93
+                      - cell "$57.00" [ref=e5963]:
+                        - generic [ref=e5964]: $57.00
+                      - cell "$56.3831" [ref=e5965]:
+                        - generic [ref=e5966]: $56.3831
+                      - cell "7:45 AM 01/26/2026" [ref=e5967]:
+                        - generic [ref=e5969]: 7:45 AM 01/26/2026
+                      - cell "7:45 AM 01/26/2026" [ref=e5970]:
+                        - generic [ref=e5972]: 7:45 AM 01/26/2026
+                      - cell "-" [ref=e5973]:
+                        - generic [ref=e5975]: "-"
+                      - cell "+$2.0531" [ref=e5976]:
+                        - generic [ref=e5977]: +$2.0531
+                      - cell "+3.7789%" [ref=e5978]:
+                        - generic [ref=e5979]: +3.7789%
+                      - cell "+$1.60" [ref=e5980]:
+                        - generic [ref=e5981]: +$1.60
+                      - cell "+2.9450%" [ref=e5982]:
+                        - generic [ref=e5983]: +2.9450%
+                      - cell [ref=e5984]:
+                        - figure [ref=e5987]:
+                          - generic [ref=e5988]:
+                            - generic [ref=e5989]:
+                              - generic [ref=e5990]: Day Range lowest value
+                              - text: $53.795
+                            - generic [ref=e5991]:
+                              - generic [ref=e5992]: Day Range highest value
+                              - text: $57.30
+                            - generic [ref=e5993]: Day Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell [ref=e5994]:
+                        - figure [ref=e5997]:
+                          - generic [ref=e5998]:
+                            - generic [ref=e5999]:
+                              - generic [ref=e6000]: 52 Week Range lowest value
+                              - text: $16.655
+                            - generic [ref=e6001]:
+                              - generic [ref=e6002]: 52 Week Range highest value
+                              - text: $58.70
+                            - generic [ref=e6003]: 52 Week Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell "View next steps for ULTRA CLEAN HLDGS IN order number 1005225219828" [ref=e6004]:
+                        - button "View next steps for ULTRA CLEAN HLDGS IN order number 1005225219828" [ref=e6006]:
+                          - generic [ref=e6007]: 
+                    - row "Expand row SOXX order number 1005223381472 View quote details for ISHARES SEMICONDUCTOR ETF ISHARES SEMICONDUCTOR ETF Filled Sell 3 Limit $342.85 Day + ext $343.0437 $359.00 $360.20 $360.49 $360.45 6:49 PM 01/23/2026 6:49 PM 01/23/2026 - +$9.02 +2.5667% +$8.77 +2.4955% View next steps for ISHARES SEMICONDUCTOR ETF order number 1005223381472" [ref=e6008]:
+                      - cell "Expand row SOXX order number 1005223381472" [ref=e6009]:
+                        - button "Expand row SOXX order number 1005223381472" [ref=e6013]
+                      - cell "View quote details for ISHARES SEMICONDUCTOR ETF ISHARES SEMICONDUCTOR ETF" [ref=e6017]:
+                        - generic [ref=e6018]:
+                          - link "View quote details for ISHARES SEMICONDUCTOR ETF" [ref=e6021] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXX
+                            - text: SOXX
+                          - generic "ISHARES SEMICONDUCTOR ETF" [ref=e6022]
+                      - cell "Filled" [ref=e6023]:
+                        - generic [ref=e6026]: Filled
+                      - cell "Sell" [ref=e6027]:
+                        - generic [ref=e6029]: Sell
+                      - cell "3" [ref=e6030]:
+                        - generic [ref=e6033]: "3"
+                      - cell "Limit $342.85" [ref=e6034]:
+                        - generic [ref=e6035]: Limit $342.85
+                      - cell "Day + ext" [ref=e6036]:
+                        - generic [ref=e6037]: Day + ext
+                      - cell "$343.0437" [ref=e6038]:
+                        - generic [ref=e6040]: $343.0437
+                      - cell "$359.00" [ref=e6041]:
+                        - generic [ref=e6042]: $359.00
+                      - cell "$360.20" [ref=e6043]:
+                        - generic [ref=e6044]: $360.20
+                      - cell "$360.49" [ref=e6045]:
+                        - generic [ref=e6046]: $360.49
+                      - cell "$360.45" [ref=e6047]:
+                        - generic [ref=e6048]: $360.45
+                      - cell "6:49 PM 01/23/2026" [ref=e6049]:
+                        - generic [ref=e6051]: 6:49 PM 01/23/2026
+                      - cell "6:49 PM 01/23/2026" [ref=e6052]:
+                        - generic [ref=e6054]: 6:49 PM 01/23/2026
+                      - cell "-" [ref=e6055]:
+                        - generic [ref=e6057]: "-"
+                      - cell "+$9.02" [ref=e6058]:
+                        - generic [ref=e6059]: +$9.02
+                      - cell "+2.5667%" [ref=e6060]:
+                        - generic [ref=e6061]: +2.5667%
+                      - cell "+$8.77" [ref=e6062]:
+                        - generic [ref=e6063]: +$8.77
+                      - cell "+2.4955%" [ref=e6064]:
+                        - generic [ref=e6065]: +2.4955%
+                      - cell [ref=e6066]:
+                        - figure [ref=e6069]:
+                          - generic [ref=e6070]:
+                            - generic [ref=e6071]:
+                              - generic [ref=e6072]: Day Range lowest value
+                              - text: $351.40
+                            - generic [ref=e6073]:
+                              - generic [ref=e6074]: Day Range highest value
+                              - text: $362.28
+                            - generic [ref=e6075]: Day Range current value $360.45
+                          - slider: "360.45"
+                      - cell [ref=e6076]:
+                        - figure [ref=e6079]:
+                          - generic [ref=e6080]:
+                            - generic [ref=e6081]:
+                              - generic [ref=e6082]: 52 Week Range lowest value
+                              - text: $148.31
+                            - generic [ref=e6083]:
+                              - generic [ref=e6084]: 52 Week Range highest value
+                              - text: $363.80
+                            - generic [ref=e6085]: 52 Week Range current value $360.45
+                          - slider: "360.45"
+                      - cell "View next steps for ISHARES SEMICONDUCTOR ETF order number 1005223381472" [ref=e6086]:
+                        - button "View next steps for ISHARES SEMICONDUCTOR ETF order number 1005223381472" [ref=e6088]:
+                          - generic [ref=e6089]: 
+                    - row "Expand row SOXL order number 1005223381470 View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF Filled Buy 15 Limit $60.97 Day + ext $60.9681 $68.00 $68.05 $68.08 $68.0675 6:45 PM 01/23/2026 6:45 PM 01/23/2026 - +$4.7275 +7.4637% +$4.71 +7.4361% View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005223381470" [ref=e6090]:
+                      - cell "Expand row SOXL order number 1005223381470" [ref=e6091]:
+                        - button "Expand row SOXL order number 1005223381470" [ref=e6095]
+                      - cell "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e6099]:
+                        - generic [ref=e6100]:
+                          - link "View quote details for DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e6103] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXL
+                            - text: SOXL
+                          - generic "DIREXION SEMICONDUCTOR BULL 3X ETF" [ref=e6104]
+                      - cell "Filled" [ref=e6105]:
+                        - generic [ref=e6108]: Filled
+                      - cell "Buy" [ref=e6109]:
+                        - generic [ref=e6111]: Buy
+                      - cell "15" [ref=e6112]:
+                        - generic [ref=e6115]: "15"
+                      - cell "Limit $60.97" [ref=e6116]:
+                        - generic [ref=e6117]: Limit $60.97
+                      - cell "Day + ext" [ref=e6118]:
+                        - generic [ref=e6119]: Day + ext
+                      - cell "$60.9681" [ref=e6120]:
+                        - generic [ref=e6122]: $60.9681
+                      - cell "$68.00" [ref=e6123]:
+                        - generic [ref=e6124]: $68.00
+                      - cell "$68.05" [ref=e6125]:
+                        - generic [ref=e6126]: $68.05
+                      - cell "$68.08" [ref=e6127]:
+                        - generic [ref=e6128]: $68.08
+                      - cell "$68.0675" [ref=e6129]:
+                        - generic [ref=e6130]: $68.0675
+                      - cell "6:45 PM 01/23/2026" [ref=e6131]:
+                        - generic [ref=e6133]: 6:45 PM 01/23/2026
+                      - cell "6:45 PM 01/23/2026" [ref=e6134]:
+                        - generic [ref=e6136]: 6:45 PM 01/23/2026
+                      - cell "-" [ref=e6137]:
+                        - generic [ref=e6139]: "-"
+                      - cell "+$4.7275" [ref=e6140]:
+                        - generic [ref=e6141]: +$4.7275
+                      - cell "+7.4637%" [ref=e6142]:
+                        - generic [ref=e6143]: +7.4637%
+                      - cell "+$4.71" [ref=e6144]:
+                        - generic [ref=e6145]: +$4.71
+                      - cell "+7.4361%" [ref=e6146]:
+                        - generic [ref=e6147]: +7.4361%
+                      - cell [ref=e6148]:
+                        - figure [ref=e6151]:
+                          - generic [ref=e6152]:
+                            - generic [ref=e6153]:
+                              - generic [ref=e6154]: Day Range lowest value
+                              - text: $63.2299
+                            - generic [ref=e6155]:
+                              - generic [ref=e6156]: Day Range highest value
+                              - text: $69.095
+                            - generic [ref=e6157]: Day Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell [ref=e6158]:
+                        - figure [ref=e6161]:
+                          - generic [ref=e6162]:
+                            - generic [ref=e6163]:
+                              - generic [ref=e6164]: 52 Week Range lowest value
+                              - text: $7.225
+                            - generic [ref=e6165]:
+                              - generic [ref=e6166]: 52 Week Range highest value
+                              - text: $71.98
+                            - generic [ref=e6167]: 52 Week Range current value $68.0675
+                          - slider: "68.0675"
+                      - cell "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005223381470" [ref=e6168]:
+                        - button "View next steps for DIREXION SEMICONDUCTOR BULL 3X ETF order number 1005223381470" [ref=e6170]:
+                          - generic [ref=e6171]: 
+                    - row "Expand row MU order number 1005216147150 View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN Filled Buy 5 Market Day $401.275 $415.95 $415.95 $416.18 $416.00 11:36 AM 01/23/2026 11:36 AM 01/23/2026 - +$42.75 +11.4534% +$42.70 +11.4401% View next steps for MICRON TECHNOLOGY IN order number 1005216147150" [ref=e6172]:
+                      - cell "Expand row MU order number 1005216147150" [ref=e6173]:
+                        - button "Expand row MU order number 1005216147150" [ref=e6177]
+                      - cell "View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN" [ref=e6181]:
+                        - generic [ref=e6182]:
+                          - link "View quote details for MICRON TECHNOLOGY IN" [ref=e6185] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MU
+                            - text: MU
+                          - generic "MICRON TECHNOLOGY IN" [ref=e6186]
+                      - cell "Filled" [ref=e6187]:
+                        - generic [ref=e6190]: Filled
+                      - cell "Buy" [ref=e6191]:
+                        - generic [ref=e6193]: Buy
+                      - cell "5" [ref=e6194]:
+                        - generic [ref=e6197]: "5"
+                      - cell "Market" [ref=e6198]:
+                        - generic [ref=e6199]: Market
+                      - cell "Day" [ref=e6200]:
+                        - generic [ref=e6201]: Day
+                      - cell "$401.275" [ref=e6202]:
+                        - generic [ref=e6204]: $401.275
+                      - cell "$415.95" [ref=e6205]:
+                        - generic [ref=e6206]: $415.95
+                      - cell "$415.95" [ref=e6207]:
+                        - generic [ref=e6208]: $415.95
+                      - cell "$416.18" [ref=e6209]:
+                        - generic [ref=e6210]: $416.18
+                      - cell "$416.00" [ref=e6211]:
+                        - generic [ref=e6212]: $416.00
+                      - cell "11:36 AM 01/23/2026" [ref=e6213]:
+                        - generic [ref=e6215]: 11:36 AM 01/23/2026
+                      - cell "11:36 AM 01/23/2026" [ref=e6216]:
+                        - generic [ref=e6218]: 11:36 AM 01/23/2026
+                      - cell "-" [ref=e6219]:
+                        - generic [ref=e6221]: "-"
+                      - cell "+$42.75" [ref=e6222]:
+                        - generic [ref=e6223]: +$42.75
+                      - cell "+11.4534%" [ref=e6224]:
+                        - generic [ref=e6225]: +11.4534%
+                      - cell "+$42.70" [ref=e6226]:
+                        - generic [ref=e6227]: +$42.70
+                      - cell "+11.4401%" [ref=e6228]:
+                        - generic [ref=e6229]: +11.4401%
+                      - cell [ref=e6230]:
+                        - figure [ref=e6233]:
+                          - generic [ref=e6234]:
+                            - generic [ref=e6235]:
+                              - generic [ref=e6236]: Day Range lowest value
+                              - text: $386.57
+                            - generic [ref=e6237]:
+                              - generic [ref=e6238]: Day Range highest value
+                              - text: $414.16
+                            - generic [ref=e6239]: Day Range current value $416.00
+                          - slider: "414.16"
+                      - cell [ref=e6240]:
+                        - figure [ref=e6243]:
+                          - generic [ref=e6244]:
+                            - generic [ref=e6245]:
+                              - generic [ref=e6246]: 52 Week Range lowest value
+                              - text: $61.54
+                            - generic [ref=e6247]:
+                              - generic [ref=e6248]: 52 Week Range highest value
+                              - text: $455.50
+                            - generic [ref=e6249]: 52 Week Range current value $416.00
+                          - slider: "416"
+                      - cell "View next steps for MICRON TECHNOLOGY IN order number 1005216147150" [ref=e6250]:
+                        - button "View next steps for MICRON TECHNOLOGY IN order number 1005216147150" [ref=e6252]:
+                          - generic [ref=e6253]: 
+                    - row "Expand row SKYT order number 1005213657968 View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY Filled Sell 54 Market Day $32.1734 $29.16 $29.40 $29.98 $29.74 10:35 AM 01/23/2026 10:35 AM 01/23/2026 - -$0.26 -0.8667% -$0.60 -2.00% View next steps for SKYWATER TECHNOLOGY order number 1005213657968" [ref=e6254]:
+                      - cell "Expand row SKYT order number 1005213657968" [ref=e6255]:
+                        - button "Expand row SKYT order number 1005213657968" [ref=e6259]
+                      - cell "View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY" [ref=e6263]:
+                        - generic [ref=e6264]:
+                          - link "View quote details for SKYWATER TECHNOLOGY" [ref=e6267] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SKYT
+                            - text: SKYT
+                          - generic "SKYWATER TECHNOLOGY" [ref=e6268]
+                      - cell "Filled" [ref=e6269]:
+                        - generic [ref=e6272]: Filled
+                      - cell "Sell" [ref=e6273]:
+                        - generic [ref=e6275]: Sell
+                      - cell "54" [ref=e6276]:
+                        - generic [ref=e6279]: "54"
+                      - cell "Market" [ref=e6280]:
+                        - generic [ref=e6281]: Market
+                      - cell "Day" [ref=e6282]:
+                        - generic [ref=e6283]: Day
+                      - cell "$32.1734" [ref=e6284]:
+                        - generic [ref=e6286]: $32.1734
+                      - cell "$29.16" [ref=e6287]:
+                        - generic [ref=e6288]: $29.16
+                      - cell "$29.40" [ref=e6289]:
+                        - generic [ref=e6290]: $29.40
+                      - cell "$29.98" [ref=e6291]:
+                        - generic [ref=e6292]: $29.98
+                      - cell "$29.74" [ref=e6293]:
+                        - generic [ref=e6294]: $29.74
+                      - cell "10:35 AM 01/23/2026" [ref=e6295]:
+                        - generic [ref=e6297]: 10:35 AM 01/23/2026
+                      - cell "10:35 AM 01/23/2026" [ref=e6298]:
+                        - generic [ref=e6300]: 10:35 AM 01/23/2026
+                      - cell "-" [ref=e6301]:
+                        - generic [ref=e6303]: "-"
+                      - cell "-$0.26" [ref=e6304]:
+                        - generic [ref=e6305]: "-$0.26"
+                      - cell "-0.8667%" [ref=e6306]:
+                        - generic [ref=e6307]: "-0.8667%"
+                      - cell "-$0.60" [ref=e6308]:
+                        - generic [ref=e6309]: "-$0.60"
+                      - cell "-2.00%" [ref=e6310]:
+                        - generic [ref=e6311]: "-2.00%"
+                      - cell [ref=e6312]:
+                        - figure [ref=e6315]:
+                          - generic [ref=e6316]:
+                            - generic [ref=e6317]:
+                              - generic [ref=e6318]: Day Range lowest value
+                              - text: $29.09
+                            - generic [ref=e6319]:
+                              - generic [ref=e6320]: Day Range highest value
+                              - text: $30.6999
+                            - generic [ref=e6321]: Day Range current value $29.74
+                          - slider: "29.74"
+                      - cell [ref=e6322]:
+                        - figure [ref=e6325]:
+                          - generic [ref=e6326]:
+                            - generic [ref=e6327]:
+                              - generic [ref=e6328]: 52 Week Range lowest value
+                              - text: $5.67
+                            - generic [ref=e6329]:
+                              - generic [ref=e6330]: 52 Week Range highest value
+                              - text: $36.268
+                            - generic [ref=e6331]: 52 Week Range current value $29.74
+                          - slider: "29.74"
+                      - cell "View next steps for SKYWATER TECHNOLOGY order number 1005213657968" [ref=e6332]:
+                        - button "View next steps for SKYWATER TECHNOLOGY order number 1005213657968" [ref=e6334]:
+                          - generic [ref=e6335]: 
+                    - row "Expand row SIVR order number 1005211336166 View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF Filled Buy 10 Limit $94.85 Day + ext $94.8293 $78.26 $78.68 $78.68 $78.55 9:12 AM 01/23/2026 9:12 AM 01/23/2026 - +$1.48 +1.9203% +$1.61 +2.0890% View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005211336166" [ref=e6336]:
+                      - cell "Expand row SIVR order number 1005211336166" [ref=e6337]:
+                        - button "Expand row SIVR order number 1005211336166" [ref=e6341]
+                      - cell "View quote details for ABRDN PHYSICAL SILVER SHARES ETF ABRDN PHYSICAL SILVER SHARES ETF" [ref=e6345]:
+                        - generic [ref=e6346]:
+                          - link "View quote details for ABRDN PHYSICAL SILVER SHARES ETF" [ref=e6349] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SIVR
+                            - text: SIVR
+                          - generic "ABRDN PHYSICAL SILVER SHARES ETF" [ref=e6350]
+                      - cell "Filled" [ref=e6351]:
+                        - generic [ref=e6354]: Filled
+                      - cell "Buy" [ref=e6355]:
+                        - generic [ref=e6357]: Buy
+                      - cell "10" [ref=e6358]:
+                        - generic [ref=e6361]: "10"
+                      - cell "Limit $94.85" [ref=e6362]:
+                        - generic [ref=e6363]: Limit $94.85
+                      - cell "Day + ext" [ref=e6364]:
+                        - generic [ref=e6365]: Day + ext
+                      - cell "$94.8293" [ref=e6366]:
+                        - generic [ref=e6368]: $94.8293
+                      - cell "$78.26" [ref=e6369]:
+                        - generic [ref=e6370]: $78.26
+                      - cell "$78.68" [ref=e6371]:
+                        - generic [ref=e6372]: $78.68
+                      - cell "$78.68" [ref=e6373]:
+                        - generic [ref=e6374]: $78.68
+                      - cell "$78.55" [ref=e6375]:
+                        - generic [ref=e6376]: $78.55
+                      - cell "9:12 AM 01/23/2026" [ref=e6377]:
+                        - generic [ref=e6379]: 9:12 AM 01/23/2026
+                      - cell "9:12 AM 01/23/2026" [ref=e6380]:
+                        - generic [ref=e6382]: 9:12 AM 01/23/2026
+                      - cell "-" [ref=e6383]:
+                        - generic [ref=e6385]: "-"
+                      - cell "+$1.48" [ref=e6386]:
+                        - generic [ref=e6387]: +$1.48
+                      - cell "+1.9203%" [ref=e6388]:
+                        - generic [ref=e6389]: +1.9203%
+                      - cell "+$1.61" [ref=e6390]:
+                        - generic [ref=e6391]: +$1.61
+                      - cell "+2.0890%" [ref=e6392]:
+                        - generic [ref=e6393]: +2.0890%
+                      - cell [ref=e6394]:
+                        - figure [ref=e6397]:
+                          - generic [ref=e6398]:
+                            - generic [ref=e6399]:
+                              - generic [ref=e6400]: Day Range lowest value
+                              - text: $78.54
+                            - generic [ref=e6401]:
+                              - generic [ref=e6402]: Day Range highest value
+                              - text: $80.84
+                            - generic [ref=e6403]: Day Range current value $78.55
+                          - slider: "78.55"
+                      - cell [ref=e6404]:
+                        - figure [ref=e6407]:
+                          - generic [ref=e6408]:
+                            - generic [ref=e6409]:
+                              - generic [ref=e6410]: 52 Week Range lowest value
+                              - text: $27.86
+                            - generic [ref=e6411]:
+                              - generic [ref=e6412]: 52 Week Range highest value
+                              - text: $115.26
+                            - generic [ref=e6413]: 52 Week Range current value $78.55
+                          - slider: "78.55"
+                      - cell "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005211336166" [ref=e6414]:
+                        - button "View next steps for ABRDN PHYSICAL SILVER SHARES ETF order number 1005211336166" [ref=e6416]:
+                          - generic [ref=e6417]: 
+                    - row "Expand row NUGT order number 1005211336058 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Buy 20 Limit $275.22 Day + ext $275.0865 footnote a $258.98 $263.00 $263.00 $259.73 9:01 AM 01/23/2026 9:01 AM 01/23/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005211336058" [ref=e6418]:
+                      - cell "Expand row NUGT order number 1005211336058" [ref=e6419]:
+                        - button "Expand row NUGT order number 1005211336058" [ref=e6423]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6427]:
+                        - generic [ref=e6428]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6431] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6432]
+                      - cell "Filled" [ref=e6433]:
+                        - generic [ref=e6436]: Filled
+                      - cell "Buy" [ref=e6437]:
+                        - generic [ref=e6439]: Buy
+                      - cell "20" [ref=e6440]:
+                        - generic [ref=e6443]: "20"
+                      - cell "Limit $275.22" [ref=e6444]:
+                        - generic [ref=e6445]: Limit $275.22
+                      - cell "Day + ext" [ref=e6446]:
+                        - generic [ref=e6447]: Day + ext
+                      - cell "$275.0865 footnote a" [ref=e6448]:
+                        - generic [ref=e6450]:
+                          - text: $275.0865
+                          - superscript [ref=e6452]:
+                            - generic [ref=e6453]: footnote
+                            - text: a
+                      - cell "$258.98" [ref=e6454]:
+                        - generic [ref=e6455]: $258.98
+                      - cell "$263.00" [ref=e6456]:
+                        - generic [ref=e6457]: $263.00
+                      - cell "$263.00" [ref=e6458]:
+                        - generic [ref=e6459]: $263.00
+                      - cell "$259.73" [ref=e6460]:
+                        - generic [ref=e6461]: $259.73
+                      - cell "9:01 AM 01/23/2026" [ref=e6462]:
+                        - generic [ref=e6464]: 9:01 AM 01/23/2026
+                      - cell "9:01 AM 01/23/2026" [ref=e6465]:
+                        - generic [ref=e6467]: 9:01 AM 01/23/2026
+                      - cell "-" [ref=e6468]:
+                        - generic [ref=e6470]: "-"
+                      - cell "+$7.01" [ref=e6471]:
+                        - generic [ref=e6472]: +$7.01
+                      - cell "+2.7738%" [ref=e6473]:
+                        - generic [ref=e6474]: +2.7738%
+                      - cell "+$10.28" [ref=e6475]:
+                        - generic [ref=e6476]: +$10.28
+                      - cell "+4.0677%" [ref=e6477]:
+                        - generic [ref=e6478]: +4.0677%
+                      - cell [ref=e6479]:
+                        - figure [ref=e6482]:
+                          - generic [ref=e6483]:
+                            - generic [ref=e6484]:
+                              - generic [ref=e6485]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e6486]:
+                              - generic [ref=e6487]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e6488]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e6489]:
+                        - figure [ref=e6492]:
+                          - generic [ref=e6493]:
+                            - generic [ref=e6494]:
+                              - generic [ref=e6495]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e6496]:
+                              - generic [ref=e6497]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e6498]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005211336058" [ref=e6499]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005211336058" [ref=e6501]:
+                          - generic [ref=e6502]: 
+                    - row "Expand row LRCX order number 1005207622079 View quote details for LAM RESH CORP LAM RESH CORP Filled Buy 5 Market Day $222.56 $234.50 $235.12 $236.49 $235.25 2:19 PM 01/22/2026 2:19 PM 01/22/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005207622079" [ref=e6503]:
+                      - cell "Expand row LRCX order number 1005207622079" [ref=e6504]:
+                        - button "Expand row LRCX order number 1005207622079" [ref=e6508]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e6512]:
+                        - generic [ref=e6513]:
+                          - link "View quote details for LAM RESH CORP" [ref=e6516] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e6517]
+                      - cell "Filled" [ref=e6518]:
+                        - generic [ref=e6521]: Filled
+                      - cell "Buy" [ref=e6522]:
+                        - generic [ref=e6524]: Buy
+                      - cell "5" [ref=e6525]:
+                        - generic [ref=e6528]: "5"
+                      - cell "Market" [ref=e6529]:
+                        - generic [ref=e6530]: Market
+                      - cell "Day" [ref=e6531]:
+                        - generic [ref=e6532]: Day
+                      - cell "$222.56" [ref=e6533]:
+                        - generic [ref=e6535]: $222.56
+                      - cell "$234.50" [ref=e6536]:
+                        - generic [ref=e6537]: $234.50
+                      - cell "$235.12" [ref=e6538]:
+                        - generic [ref=e6539]: $235.12
+                      - cell "$236.49" [ref=e6540]:
+                        - generic [ref=e6541]: $236.49
+                      - cell "$235.25" [ref=e6542]:
+                        - generic [ref=e6543]: $235.25
+                      - cell "2:19 PM 01/22/2026" [ref=e6544]:
+                        - generic [ref=e6546]: 2:19 PM 01/22/2026
+                      - cell "2:19 PM 01/22/2026" [ref=e6547]:
+                        - generic [ref=e6549]: 2:19 PM 01/22/2026
+                      - cell "-" [ref=e6550]:
+                        - generic [ref=e6552]: "-"
+                      - cell "+$8.64" [ref=e6553]:
+                        - generic [ref=e6554]: +$8.64
+                      - cell "+3.8127%" [ref=e6555]:
+                        - generic [ref=e6556]: +3.8127%
+                      - cell "+$8.51" [ref=e6557]:
+                        - generic [ref=e6558]: +$8.51
+                      - cell "+3.7554%" [ref=e6559]:
+                        - generic [ref=e6560]: +3.7554%
+                      - cell [ref=e6561]:
+                        - figure [ref=e6564]:
+                          - generic [ref=e6565]:
+                            - generic [ref=e6566]:
+                              - generic [ref=e6567]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e6568]:
+                              - generic [ref=e6569]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e6570]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e6571]:
+                        - figure [ref=e6574]:
+                          - generic [ref=e6575]:
+                            - generic [ref=e6576]:
+                              - generic [ref=e6577]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e6578]:
+                              - generic [ref=e6579]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e6580]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005207622079" [ref=e6581]:
+                        - button "View next steps for LAM RESH CORP order number 1005207622079" [ref=e6583]:
+                          - generic [ref=e6584]: 
+                    - row "Expand row SKYT order number 1005207622015 View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY Filled Buy 20 Market Day $32.955 $29.16 $29.40 $29.98 $29.74 2:16 PM 01/22/2026 2:16 PM 01/22/2026 - -$0.26 -0.8667% -$0.60 -2.00% View next steps for SKYWATER TECHNOLOGY order number 1005207622015" [ref=e6585]:
+                      - cell "Expand row SKYT order number 1005207622015" [ref=e6586]:
+                        - button "Expand row SKYT order number 1005207622015" [ref=e6590]
+                      - cell "View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY" [ref=e6594]:
+                        - generic [ref=e6595]:
+                          - link "View quote details for SKYWATER TECHNOLOGY" [ref=e6598] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SKYT
+                            - text: SKYT
+                          - generic "SKYWATER TECHNOLOGY" [ref=e6599]
+                      - cell "Filled" [ref=e6600]:
+                        - generic [ref=e6603]: Filled
+                      - cell "Buy" [ref=e6604]:
+                        - generic [ref=e6606]: Buy
+                      - cell "20" [ref=e6607]:
+                        - generic [ref=e6610]: "20"
+                      - cell "Market" [ref=e6611]:
+                        - generic [ref=e6612]: Market
+                      - cell "Day" [ref=e6613]:
+                        - generic [ref=e6614]: Day
+                      - cell "$32.955" [ref=e6615]:
+                        - generic [ref=e6617]: $32.955
+                      - cell "$29.16" [ref=e6618]:
+                        - generic [ref=e6619]: $29.16
+                      - cell "$29.40" [ref=e6620]:
+                        - generic [ref=e6621]: $29.40
+                      - cell "$29.98" [ref=e6622]:
+                        - generic [ref=e6623]: $29.98
+                      - cell "$29.74" [ref=e6624]:
+                        - generic [ref=e6625]: $29.74
+                      - cell "2:16 PM 01/22/2026" [ref=e6626]:
+                        - generic [ref=e6628]: 2:16 PM 01/22/2026
+                      - cell "2:16 PM 01/22/2026" [ref=e6629]:
+                        - generic [ref=e6631]: 2:16 PM 01/22/2026
+                      - cell "-" [ref=e6632]:
+                        - generic [ref=e6634]: "-"
+                      - cell "-$0.26" [ref=e6635]:
+                        - generic [ref=e6636]: "-$0.26"
+                      - cell "-0.8667%" [ref=e6637]:
+                        - generic [ref=e6638]: "-0.8667%"
+                      - cell "-$0.60" [ref=e6639]:
+                        - generic [ref=e6640]: "-$0.60"
+                      - cell "-2.00%" [ref=e6641]:
+                        - generic [ref=e6642]: "-2.00%"
+                      - cell [ref=e6643]:
+                        - figure [ref=e6646]:
+                          - generic [ref=e6647]:
+                            - generic [ref=e6648]:
+                              - generic [ref=e6649]: Day Range lowest value
+                              - text: $29.09
+                            - generic [ref=e6650]:
+                              - generic [ref=e6651]: Day Range highest value
+                              - text: $30.6999
+                            - generic [ref=e6652]: Day Range current value $29.74
+                          - slider: "29.74"
+                      - cell [ref=e6653]:
+                        - figure [ref=e6656]:
+                          - generic [ref=e6657]:
+                            - generic [ref=e6658]:
+                              - generic [ref=e6659]: 52 Week Range lowest value
+                              - text: $5.67
+                            - generic [ref=e6660]:
+                              - generic [ref=e6661]: 52 Week Range highest value
+                              - text: $36.268
+                            - generic [ref=e6662]: 52 Week Range current value $29.74
+                          - slider: "29.74"
+                      - cell "View next steps for SKYWATER TECHNOLOGY order number 1005207622015" [ref=e6663]:
+                        - button "View next steps for SKYWATER TECHNOLOGY order number 1005207622015" [ref=e6665]:
+                          - generic [ref=e6666]: 
+                    - row "Expand row UCTT order number 1005206295951 View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN Filled Buy 8 Market Day $44.67 $53.02 $55.93 $57.00 $56.3831 2:15 PM 01/22/2026 2:15 PM 01/22/2026 - +$2.0531 +3.7789% +$1.60 +2.9450% View next steps for ULTRA CLEAN HLDGS IN order number 1005206295951" [ref=e6667]:
+                      - cell "Expand row UCTT order number 1005206295951" [ref=e6668]:
+                        - button "Expand row UCTT order number 1005206295951" [ref=e6672]
+                      - cell "View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN" [ref=e6676]:
+                        - generic [ref=e6677]:
+                          - link "View quote details for ULTRA CLEAN HLDGS IN" [ref=e6680] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UCTT
+                            - text: UCTT
+                          - generic "ULTRA CLEAN HLDGS IN" [ref=e6681]
+                      - cell "Filled" [ref=e6682]:
+                        - generic [ref=e6685]: Filled
+                      - cell "Buy" [ref=e6686]:
+                        - generic [ref=e6688]: Buy
+                      - cell "8" [ref=e6689]:
+                        - generic [ref=e6692]: "8"
+                      - cell "Market" [ref=e6693]:
+                        - generic [ref=e6694]: Market
+                      - cell "Day" [ref=e6695]:
+                        - generic [ref=e6696]: Day
+                      - cell "$44.67" [ref=e6697]:
+                        - generic [ref=e6699]: $44.67
+                      - cell "$53.02" [ref=e6700]:
+                        - generic [ref=e6701]: $53.02
+                      - cell "$55.93" [ref=e6702]:
+                        - generic [ref=e6703]: $55.93
+                      - cell "$57.00" [ref=e6704]:
+                        - generic [ref=e6705]: $57.00
+                      - cell "$56.3831" [ref=e6706]:
+                        - generic [ref=e6707]: $56.3831
+                      - cell "2:15 PM 01/22/2026" [ref=e6708]:
+                        - generic [ref=e6710]: 2:15 PM 01/22/2026
+                      - cell "2:15 PM 01/22/2026" [ref=e6711]:
+                        - generic [ref=e6713]: 2:15 PM 01/22/2026
+                      - cell "-" [ref=e6714]:
+                        - generic [ref=e6716]: "-"
+                      - cell "+$2.0531" [ref=e6717]:
+                        - generic [ref=e6718]: +$2.0531
+                      - cell "+3.7789%" [ref=e6719]:
+                        - generic [ref=e6720]: +3.7789%
+                      - cell "+$1.60" [ref=e6721]:
+                        - generic [ref=e6722]: +$1.60
+                      - cell "+2.9450%" [ref=e6723]:
+                        - generic [ref=e6724]: +2.9450%
+                      - cell [ref=e6725]:
+                        - figure [ref=e6728]:
+                          - generic [ref=e6729]:
+                            - generic [ref=e6730]:
+                              - generic [ref=e6731]: Day Range lowest value
+                              - text: $53.795
+                            - generic [ref=e6732]:
+                              - generic [ref=e6733]: Day Range highest value
+                              - text: $57.30
+                            - generic [ref=e6734]: Day Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell [ref=e6735]:
+                        - figure [ref=e6738]:
+                          - generic [ref=e6739]:
+                            - generic [ref=e6740]:
+                              - generic [ref=e6741]: 52 Week Range lowest value
+                              - text: $16.655
+                            - generic [ref=e6742]:
+                              - generic [ref=e6743]: 52 Week Range highest value
+                              - text: $58.70
+                            - generic [ref=e6744]: 52 Week Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell "View next steps for ULTRA CLEAN HLDGS IN order number 1005206295951" [ref=e6745]:
+                        - button "View next steps for ULTRA CLEAN HLDGS IN order number 1005206295951" [ref=e6747]:
+                          - generic [ref=e6748]: 
+                    - row "Expand row AEM order number 1005201408191 View quote details for AGNICO EAGLE MINES L AGNICO EAGLE MINES L Filled Sell 6 Market Day $211.885 $215.00 $217.19 $218.00 $216.95 10:39 AM 01/22/2026 10:39 AM 01/22/2026 - +$5.06 +2.3880% +$5.30 +2.5013% View next steps for AGNICO EAGLE MINES L order number 1005201408191" [ref=e6749]:
+                      - cell "Expand row AEM order number 1005201408191" [ref=e6750]:
+                        - button "Expand row AEM order number 1005201408191" [ref=e6754]
+                      - cell "View quote details for AGNICO EAGLE MINES L AGNICO EAGLE MINES L" [ref=e6758]:
+                        - generic [ref=e6759]:
+                          - link "View quote details for AGNICO EAGLE MINES L" [ref=e6762] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AEM
+                            - text: AEM
+                          - generic "AGNICO EAGLE MINES L" [ref=e6763]
+                      - cell "Filled" [ref=e6764]:
+                        - generic [ref=e6767]: Filled
+                      - cell "Sell" [ref=e6768]:
+                        - generic [ref=e6770]: Sell
+                      - cell "6" [ref=e6771]:
+                        - generic [ref=e6774]: "6"
+                      - cell "Market" [ref=e6775]:
+                        - generic [ref=e6776]: Market
+                      - cell "Day" [ref=e6777]:
+                        - generic [ref=e6778]: Day
+                      - cell "$211.885" [ref=e6779]:
+                        - generic [ref=e6781]: $211.885
+                      - cell "$215.00" [ref=e6782]:
+                        - generic [ref=e6783]: $215.00
+                      - cell "$217.19" [ref=e6784]:
+                        - generic [ref=e6785]: $217.19
+                      - cell "$218.00" [ref=e6786]:
+                        - generic [ref=e6787]: $218.00
+                      - cell "$216.95" [ref=e6788]:
+                        - generic [ref=e6789]: $216.95
+                      - cell "10:39 AM 01/22/2026" [ref=e6790]:
+                        - generic [ref=e6792]: 10:39 AM 01/22/2026
+                      - cell "10:39 AM 01/22/2026" [ref=e6793]:
+                        - generic [ref=e6795]: 10:39 AM 01/22/2026
+                      - cell "-" [ref=e6796]:
+                        - generic [ref=e6798]: "-"
+                      - cell "+$5.06" [ref=e6799]:
+                        - generic [ref=e6800]: +$5.06
+                      - cell "+2.3880%" [ref=e6801]:
+                        - generic [ref=e6802]: +2.3880%
+                      - cell "+$5.30" [ref=e6803]:
+                        - generic [ref=e6804]: +$5.30
+                      - cell "+2.5013%" [ref=e6805]:
+                        - generic [ref=e6806]: +2.5013%
+                      - cell [ref=e6807]:
+                        - figure [ref=e6810]:
+                          - generic [ref=e6811]:
+                            - generic [ref=e6812]:
+                              - generic [ref=e6813]: Day Range lowest value
+                              - text: $209.76
+                            - generic [ref=e6814]:
+                              - generic [ref=e6815]: Day Range highest value
+                              - text: $218.25
+                            - generic [ref=e6816]: Day Range current value $216.95
+                          - slider: "216.95"
+                      - cell [ref=e6817]:
+                        - figure [ref=e6820]:
+                          - generic [ref=e6821]:
+                            - generic [ref=e6822]:
+                              - generic [ref=e6823]: 52 Week Range lowest value
+                              - text: $92.11
+                            - generic [ref=e6824]:
+                              - generic [ref=e6825]: 52 Week Range highest value
+                              - text: $225.00
+                            - generic [ref=e6826]: 52 Week Range current value $216.95
+                          - slider: "216.95"
+                      - cell "View next steps for AGNICO EAGLE MINES L order number 1005201408191" [ref=e6827]:
+                        - button "View next steps for AGNICO EAGLE MINES L order number 1005201408191" [ref=e6829]:
+                          - generic [ref=e6830]: 
+                    - row "Expand row NUGT order number 1005201408129 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Sell 30 Market Day $268.5181 $258.98 $263.00 $263.00 $259.73 10:37 AM 01/22/2026 10:37 AM 01/22/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005201408129" [ref=e6831]:
+                      - cell "Expand row NUGT order number 1005201408129" [ref=e6832]:
+                        - button "Expand row NUGT order number 1005201408129" [ref=e6836]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6840]:
+                        - generic [ref=e6841]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6844] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e6845]
+                      - cell "Filled" [ref=e6846]:
+                        - generic [ref=e6849]: Filled
+                      - cell "Sell" [ref=e6850]:
+                        - generic [ref=e6852]: Sell
+                      - cell "30" [ref=e6853]:
+                        - generic [ref=e6856]: "30"
+                      - cell "Market" [ref=e6857]:
+                        - generic [ref=e6858]: Market
+                      - cell "Day" [ref=e6859]:
+                        - generic [ref=e6860]: Day
+                      - cell "$268.5181" [ref=e6861]:
+                        - generic [ref=e6863]: $268.5181
+                      - cell "$258.98" [ref=e6864]:
+                        - generic [ref=e6865]: $258.98
+                      - cell "$263.00" [ref=e6866]:
+                        - generic [ref=e6867]: $263.00
+                      - cell "$263.00" [ref=e6868]:
+                        - generic [ref=e6869]: $263.00
+                      - cell "$259.73" [ref=e6870]:
+                        - generic [ref=e6871]: $259.73
+                      - cell "10:37 AM 01/22/2026" [ref=e6872]:
+                        - generic [ref=e6874]: 10:37 AM 01/22/2026
+                      - cell "10:37 AM 01/22/2026" [ref=e6875]:
+                        - generic [ref=e6877]: 10:37 AM 01/22/2026
+                      - cell "-" [ref=e6878]:
+                        - generic [ref=e6880]: "-"
+                      - cell "+$7.01" [ref=e6881]:
+                        - generic [ref=e6882]: +$7.01
+                      - cell "+2.7738%" [ref=e6883]:
+                        - generic [ref=e6884]: +2.7738%
+                      - cell "+$10.28" [ref=e6885]:
+                        - generic [ref=e6886]: +$10.28
+                      - cell "+4.0677%" [ref=e6887]:
+                        - generic [ref=e6888]: +4.0677%
+                      - cell [ref=e6889]:
+                        - figure [ref=e6892]:
+                          - generic [ref=e6893]:
+                            - generic [ref=e6894]:
+                              - generic [ref=e6895]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e6896]:
+                              - generic [ref=e6897]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e6898]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e6899]:
+                        - figure [ref=e6902]:
+                          - generic [ref=e6903]:
+                            - generic [ref=e6904]:
+                              - generic [ref=e6905]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e6906]:
+                              - generic [ref=e6907]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e6908]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005201408129" [ref=e6909]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005201408129" [ref=e6911]:
+                          - generic [ref=e6912]: 
+                    - row "Expand row WDC order number 1005196404845 View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP Filled Sell 5 Limit $246.10 Day + ext $246.26 footnote a $274.40 $274.40 $274.90 $274.88 5:35 PM 01/21/2026 5:35 PM 01/21/2026 - +$12.32 +4.6923% +$11.84 +4.5094% View next steps for WESTERN DIGITAL CORP order number 1005196404845" [ref=e6913]:
+                      - cell "Expand row WDC order number 1005196404845" [ref=e6914]:
+                        - button "Expand row WDC order number 1005196404845" [ref=e6918]
+                      - cell "View quote details for WESTERN DIGITAL CORP WESTERN DIGITAL CORP" [ref=e6922]:
+                        - generic [ref=e6923]:
+                          - link "View quote details for WESTERN DIGITAL CORP" [ref=e6926] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=WDC
+                            - text: WDC
+                          - generic "WESTERN DIGITAL CORP" [ref=e6927]
+                      - cell "Filled" [ref=e6928]:
+                        - generic [ref=e6931]: Filled
+                      - cell "Sell" [ref=e6932]:
+                        - generic [ref=e6934]: Sell
+                      - cell "5" [ref=e6935]:
+                        - generic [ref=e6938]: "5"
+                      - cell "Limit $246.10" [ref=e6939]:
+                        - generic [ref=e6940]: Limit $246.10
+                      - cell "Day + ext" [ref=e6941]:
+                        - generic [ref=e6942]: Day + ext
+                      - cell "$246.26 footnote a" [ref=e6943]:
+                        - generic [ref=e6945]:
+                          - text: $246.26
+                          - superscript [ref=e6947]:
+                            - generic [ref=e6948]: footnote
+                            - text: a
+                      - cell "$274.40" [ref=e6949]:
+                        - generic [ref=e6950]: $274.40
+                      - cell "$274.40" [ref=e6951]:
+                        - generic [ref=e6952]: $274.40
+                      - cell "$274.90" [ref=e6953]:
+                        - generic [ref=e6954]: $274.90
+                      - cell "$274.88" [ref=e6955]:
+                        - generic [ref=e6956]: $274.88
+                      - cell "5:35 PM 01/21/2026" [ref=e6957]:
+                        - generic [ref=e6959]: 5:35 PM 01/21/2026
+                      - cell "5:35 PM 01/21/2026" [ref=e6960]:
+                        - generic [ref=e6962]: 5:35 PM 01/21/2026
+                      - cell "-" [ref=e6963]:
+                        - generic [ref=e6965]: "-"
+                      - cell "+$12.32" [ref=e6966]:
+                        - generic [ref=e6967]: +$12.32
+                      - cell "+4.6923%" [ref=e6968]:
+                        - generic [ref=e6969]: +4.6923%
+                      - cell "+$11.84" [ref=e6970]:
+                        - generic [ref=e6971]: +$11.84
+                      - cell "+4.5094%" [ref=e6972]:
+                        - generic [ref=e6973]: +4.5094%
+                      - cell [ref=e6974]:
+                        - figure [ref=e6977]:
+                          - generic [ref=e6978]:
+                            - generic [ref=e6979]:
+                              - generic [ref=e6980]: Day Range lowest value
+                              - text: $266.34
+                            - generic [ref=e6981]:
+                              - generic [ref=e6982]: Day Range highest value
+                              - text: $279.79
+                            - generic [ref=e6983]: Day Range current value $274.88
+                          - slider: "274.88"
+                      - cell [ref=e6984]:
+                        - figure [ref=e6987]:
+                          - generic [ref=e6988]:
+                            - generic [ref=e6989]:
+                              - generic [ref=e6990]: 52 Week Range lowest value
+                              - text: $28.83
+                            - generic [ref=e6991]:
+                              - generic [ref=e6992]: 52 Week Range highest value
+                              - text: $296.50
+                            - generic [ref=e6993]: 52 Week Range current value $274.88
+                          - slider: "274.88"
+                      - cell "View next steps for WESTERN DIGITAL CORP order number 1005196404845" [ref=e6994]:
+                        - button "View next steps for WESTERN DIGITAL CORP order number 1005196404845" [ref=e6996]:
+                          - generic [ref=e6997]: 
+                    - row "Expand row NUGT order number 1005191471005 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Buy 10 Market Day $258.065 $258.98 $263.00 $263.00 $259.73 1:05 PM 01/21/2026 1:05 PM 01/21/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005191471005" [ref=e6998]:
+                      - cell "Expand row NUGT order number 1005191471005" [ref=e6999]:
+                        - button "Expand row NUGT order number 1005191471005" [ref=e7003]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7007]:
+                        - generic [ref=e7008]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7011] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7012]
+                      - cell "Filled" [ref=e7013]:
+                        - generic [ref=e7016]: Filled
+                      - cell "Buy" [ref=e7017]:
+                        - generic [ref=e7019]: Buy
+                      - cell "10" [ref=e7020]:
+                        - generic [ref=e7023]: "10"
+                      - cell "Market" [ref=e7024]:
+                        - generic [ref=e7025]: Market
+                      - cell "Day" [ref=e7026]:
+                        - generic [ref=e7027]: Day
+                      - cell "$258.065" [ref=e7028]:
+                        - generic [ref=e7030]: $258.065
+                      - cell "$258.98" [ref=e7031]:
+                        - generic [ref=e7032]: $258.98
+                      - cell "$263.00" [ref=e7033]:
+                        - generic [ref=e7034]: $263.00
+                      - cell "$263.00" [ref=e7035]:
+                        - generic [ref=e7036]: $263.00
+                      - cell "$259.73" [ref=e7037]:
+                        - generic [ref=e7038]: $259.73
+                      - cell "1:05 PM 01/21/2026" [ref=e7039]:
+                        - generic [ref=e7041]: 1:05 PM 01/21/2026
+                      - cell "1:05 PM 01/21/2026" [ref=e7042]:
+                        - generic [ref=e7044]: 1:05 PM 01/21/2026
+                      - cell "-" [ref=e7045]:
+                        - generic [ref=e7047]: "-"
+                      - cell "+$7.01" [ref=e7048]:
+                        - generic [ref=e7049]: +$7.01
+                      - cell "+2.7738%" [ref=e7050]:
+                        - generic [ref=e7051]: +2.7738%
+                      - cell "+$10.28" [ref=e7052]:
+                        - generic [ref=e7053]: +$10.28
+                      - cell "+4.0677%" [ref=e7054]:
+                        - generic [ref=e7055]: +4.0677%
+                      - cell [ref=e7056]:
+                        - figure [ref=e7059]:
+                          - generic [ref=e7060]:
+                            - generic [ref=e7061]:
+                              - generic [ref=e7062]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e7063]:
+                              - generic [ref=e7064]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e7065]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e7066]:
+                        - figure [ref=e7069]:
+                          - generic [ref=e7070]:
+                            - generic [ref=e7071]:
+                              - generic [ref=e7072]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e7073]:
+                              - generic [ref=e7074]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e7075]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005191471005" [ref=e7076]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005191471005" [ref=e7078]:
+                          - generic [ref=e7079]: 
+                    - row "Expand row FORM order number 1005183381303 View quote details for FORMFACTOR INC FORMFACTOR INC Filled Buy 15 Market Day $80.28 $95.30 $96.07 $97.00 $96.30 9:32 AM 01/21/2026 9:32 AM 01/21/2026 - +$3.00 +3.2154% +$2.77 +2.9689% View next steps for FORMFACTOR INC order number 1005183381303" [ref=e7080]:
+                      - cell "Expand row FORM order number 1005183381303" [ref=e7081]:
+                        - button "Expand row FORM order number 1005183381303" [ref=e7085]
+                      - cell "View quote details for FORMFACTOR INC FORMFACTOR INC" [ref=e7089]:
+                        - generic [ref=e7090]:
+                          - link "View quote details for FORMFACTOR INC" [ref=e7093] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FORM
+                            - text: FORM
+                          - generic "FORMFACTOR INC" [ref=e7094]
+                      - cell "Filled" [ref=e7095]:
+                        - generic [ref=e7098]: Filled
+                      - cell "Buy" [ref=e7099]:
+                        - generic [ref=e7101]: Buy
+                      - cell "15" [ref=e7102]:
+                        - generic [ref=e7105]: "15"
+                      - cell "Market" [ref=e7106]:
+                        - generic [ref=e7107]: Market
+                      - cell "Day" [ref=e7108]:
+                        - generic [ref=e7109]: Day
+                      - cell "$80.28" [ref=e7110]:
+                        - generic [ref=e7112]: $80.28
+                      - cell "$95.30" [ref=e7113]:
+                        - generic [ref=e7114]: $95.30
+                      - cell "$96.07" [ref=e7115]:
+                        - generic [ref=e7116]: $96.07
+                      - cell "$97.00" [ref=e7117]:
+                        - generic [ref=e7118]: $97.00
+                      - cell "$96.30" [ref=e7119]:
+                        - generic [ref=e7120]: $96.30
+                      - cell "9:32 AM 01/21/2026" [ref=e7121]:
+                        - generic [ref=e7123]: 9:32 AM 01/21/2026
+                      - cell "9:32 AM 01/21/2026" [ref=e7124]:
+                        - generic [ref=e7126]: 9:32 AM 01/21/2026
+                      - cell "-" [ref=e7127]:
+                        - generic [ref=e7129]: "-"
+                      - cell "+$3.00" [ref=e7130]:
+                        - generic [ref=e7131]: +$3.00
+                      - cell "+3.2154%" [ref=e7132]:
+                        - generic [ref=e7133]: +3.2154%
+                      - cell "+$2.77" [ref=e7134]:
+                        - generic [ref=e7135]: +$2.77
+                      - cell "+2.9689%" [ref=e7136]:
+                        - generic [ref=e7137]: +2.9689%
+                      - cell [ref=e7138]:
+                        - figure [ref=e7141]:
+                          - generic [ref=e7142]:
+                            - generic [ref=e7143]:
+                              - generic [ref=e7144]: Day Range lowest value
+                              - text: $93.05
+                            - generic [ref=e7145]:
+                              - generic [ref=e7146]: Day Range highest value
+                              - text: $97.3788
+                            - generic [ref=e7147]: Day Range current value $96.30
+                          - slider: "96.3"
+                      - cell [ref=e7148]:
+                        - figure [ref=e7151]:
+                          - generic [ref=e7152]:
+                            - generic [ref=e7153]:
+                              - generic [ref=e7154]: 52 Week Range lowest value
+                              - text: $22.58
+                            - generic [ref=e7155]:
+                              - generic [ref=e7156]: 52 Week Range highest value
+                              - text: $97.3788
+                            - generic [ref=e7157]: 52 Week Range current value $96.30
+                          - slider: "96.3"
+                      - cell "View next steps for FORMFACTOR INC order number 1005183381303" [ref=e7158]:
+                        - button "View next steps for FORMFACTOR INC order number 1005183381303" [ref=e7160]:
+                          - generic [ref=e7161]: 
+                    - row "Expand row NUGT order number 1005183380830 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Buy 20 Limit $272.01 Day + ext $272.01 $258.98 $263.00 $263.00 $259.73 9:19 AM 01/21/2026 9:19 AM 01/21/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005183380830" [ref=e7162]:
+                      - cell "Expand row NUGT order number 1005183380830" [ref=e7163]:
+                        - button "Expand row NUGT order number 1005183380830" [ref=e7167]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7171]:
+                        - generic [ref=e7172]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7175] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7176]
+                      - cell "Filled" [ref=e7177]:
+                        - generic [ref=e7180]: Filled
+                      - cell "Buy" [ref=e7181]:
+                        - generic [ref=e7183]: Buy
+                      - cell "20" [ref=e7184]:
+                        - generic [ref=e7187]: "20"
+                      - cell "Limit $272.01" [ref=e7188]:
+                        - generic [ref=e7189]: Limit $272.01
+                      - cell "Day + ext" [ref=e7190]:
+                        - generic [ref=e7191]: Day + ext
+                      - cell "$272.01" [ref=e7192]:
+                        - generic [ref=e7194]: $272.01
+                      - cell "$258.98" [ref=e7195]:
+                        - generic [ref=e7196]: $258.98
+                      - cell "$263.00" [ref=e7197]:
+                        - generic [ref=e7198]: $263.00
+                      - cell "$263.00" [ref=e7199]:
+                        - generic [ref=e7200]: $263.00
+                      - cell "$259.73" [ref=e7201]:
+                        - generic [ref=e7202]: $259.73
+                      - cell "9:19 AM 01/21/2026" [ref=e7203]:
+                        - generic [ref=e7205]: 9:19 AM 01/21/2026
+                      - cell "9:19 AM 01/21/2026" [ref=e7206]:
+                        - generic [ref=e7208]: 9:19 AM 01/21/2026
+                      - cell "-" [ref=e7209]:
+                        - generic [ref=e7211]: "-"
+                      - cell "+$7.01" [ref=e7212]:
+                        - generic [ref=e7213]: +$7.01
+                      - cell "+2.7738%" [ref=e7214]:
+                        - generic [ref=e7215]: +2.7738%
+                      - cell "+$10.28" [ref=e7216]:
+                        - generic [ref=e7217]: +$10.28
+                      - cell "+4.0677%" [ref=e7218]:
+                        - generic [ref=e7219]: +4.0677%
+                      - cell [ref=e7220]:
+                        - figure [ref=e7223]:
+                          - generic [ref=e7224]:
+                            - generic [ref=e7225]:
+                              - generic [ref=e7226]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e7227]:
+                              - generic [ref=e7228]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e7229]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e7230]:
+                        - figure [ref=e7233]:
+                          - generic [ref=e7234]:
+                            - generic [ref=e7235]:
+                              - generic [ref=e7236]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e7237]:
+                              - generic [ref=e7238]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e7239]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005183380830" [ref=e7240]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005183380830" [ref=e7242]:
+                          - generic [ref=e7243]: 
+                    - row "Expand row GGLL order number 1005183380798 View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF Filled Sell 10 Limit $101.50 Day + ext $101.62 $94.27 $94.27 $94.60 $94.60 9:16 AM 01/21/2026 9:16 AM 01/21/2026 - -$4.36 -4.4058% -$4.69 -4.7393% View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005183380798" [ref=e7244]:
+                      - cell "Expand row GGLL order number 1005183380798" [ref=e7245]:
+                        - button "Expand row GGLL order number 1005183380798" [ref=e7249]
+                      - cell "View quote details for DIREXION DAILY GOOGL BULL 2X ETF DIREXION DAILY GOOGL BULL 2X ETF" [ref=e7253]:
+                        - generic [ref=e7254]:
+                          - link "View quote details for DIREXION DAILY GOOGL BULL 2X ETF" [ref=e7257] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GGLL
+                            - text: GGLL
+                          - generic "DIREXION DAILY GOOGL BULL 2X ETF" [ref=e7258]
+                      - cell "Filled" [ref=e7259]:
+                        - generic [ref=e7262]: Filled
+                      - cell "Sell" [ref=e7263]:
+                        - generic [ref=e7265]: Sell
+                      - cell "10" [ref=e7266]:
+                        - generic [ref=e7269]: "10"
+                      - cell "Limit $101.50" [ref=e7270]:
+                        - generic [ref=e7271]: Limit $101.50
+                      - cell "Day + ext" [ref=e7272]:
+                        - generic [ref=e7273]: Day + ext
+                      - cell "$101.62" [ref=e7274]:
+                        - generic [ref=e7276]: $101.62
+                      - cell "$94.27" [ref=e7277]:
+                        - generic [ref=e7278]: $94.27
+                      - cell "$94.27" [ref=e7279]:
+                        - generic [ref=e7280]: $94.27
+                      - cell "$94.60" [ref=e7281]:
+                        - generic [ref=e7282]: $94.60
+                      - cell "$94.60" [ref=e7283]:
+                        - generic [ref=e7284]: $94.60
+                      - cell "9:16 AM 01/21/2026" [ref=e7285]:
+                        - generic [ref=e7287]: 9:16 AM 01/21/2026
+                      - cell "9:16 AM 01/21/2026" [ref=e7288]:
+                        - generic [ref=e7290]: 9:16 AM 01/21/2026
+                      - cell "-" [ref=e7291]:
+                        - generic [ref=e7293]: "-"
+                      - cell "-$4.36" [ref=e7294]:
+                        - generic [ref=e7295]: "-$4.36"
+                      - cell "-4.4058%" [ref=e7296]:
+                        - generic [ref=e7297]: "-4.4058%"
+                      - cell "-$4.69" [ref=e7298]:
+                        - generic [ref=e7299]: "-$4.69"
+                      - cell "-4.7393%" [ref=e7300]:
+                        - generic [ref=e7301]: "-4.7393%"
+                      - cell [ref=e7302]:
+                        - figure [ref=e7305]:
+                          - generic [ref=e7306]:
+                            - generic [ref=e7307]:
+                              - generic [ref=e7308]: Day Range lowest value
+                              - text: $93.36
+                            - generic [ref=e7309]:
+                              - generic [ref=e7310]: Day Range highest value
+                              - text: $100.29
+                            - generic [ref=e7311]: Day Range current value $94.60
+                          - slider: "94.6"
+                      - cell [ref=e7312]:
+                        - figure [ref=e7315]:
+                          - generic [ref=e7316]:
+                            - generic [ref=e7317]:
+                              - generic [ref=e7318]: 52 Week Range lowest value
+                              - text: $23.60
+                            - generic [ref=e7319]:
+                              - generic [ref=e7320]: 52 Week Range highest value
+                              - text: $119.12
+                            - generic [ref=e7321]: 52 Week Range current value $94.60
+                          - slider: "94.6"
+                      - cell "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005183380798" [ref=e7322]:
+                        - button "View next steps for DIREXION DAILY GOOGL BULL 2X ETF order number 1005183380798" [ref=e7324]:
+                          - generic [ref=e7325]: 
+                    - row "Expand row SOXX order number 1005183380694 View quote details for ISHARES SEMICONDUCTOR ETF ISHARES SEMICONDUCTOR ETF Filled Buy 3 Limit $340.98 Day + ext $340.5906 $359.00 $360.20 $360.49 $360.45 9:07 AM 01/21/2026 9:07 AM 01/21/2026 - +$9.02 +2.5667% +$8.77 +2.4955% View next steps for ISHARES SEMICONDUCTOR ETF order number 1005183380694" [ref=e7326]:
+                      - cell "Expand row SOXX order number 1005183380694" [ref=e7327]:
+                        - button "Expand row SOXX order number 1005183380694" [ref=e7331]
+                      - cell "View quote details for ISHARES SEMICONDUCTOR ETF ISHARES SEMICONDUCTOR ETF" [ref=e7335]:
+                        - generic [ref=e7336]:
+                          - link "View quote details for ISHARES SEMICONDUCTOR ETF" [ref=e7339] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SOXX
+                            - text: SOXX
+                          - generic "ISHARES SEMICONDUCTOR ETF" [ref=e7340]
+                      - cell "Filled" [ref=e7341]:
+                        - generic [ref=e7344]: Filled
+                      - cell "Buy" [ref=e7345]:
+                        - generic [ref=e7347]: Buy
+                      - cell "3" [ref=e7348]:
+                        - generic [ref=e7351]: "3"
+                      - cell "Limit $340.98" [ref=e7352]:
+                        - generic [ref=e7353]: Limit $340.98
+                      - cell "Day + ext" [ref=e7354]:
+                        - generic [ref=e7355]: Day + ext
+                      - cell "$340.5906" [ref=e7356]:
+                        - generic [ref=e7358]: $340.5906
+                      - cell "$359.00" [ref=e7359]:
+                        - generic [ref=e7360]: $359.00
+                      - cell "$360.20" [ref=e7361]:
+                        - generic [ref=e7362]: $360.20
+                      - cell "$360.49" [ref=e7363]:
+                        - generic [ref=e7364]: $360.49
+                      - cell "$360.45" [ref=e7365]:
+                        - generic [ref=e7366]: $360.45
+                      - cell "9:07 AM 01/21/2026" [ref=e7367]:
+                        - generic [ref=e7369]: 9:07 AM 01/21/2026
+                      - cell "9:07 AM 01/21/2026" [ref=e7370]:
+                        - generic [ref=e7372]: 9:07 AM 01/21/2026
+                      - cell "-" [ref=e7373]:
+                        - generic [ref=e7375]: "-"
+                      - cell "+$9.02" [ref=e7376]:
+                        - generic [ref=e7377]: +$9.02
+                      - cell "+2.5667%" [ref=e7378]:
+                        - generic [ref=e7379]: +2.5667%
+                      - cell "+$8.77" [ref=e7380]:
+                        - generic [ref=e7381]: +$8.77
+                      - cell "+2.4955%" [ref=e7382]:
+                        - generic [ref=e7383]: +2.4955%
+                      - cell [ref=e7384]:
+                        - figure [ref=e7387]:
+                          - generic [ref=e7388]:
+                            - generic [ref=e7389]:
+                              - generic [ref=e7390]: Day Range lowest value
+                              - text: $351.40
+                            - generic [ref=e7391]:
+                              - generic [ref=e7392]: Day Range highest value
+                              - text: $362.28
+                            - generic [ref=e7393]: Day Range current value $360.45
+                          - slider: "360.45"
+                      - cell [ref=e7394]:
+                        - figure [ref=e7397]:
+                          - generic [ref=e7398]:
+                            - generic [ref=e7399]:
+                              - generic [ref=e7400]: 52 Week Range lowest value
+                              - text: $148.31
+                            - generic [ref=e7401]:
+                              - generic [ref=e7402]: 52 Week Range highest value
+                              - text: $363.80
+                            - generic [ref=e7403]: 52 Week Range current value $360.45
+                          - slider: "360.45"
+                      - cell "View next steps for ISHARES SEMICONDUCTOR ETF order number 1005183380694" [ref=e7404]:
+                        - button "View next steps for ISHARES SEMICONDUCTOR ETF order number 1005183380694" [ref=e7406]:
+                          - generic [ref=e7407]: 
+                    - row "Expand row SKYT order number 1005183380551 View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY Filled Buy 34 Limit $35.50 Day + ext $35.4015 $29.16 $29.40 $29.98 $29.74 8:52 AM 01/21/2026 8:52 AM 01/21/2026 - -$0.26 -0.8667% -$0.60 -2.00% View next steps for SKYWATER TECHNOLOGY order number 1005183380551" [ref=e7408]:
+                      - cell "Expand row SKYT order number 1005183380551" [ref=e7409]:
+                        - button "Expand row SKYT order number 1005183380551" [ref=e7413]
+                      - cell "View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY" [ref=e7417]:
+                        - generic [ref=e7418]:
+                          - link "View quote details for SKYWATER TECHNOLOGY" [ref=e7421] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SKYT
+                            - text: SKYT
+                          - generic "SKYWATER TECHNOLOGY" [ref=e7422]
+                      - cell "Filled" [ref=e7423]:
+                        - generic [ref=e7426]: Filled
+                      - cell "Buy" [ref=e7427]:
+                        - generic [ref=e7429]: Buy
+                      - cell "34" [ref=e7430]:
+                        - generic [ref=e7433]: "34"
+                      - cell "Limit $35.50" [ref=e7434]:
+                        - generic [ref=e7435]: Limit $35.50
+                      - cell "Day + ext" [ref=e7436]:
+                        - generic [ref=e7437]: Day + ext
+                      - cell "$35.4015" [ref=e7438]:
+                        - generic [ref=e7440]: $35.4015
+                      - cell "$29.16" [ref=e7441]:
+                        - generic [ref=e7442]: $29.16
+                      - cell "$29.40" [ref=e7443]:
+                        - generic [ref=e7444]: $29.40
+                      - cell "$29.98" [ref=e7445]:
+                        - generic [ref=e7446]: $29.98
+                      - cell "$29.74" [ref=e7447]:
+                        - generic [ref=e7448]: $29.74
+                      - cell "8:52 AM 01/21/2026" [ref=e7449]:
+                        - generic [ref=e7451]: 8:52 AM 01/21/2026
+                      - cell "8:52 AM 01/21/2026" [ref=e7452]:
+                        - generic [ref=e7454]: 8:52 AM 01/21/2026
+                      - cell "-" [ref=e7455]:
+                        - generic [ref=e7457]: "-"
+                      - cell "-$0.26" [ref=e7458]:
+                        - generic [ref=e7459]: "-$0.26"
+                      - cell "-0.8667%" [ref=e7460]:
+                        - generic [ref=e7461]: "-0.8667%"
+                      - cell "-$0.60" [ref=e7462]:
+                        - generic [ref=e7463]: "-$0.60"
+                      - cell "-2.00%" [ref=e7464]:
+                        - generic [ref=e7465]: "-2.00%"
+                      - cell [ref=e7466]:
+                        - figure [ref=e7469]:
+                          - generic [ref=e7470]:
+                            - generic [ref=e7471]:
+                              - generic [ref=e7472]: Day Range lowest value
+                              - text: $29.09
+                            - generic [ref=e7473]:
+                              - generic [ref=e7474]: Day Range highest value
+                              - text: $30.6999
+                            - generic [ref=e7475]: Day Range current value $29.74
+                          - slider: "29.74"
+                      - cell [ref=e7476]:
+                        - figure [ref=e7479]:
+                          - generic [ref=e7480]:
+                            - generic [ref=e7481]:
+                              - generic [ref=e7482]: 52 Week Range lowest value
+                              - text: $5.67
+                            - generic [ref=e7483]:
+                              - generic [ref=e7484]: 52 Week Range highest value
+                              - text: $36.268
+                            - generic [ref=e7485]: 52 Week Range current value $29.74
+                          - slider: "29.74"
+                      - cell "View next steps for SKYWATER TECHNOLOGY order number 1005183380551" [ref=e7486]:
+                        - button "View next steps for SKYWATER TECHNOLOGY order number 1005183380551" [ref=e7488]:
+                          - generic [ref=e7489]: 
+                    - row "Expand row AEM order number 1005183380535 View quote details for AGNICO EAGLE MINES L AGNICO EAGLE MINES L Filled Buy 6 Limit $214.50 Day + ext $214.4225 $215.00 $217.19 $218.00 $216.95 8:50 AM 01/21/2026 8:50 AM 01/21/2026 - +$5.06 +2.3880% +$5.30 +2.5013% View next steps for AGNICO EAGLE MINES L order number 1005183380535" [ref=e7490]:
+                      - cell "Expand row AEM order number 1005183380535" [ref=e7491]:
+                        - button "Expand row AEM order number 1005183380535" [ref=e7495]
+                      - cell "View quote details for AGNICO EAGLE MINES L AGNICO EAGLE MINES L" [ref=e7499]:
+                        - generic [ref=e7500]:
+                          - link "View quote details for AGNICO EAGLE MINES L" [ref=e7503] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AEM
+                            - text: AEM
+                          - generic "AGNICO EAGLE MINES L" [ref=e7504]
+                      - cell "Filled" [ref=e7505]:
+                        - generic [ref=e7508]: Filled
+                      - cell "Buy" [ref=e7509]:
+                        - generic [ref=e7511]: Buy
+                      - cell "6" [ref=e7512]:
+                        - generic [ref=e7515]: "6"
+                      - cell "Limit $214.50" [ref=e7516]:
+                        - generic [ref=e7517]: Limit $214.50
+                      - cell "Day + ext" [ref=e7518]:
+                        - generic [ref=e7519]: Day + ext
+                      - cell "$214.4225" [ref=e7520]:
+                        - generic [ref=e7522]: $214.4225
+                      - cell "$215.00" [ref=e7523]:
+                        - generic [ref=e7524]: $215.00
+                      - cell "$217.19" [ref=e7525]:
+                        - generic [ref=e7526]: $217.19
+                      - cell "$218.00" [ref=e7527]:
+                        - generic [ref=e7528]: $218.00
+                      - cell "$216.95" [ref=e7529]:
+                        - generic [ref=e7530]: $216.95
+                      - cell "8:50 AM 01/21/2026" [ref=e7531]:
+                        - generic [ref=e7533]: 8:50 AM 01/21/2026
+                      - cell "8:50 AM 01/21/2026" [ref=e7534]:
+                        - generic [ref=e7536]: 8:50 AM 01/21/2026
+                      - cell "-" [ref=e7537]:
+                        - generic [ref=e7539]: "-"
+                      - cell "+$5.06" [ref=e7540]:
+                        - generic [ref=e7541]: +$5.06
+                      - cell "+2.3880%" [ref=e7542]:
+                        - generic [ref=e7543]: +2.3880%
+                      - cell "+$5.30" [ref=e7544]:
+                        - generic [ref=e7545]: +$5.30
+                      - cell "+2.5013%" [ref=e7546]:
+                        - generic [ref=e7547]: +2.5013%
+                      - cell [ref=e7548]:
+                        - figure [ref=e7551]:
+                          - generic [ref=e7552]:
+                            - generic [ref=e7553]:
+                              - generic [ref=e7554]: Day Range lowest value
+                              - text: $209.76
+                            - generic [ref=e7555]:
+                              - generic [ref=e7556]: Day Range highest value
+                              - text: $218.25
+                            - generic [ref=e7557]: Day Range current value $216.95
+                          - slider: "216.95"
+                      - cell [ref=e7558]:
+                        - figure [ref=e7561]:
+                          - generic [ref=e7562]:
+                            - generic [ref=e7563]:
+                              - generic [ref=e7564]: 52 Week Range lowest value
+                              - text: $92.11
+                            - generic [ref=e7565]:
+                              - generic [ref=e7566]: 52 Week Range highest value
+                              - text: $225.00
+                            - generic [ref=e7567]: 52 Week Range current value $216.95
+                          - slider: "216.95"
+                      - cell "View next steps for AGNICO EAGLE MINES L order number 1005183380535" [ref=e7568]:
+                        - button "View next steps for AGNICO EAGLE MINES L order number 1005183380535" [ref=e7570]:
+                          - generic [ref=e7571]: 
+                    - row "Expand row GDX order number 1005183380534 View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF Filled Buy 12 Limit $105.45 Day + ext $105.4095 $104.80 $105.30 $105.30 $105.272 8:50 AM 01/21/2026 8:50 AM 01/21/2026 - +$2.262 +2.1959% +$2.29 +2.2231% View next steps for VANECK GOLD MINERS ETF order number 1005183380534" [ref=e7572]:
+                      - cell "Expand row GDX order number 1005183380534" [ref=e7573]:
+                        - button "Expand row GDX order number 1005183380534" [ref=e7577]
+                      - cell "View quote details for VANECK GOLD MINERS ETF VANECK GOLD MINERS ETF" [ref=e7581]:
+                        - generic [ref=e7582]:
+                          - link "View quote details for VANECK GOLD MINERS ETF" [ref=e7585] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=GDX
+                            - text: GDX
+                          - generic "VANECK GOLD MINERS ETF" [ref=e7586]
+                      - cell "Filled" [ref=e7587]:
+                        - generic [ref=e7590]: Filled
+                      - cell "Buy" [ref=e7591]:
+                        - generic [ref=e7593]: Buy
+                      - cell "12" [ref=e7594]:
+                        - generic [ref=e7597]: "12"
+                      - cell "Limit $105.45" [ref=e7598]:
+                        - generic [ref=e7599]: Limit $105.45
+                      - cell "Day + ext" [ref=e7600]:
+                        - generic [ref=e7601]: Day + ext
+                      - cell "$105.4095" [ref=e7602]:
+                        - generic [ref=e7604]: $105.4095
+                      - cell "$104.80" [ref=e7605]:
+                        - generic [ref=e7606]: $104.80
+                      - cell "$105.30" [ref=e7607]:
+                        - generic [ref=e7608]: $105.30
+                      - cell "$105.30" [ref=e7609]:
+                        - generic [ref=e7610]: $105.30
+                      - cell "$105.272" [ref=e7611]:
+                        - generic [ref=e7612]: $105.272
+                      - cell "8:50 AM 01/21/2026" [ref=e7613]:
+                        - generic [ref=e7615]: 8:50 AM 01/21/2026
+                      - cell "8:50 AM 01/21/2026" [ref=e7616]:
+                        - generic [ref=e7618]: 8:50 AM 01/21/2026
+                      - cell "-" [ref=e7619]:
+                        - generic [ref=e7621]: "-"
+                      - cell "+$2.262" [ref=e7622]:
+                        - generic [ref=e7623]: +$2.262
+                      - cell "+2.1959%" [ref=e7624]:
+                        - generic [ref=e7625]: +2.1959%
+                      - cell "+$2.29" [ref=e7626]:
+                        - generic [ref=e7627]: +$2.29
+                      - cell "+2.2231%" [ref=e7628]:
+                        - generic [ref=e7629]: +2.2231%
+                      - cell [ref=e7630]:
+                        - figure [ref=e7633]:
+                          - generic [ref=e7634]:
+                            - generic [ref=e7635]:
+                              - generic [ref=e7636]: Day Range lowest value
+                              - text: $102.49
+                            - generic [ref=e7637]:
+                              - generic [ref=e7638]: Day Range highest value
+                              - text: $106.47
+                            - generic [ref=e7639]: Day Range current value $105.272
+                          - slider: "105.272"
+                      - cell [ref=e7640]:
+                        - figure [ref=e7643]:
+                          - generic [ref=e7644]:
+                            - generic [ref=e7645]:
+                              - generic [ref=e7646]: 52 Week Range lowest value
+                              - text: $38.581
+                            - generic [ref=e7647]:
+                              - generic [ref=e7648]: 52 Week Range highest value
+                              - text: $113.50
+                            - generic [ref=e7649]: 52 Week Range current value $105.272
+                          - slider: "105.272"
+                      - cell "View next steps for VANECK GOLD MINERS ETF order number 1005183380534" [ref=e7650]:
+                        - button "View next steps for VANECK GOLD MINERS ETF order number 1005183380534" [ref=e7652]:
+                          - generic [ref=e7653]: 
+                    - row "Expand row LRCX order number 1005182262890 View quote details for LAM RESH CORP LAM RESH CORP Filled Sell 5 Limit $222.20 Day + ext $222.36 $234.50 $235.12 $236.49 $235.25 7:10 PM 01/20/2026 7:10 PM 01/20/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005182262890" [ref=e7654]:
+                      - cell "Expand row LRCX order number 1005182262890" [ref=e7655]:
+                        - button "Expand row LRCX order number 1005182262890" [ref=e7659]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e7663]:
+                        - generic [ref=e7664]:
+                          - link "View quote details for LAM RESH CORP" [ref=e7667] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e7668]
+                      - cell "Filled" [ref=e7669]:
+                        - generic [ref=e7672]: Filled
+                      - cell "Sell" [ref=e7673]:
+                        - generic [ref=e7675]: Sell
+                      - cell "5" [ref=e7676]:
+                        - generic [ref=e7679]: "5"
+                      - cell "Limit $222.20" [ref=e7680]:
+                        - generic [ref=e7681]: Limit $222.20
+                      - cell "Day + ext" [ref=e7682]:
+                        - generic [ref=e7683]: Day + ext
+                      - cell "$222.36" [ref=e7684]:
+                        - generic [ref=e7686]: $222.36
+                      - cell "$234.50" [ref=e7687]:
+                        - generic [ref=e7688]: $234.50
+                      - cell "$235.12" [ref=e7689]:
+                        - generic [ref=e7690]: $235.12
+                      - cell "$236.49" [ref=e7691]:
+                        - generic [ref=e7692]: $236.49
+                      - cell "$235.25" [ref=e7693]:
+                        - generic [ref=e7694]: $235.25
+                      - cell "7:10 PM 01/20/2026" [ref=e7695]:
+                        - generic [ref=e7697]: 7:10 PM 01/20/2026
+                      - cell "7:10 PM 01/20/2026" [ref=e7698]:
+                        - generic [ref=e7700]: 7:10 PM 01/20/2026
+                      - cell "-" [ref=e7701]:
+                        - generic [ref=e7703]: "-"
+                      - cell "+$8.64" [ref=e7704]:
+                        - generic [ref=e7705]: +$8.64
+                      - cell "+3.8127%" [ref=e7706]:
+                        - generic [ref=e7707]: +3.8127%
+                      - cell "+$8.51" [ref=e7708]:
+                        - generic [ref=e7709]: +$8.51
+                      - cell "+3.7554%" [ref=e7710]:
+                        - generic [ref=e7711]: +3.7554%
+                      - cell [ref=e7712]:
+                        - figure [ref=e7715]:
+                          - generic [ref=e7716]:
+                            - generic [ref=e7717]:
+                              - generic [ref=e7718]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e7719]:
+                              - generic [ref=e7720]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e7721]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e7722]:
+                        - figure [ref=e7725]:
+                          - generic [ref=e7726]:
+                            - generic [ref=e7727]:
+                              - generic [ref=e7728]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e7729]:
+                              - generic [ref=e7730]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e7731]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005182262890" [ref=e7732]:
+                        - button "View next steps for LAM RESH CORP order number 1005182262890" [ref=e7734]:
+                          - generic [ref=e7735]: 
+                    - row "Expand row MU order number 1005182262887 View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN Filled Sell 3 Limit $367.50 Day + ext $367.53 $415.95 $415.95 $416.18 $416.00 7:10 PM 01/20/2026 7:10 PM 01/20/2026 - +$42.75 +11.4534% +$42.70 +11.4401% View next steps for MICRON TECHNOLOGY IN order number 1005182262887" [ref=e7736]:
+                      - cell "Expand row MU order number 1005182262887" [ref=e7737]:
+                        - button "Expand row MU order number 1005182262887" [ref=e7741]
+                      - cell "View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN" [ref=e7745]:
+                        - generic [ref=e7746]:
+                          - link "View quote details for MICRON TECHNOLOGY IN" [ref=e7749] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MU
+                            - text: MU
+                          - generic "MICRON TECHNOLOGY IN" [ref=e7750]
+                      - cell "Filled" [ref=e7751]:
+                        - generic [ref=e7754]: Filled
+                      - cell "Sell" [ref=e7755]:
+                        - generic [ref=e7757]: Sell
+                      - cell "3" [ref=e7758]:
+                        - generic [ref=e7761]: "3"
+                      - cell "Limit $367.50" [ref=e7762]:
+                        - generic [ref=e7763]: Limit $367.50
+                      - cell "Day + ext" [ref=e7764]:
+                        - generic [ref=e7765]: Day + ext
+                      - cell "$367.53" [ref=e7766]:
+                        - generic [ref=e7768]: $367.53
+                      - cell "$415.95" [ref=e7769]:
+                        - generic [ref=e7770]: $415.95
+                      - cell "$415.95" [ref=e7771]:
+                        - generic [ref=e7772]: $415.95
+                      - cell "$416.18" [ref=e7773]:
+                        - generic [ref=e7774]: $416.18
+                      - cell "$416.00" [ref=e7775]:
+                        - generic [ref=e7776]: $416.00
+                      - cell "7:10 PM 01/20/2026" [ref=e7777]:
+                        - generic [ref=e7779]: 7:10 PM 01/20/2026
+                      - cell "7:10 PM 01/20/2026" [ref=e7780]:
+                        - generic [ref=e7782]: 7:10 PM 01/20/2026
+                      - cell "-" [ref=e7783]:
+                        - generic [ref=e7785]: "-"
+                      - cell "+$42.75" [ref=e7786]:
+                        - generic [ref=e7787]: +$42.75
+                      - cell "+11.4534%" [ref=e7788]:
+                        - generic [ref=e7789]: +11.4534%
+                      - cell "+$42.70" [ref=e7790]:
+                        - generic [ref=e7791]: +$42.70
+                      - cell "+11.4401%" [ref=e7792]:
+                        - generic [ref=e7793]: +11.4401%
+                      - cell [ref=e7794]:
+                        - figure [ref=e7797]:
+                          - generic [ref=e7798]:
+                            - generic [ref=e7799]:
+                              - generic [ref=e7800]: Day Range lowest value
+                              - text: $386.57
+                            - generic [ref=e7801]:
+                              - generic [ref=e7802]: Day Range highest value
+                              - text: $414.16
+                            - generic [ref=e7803]: Day Range current value $416.00
+                          - slider: "414.16"
+                      - cell [ref=e7804]:
+                        - figure [ref=e7807]:
+                          - generic [ref=e7808]:
+                            - generic [ref=e7809]:
+                              - generic [ref=e7810]: 52 Week Range lowest value
+                              - text: $61.54
+                            - generic [ref=e7811]:
+                              - generic [ref=e7812]: 52 Week Range highest value
+                              - text: $455.50
+                            - generic [ref=e7813]: 52 Week Range current value $416.00
+                          - slider: "416"
+                      - cell "View next steps for MICRON TECHNOLOGY IN order number 1005182262887" [ref=e7814]:
+                        - button "View next steps for MICRON TECHNOLOGY IN order number 1005182262887" [ref=e7816]:
+                          - generic [ref=e7817]: 
+                    - row "Expand row NUGT order number 1005179951131 View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF Filled Sell 10 Market Day $258.7184 $258.98 $263.00 $263.00 $259.73 2:56 PM 01/20/2026 2:56 PM 01/20/2026 - +$7.01 +2.7738% +$10.28 +4.0677% View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005179951131" [ref=e7818]:
+                      - cell "Expand row NUGT order number 1005179951131" [ref=e7819]:
+                        - button "Expand row NUGT order number 1005179951131" [ref=e7823]
+                      - cell "View quote details for DRXN DLY GLD MNS INX BL 2X ETF DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7827]:
+                        - generic [ref=e7828]:
+                          - link "View quote details for DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7831] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=NUGT
+                            - text: NUGT
+                          - generic "DRXN DLY GLD MNS INX BL 2X ETF" [ref=e7832]
+                      - cell "Filled" [ref=e7833]:
+                        - generic [ref=e7836]: Filled
+                      - cell "Sell" [ref=e7837]:
+                        - generic [ref=e7839]: Sell
+                      - cell "10" [ref=e7840]:
+                        - generic [ref=e7843]: "10"
+                      - cell "Market" [ref=e7844]:
+                        - generic [ref=e7845]: Market
+                      - cell "Day" [ref=e7846]:
+                        - generic [ref=e7847]: Day
+                      - cell "$258.7184" [ref=e7848]:
+                        - generic [ref=e7850]: $258.7184
+                      - cell "$258.98" [ref=e7851]:
+                        - generic [ref=e7852]: $258.98
+                      - cell "$263.00" [ref=e7853]:
+                        - generic [ref=e7854]: $263.00
+                      - cell "$263.00" [ref=e7855]:
+                        - generic [ref=e7856]: $263.00
+                      - cell "$259.73" [ref=e7857]:
+                        - generic [ref=e7858]: $259.73
+                      - cell "2:56 PM 01/20/2026" [ref=e7859]:
+                        - generic [ref=e7861]: 2:56 PM 01/20/2026
+                      - cell "2:56 PM 01/20/2026" [ref=e7862]:
+                        - generic [ref=e7864]: 2:56 PM 01/20/2026
+                      - cell "-" [ref=e7865]:
+                        - generic [ref=e7867]: "-"
+                      - cell "+$7.01" [ref=e7868]:
+                        - generic [ref=e7869]: +$7.01
+                      - cell "+2.7738%" [ref=e7870]:
+                        - generic [ref=e7871]: +2.7738%
+                      - cell "+$10.28" [ref=e7872]:
+                        - generic [ref=e7873]: +$10.28
+                      - cell "+4.0677%" [ref=e7874]:
+                        - generic [ref=e7875]: +4.0677%
+                      - cell [ref=e7876]:
+                        - figure [ref=e7879]:
+                          - generic [ref=e7880]:
+                            - generic [ref=e7881]:
+                              - generic [ref=e7882]: Day Range lowest value
+                              - text: $249.58
+                            - generic [ref=e7883]:
+                              - generic [ref=e7884]: Day Range highest value
+                              - text: $268.6499
+                            - generic [ref=e7885]: Day Range current value $259.73
+                          - slider: "259.73"
+                      - cell [ref=e7886]:
+                        - figure [ref=e7889]:
+                          - generic [ref=e7890]:
+                            - generic [ref=e7891]:
+                              - generic [ref=e7892]: 52 Week Range lowest value
+                              - text: $44.30
+                            - generic [ref=e7893]:
+                              - generic [ref=e7894]: 52 Week Range highest value
+                              - text: $317.99
+                            - generic [ref=e7895]: 52 Week Range current value $259.73
+                          - slider: "259.73"
+                      - cell "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005179951131" [ref=e7896]:
+                        - button "View next steps for DRXN DLY GLD MNS INX BL 2X ETF order number 1005179951131" [ref=e7898]:
+                          - generic [ref=e7899]: 
+                    - row "Expand row HYMC order number 1005175998110 View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A Filled Sell 58 Market Day $40.0149 $35.05 $35.14 $35.14 $35.1261 12:05 PM 01/20/2026 12:05 PM 01/20/2026 - -$1.5239 -4.1580% -$1.51 -4.1201% View next steps for HYCROFT MNG HLDG COR A order number 1005175998110" [ref=e7900]:
+                      - cell "Expand row HYMC order number 1005175998110" [ref=e7901]:
+                        - button "Expand row HYMC order number 1005175998110" [ref=e7905]
+                      - cell "View quote details for HYCROFT MNG HLDG COR A HYCROFT MNG HLDG COR A" [ref=e7909]:
+                        - generic [ref=e7910]:
+                          - link "View quote details for HYCROFT MNG HLDG COR A" [ref=e7913] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=HYMC
+                            - text: HYMC
+                          - generic "HYCROFT MNG HLDG COR A" [ref=e7914]
+                      - cell "Filled" [ref=e7915]:
+                        - generic [ref=e7918]: Filled
+                      - cell "Sell" [ref=e7919]:
+                        - generic [ref=e7921]: Sell
+                      - cell "58" [ref=e7922]:
+                        - generic [ref=e7925]: "58"
+                      - cell "Market" [ref=e7926]:
+                        - generic [ref=e7927]: Market
+                      - cell "Day" [ref=e7928]:
+                        - generic [ref=e7929]: Day
+                      - cell "$40.0149" [ref=e7930]:
+                        - generic [ref=e7932]: $40.0149
+                      - cell "$35.05" [ref=e7933]:
+                        - generic [ref=e7934]: $35.05
+                      - cell "$35.14" [ref=e7935]:
+                        - generic [ref=e7936]: $35.14
+                      - cell "$35.14" [ref=e7937]:
+                        - generic [ref=e7938]: $35.14
+                      - cell "$35.1261" [ref=e7939]:
+                        - generic [ref=e7940]: $35.1261
+                      - cell "12:05 PM 01/20/2026" [ref=e7941]:
+                        - generic [ref=e7943]: 12:05 PM 01/20/2026
+                      - cell "12:05 PM 01/20/2026" [ref=e7944]:
+                        - generic [ref=e7946]: 12:05 PM 01/20/2026
+                      - cell "-" [ref=e7947]:
+                        - generic [ref=e7949]: "-"
+                      - cell "-$1.5239" [ref=e7950]:
+                        - generic [ref=e7951]: "-$1.5239"
+                      - cell "-4.1580%" [ref=e7952]:
+                        - generic [ref=e7953]: "-4.1580%"
+                      - cell "-$1.51" [ref=e7954]:
+                        - generic [ref=e7955]: "-$1.51"
+                      - cell "-4.1201%" [ref=e7956]:
+                        - generic [ref=e7957]: "-4.1201%"
+                      - cell [ref=e7958]:
+                        - figure [ref=e7961]:
+                          - generic [ref=e7962]:
+                            - generic [ref=e7963]:
+                              - generic [ref=e7964]: Day Range lowest value
+                              - text: $34.14
+                            - generic [ref=e7965]:
+                              - generic [ref=e7966]: Day Range highest value
+                              - text: $38.60
+                            - generic [ref=e7967]: Day Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell [ref=e7968]:
+                        - figure [ref=e7971]:
+                          - generic [ref=e7972]:
+                            - generic [ref=e7973]:
+                              - generic [ref=e7974]: 52 Week Range lowest value
+                              - text: $2.22
+                            - generic [ref=e7975]:
+                              - generic [ref=e7976]: 52 Week Range highest value
+                              - text: $58.7299
+                            - generic [ref=e7977]: 52 Week Range current value $35.1261
+                          - slider: "35.1261"
+                      - cell "View next steps for HYCROFT MNG HLDG COR A order number 1005175998110" [ref=e7978]:
+                        - button "View next steps for HYCROFT MNG HLDG COR A order number 1005175998110" [ref=e7980]:
+                          - generic [ref=e7981]: 
+                    - row "Expand row SKYT order number 1005175998096 View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY Filled Sell 35 Market Day $35.5313 $29.16 $29.40 $29.98 $29.74 12:05 PM 01/20/2026 12:05 PM 01/20/2026 - -$0.26 -0.8667% -$0.60 -2.00% View next steps for SKYWATER TECHNOLOGY order number 1005175998096" [ref=e7982]:
+                      - cell "Expand row SKYT order number 1005175998096" [ref=e7983]:
+                        - button "Expand row SKYT order number 1005175998096" [ref=e7987]
+                      - cell "View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY" [ref=e7991]:
+                        - generic [ref=e7992]:
+                          - link "View quote details for SKYWATER TECHNOLOGY" [ref=e7995] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SKYT
+                            - text: SKYT
+                          - generic "SKYWATER TECHNOLOGY" [ref=e7996]
+                      - cell "Filled" [ref=e7997]:
+                        - generic [ref=e8000]: Filled
+                      - cell "Sell" [ref=e8001]:
+                        - generic [ref=e8003]: Sell
+                      - cell "35" [ref=e8004]:
+                        - generic [ref=e8007]: "35"
+                      - cell "Market" [ref=e8008]:
+                        - generic [ref=e8009]: Market
+                      - cell "Day" [ref=e8010]:
+                        - generic [ref=e8011]: Day
+                      - cell "$35.5313" [ref=e8012]:
+                        - generic [ref=e8014]: $35.5313
+                      - cell "$29.16" [ref=e8015]:
+                        - generic [ref=e8016]: $29.16
+                      - cell "$29.40" [ref=e8017]:
+                        - generic [ref=e8018]: $29.40
+                      - cell "$29.98" [ref=e8019]:
+                        - generic [ref=e8020]: $29.98
+                      - cell "$29.74" [ref=e8021]:
+                        - generic [ref=e8022]: $29.74
+                      - cell "12:05 PM 01/20/2026" [ref=e8023]:
+                        - generic [ref=e8025]: 12:05 PM 01/20/2026
+                      - cell "12:05 PM 01/20/2026" [ref=e8026]:
+                        - generic [ref=e8028]: 12:05 PM 01/20/2026
+                      - cell "-" [ref=e8029]:
+                        - generic [ref=e8031]: "-"
+                      - cell "-$0.26" [ref=e8032]:
+                        - generic [ref=e8033]: "-$0.26"
+                      - cell "-0.8667%" [ref=e8034]:
+                        - generic [ref=e8035]: "-0.8667%"
+                      - cell "-$0.60" [ref=e8036]:
+                        - generic [ref=e8037]: "-$0.60"
+                      - cell "-2.00%" [ref=e8038]:
+                        - generic [ref=e8039]: "-2.00%"
+                      - cell [ref=e8040]:
+                        - figure [ref=e8043]:
+                          - generic [ref=e8044]:
+                            - generic [ref=e8045]:
+                              - generic [ref=e8046]: Day Range lowest value
+                              - text: $29.09
+                            - generic [ref=e8047]:
+                              - generic [ref=e8048]: Day Range highest value
+                              - text: $30.6999
+                            - generic [ref=e8049]: Day Range current value $29.74
+                          - slider: "29.74"
+                      - cell [ref=e8050]:
+                        - figure [ref=e8053]:
+                          - generic [ref=e8054]:
+                            - generic [ref=e8055]:
+                              - generic [ref=e8056]: 52 Week Range lowest value
+                              - text: $5.67
+                            - generic [ref=e8057]:
+                              - generic [ref=e8058]: 52 Week Range highest value
+                              - text: $36.268
+                            - generic [ref=e8059]: 52 Week Range current value $29.74
+                          - slider: "29.74"
+                      - cell "View next steps for SKYWATER TECHNOLOGY order number 1005175998096" [ref=e8060]:
+                        - button "View next steps for SKYWATER TECHNOLOGY order number 1005175998096" [ref=e8062]:
+                          - generic [ref=e8063]: 
+                    - row "Expand row AXTI order number 1005169796642 View quote details for AXT INC AXT INC Filled Sell 52 Market Day $21.7501 $26.52 $26.75 $26.75 $26.74 9:37 AM 01/20/2026 9:37 AM 01/20/2026 - +$2.39 +9.8152% +$2.40 +9.8563% View next steps for AXT INC order number 1005169796642" [ref=e8064]:
+                      - cell "Expand row AXTI order number 1005169796642" [ref=e8065]:
+                        - button "Expand row AXTI order number 1005169796642" [ref=e8069]
+                      - cell "View quote details for AXT INC AXT INC" [ref=e8073]:
+                        - generic [ref=e8074]:
+                          - link "View quote details for AXT INC" [ref=e8077] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AXTI
+                            - text: AXTI
+                          - generic "AXT INC" [ref=e8078]
+                      - cell "Filled" [ref=e8079]:
+                        - generic [ref=e8082]: Filled
+                      - cell "Sell" [ref=e8083]:
+                        - generic [ref=e8085]: Sell
+                      - cell "52" [ref=e8086]:
+                        - generic [ref=e8089]: "52"
+                      - cell "Market" [ref=e8090]:
+                        - generic [ref=e8091]: Market
+                      - cell "Day" [ref=e8092]:
+                        - generic [ref=e8093]: Day
+                      - cell "$21.7501" [ref=e8094]:
+                        - generic [ref=e8096]: $21.7501
+                      - cell "$26.52" [ref=e8097]:
+                        - generic [ref=e8098]: $26.52
+                      - cell "$26.75" [ref=e8099]:
+                        - generic [ref=e8100]: $26.75
+                      - cell "$26.75" [ref=e8101]:
+                        - generic [ref=e8102]: $26.75
+                      - cell "$26.74" [ref=e8103]:
+                        - generic [ref=e8104]: $26.74
+                      - cell "9:37 AM 01/20/2026" [ref=e8105]:
+                        - generic [ref=e8107]: 9:37 AM 01/20/2026
+                      - cell "9:37 AM 01/20/2026" [ref=e8108]:
+                        - generic [ref=e8110]: 9:37 AM 01/20/2026
+                      - cell "-" [ref=e8111]:
+                        - generic [ref=e8113]: "-"
+                      - cell "+$2.39" [ref=e8114]:
+                        - generic [ref=e8115]: +$2.39
+                      - cell "+9.8152%" [ref=e8116]:
+                        - generic [ref=e8117]: +9.8152%
+                      - cell "+$2.40" [ref=e8118]:
+                        - generic [ref=e8119]: +$2.40
+                      - cell "+9.8563%" [ref=e8120]:
+                        - generic [ref=e8121]: +9.8563%
+                      - cell [ref=e8122]:
+                        - figure [ref=e8125]:
+                          - generic [ref=e8126]:
+                            - generic [ref=e8127]:
+                              - generic [ref=e8128]: Day Range lowest value
+                              - text: $25.265
+                            - generic [ref=e8129]:
+                              - generic [ref=e8130]: Day Range highest value
+                              - text: $28.49
+                            - generic [ref=e8131]: Day Range current value $26.74
+                          - slider: "26.74"
+                      - cell [ref=e8132]:
+                        - figure [ref=e8135]:
+                          - generic [ref=e8136]:
+                            - generic [ref=e8137]:
+                              - generic [ref=e8138]: 52 Week Range lowest value
+                              - text: $1.13
+                            - generic [ref=e8139]:
+                              - generic [ref=e8140]: 52 Week Range highest value
+                              - text: $28.49
+                            - generic [ref=e8141]: 52 Week Range current value $26.74
+                          - slider: "26.74"
+                      - cell "View next steps for AXT INC order number 1005169796642" [ref=e8142]:
+                        - button "View next steps for AXT INC order number 1005169796642" [ref=e8144]:
+                          - generic [ref=e8145]: 
+                    - row "Expand row MU order number 1005168692673 View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN Filled Sell 3 Limit $361.60 Day + ext $361.64 $415.95 $415.95 $416.18 $416.00 8:03 AM 01/20/2026 8:03 AM 01/20/2026 - +$42.75 +11.4534% +$42.70 +11.4401% View next steps for MICRON TECHNOLOGY IN order number 1005168692673" [ref=e8146]:
+                      - cell "Expand row MU order number 1005168692673" [ref=e8147]:
+                        - button "Expand row MU order number 1005168692673" [ref=e8151]
+                      - cell "View quote details for MICRON TECHNOLOGY IN MICRON TECHNOLOGY IN" [ref=e8155]:
+                        - generic [ref=e8156]:
+                          - link "View quote details for MICRON TECHNOLOGY IN" [ref=e8159] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=MU
+                            - text: MU
+                          - generic "MICRON TECHNOLOGY IN" [ref=e8160]
+                      - cell "Filled" [ref=e8161]:
+                        - generic [ref=e8164]: Filled
+                      - cell "Sell" [ref=e8165]:
+                        - generic [ref=e8167]: Sell
+                      - cell "3" [ref=e8168]:
+                        - generic [ref=e8171]: "3"
+                      - cell "Limit $361.60" [ref=e8172]:
+                        - generic [ref=e8173]: Limit $361.60
+                      - cell "Day + ext" [ref=e8174]:
+                        - generic [ref=e8175]: Day + ext
+                      - cell "$361.64" [ref=e8176]:
+                        - generic [ref=e8178]: $361.64
+                      - cell "$415.95" [ref=e8179]:
+                        - generic [ref=e8180]: $415.95
+                      - cell "$415.95" [ref=e8181]:
+                        - generic [ref=e8182]: $415.95
+                      - cell "$416.18" [ref=e8183]:
+                        - generic [ref=e8184]: $416.18
+                      - cell "$416.00" [ref=e8185]:
+                        - generic [ref=e8186]: $416.00
+                      - cell "8:03 AM 01/20/2026" [ref=e8187]:
+                        - generic [ref=e8189]: 8:03 AM 01/20/2026
+                      - cell "8:03 AM 01/20/2026" [ref=e8190]:
+                        - generic [ref=e8192]: 8:03 AM 01/20/2026
+                      - cell "-" [ref=e8193]:
+                        - generic [ref=e8195]: "-"
+                      - cell "+$42.75" [ref=e8196]:
+                        - generic [ref=e8197]: +$42.75
+                      - cell "+11.4534%" [ref=e8198]:
+                        - generic [ref=e8199]: +11.4534%
+                      - cell "+$42.70" [ref=e8200]:
+                        - generic [ref=e8201]: +$42.70
+                      - cell "+11.4401%" [ref=e8202]:
+                        - generic [ref=e8203]: +11.4401%
+                      - cell [ref=e8204]:
+                        - figure [ref=e8207]:
+                          - generic [ref=e8208]:
+                            - generic [ref=e8209]:
+                              - generic [ref=e8210]: Day Range lowest value
+                              - text: $386.57
+                            - generic [ref=e8211]:
+                              - generic [ref=e8212]: Day Range highest value
+                              - text: $414.16
+                            - generic [ref=e8213]: Day Range current value $416.00
+                          - slider: "414.16"
+                      - cell [ref=e8214]:
+                        - figure [ref=e8217]:
+                          - generic [ref=e8218]:
+                            - generic [ref=e8219]:
+                              - generic [ref=e8220]: 52 Week Range lowest value
+                              - text: $61.54
+                            - generic [ref=e8221]:
+                              - generic [ref=e8222]: 52 Week Range highest value
+                              - text: $455.50
+                            - generic [ref=e8223]: 52 Week Range current value $416.00
+                          - slider: "416"
+                      - cell "View next steps for MICRON TECHNOLOGY IN order number 1005168692673" [ref=e8224]:
+                        - button "View next steps for MICRON TECHNOLOGY IN order number 1005168692673" [ref=e8226]:
+                          - generic [ref=e8227]: 
+                    - row "Expand row FCX order number 1005168692628 View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC Filled Sell 14 Limit $58.50 Day + ext $58.55 $65.00 $65.46 $65.67 $65.467 7:57 AM 01/20/2026 7:57 AM 01/20/2026 - +$2.207 +3.4888% +$2.20 +3.4777% View next steps for FREEPORT-MCMORAN INC order number 1005168692628" [ref=e8228]:
+                      - cell "Expand row FCX order number 1005168692628" [ref=e8229]:
+                        - button "Expand row FCX order number 1005168692628" [ref=e8233]
+                      - cell "View quote details for FREEPORT-MCMORAN INC FREEPORT-MCMORAN INC" [ref=e8237]:
+                        - generic [ref=e8238]:
+                          - link "View quote details for FREEPORT-MCMORAN INC" [ref=e8241] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=FCX
+                            - text: FCX
+                          - generic "FREEPORT-MCMORAN INC" [ref=e8242]
+                      - cell "Filled" [ref=e8243]:
+                        - generic [ref=e8246]: Filled
+                      - cell "Sell" [ref=e8247]:
+                        - generic [ref=e8249]: Sell
+                      - cell "14" [ref=e8250]:
+                        - generic [ref=e8253]: "14"
+                      - cell "Limit $58.50" [ref=e8254]:
+                        - generic [ref=e8255]: Limit $58.50
+                      - cell "Day + ext" [ref=e8256]:
+                        - generic [ref=e8257]: Day + ext
+                      - cell "$58.55" [ref=e8258]:
+                        - generic [ref=e8260]: $58.55
+                      - cell "$65.00" [ref=e8261]:
+                        - generic [ref=e8262]: $65.00
+                      - cell "$65.46" [ref=e8263]:
+                        - generic [ref=e8264]: $65.46
+                      - cell "$65.67" [ref=e8265]:
+                        - generic [ref=e8266]: $65.67
+                      - cell "$65.467" [ref=e8267]:
+                        - generic [ref=e8268]: $65.467
+                      - cell "7:57 AM 01/20/2026" [ref=e8269]:
+                        - generic [ref=e8271]: 7:57 AM 01/20/2026
+                      - cell "7:57 AM 01/20/2026" [ref=e8272]:
+                        - generic [ref=e8274]: 7:57 AM 01/20/2026
+                      - cell "-" [ref=e8275]:
+                        - generic [ref=e8277]: "-"
+                      - cell "+$2.207" [ref=e8278]:
+                        - generic [ref=e8279]: +$2.207
+                      - cell "+3.4888%" [ref=e8280]:
+                        - generic [ref=e8281]: +3.4888%
+                      - cell "+$2.20" [ref=e8282]:
+                        - generic [ref=e8283]: +$2.20
+                      - cell "+3.4777%" [ref=e8284]:
+                        - generic [ref=e8285]: +3.4777%
+                      - cell [ref=e8286]:
+                        - figure [ref=e8289]:
+                          - generic [ref=e8290]:
+                            - generic [ref=e8291]:
+                              - generic [ref=e8292]: Day Range lowest value
+                              - text: $63.07
+                            - generic [ref=e8293]:
+                              - generic [ref=e8294]: Day Range highest value
+                              - text: $65.50
+                            - generic [ref=e8295]: Day Range current value $65.467
+                          - slider: "65.467"
+                      - cell [ref=e8296]:
+                        - figure [ref=e8299]:
+                          - generic [ref=e8300]:
+                            - generic [ref=e8301]:
+                              - generic [ref=e8302]: 52 Week Range lowest value
+                              - text: $27.66
+                            - generic [ref=e8303]:
+                              - generic [ref=e8304]: 52 Week Range highest value
+                              - text: $69.44
+                            - generic [ref=e8305]: 52 Week Range current value $65.467
+                          - slider: "65.467"
+                      - cell "View next steps for FREEPORT-MCMORAN INC order number 1005168692628" [ref=e8306]:
+                        - button "View next steps for FREEPORT-MCMORAN INC order number 1005168692628" [ref=e8308]:
+                          - generic [ref=e8309]: 
+                    - row "Expand row SKYT order number 1005168692619 View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY Filled Sell 25 Limit $31.88 Day + ext $31.936 $29.16 $29.40 $29.98 $29.74 7:56 AM 01/20/2026 7:56 AM 01/20/2026 - -$0.26 -0.8667% -$0.60 -2.00% View next steps for SKYWATER TECHNOLOGY order number 1005168692619" [ref=e8310]:
+                      - cell "Expand row SKYT order number 1005168692619" [ref=e8311]:
+                        - button "Expand row SKYT order number 1005168692619" [ref=e8315]
+                      - cell "View quote details for SKYWATER TECHNOLOGY SKYWATER TECHNOLOGY" [ref=e8319]:
+                        - generic [ref=e8320]:
+                          - link "View quote details for SKYWATER TECHNOLOGY" [ref=e8323] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=SKYT
+                            - text: SKYT
+                          - generic "SKYWATER TECHNOLOGY" [ref=e8324]
+                      - cell "Filled" [ref=e8325]:
+                        - generic [ref=e8328]: Filled
+                      - cell "Sell" [ref=e8329]:
+                        - generic [ref=e8331]: Sell
+                      - cell "25" [ref=e8332]:
+                        - generic [ref=e8335]: "25"
+                      - cell "Limit $31.88" [ref=e8336]:
+                        - generic [ref=e8337]: Limit $31.88
+                      - cell "Day + ext" [ref=e8338]:
+                        - generic [ref=e8339]: Day + ext
+                      - cell "$31.936" [ref=e8340]:
+                        - generic [ref=e8342]: $31.936
+                      - cell "$29.16" [ref=e8343]:
+                        - generic [ref=e8344]: $29.16
+                      - cell "$29.40" [ref=e8345]:
+                        - generic [ref=e8346]: $29.40
+                      - cell "$29.98" [ref=e8347]:
+                        - generic [ref=e8348]: $29.98
+                      - cell "$29.74" [ref=e8349]:
+                        - generic [ref=e8350]: $29.74
+                      - cell "7:56 AM 01/20/2026" [ref=e8351]:
+                        - generic [ref=e8353]: 7:56 AM 01/20/2026
+                      - cell "7:56 AM 01/20/2026" [ref=e8354]:
+                        - generic [ref=e8356]: 7:56 AM 01/20/2026
+                      - cell "-" [ref=e8357]:
+                        - generic [ref=e8359]: "-"
+                      - cell "-$0.26" [ref=e8360]:
+                        - generic [ref=e8361]: "-$0.26"
+                      - cell "-0.8667%" [ref=e8362]:
+                        - generic [ref=e8363]: "-0.8667%"
+                      - cell "-$0.60" [ref=e8364]:
+                        - generic [ref=e8365]: "-$0.60"
+                      - cell "-2.00%" [ref=e8366]:
+                        - generic [ref=e8367]: "-2.00%"
+                      - cell [ref=e8368]:
+                        - figure [ref=e8371]:
+                          - generic [ref=e8372]:
+                            - generic [ref=e8373]:
+                              - generic [ref=e8374]: Day Range lowest value
+                              - text: $29.09
+                            - generic [ref=e8375]:
+                              - generic [ref=e8376]: Day Range highest value
+                              - text: $30.6999
+                            - generic [ref=e8377]: Day Range current value $29.74
+                          - slider: "29.74"
+                      - cell [ref=e8378]:
+                        - figure [ref=e8381]:
+                          - generic [ref=e8382]:
+                            - generic [ref=e8383]:
+                              - generic [ref=e8384]: 52 Week Range lowest value
+                              - text: $5.67
+                            - generic [ref=e8385]:
+                              - generic [ref=e8386]: 52 Week Range highest value
+                              - text: $36.268
+                            - generic [ref=e8387]: 52 Week Range current value $29.74
+                          - slider: "29.74"
+                      - cell "View next steps for SKYWATER TECHNOLOGY order number 1005168692619" [ref=e8388]:
+                        - button "View next steps for SKYWATER TECHNOLOGY order number 1005168692619" [ref=e8390]:
+                          - generic [ref=e8391]: 
+                    - row "Expand row AXTI order number 1005168692609 View quote details for AXT INC AXT INC Filled Sell 25 Limit $20.92 Day + ext $21.00 $26.52 $26.75 $26.75 $26.74 7:55 AM 01/20/2026 7:55 AM 01/20/2026 - +$2.39 +9.8152% +$2.40 +9.8563% View next steps for AXT INC order number 1005168692609" [ref=e8392]:
+                      - cell "Expand row AXTI order number 1005168692609" [ref=e8393]:
+                        - button "Expand row AXTI order number 1005168692609" [ref=e8397]
+                      - cell "View quote details for AXT INC AXT INC" [ref=e8401]:
+                        - generic [ref=e8402]:
+                          - link "View quote details for AXT INC" [ref=e8405] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=AXTI
+                            - text: AXTI
+                          - generic "AXT INC" [ref=e8406]
+                      - cell "Filled" [ref=e8407]:
+                        - generic [ref=e8410]: Filled
+                      - cell "Sell" [ref=e8411]:
+                        - generic [ref=e8413]: Sell
+                      - cell "25" [ref=e8414]:
+                        - generic [ref=e8417]: "25"
+                      - cell "Limit $20.92" [ref=e8418]:
+                        - generic [ref=e8419]: Limit $20.92
+                      - cell "Day + ext" [ref=e8420]:
+                        - generic [ref=e8421]: Day + ext
+                      - cell "$21.00" [ref=e8422]:
+                        - generic [ref=e8424]: $21.00
+                      - cell "$26.52" [ref=e8425]:
+                        - generic [ref=e8426]: $26.52
+                      - cell "$26.75" [ref=e8427]:
+                        - generic [ref=e8428]: $26.75
+                      - cell "$26.75" [ref=e8429]:
+                        - generic [ref=e8430]: $26.75
+                      - cell "$26.74" [ref=e8431]:
+                        - generic [ref=e8432]: $26.74
+                      - cell "7:55 AM 01/20/2026" [ref=e8433]:
+                        - generic [ref=e8435]: 7:55 AM 01/20/2026
+                      - cell "7:55 AM 01/20/2026" [ref=e8436]:
+                        - generic [ref=e8438]: 7:55 AM 01/20/2026
+                      - cell "-" [ref=e8439]:
+                        - generic [ref=e8441]: "-"
+                      - cell "+$2.39" [ref=e8442]:
+                        - generic [ref=e8443]: +$2.39
+                      - cell "+9.8152%" [ref=e8444]:
+                        - generic [ref=e8445]: +9.8152%
+                      - cell "+$2.40" [ref=e8446]:
+                        - generic [ref=e8447]: +$2.40
+                      - cell "+9.8563%" [ref=e8448]:
+                        - generic [ref=e8449]: +9.8563%
+                      - cell [ref=e8450]:
+                        - figure [ref=e8453]:
+                          - generic [ref=e8454]:
+                            - generic [ref=e8455]:
+                              - generic [ref=e8456]: Day Range lowest value
+                              - text: $25.265
+                            - generic [ref=e8457]:
+                              - generic [ref=e8458]: Day Range highest value
+                              - text: $28.49
+                            - generic [ref=e8459]: Day Range current value $26.74
+                          - slider: "26.74"
+                      - cell [ref=e8460]:
+                        - figure [ref=e8463]:
+                          - generic [ref=e8464]:
+                            - generic [ref=e8465]:
+                              - generic [ref=e8466]: 52 Week Range lowest value
+                              - text: $1.13
+                            - generic [ref=e8467]:
+                              - generic [ref=e8468]: 52 Week Range highest value
+                              - text: $28.49
+                            - generic [ref=e8469]: 52 Week Range current value $26.74
+                          - slider: "26.74"
+                      - cell "View next steps for AXT INC order number 1005168692609" [ref=e8470]:
+                        - button "View next steps for AXT INC order number 1005168692609" [ref=e8472]:
+                          - generic [ref=e8473]: 
+                    - row "Expand row COPX order number 1005168692580 View quote details for GLOBAL X COPPER MINERS ETF GLOBAL X COPPER MINERS ETF Filled Buy 15 Limit $81.50 Day + ext $81.4977 $89.71 $90.12 $90.75 $90.28 7:50 AM 01/20/2026 7:50 AM 01/20/2026 - +$2.05 +2.3235% +$1.89 +2.1421% View next steps for GLOBAL X COPPER MINERS ETF order number 1005168692580" [ref=e8474]:
+                      - cell "Expand row COPX order number 1005168692580" [ref=e8475]:
+                        - button "Expand row COPX order number 1005168692580" [ref=e8479]
+                      - cell "View quote details for GLOBAL X COPPER MINERS ETF GLOBAL X COPPER MINERS ETF" [ref=e8483]:
+                        - generic [ref=e8484]:
+                          - link "View quote details for GLOBAL X COPPER MINERS ETF" [ref=e8487] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=COPX
+                            - text: COPX
+                          - generic "GLOBAL X COPPER MINERS ETF" [ref=e8488]
+                      - cell "Filled" [ref=e8489]:
+                        - generic [ref=e8492]: Filled
+                      - cell "Buy" [ref=e8493]:
+                        - generic [ref=e8495]: Buy
+                      - cell "15" [ref=e8496]:
+                        - generic [ref=e8499]: "15"
+                      - cell "Limit $81.50" [ref=e8500]:
+                        - generic [ref=e8501]: Limit $81.50
+                      - cell "Day + ext" [ref=e8502]:
+                        - generic [ref=e8503]: Day + ext
+                      - cell "$81.4977" [ref=e8504]:
+                        - generic [ref=e8506]: $81.4977
+                      - cell "$89.71" [ref=e8507]:
+                        - generic [ref=e8508]: $89.71
+                      - cell "$90.12" [ref=e8509]:
+                        - generic [ref=e8510]: $90.12
+                      - cell "$90.75" [ref=e8511]:
+                        - generic [ref=e8512]: $90.75
+                      - cell "$90.28" [ref=e8513]:
+                        - generic [ref=e8514]: $90.28
+                      - cell "7:50 AM 01/20/2026" [ref=e8515]:
+                        - generic [ref=e8517]: 7:50 AM 01/20/2026
+                      - cell "7:50 AM 01/20/2026" [ref=e8518]:
+                        - generic [ref=e8520]: 7:50 AM 01/20/2026
+                      - cell "-" [ref=e8521]:
+                        - generic [ref=e8523]: "-"
+                      - cell "+$2.05" [ref=e8524]:
+                        - generic [ref=e8525]: +$2.05
+                      - cell "+2.3235%" [ref=e8526]:
+                        - generic [ref=e8527]: +2.3235%
+                      - cell "+$1.89" [ref=e8528]:
+                        - generic [ref=e8529]: +$1.89
+                      - cell "+2.1421%" [ref=e8530]:
+                        - generic [ref=e8531]: +2.1421%
+                      - cell [ref=e8532]:
+                        - figure [ref=e8535]:
+                          - generic [ref=e8536]:
+                            - generic [ref=e8537]:
+                              - generic [ref=e8538]: Day Range lowest value
+                              - text: $88.30
+                            - generic [ref=e8539]:
+                              - generic [ref=e8540]: Day Range highest value
+                              - text: $91.3372
+                            - generic [ref=e8541]: Day Range current value $90.28
+                          - slider: "90.28"
+                      - cell [ref=e8542]:
+                        - figure [ref=e8545]:
+                          - generic [ref=e8546]:
+                            - generic [ref=e8547]:
+                              - generic [ref=e8548]: 52 Week Range lowest value
+                              - text: $30.77
+                            - generic [ref=e8549]:
+                              - generic [ref=e8550]: 52 Week Range highest value
+                              - text: $99.99
+                            - generic [ref=e8551]: 52 Week Range current value $90.28
+                          - slider: "90.28"
+                      - cell "View next steps for GLOBAL X COPPER MINERS ETF order number 1005168692580" [ref=e8552]:
+                        - button "View next steps for GLOBAL X COPPER MINERS ETF order number 1005168692580" [ref=e8554]:
+                          - generic [ref=e8555]: 
+                    - row "Expand row UEC order number 1005168692560 View quote details for URANIUM ENERGY CORP URANIUM ENERGY CORP Filled Buy 70 Limit $17.62 Day + ext $17.6198 $15.89 $15.90 $15.98 $15.95 7:49 AM 01/20/2026 7:49 AM 01/20/2026 - -$0.39 -2.3868% -$0.44 -2.6928% View next steps for URANIUM ENERGY CORP order number 1005168692560" [ref=e8556]:
+                      - cell "Expand row UEC order number 1005168692560" [ref=e8557]:
+                        - button "Expand row UEC order number 1005168692560" [ref=e8561]
+                      - cell "View quote details for URANIUM ENERGY CORP URANIUM ENERGY CORP" [ref=e8565]:
+                        - generic [ref=e8566]:
+                          - link "View quote details for URANIUM ENERGY CORP" [ref=e8569] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UEC
+                            - text: UEC
+                          - generic "URANIUM ENERGY CORP" [ref=e8570]
+                      - cell "Filled" [ref=e8571]:
+                        - generic [ref=e8574]: Filled
+                      - cell "Buy" [ref=e8575]:
+                        - generic [ref=e8577]: Buy
+                      - cell "70" [ref=e8578]:
+                        - generic [ref=e8581]: "70"
+                      - cell "Limit $17.62" [ref=e8582]:
+                        - generic [ref=e8583]: Limit $17.62
+                      - cell "Day + ext" [ref=e8584]:
+                        - generic [ref=e8585]: Day + ext
+                      - cell "$17.6198" [ref=e8586]:
+                        - generic [ref=e8588]: $17.6198
+                      - cell "$15.89" [ref=e8589]:
+                        - generic [ref=e8590]: $15.89
+                      - cell "$15.90" [ref=e8591]:
+                        - generic [ref=e8592]: $15.90
+                      - cell "$15.98" [ref=e8593]:
+                        - generic [ref=e8594]: $15.98
+                      - cell "$15.95" [ref=e8595]:
+                        - generic [ref=e8596]: $15.95
+                      - cell "7:49 AM 01/20/2026" [ref=e8597]:
+                        - generic [ref=e8599]: 7:49 AM 01/20/2026
+                      - cell "7:49 AM 01/20/2026" [ref=e8600]:
+                        - generic [ref=e8602]: 7:49 AM 01/20/2026
+                      - cell "-" [ref=e8603]:
+                        - generic [ref=e8605]: "-"
+                      - cell "-$0.39" [ref=e8606]:
+                        - generic [ref=e8607]: "-$0.39"
+                      - cell "-2.3868%" [ref=e8608]:
+                        - generic [ref=e8609]: "-2.3868%"
+                      - cell "-$0.44" [ref=e8610]:
+                        - generic [ref=e8611]: "-$0.44"
+                      - cell "-2.6928%" [ref=e8612]:
+                        - generic [ref=e8613]: "-2.6928%"
+                      - cell [ref=e8614]:
+                        - figure [ref=e8617]:
+                          - generic [ref=e8618]:
+                            - generic [ref=e8619]:
+                              - generic [ref=e8620]: Day Range lowest value
+                              - text: $15.34
+                            - generic [ref=e8621]:
+                              - generic [ref=e8622]: Day Range highest value
+                              - text: $17.00
+                            - generic [ref=e8623]: Day Range current value $15.95
+                          - slider: "15.95"
+                      - cell [ref=e8624]:
+                        - figure [ref=e8627]:
+                          - generic [ref=e8628]:
+                            - generic [ref=e8629]:
+                              - generic [ref=e8630]: 52 Week Range lowest value
+                              - text: $3.85
+                            - generic [ref=e8631]:
+                              - generic [ref=e8632]: 52 Week Range highest value
+                              - text: $20.34
+                            - generic [ref=e8633]: 52 Week Range current value $15.95
+                          - slider: "15.95"
+                      - cell "View next steps for URANIUM ENERGY CORP order number 1005168692560" [ref=e8634]:
+                        - button "View next steps for URANIUM ENERGY CORP order number 1005168692560" [ref=e8636]:
+                          - generic [ref=e8637]: 
+                    - row "Expand row LRCX order number 1005155390367 View quote details for LAM RESH CORP LAM RESH CORP Filled Buy 5 Market Day $223.41 $234.50 $235.12 $236.49 $235.25 9:33 AM 01/16/2026 9:33 AM 01/16/2026 - +$8.64 +3.8127% +$8.51 +3.7554% View next steps for LAM RESH CORP order number 1005155390367" [ref=e8638]:
+                      - cell "Expand row LRCX order number 1005155390367" [ref=e8639]:
+                        - button "Expand row LRCX order number 1005155390367" [ref=e8643]
+                      - cell "View quote details for LAM RESH CORP LAM RESH CORP" [ref=e8647]:
+                        - generic [ref=e8648]:
+                          - link "View quote details for LAM RESH CORP" [ref=e8651] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=LRCX
+                            - text: LRCX
+                          - generic "LAM RESH CORP" [ref=e8652]
+                      - cell "Filled" [ref=e8653]:
+                        - generic [ref=e8656]: Filled
+                      - cell "Buy" [ref=e8657]:
+                        - generic [ref=e8659]: Buy
+                      - cell "5" [ref=e8660]:
+                        - generic [ref=e8663]: "5"
+                      - cell "Market" [ref=e8664]:
+                        - generic [ref=e8665]: Market
+                      - cell "Day" [ref=e8666]:
+                        - generic [ref=e8667]: Day
+                      - cell "$223.41" [ref=e8668]:
+                        - generic [ref=e8670]: $223.41
+                      - cell "$234.50" [ref=e8671]:
+                        - generic [ref=e8672]: $234.50
+                      - cell "$235.12" [ref=e8673]:
+                        - generic [ref=e8674]: $235.12
+                      - cell "$236.49" [ref=e8675]:
+                        - generic [ref=e8676]: $236.49
+                      - cell "$235.25" [ref=e8677]:
+                        - generic [ref=e8678]: $235.25
+                      - cell "9:33 AM 01/16/2026" [ref=e8679]:
+                        - generic [ref=e8681]: 9:33 AM 01/16/2026
+                      - cell "9:33 AM 01/16/2026" [ref=e8682]:
+                        - generic [ref=e8684]: 9:33 AM 01/16/2026
+                      - cell "-" [ref=e8685]:
+                        - generic [ref=e8687]: "-"
+                      - cell "+$8.64" [ref=e8688]:
+                        - generic [ref=e8689]: +$8.64
+                      - cell "+3.8127%" [ref=e8690]:
+                        - generic [ref=e8691]: +3.8127%
+                      - cell "+$8.51" [ref=e8692]:
+                        - generic [ref=e8693]: +$8.51
+                      - cell "+3.7554%" [ref=e8694]:
+                        - generic [ref=e8695]: +3.7554%
+                      - cell [ref=e8696]:
+                        - figure [ref=e8699]:
+                          - generic [ref=e8700]:
+                            - generic [ref=e8701]:
+                              - generic [ref=e8702]: Day Range lowest value
+                              - text: $230.04
+                            - generic [ref=e8703]:
+                              - generic [ref=e8704]: Day Range highest value
+                              - text: $240.34
+                            - generic [ref=e8705]: Day Range current value $235.25
+                          - slider: "235.25"
+                      - cell [ref=e8706]:
+                        - figure [ref=e8709]:
+                          - generic [ref=e8710]:
+                            - generic [ref=e8711]:
+                              - generic [ref=e8712]: 52 Week Range lowest value
+                              - text: $56.32
+                            - generic [ref=e8713]:
+                              - generic [ref=e8714]: 52 Week Range highest value
+                              - text: $251.87
+                            - generic [ref=e8715]: 52 Week Range current value $235.25
+                          - slider: "235.25"
+                      - cell "View next steps for LAM RESH CORP order number 1005155390367" [ref=e8716]:
+                        - button "View next steps for LAM RESH CORP order number 1005155390367" [ref=e8718]:
+                          - generic [ref=e8719]: 
+                    - row "Expand row UCTT order number 1005155390212 View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN Filled Buy 22 Market Day $43.97 $53.02 $55.93 $57.00 $56.3831 9:32 AM 01/16/2026 9:32 AM 01/16/2026 - +$2.0531 +3.7789% +$1.60 +2.9450% View next steps for ULTRA CLEAN HLDGS IN order number 1005155390212" [ref=e8720]:
+                      - cell "Expand row UCTT order number 1005155390212" [ref=e8721]:
+                        - button "Expand row UCTT order number 1005155390212" [ref=e8725]
+                      - cell "View quote details for ULTRA CLEAN HLDGS IN ULTRA CLEAN HLDGS IN" [ref=e8729]:
+                        - generic [ref=e8730]:
+                          - link "View quote details for ULTRA CLEAN HLDGS IN" [ref=e8733] [cursor=pointer]:
+                            - /url: /SymbolRouting.aspx?symbol=UCTT
+                            - text: UCTT
+                          - generic "ULTRA CLEAN HLDGS IN" [ref=e8734]
+                      - cell "Filled" [ref=e8735]:
+                        - generic [ref=e8738]: Filled
+                      - cell "Buy" [ref=e8739]:
+                        - generic [ref=e8741]: Buy
+                      - cell "22" [ref=e8742]:
+                        - generic [ref=e8745]: "22"
+                      - cell "Market" [ref=e8746]:
+                        - generic [ref=e8747]: Market
+                      - cell "Day" [ref=e8748]:
+                        - generic [ref=e8749]: Day
+                      - cell "$43.97" [ref=e8750]:
+                        - generic [ref=e8752]: $43.97
+                      - cell "$53.02" [ref=e8753]:
+                        - generic [ref=e8754]: $53.02
+                      - cell "$55.93" [ref=e8755]:
+                        - generic [ref=e8756]: $55.93
+                      - cell "$57.00" [ref=e8757]:
+                        - generic [ref=e8758]: $57.00
+                      - cell "$56.3831" [ref=e8759]:
+                        - generic [ref=e8760]: $56.3831
+                      - cell "9:32 AM 01/16/2026" [ref=e8761]:
+                        - generic [ref=e8763]: 9:32 AM 01/16/2026
+                      - cell "9:32 AM 01/16/2026" [ref=e8764]:
+                        - generic [ref=e8766]: 9:32 AM 01/16/2026
+                      - cell "-" [ref=e8767]:
+                        - generic [ref=e8769]: "-"
+                      - cell "+$2.0531" [ref=e8770]:
+                        - generic [ref=e8771]: +$2.0531
+                      - cell "+3.7789%" [ref=e8772]:
+                        - generic [ref=e8773]: +3.7789%
+                      - cell "+$1.60" [ref=e8774]:
+                        - generic [ref=e8775]: +$1.60
+                      - cell "+2.9450%" [ref=e8776]:
+                        - generic [ref=e8777]: +2.9450%
+                      - cell [ref=e8778]:
+                        - figure [ref=e8781]:
+                          - generic [ref=e8782]:
+                            - generic [ref=e8783]:
+                              - generic [ref=e8784]: Day Range lowest value
+                              - text: $53.795
+                            - generic [ref=e8785]:
+                              - generic [ref=e8786]: Day Range highest value
+                              - text: $57.30
+                            - generic [ref=e8787]: Day Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell [ref=e8788]:
+                        - figure [ref=e8791]:
+                          - generic [ref=e8792]:
+                            - generic [ref=e8793]:
+                              - generic [ref=e8794]: 52 Week Range lowest value
+                              - text: $16.655
+                            - generic [ref=e8795]:
+                              - generic [ref=e8796]: 52 Week Range highest value
+                              - text: $58.70
+                            - generic [ref=e8797]: 52 Week Range current value $56.3831
+                          - slider: "56.3831"
+                      - cell "View next steps for ULTRA CLEAN HLDGS IN order number 1005155390212" [ref=e8798]:
+                        - button "View next steps for ULTRA CLEAN HLDGS IN order number 1005155390212" [ref=e8800]:
+                          - generic [ref=e8801]: 
+                - navigation "Select a page" [ref=e8803]:
+                  - list [ref=e8804]:
+                    - listitem [ref=e8805]:
+                      - link "Page 1 selected" [ref=e8806] [cursor=pointer]:
+                        - /url: javascript:void(0);
+                        - text: "1"
+                    - listitem [ref=e8807]:
+                      - link "Go to page 2" [ref=e8808] [cursor=pointer]:
+                        - /url: javascript:void(0);
+                        - text: "2"
+                    - listitem [ref=e8809]:
+                      - link "Go to next page" [ref=e8810] [cursor=pointer]:
+                        - /url: javascript:void(0);
+                        - text: Next
+              - list [ref=e8813]:
+                - listitem [ref=e8814]:
+                  - heading "Disclosures toggle" [level=2] [ref=e8815]:
+                    - button "Disclosures toggle" [ref=e8816]:
+                      - generic [ref=e8817]:
+                        - generic [ref=e8819]: Disclosures
+                        - generic [ref=e8821]: toggle
+                  - region "Disclosures":
+                    - generic [ref=e8825]:
+                      - paragraph [ref=e8827]: "Brokerage Products: Not FDIC Insured • No Bank Guarantee • May Lose Value"
+                      - generic [ref=e8830]:
+                        - paragraph [ref=e8832]: a. For orders filled in multiple lots at different prices, the Fill Price column displays the average fill price rounded to 4 decimal places. For Open Partial Fill orders, the average displayed in Fill Price may change if additional lots fill. Expand the order to see all lots and each lot price.
+                        - paragraph [ref=e8834]: This account includes EXTO orders. Orders filled during overnight maintenance periods may not be reflected immediately on balances, positions, or history.
+                        - generic [ref=e8835]:
+                          - paragraph [ref=e8837]:
+                            - text: It is your responsibility to select the proper cost basis method appropriate to your tax situation. Identification of stock for sale, transfer, delivery or distribution must be made by settlement date. View
+                            - link "Cost Basis Disclosure Statement" [ref=e8838] [cursor=pointer]:
+                              - /url: https://www.schwab.com/resource/cost-basis-disclosure-statement
+                            - text: for additional information on cost basis method choices and how Schwab reports adjusted-cost basis information to the IRS.
+                          - paragraph [ref=e8840]: This general information is not intended to be a substitute for specific individualized tax, legal, or investment planning advice and is not intended to be construed as tax advice. This information cannot be used for the purpose of avoiding penalties that may be imposed under the Internal Revenue Code or applicable state or local tax law provisions. Where specific advice is necessary or appropriate, Schwab recommends consulting with a qualified tax professional, CPA, financial planner, or investment manager.
+                          - paragraph [ref=e8842]: Note that your intraday Position Lot Details and Gain/Loss will be calculated using your default cost basis method and will be updated using your Specified Lot instructions the following business day.
+                        - generic [ref=e8843]:
+                          - paragraph [ref=e8845]: Equities market data is provided from multiple sources including but not limited to Cboe One, Nasdaq Basic/Last Sale, and the National Market System Plan.
+                          - paragraph [ref=e8847]: For Mutual Funds, the Net Asset Value (NAV) is a daily calculation occurring after market close. This process may take 2 to 4 hours before a final NAV is displayed to the public.
+                          - paragraph [ref=e8849]: Options data is provided by the Options Price Reporting Authority.
+                          - paragraph [ref=e8851]: Option quotes are delayed for non-paying professional users or clients of unknown status.
+                          - paragraph [ref=e8853]: Streaming quotes may update as frequently as once per second. Streaming may be disabled to maintain system performance.
+                          - paragraph [ref=e8855]: As your agreement for the receipt and use of market data provides, the securities markets/3rd party vendors (1) reserve all rights to the market data that they make available; (2) do not guarantee that data; and (3) shall not be liable for any loss due either to their negligence or to any cause beyond their reasonable control.
+                          - paragraph [ref=e8857]: Total orders displayed may be impacted by system limits. To see all filled orders, check your Transaction History.
+          - generic [ref=e158]: (0924-SS9E)
+      - contentinfo [ref=e162]:
+        - generic [ref=e163]:
+          - generic [ref=e165]: "Today's Date: 10:02 PM ET, 02/11/2026"
+          - img "Own your tomorrow ®" [ref=e167]
+        - generic [ref=e169]:
+          - generic [ref=e171]:
+            - text: Check the background of Charles Schwab or one of its investment professionals on
+            - link "FINRA's BrokerCheck" [ref=e172] [cursor=pointer]:
+              - /url: https://brokercheck.finra.org/
+              - text: FINRA's BrokerCheck
+            - text: .
+          - link "Back to Top" [ref=e177] [cursor=pointer]:
+            - /url: "#"
+            - text: Back to Top
+        - navigation "Footer site" [ref=e181]:
+          - list "Schwab.com links" [ref=e182]:
+            - listitem [ref=e183]:
+              - generic [ref=e184]: Accounts
+              - list "Accounts sub links" [ref=e185]:
+                - listitem [ref=e186]:
+                  - link "Summary" [ref=e187] [cursor=pointer]:
+                    - /url: /clientapps/accounts/summary/
+                - listitem [ref=e188]:
+                  - link "Balances" [ref=e189] [cursor=pointer]:
+                    - /url: /app/accounts/balances/
+                - listitem [ref=e190]:
+                  - link "Positions" [ref=e191] [cursor=pointer]:
+                    - /url: /app/accounts/positions/
+                - listitem [ref=e192]:
+                  - link "Realized Gain / Loss" [ref=e193] [cursor=pointer]:
+                    - /url: /app/accounts/RGL
+                - listitem [ref=e194]:
+                  - link "Investment Income" [ref=e195] [cursor=pointer]:
+                    - /url: /clientapps/accounts/summary/income
+                - listitem [ref=e196]:
+                  - link "Portfolio Performance" [ref=e197] [cursor=pointer]:
+                    - /url: /app/portfoliohealth/#/
+                - listitem [ref=e198]:
+                  - link "Securities Lending" [ref=e199] [cursor=pointer]:
+                    - /url: /Apps/Service/SLFP/
+                - listitem [ref=e200]:
+                  - link "Corporate Actions" [ref=e201] [cursor=pointer]:
+                    - /url: /Accounts/EReorg/eReOrgActiveAccountOffers.aspx
+                - listitem [ref=e202]:
+                  - link "Transaction History" [ref=e203] [cursor=pointer]:
+                    - /url: /app/accounts/history/
+                - listitem [ref=e204]:
+                  - link "Statements & Tax Forms" [ref=e205] [cursor=pointer]:
+                    - /url: /app/accounts/statements/
+                - listitem [ref=e206]:
+                  - link "Open An Account" [ref=e207] [cursor=pointer]:
+                    - /url: /secured/client-account/open-an-account
+                - listitem [ref=e208]:
+                  - link "Relationship Summary" [ref=e209] [cursor=pointer]:
+                    - /url: /secured/transparency
+            - listitem [ref=e210]:
+              - generic [ref=e211]: Trade
+              - list "Trade sub links" [ref=e212]:
+                - listitem [ref=e213]:
+                  - link "All-In-One Trade Ticket" [ref=e214] [cursor=pointer]:
+                    - /url: /app/trade/tom/trade
+                - listitem [ref=e215]:
+                  - link "Stocks & ETFs" [ref=e216] [cursor=pointer]:
+                    - /url: /app/trade/tom?Strategy=S
+                - listitem [ref=e217]:
+                  - link "Options" [ref=e218] [cursor=pointer]:
+                    - /url: /app/trade/tom?Strategy=O
+                - listitem [ref=e219]:
+                  - link "Mutual Funds" [ref=e220] [cursor=pointer]:
+                    - /url: /app/trade/tom?Strategy=MF
+                - listitem [ref=e221]:
+                  - link "Schwab Stock Slices™" [ref=e222] [cursor=pointer]:
+                    - /url: /app/trade/stockslices/#/home
+                - listitem [ref=e223]:
+                  - link "Schwab Investing Themes™" [ref=e224] [cursor=pointer]:
+                    - /url: /app/trade/thematic
+                - listitem [ref=e225]:
+                  - link "Order Status" [ref=e226] [cursor=pointer]:
+                    - /url: /app/trade/orderstatus
+                - listitem [ref=e227]:
+                  - link "Bonds" [ref=e228] [cursor=pointer]:
+                    - /url: /Areas/Trade/FixedIncomeSearch/FISearch.aspx/TradeBondsProductRates
+                - listitem [ref=e229]:
+                  - link "CDs" [ref=e230] [cursor=pointer]:
+                    - /url: /Areas/Trade/FixedIncomeSearch/FISearch.aspx/TradeCDs
+                - listitem [ref=e231]:
+                  - link "Futures" [ref=e232] [cursor=pointer]:
+                    - /url: /retail/trade/futures
+                - listitem [ref=e233]:
+                  - link "Forex" [ref=e234] [cursor=pointer]:
+                    - /url: /retail/trade/forex
+                - listitem [ref=e235]:
+                  - link "IPOs" [ref=e236] [cursor=pointer]:
+                    - /url: /retail/trade/ipo
+                - listitem [ref=e237]:
+                  - link "Trading Platforms" [ref=e238] [cursor=pointer]:
+                    - /url: /retail/trade/tradingtools
+                - listitem [ref=e239]:
+                  - link "Watchlist" [ref=e240] [cursor=pointer]:
+                    - /url: /app/trade/watchlist
+            - listitem [ref=e241]:
+              - generic [ref=e242]: Research
+              - list "Research sub links" [ref=e243]:
+                - listitem [ref=e244]:
+                  - link "U.S. Markets" [ref=e245] [cursor=pointer]:
+                    - /url: /app/research/#/markets
+                - listitem [ref=e246]:
+                  - link "International Markets" [ref=e247] [cursor=pointer]:
+                    - /url: /secure/cc/research/international_markets/markets.html?path=/research/Client/Markets/International/Overview
+                - listitem [ref=e248]:
+                  - link "Research Tools" [ref=e249] [cursor=pointer]:
+                    - /url: /app/research/#/tools/stocks
+                - listitem [ref=e250]:
+                  - link "Watchlist" [ref=e251] [cursor=pointer]:
+                    - /url: /app/trade/watchlist/
+            - listitem [ref=e252]:
+              - generic [ref=e253]: Move Money
+              - list "Move Money sub links" [ref=e254]:
+                - listitem [ref=e255]:
+                  - link "Transfers & Payments" [ref=e256] [cursor=pointer]:
+                    - /url: /app/accounts/transfers_and_payments_overview/
+                - listitem [ref=e257]:
+                  - link "Recent Transfer Activity" [ref=e258] [cursor=pointer]:
+                    - /url: /app/accounts/transfer-activity
+                - listitem [ref=e259]:
+                  - link "Online Transfer" [ref=e260] [cursor=pointer]:
+                    - /url: /app/accounts/transfers
+                - listitem [ref=e261]:
+                  - link "External Accounts" [ref=e262] [cursor=pointer]:
+                    - /url: /app/accounts/externalaccounts/
+                - listitem [ref=e263]:
+                  - link "Send Wire" [ref=e264] [cursor=pointer]:
+                    - /url: /app/accounts/wire-transfers
+                - listitem [ref=e265]:
+                  - link "Pay Bills" [ref=e266] [cursor=pointer]:
+                    - /url: /app/accounts/billpay/#/billpay
+                - listitem [ref=e267]:
+                  - link "Request Check" [ref=e268] [cursor=pointer]:
+                    - /url: /app/accounts/check-disbursement
+                - listitem [ref=e269]:
+                  - link "Transfer Account" [ref=e270] [cursor=pointer]:
+                    - /url: /app/transferofaccounts/#/transferofaccounts/getting-started
+                - listitem [ref=e271]:
+                  - link "Routing Numbers & Direct Deposit" [ref=e272] [cursor=pointer]:
+                    - /url: /app/routing-numbers
+            - listitem [ref=e273]:
+              - generic [ref=e274]: Products
+              - list "Products sub links" [ref=e275]:
+                - listitem [ref=e276]:
+                  - link "Ways to Invest" [ref=e277] [cursor=pointer]:
+                    - /url: /secured/invest-with-us
+                - listitem [ref=e278]:
+                  - link "Account Types" [ref=e279] [cursor=pointer]:
+                    - /url: /secured/investment-account-goals
+                - listitem [ref=e280]:
+                  - link "Retirement & IRAs" [ref=e281] [cursor=pointer]:
+                    - /url: /secured/ira
+                - listitem [ref=e282]:
+                  - link "Banking & Borrowing" [ref=e283] [cursor=pointer]:
+                    - /url: /secured/bank
+                - listitem [ref=e284]:
+                  - link "Trading" [ref=e285] [cursor=pointer]:
+                    - /url: /secured/trading
+                - listitem [ref=e286]:
+                  - link "Investment Products" [ref=e287] [cursor=pointer]:
+                    - /url: /secured/investment
+                - listitem [ref=e288]:
+                  - link "Advice Solutions" [ref=e289] [cursor=pointer]:
+                    - /url: /secured/invest-with-us/wealth-management-services
+                - listitem [ref=e290]:
+                  - link "Financial Planning" [ref=e291] [cursor=pointer]:
+                    - /url: /app/accounts/financialplanning/#/home
+                - listitem [ref=e292]:
+                  - link "Work With a Consultant" [ref=e293] [cursor=pointer]:
+                    - /url: /secured/invest-with-us/professional-advice
+                - listitem [ref=e294]:
+                  - link "Featured Offerings" [ref=e295] [cursor=pointer]:
+                    - /url: /secured/featured-products
+                - listitem [ref=e296]:
+                  - link "Commissions & Fees" [ref=e297] [cursor=pointer]:
+                    - /url: /secured/pricing
+                - listitem [ref=e298]:
+                  - link "Investing & Planning Tools" [ref=e299] [cursor=pointer]:
+                    - /url: /secured/tools-overview
+            - listitem [ref=e300]:
+              - generic [ref=e301]: Learn
+              - list "Learn sub links" [ref=e302]:
+                - listitem [ref=e303]:
+                  - link "Insights & Education" [ref=e304] [cursor=pointer]:
+                    - /url: /app/learn/#/home-client
+                - listitem [ref=e305]:
+                  - link "Market Commentary" [ref=e306] [cursor=pointer]:
+                    - /url: /app/learn/#/market-commentary
+                - listitem [ref=e307]:
+                  - link "Trading" [ref=e308] [cursor=pointer]:
+                    - /url: /app/learn/#/trading
+                - listitem [ref=e309]:
+                  - link "thinkorswim Demos" [ref=e310] [cursor=pointer]:
+                    - /url: /app/learn/#/thinkorswim-demos
+                - listitem [ref=e311]:
+                  - link "Planning & Retirement" [ref=e312] [cursor=pointer]:
+                    - /url: /app/learn/#/planning
+                - listitem [ref=e313]:
+                  - link "Equity Compensation" [ref=e314] [cursor=pointer]:
+                    - /url: /app/learn/#/equity-compensation
+                - listitem [ref=e315]:
+                  - link "Tax Center" [ref=e316] [cursor=pointer]:
+                    - /url: /secured/taxes
+                - listitem [ref=e317]:
+                  - link "Investing Principles" [ref=e318] [cursor=pointer]:
+                    - /url: /secured/investing-principles
+                - listitem [ref=e319]:
+                  - link "Courses" [ref=e320] [cursor=pointer]:
+                    - /url: /app/learn/#/courses
+                - listitem [ref=e321]:
+                  - link "Schwab Coaching™" [ref=e322] [cursor=pointer]:
+                    - /url: /secured/coaching
+                - listitem [ref=e323]:
+                  - link "Onward Magazine" [ref=e324] [cursor=pointer]:
+                    - /url: /app/learn/#/onward
+                - listitem [ref=e325]:
+                  - link "Podcasts" [ref=e326] [cursor=pointer]:
+                    - /url: /app/learn/#/podcasts
+                - listitem [ref=e327]:
+                  - link "Schwab Network" [ref=e328] [cursor=pointer]:
+                    - /url: /secured/schwab-network
+                - listitem [ref=e329]:
+                  - link "New Client Welcome Center" [ref=e330] [cursor=pointer]:
+                    - /url: /secured/new-client-welcome-center
+        - region "Disclaimers, Disclosures and Footnotes" [ref=e332]:
+          - generic [ref=e333]: "Investment and Insurance Products Are: Not FDIC Insured • Not Insured by Any Federal Government Agency • Not a Deposit or Other Obligation of, or Guaranteed by, the Bank or any of its Affiliates • Subject to Investment Risks, Including Possible Loss of Principal Amount Invested"
+          - generic [ref=e334]:
+            - paragraph [ref=e335]:
+              - text: The Charles Schwab Corporation provides a full range of brokerage, banking and financial advisory services through its operating subsidiaries. Its broker-dealer subsidiary, Charles Schwab & Co. Inc. (
+              - link "Member SIPC" [ref=e336] [cursor=pointer]:
+                - /url: http://www.sipc.org/
+                - text: Member SIPC
+              - text: ), and its affiliates offer investment services and products. Its banking subsidiary, Charles Schwab Bank, SSB (member FDIC and an Equal Housing Lender), provides deposit and lending services and products.
+              - text: This site is designed for U.S. residents. Non-U.S. residents are subject to country-specific restrictions. Learn more about our services for
+              - link "non-US Residents" [ref=e340] [cursor=pointer]:
+                - /url: https://international.schwab.com/
+                - text: non-US Residents
+              - text: ","
+              - link "Charles Schwab Hong Kong clients" [ref=e344] [cursor=pointer]:
+                - /url: https://www.schwab.com.hk/
+                - text: Charles Schwab Hong Kong clients
+              - text: ","
+              - link "Charles Schwab UK clients" [ref=e348] [cursor=pointer]:
+                - /url: https://www.schwab.co.uk/
+                - text: Charles Schwab UK clients
+              - text: .
+              - text: © 2026 Charles Schwab & Co., Inc. All rights reserved.
+              - link "Member SIPC" [ref=e352] [cursor=pointer]:
+                - /url: http://www.sipc.org/
+                - text: Member SIPC
+              - text: . Unauthorized access is prohibited. Usage will be monitored.
+            - list [ref=e356]:
+              - listitem [ref=e357]:
+                - link "Agreements" [ref=e358] [cursor=pointer]:
+                  - /url: /secured/agreements
+              - listitem [ref=e359]:
+                - link "Investment Professionals' Compensation" [ref=e360] [cursor=pointer]:
+                  - /url: javascript:void(0);
+                  - text: Investment Professionals' Compensation
+              - listitem [ref=e363]:
+                - link "Privacy" [ref=e364] [cursor=pointer]:
+                  - /url: javascript:void(0);
+                  - text: Privacy
+              - listitem [ref=e367]:
+                - link "SchwabSafe" [ref=e368] [cursor=pointer]:
+                  - /url: /secured/schwabsafe
+                  - text: SchwabSafe
+              - listitem [ref=e371]:
+                - link "SIPC®" [ref=e372] [cursor=pointer]:
+                  - /url: /secured/legal/account-protection
+              - listitem [ref=e373]:
+                - link "FDIC Insurance" [ref=e374] [cursor=pointer]:
+                  - /url: /secured/legal/fdic-insurance
+              - listitem [ref=e375]:
+                - link "Help" [ref=e376] [cursor=pointer]:
+                  - /url: /secured/help
+              - listitem [ref=e377]:
+                - link "Bank Client Complaint" [ref=e378] [cursor=pointer]:
+                  - /url: javascript:void(0);
+                  - text: Bank Client Complaint
+              - listitem [ref=e381]:
+                - link "Client Relationship Summaries" [ref=e382] [cursor=pointer]:
+                  - /url: /secured/transparency
+              - listitem [ref=e383]:
+                - link "Screen Share" [ref=e384] [cursor=pointer]:
+                  - /url: /#
+  - generic:
+    - region "quote bar":
+      - generic [ref=e385]:
+        - generic "Streaming quotes are on. To turn them off, use the profile button and select Streaming Quotes to open the settings page." [ref=e386]:
+          - generic [ref=e390]:
+            - generic [ref=e391]:
+              - generic [ref=e392]: quick quote
+              - combobox "quick quote" [ref=e394]
+            - status [ref=e396]
+        - button "Additional actions" [ref=e400]:
+          - generic [ref=e401]: Additional actions
+        - separator [ref=e408]
+        - generic [ref=e8858]:
+          - generic [ref=e8859]:
+            - link "Go to DJIA research" [ref=e8862] [cursor=pointer]:
+              - /url: /SymbolRouting.aspx?Symbol=$DJI&Location=QQIndices
+              - text: DJIA
+            - generic [ref=e8863]:
+              - text: 50,121.40
+              - generic [ref=e8864]:
+                - generic [ref=e8865]: "-66.74"
+                - generic [ref=e8866]: (-0.13%)
+          - generic [ref=e8867]:
+            - link "Go to NASDAQ research" [ref=e8870] [cursor=pointer]:
+              - /url: /SymbolRouting.aspx?Symbol=$COMPX&Location=QQIndices
+              - text: NASDAQ
+            - generic [ref=e8871]:
+              - text: 23,066.47
+              - generic [ref=e8872]:
+                - generic [ref=e8873]: "-36.01"
+                - generic [ref=e8874]: (-0.16%)
+          - generic [ref=e8875]:
+            - link "Go to S&P 500 research" [ref=e8878] [cursor=pointer]:
+              - /url: /SymbolRouting.aspx?Symbol=$SPX&Location=QQIndices
+              - text: S&P 500
+            - generic [ref=e8879]:
+              - text: 6,941.47
+              - generic [ref=e8880]:
+                - generic [ref=e8881]: "-0.34"
+                - generic [ref=e8882]: (-0.00%)
+          - generic [ref=e8883]:
+            - link "Go to Russell 2000 research" [ref=e8886] [cursor=pointer]:
+              - /url: /SymbolRouting.aspx?Symbol=$RUT&Location=QQIndices
+              - text: Russell 2000
+            - generic [ref=e8887]:
+              - text: 2,669.47
+              - generic [ref=e8888]:
+                - generic [ref=e8889]: "-10.30"
+                - generic [ref=e8890]: (-0.38%)
+          - generic [ref=e8891]:
+            - paragraph [ref=e8893]: Time (ET)
+            - time [ref=e8896]:
+              - generic [ref=e8897]: 4:32:12 PM
+              - text: 04:32:12 PM
+          - button "Refresh" [ref=e8902]:
+            - generic [ref=e8906]: Refresh

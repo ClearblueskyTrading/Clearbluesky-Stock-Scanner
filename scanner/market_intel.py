@@ -269,6 +269,60 @@ def _fetch_overnight_markets(config: Optional[dict] = None):
 
 
 # ---------------------------------------------------------------------------
+# Market pulse – SPY/QQQ % from open, VIX vs 10d avg
+# ---------------------------------------------------------------------------
+
+def _fetch_market_pulse():
+    """
+    Fetch intraday pulse: SPY/QQQ % from today's open, VIX vs 10-day average.
+    Uses yfinance. Returns dict with spy_pct_from_open, qqq_pct_from_open, vix, vix_10d_avg, vix_vs_10d.
+    """
+    pulse = {
+        "spy_pct_from_open": None,
+        "qqq_pct_from_open": None,
+        "vix": None,
+        "vix_10d_avg": None,
+        "vix_vs_10d": None,
+    }
+    try:
+        import yfinance as yf
+        # SPY/QQQ: latest bar = today; (Close - Open) / Open
+        for sym, key in [("SPY", "spy_pct_from_open"), ("QQQ", "qqq_pct_from_open")]:
+            try:
+                d = yf.Ticker(sym)
+                h = d.history(period="5d", interval="1d")
+                if h is not None and len(h) >= 1 and "Open" in h.columns and "Close" in h.columns:
+                    row = h.iloc[-1]
+                    o, c = float(row["Open"]), float(row["Close"])
+                    if o and o != 0:
+                        pulse[key] = round((c - o) / o * 100, 2)
+            except Exception:
+                pass
+        # VIX: current vs 10-day average
+        try:
+            vix = yf.Ticker("^VIX")
+            h = vix.history(period="15d", interval="1d")
+            if h is not None and len(h) >= 1:
+                pulse["vix"] = round(float(h["Close"].iloc[-1]), 2)
+                if len(h) >= 5:
+                    avg = float(h["Close"].tail(10).mean())
+                    pulse["vix_10d_avg"] = round(avg, 2)
+                    curr = pulse["vix"]
+                    if curr and avg:
+                        if curr > avg * 1.05:
+                            pulse["vix_vs_10d"] = "above"
+                        elif curr < avg * 0.95:
+                            pulse["vix_vs_10d"] = "below"
+                        else:
+                            pulse["vix_vs_10d"] = "at"
+        except Exception:
+            pass
+    except Exception:
+        pass
+    return pulse
+
+
+# ---------------------------------------------------------------------------
 # Public API – gather everything
 # ---------------------------------------------------------------------------
 
@@ -297,6 +351,7 @@ def gather_market_intel(progress_callback=None, config: Optional[dict] = None):
         "sector_performance": [],
         "market_snapshot": [],
         "overnight_markets": [],
+        "market_pulse": {},
     }
 
     # Run fetches in controlled parallel — max 2 workers to be polite to Finviz + yfinance
@@ -306,17 +361,22 @@ def gather_market_intel(progress_callback=None, config: Optional[dict] = None):
         "sector_performance": _fetch_sector_performance,
         "market_snapshot": lambda: _fetch_market_snapshot(config=config),
         "overnight_markets": lambda: _fetch_overnight_markets(config=config),
+        "market_pulse": _fetch_market_pulse,
     }
     with ThreadPoolExecutor(max_workers=2) as pool:
         futures = {pool.submit(fn): key for key, fn in tasks.items()}
         for future in as_completed(futures):
             key = futures[future]
             try:
-                result[key] = future.result(timeout=60)
+                val = future.result(timeout=60)
+                result[key] = val if val is not None else ([] if key != "market_pulse" else {})
             except Exception:
-                result[key] = []
+                result[key] = [] if key != "market_pulse" else {}
             time.sleep(0.3)  # polite delay between completing tasks
 
+    # market_pulse returns dict, not list — handle non-list results
+    if not isinstance(result.get("market_pulse"), dict):
+        result["market_pulse"] = {}
     counts = (
         f"{len(result['google_news'])} headlines, "
         f"{len(result['finviz_news'])} Finviz articles, "
@@ -342,6 +402,21 @@ def format_intel_for_prompt(intel):
         "MARKET INTELLIGENCE (live data)",
         "═══════════════════════════════════════════════════",
     ]
+
+    # Market pulse (SPY/QQQ from open, VIX vs 10d)
+    pulse = intel.get("market_pulse") or {}
+    if any(pulse.get(k) is not None for k in ("spy_pct_from_open", "qqq_pct_from_open", "vix")):
+        lines.append("")
+        lines.append("MARKET PULSE (today's intraday context):")
+        if pulse.get("spy_pct_from_open") is not None:
+            lines.append(f"  SPY from open: {pulse['spy_pct_from_open']:+.2f}%")
+        if pulse.get("qqq_pct_from_open") is not None:
+            lines.append(f"  QQQ from open: {pulse['qqq_pct_from_open']:+.2f}%")
+        if pulse.get("vix") is not None:
+            vix_line = f"  VIX: {pulse['vix']}"
+            if pulse.get("vix_10d_avg") is not None and pulse.get("vix_vs_10d"):
+                vix_line += f" (10d avg {pulse['vix_10d_avg']}, {pulse['vix_vs_10d']} avg)"
+            lines.append(vix_line)
 
     # Market snapshot
     snap = intel.get("market_snapshot", [])
