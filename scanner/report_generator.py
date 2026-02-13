@@ -56,8 +56,7 @@ earnings flags, and price history below to produce a human-ready trading report.
 TARGET AUDIENCE: Experienced trader. Output must be direct, actionable, no fluff.
 Assume the reader knows basics; focus on setup quality, catalyst, invalidation, and execution.
 
-Context: Swing trading, 1-5 day holds (optimal 1-2 days). Universe is S&P 500
-stocks + leveraged bull ETFs. Cash account, ~$20K portfolio.
+Context: Primary strategy = 5-day sector rotation ($20K). Config: 1 pos = 100% top sector; 2 pos = 60/40 top two. Bear ETFs when sector negative. Secondary = swing/dip plays (1-5 day holds). Universe: S&P 500 + leveraged ETFs. Cash account.
 
 CRITICAL DATA TO USE:
 - **EARNINGS WARNINGS**: Tickers with "EARNINGS IN X DAYS" (1-3 days) → AVOID unless exceptional.
@@ -67,6 +66,7 @@ CRITICAL DATA TO USE:
 - **RELATIVE VOLUME**: 1.5x+ = unusual interest. Use with price action.
 - **RSI**: >75 = extended (wait for dip). <30 = oversold potential.
 - **Leveraged ETFs (SOXL, TQQQ, etc.)**: MAX 3-DAY HOLD due to decay.
+- **LEVERAGED PREFERENCE**: When a stock has a high score (90+) and the hold is short (1–3 days), prefer or suggest the leveraged ETF alternative when available: NVDA→NVDU, MU→MUU, AAPL→AAPU, MSFT→MSFU, sector plays→SOXL (semis), TQQQ (Nasdaq), etc. Same thesis, amplified. ⚠️ 3-DAY MAX for leveraged.
 
 REQUIRED OUTPUT FORMAT — Produce your response in this exact structure:
 
@@ -122,7 +122,7 @@ Overnight: [Asia, Europe impact on US open]. Trade implication: [1 line — e.g.
 ═══════════════════════════════════════════════════════════════════════════════
 
 • Order type: LIMIT preferred (avoid slippage on gaps); when to use market
-• Hard -5% stops on ALL positions
+• Stops: 1.7–2.7% (bear regime) or up to 3.2% (normal) — avoid round numbers
 • 50% profit rule: take half at T1 if gap up 3%+
 • Hold period: 5-day max, 3-day for leveraged
 • Entry window: [e.g. 9:45-10:15 AM best, or wait for dip]
@@ -161,8 +161,8 @@ shown strong N-day returns (e.g. 40%+ in 20 days). Do NOT give swing-trade advic
 
 TARGET AUDIENCE: Experienced trader. Output must be direct, actionable, no fluff.
 
-Context: MOMENTUM / TREND-FOLLOWING. Hold period: WEEKS TO MONTHS (aligns with scan: 5–50 days).
-This is NOT swing trading. No "1–5 day holds", no "wait for dip", no "5-day max".
+Context: Primary = 5-day sector rotation ($20K). 1 pos or 2 pos (60/40), bear ETFs when negative. Secondary = momentum holds (weeks to months).
+This momentum scan supports both: rotation deploy ticker(s) (from sector rankings) and individual stock momentum plays.
 
 STRATEGY: RIDE THE MOMENTUM. The trend is your friend.
 - Scale in now or on strength — do NOT default to "wait for pullback"
@@ -658,6 +658,12 @@ class ReportGenerator:
             out["price_history_30d"] = price_history
         if instructions not in (None, ""):
             out["instructions"] = instructions.strip()
+        # Sector rotation signal (5-day momentum, deploy ticker; uses ptm_rotation_positions/bear from config)
+        try:
+            from sector_rotation import get_rotation_signal_for_report
+            out["rotation_signal"] = get_rotation_signal_for_report(lookback_days=5, config=config)
+        except Exception:
+            out["rotation_signal"] = None
         return out
 
     def generate_combined_report_pdf(self, results, scan_type="Scan", min_score=60, progress_callback=None, watchlist_tickers=None, config=None, index=None):
@@ -956,11 +962,23 @@ class ReportGenerator:
             sma50_pct = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
             sma200_pct = market_breadth.get("sp500_above_sma200_pct") if market_breadth.get("sp500_above_sma200_pct") is not None else "N/A"
             breadth_line_prompt = f"\nMarket breadth (position sizing): {regime} | Above SMA50: {sma50_pct}% | Above SMA200: {sma200_pct}% | A/D: {market_breadth.get('advance_decline')} | Avg RSI: {market_breadth.get('avg_rsi_sp500')}\n"
+        rot_prompt = ""
+        try:
+            from sector_rotation import get_rotation_signal_for_report
+            rot = get_rotation_signal_for_report(lookback_days=5, config=config)
+            if rot and rot.get("top_ticker"):
+                if rot.get("n_positions") == 2 and rot.get("top_2_tickers"):
+                    t1, t2 = rot["top_2_tickers"][:2]
+                    rot_prompt = f"\nSECTOR ROTATION (5-day cycle, $20K, 2 pos): Deploy 60% into {t1[0]} ({t1[1]}, {t1[2]:+.2f}% 5d), 40% into {t2[0]} ({t2[1]}, {t2[2]:+.2f}% 5d). Bear ETFs when negative. Top sectors: {', '.join(f'{r[1]}(+{r[2]:.1f}%)' for r in rot.get('rankings', [])[:5])}.\n"
+                else:
+                    rot_prompt = f"\nSECTOR ROTATION (5-day cycle, $20K): Deploy 100% into {rot['top_ticker']} ({rot.get('top_sector')}, +{rot.get('top_return_5d', 0):.2f}% 5d). Top sectors: {', '.join(f'{r[1]}(+{r[2]:.1f}%)' for r in rot.get('rankings', [])[:5])}.\n"
+        except Exception:
+            pass
         # Momentum scans: use full momentum directive (no swing-trade language)
         is_momentum = "velocity" in scan_type.lower() or "velocity_trend" in scan_type.lower()
         directive_block = MOMENTUM_TREND_DIRECTIVE.strip() if is_momentum else MASTER_TRADING_REPORT_DIRECTIVE.strip()
 
-        ai_prompt = f"""SCAN: {scan_type}.{breadth_line_prompt}
+        ai_prompt = f"""SCAN: {scan_type}.{breadth_line_prompt}{rot_prompt}
 {market_intel_prompt}{smart_money_prompt}{insider_prompt}{price_history_prompt}
 
 STOCKS TO ANALYZE: {tickers_list}
@@ -977,10 +995,36 @@ Use the directive above. Produce output in: MARKET SNAPSHOT → TIER 1/2/3 picks
         body_lines = [
             "",
             "═══════════════════════════════════════════════════",
-            "STOCK DATA (from scanner)",
+            "SECTOR ROTATION (5-day cycle strategy)",
             "═══════════════════════════════════════════════════",
             ""
         ]
+        try:
+            from sector_rotation import get_rotation_signal_for_report
+            rot = get_rotation_signal_for_report(lookback_days=5, config=config)
+        except Exception:
+            rot = None
+        if rot and rot.get("top_ticker"):
+            if rot.get("n_positions") == 2 and rot.get("top_2_tickers"):
+                t1, t2 = rot["top_2_tickers"][:2]
+                body_lines.append(f"**Deploy 60% into: {t1[0]}** ({t1[1]}, {t1[2]:+.2f}% 5d) | **40% into: {t2[0]}** ({t2[1]}, {t2[2]:+.2f}% 5d)")
+                if rot.get("use_bear"):
+                    body_lines.append("*Bear ETFs (SQQQ, FAZ, ERY, etc.) when sector momentum negative.*")
+            else:
+                body_lines.append(f"**Deploy 100% into: {rot['top_ticker']}** ({rot.get('top_sector', 'N/A')}, +{rot.get('top_return_5d', 0):.2f}% 5d)")
+            body_lines.append("")
+            body_lines.append("Top 5 sectors (5d momentum):")
+            for r in rot.get("rankings", [])[:5]:
+                body_lines.append(f"  • {r[1]} ({r[0]}): +{r[2]:.2f}%")
+            body_lines.append("")
+            body_lines.append("*Strategy: 5-day cycle, $20K, liquidate → redeploy into new leader(s). Sell losers intra-cycle (-15%), replace with performers.*")
+            body_lines.append("")
+        body_lines.extend([
+            "═══════════════════════════════════════════════════",
+            "STOCK DATA (from scanner)",
+            "═══════════════════════════════════════════════════",
+            ""
+        ])
         if market_breadth and "error" not in market_breadth:
             regime = market_breadth.get("market_regime", "N/A")
             sma50 = market_breadth.get("sp500_above_sma50_pct") if market_breadth.get("sp500_above_sma50_pct") is not None else "N/A"
@@ -1207,6 +1251,8 @@ def build_markdown_report(analysis_package: dict, report_text: str, ai_response:
         front["price_history_30d"] = _to_yaml_safe(analysis_package["price_history_30d"])
     if analysis_package.get("backtest_stats"):
         front["backtest_stats"] = _to_yaml_safe(analysis_package["backtest_stats"])
+    if analysis_package.get("rotation_signal"):
+        front["rotation_signal"] = _to_yaml_safe(analysis_package["rotation_signal"])
 
     if yaml:
         fm = yaml.dump(front, default_flow_style=False, allow_unicode=True, sort_keys=False)

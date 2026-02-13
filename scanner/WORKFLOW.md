@@ -14,7 +14,7 @@ When you run a scan and have API keys set, this is the flow:
 
 3. **AI analysis** (only if `openrouter_api_key` is set):
    - **System prompt**: Base analyst instructions.
-   - **RAG**: If `rag_enabled` and `rag_books_folder` are set, relevant book chunks (from ChromaDB index of .txt/.pdf) are appended to the system prompt.
+   - **RAG**: If `rag_enabled` and `rag_books_folder` are set, relevant AI Knowledge chunks (from ChromaDB index of .txt, .pdf, .md, etc.) are appended to the system prompt.
    - **User content**: The JSON analysis package is sent to OpenRouter.
    - **Chart data**: 30-day price history and recent daily OHLC are included in the JSON (no chart images).
    - **OpenRouter**: 3-model consensus (Llama, OpenAI, DeepSeek). Response is included in the `.md` file and opened.
@@ -29,7 +29,7 @@ When you run a scan and have API keys set, this is the flow:
 | `alpha_vantage_api_key` | Enables sentiment + headlines per ticker in report/JSON. |
 | `include_ta_in_report` | Include TA (SMAs, RSI, MACD, etc.) in report and JSON. |
 | `use_sec_insider_context` | Add 10b5-1 vs discretionary context for tickers with insider data. |
-| `rag_books_folder` + `rag_enabled` | Include RAG book excerpts in AI system prompt (.txt and .pdf). |
+| `rag_books_folder` + `rag_enabled` | Include RAG AI Knowledge excerpts in AI system prompt (.txt, .pdf, .md, .docx, etc.). |
 | `use_vision_charts` | Legacy; chart data is now in JSON only (no images sent). |
 
 **RAG books**: Place `.txt` and/or `.pdf` files in the books folder, then click **Build RAG index** in Settings. With **Include RAG excerpts in AI analysis** checked, relevant chunks are added to the AI system prompt for each scan.

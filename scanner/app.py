@@ -1716,22 +1716,22 @@ class TradeBotApp:
                 self.status.config(text="Backtest update failed")
         tk.Button(bt_f, text="Update backtest outcomes now", command=run_backtest_update, width=28).pack(anchor="w", pady=(2, 4))
 
-        # --- RAG book knowledge ---
+        # --- RAG AI Knowledge ---
         sep_rag = tk.Frame(scroll_frame, bg="#ddd", height=1)
         sep_rag.pack(fill="x", padx=20, pady=8)
-        tk.Label(scroll_frame, text="RAG book knowledge", font=("Arial", 10, "bold"),
+        tk.Label(scroll_frame, text="RAG AI Knowledge", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="Folder of .txt and .pdf trading books. Build index (ChromaDB), then include excerpts in AI analysis.",
+        tk.Label(scroll_frame, text="Folder for documents (.txt, .pdf, .md, .docx, .html, etc.). Build index (ChromaDB), then include excerpts in AI analysis.",
                 font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         rag_f = tk.Frame(scroll_frame, bg="white", padx=20)
         rag_f.pack(fill="x")
         rag_folder_var = tk.StringVar(value=self.config.get("rag_books_folder", "") or "")
-        tk.Label(rag_f, text="Books folder (.txt, .pdf):", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
+        tk.Label(rag_f, text="AI Knowledge folder:", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w")
         rag_row = tk.Frame(rag_f, bg="white")
         rag_row.pack(fill="x", pady=(2, 4))
         tk.Entry(rag_row, textvariable=rag_folder_var, width=36).pack(side="left")
         def browse_rag():
-            path = filedialog.askdirectory(title="Select folder of .txt / .pdf trading books", initialdir=rag_folder_var.get() or APP_DIR)
+            path = filedialog.askdirectory(title="Select AI Knowledge folder", initialdir=rag_folder_var.get() or APP_DIR)
             if path:
                 rag_folder_var.set(path)
         tk.Button(rag_row, text="Browse...", command=browse_rag, width=8).pack(side="left", padx=(6, 0))
@@ -1741,8 +1741,8 @@ class TradeBotApp:
             folder = rag_folder_var.get().strip()
             rag_status_lbl.config(text="")
             if not folder:
-                rag_status_lbl.config(text="Select a books folder first.")
-                messagebox.showwarning("RAG", "Select a books folder first.")
+                rag_status_lbl.config(text="Select an AI Knowledge folder first.")
+                messagebox.showwarning("RAG", "Select an AI Knowledge folder first.")
                 return
             try:
                 from rag_engine import build_index
@@ -1756,12 +1756,12 @@ class TradeBotApp:
                     self.status.config(text=m)
                     win.update()
                 n = build_index(folder, progress_callback=on_progress)
-                rag_status_lbl.config(text=f"Indexed {n} chunks." if n else (last_msg[0] or "No .txt or .pdf chunks found."))
+                rag_status_lbl.config(text=f"Indexed {n} chunks." if n else (last_msg[0] or "No document chunks found."))
                 self.status.config(text=f"RAG index: {n} chunks")
                 if n:
-                    messagebox.showinfo("RAG", f"RAG index built: {n} chunks from your books folder.")
+                    messagebox.showinfo("RAG", f"RAG index built: {n} chunks from your AI Knowledge folder.")
                 else:
-                    messagebox.showwarning("RAG", last_msg[0] or "No .txt or .pdf files found, or ChromaDB failed. Check the folder has .txt/.pdf files and that ChromaDB is installed (pip install chromadb PyMuPDF).")
+                    messagebox.showwarning("RAG", last_msg[0] or "No documents found, or ChromaDB failed. Check the folder has supported files (.txt, .pdf, .md, etc.) and that ChromaDB is installed (pip install chromadb PyMuPDF).")
             except Exception as e:
                 log_error(e, "RAG build")
                 err = str(e)

@@ -56,8 +56,8 @@ SCAN_PARAM_SPECS = {
     ],
     "swing": [
         {"key": "emotional_min_score", "label": "Min Score", "min": 50, "max": 90, "default": 65, "type": "int"},
-        {"key": "emotional_dip_min_percent", "label": "Min Dip %", "min": 0, "max": 5, "default": 1.0, "type": "float"},
-        {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 5.0, "type": "float"},
+        {"key": "emotional_dip_min_percent", "label": "Min Dip %", "min": 0, "max": 5, "default": 1.5, "type": "float"},
+        {"key": "emotional_dip_max_percent", "label": "Max Dip %", "min": 1, "max": 10, "default": 4.0, "type": "float"},
         {"key": "emotional_min_volume_ratio", "label": "Min Rel Vol", "min": 1.0, "max": 5.0, "default": 1.2, "type": "float"},
         {"key": "emotional_min_upside_to_target", "label": "Min Upside %", "min": 0, "max": 30, "default": 5.0, "type": "float"},
         {"key": "emotional_require_above_sma200", "label": "Above SMA200", "default": True, "type": "bool"},
@@ -211,7 +211,7 @@ def load_config():
         "use_market_intel": True,
         # SEC EDGAR insider context (10b5-1 plan vs discretionary)
         "use_sec_insider_context": False,
-        # RAG book knowledge (ChromaDB; folder of .txt trading books)
+        # RAG AI Knowledge (ChromaDB; folder of documents)
         "rag_books_folder": "",
         "rag_enabled": False,
 

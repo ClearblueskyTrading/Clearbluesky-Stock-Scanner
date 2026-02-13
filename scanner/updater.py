@@ -152,12 +152,13 @@ def rollback(progress_callback=None) -> Optional[str]:
         with tempfile.TemporaryDirectory() as tmp:
             with zipfile.ZipFile(backup_path, "r") as zf:
                 _safe_extractall(zf, tmp)
-            # Our backup: flat files in tmp. GitHub zip: one root folder, maybe with app/ subdir.
+            # Our backup: flat files in tmp. GitHub zip: one root folder, maybe with scanner/ subdir.
             entries = os.listdir(tmp)
             if len(entries) == 1 and os.path.isdir(os.path.join(tmp, entries[0])):
                 single = os.path.join(tmp, entries[0])
-                app_sub = os.path.join(single, "app")
-                src_root = app_sub if os.path.isdir(app_sub) else single
+                scanner_sub = os.path.join(single, "scanner")
+                app_sub = os.path.join(single, "app")  # legacy layout
+                src_root = scanner_sub if os.path.isdir(scanner_sub) else (app_sub if os.path.isdir(app_sub) else single)
             else:
                 src_root = tmp
             if progress_callback:
@@ -217,12 +218,13 @@ def apply_update(version_before: str, tag: Optional[str] = None, progress_callba
                 if bad is not None:
                     return f"Zip integrity check failed on: {bad} (corrupted download?)."
                 _safe_extractall(zf, tmp)
-            # GitHub zip has one root dir; repo has app/ subfolder
+            # GitHub zip has one root dir; repo has scanner/ subfolder (or legacy app/)
             entries = [e for e in os.listdir(tmp) if e != "update.zip"]
             if len(entries) == 1 and os.path.isdir(os.path.join(tmp, entries[0])):
                 single = os.path.join(tmp, entries[0])
+                scanner_sub = os.path.join(single, "scanner")
                 app_sub = os.path.join(single, "app")
-                src_root = app_sub if os.path.isdir(app_sub) else single
+                src_root = scanner_sub if os.path.isdir(scanner_sub) else (app_sub if os.path.isdir(app_sub) else single)
             else:
                 src_root = tmp
             # Stage update in a temporary copy first, then apply (atomic-ish)

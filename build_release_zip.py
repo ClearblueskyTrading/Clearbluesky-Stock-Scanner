@@ -4,7 +4,7 @@ Build a clean release zip for ClearBlueSky v7.0 (and future 7.1, 7.2).
 Uses git ls-files so zip = repo contents only (no Cursor project filesystem pollution).
 Excludes user data, Cursor/trading docs, etc.
 Run from repo root: python build_release_zip.py
-Output: ClearBlueSky-v7.0.zip (or version from app/app.py VERSION)
+Output: ClearBlueSky-v7.0.zip (or version from scanner/app.py VERSION)
 """
 
 import os
@@ -14,9 +14,9 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-APP = ROOT / "app"
+APP = ROOT / "scanner"
 
-# Exclude patterns (relative to root or app)
+# Exclude patterns (relative to root or scanner)
 EXCLUDE_DIRS = {
     "__pycache__",
     ".git",
@@ -56,6 +56,7 @@ EXCLUDE_FILES = {
     "MARKET_STRATEGY_DRAFT.md",
     "NON_DAYTRADE_STRATEGY.md",
     "mcp.json.example",
+    "ptm_rotation_state.json",  # Cursor PTM state — not for release
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [

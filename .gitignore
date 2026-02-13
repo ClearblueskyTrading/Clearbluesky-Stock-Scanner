@@ -11,32 +11,32 @@ ClearBlueSkyWin/
 /Trend_Scan_Report_*.pdf
 
 # User data – never commit (contains optional API keys and preferences)
-app/user_config.json
+scanner/user_config.json
 scripts/voice_choice.txt
 screenshots/
 
 # Generated / runtime
-app/error_log.txt
-app/__pycache__/
+scanner/error_log.txt
+scanner/__pycache__/
 **/__pycache__/
 *.pyc
 *.pyo
 
 # Reports and scan outputs (user-generated)
-app/reports/
-app/scans/
-app/scanner_output/
+scanner/reports/
+scanner/scans/
+scanner/scanner_output/
 
 # RAG index and backtest DB (user-generated; do not ship)
-app/rag_store/
-app/backtest_signals.db
+scanner/rag_store/
+scanner/backtest_signals.db
 
 # Updater backup and manifest (local; user-specific)
-app/update_backups/
-app/update_backup_manifest.json
+scanner/update_backups/
+scanner/update_backup_manifest.json
 
 # User preset exports (do not commit)
-app/scanner_presets_export.json
+scanner/scanner_presets_export.json
 
 # Security — NEVER commit files that may contain API keys
 CURSOR_RAG_KNOWLEDGE_ARCHITECTURE.md
@@ -51,15 +51,24 @@ mcp-servers/
 # Cursor IDE rules (project-local, not for distribution)
 .cursor/
 
+# PTM daemon logs (Cursor project only)
+scanner/ptm_logs/
+
+# PTM rotation state (position data — Cursor project only)
+scanner/ptm_rotation_state.json
+
 # Trading (Cursor project only — not scanner app)
-app/alpaca_trades.py
-app/paper_trading_manager.py
-app/alpaca_swing_dip_strategy.py
-app/PaperTradingManager.bat
+scanner/alpaca_trades.py
+scanner/paper_trading_manager.py
+scanner/alpaca_swing_dip_strategy.py
+scanner/PaperTradingManager.bat
 
 # OS
 .DS_Store
 Thumbs.db
+
+# RAG/vector DB (user-generated)
+velocity_memory/chroma_db/
 
 # IDE
 .idea/
