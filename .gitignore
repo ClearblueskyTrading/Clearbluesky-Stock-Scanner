@@ -54,7 +54,7 @@ mcp-servers/
 # PTM daemon logs (Cursor project only)
 scanner/ptm_logs/
 
-# PTM rotation state (position data — Cursor project only)
+# PTM rotation state (trading positions — do not commit)
 scanner/ptm_rotation_state.json
 
 # Trading (Cursor project only — not scanner app)
