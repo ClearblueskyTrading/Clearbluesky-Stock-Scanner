@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Build a clean release zip for ClearBlueSky v7.0 (and future 7.1, 7.2).
+Build a clean release zip for ClearBlueSky (v8.0).
 Uses git ls-files so zip = repo contents only (no Cursor project filesystem pollution).
-Excludes user data, Cursor/trading docs, etc.
+Excludes user data, API keys, Cursor/trading docs, personal info.
 Run from repo root: python build_release_zip.py
-Output: ClearBlueSky-v7.0.zip (or version from scanner/app.py VERSION)
+Output: ClearBlueSky-v8.0.zip (or version from scanner/app.py VERSION)
 """
 
 import os
@@ -29,6 +29,8 @@ EXCLUDE_DIRS = {
     "ClearBlueSkyWin",
     "backup-v6.4",
     "scripts",  # Cursor agent tooling — scanner-only on GitHub
+    "agent-tools",  # Cursor agent — not scanner
+    "velocity_memory",  # RAG store — may contain user data
 }
 EXCLUDE_FILES = {
     "user_config.json",      # user API keys, preferences
@@ -57,6 +59,8 @@ EXCLUDE_FILES = {
     "NON_DAYTRADE_STRATEGY.md",
     "mcp.json.example",
     "ptm_rotation_state.json",  # Cursor PTM state — not for release
+    "credentials.json",
+    "secrets.json",
 }
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip")
 EXCLUDE_PATTERNS = [
@@ -64,6 +68,7 @@ EXCLUDE_PATTERNS = [
     re.compile(r".*_Scan_Report_.*\.pdf", re.I),
     re.compile(r"^_test_", re.I),
     re.compile(r"\.env\.", re.I),  # .env.local, .env.prod, etc.
+    re.compile(r"\.(key|pem)$", re.I),  # keys, certs
     re.compile(r"docs[/\\]docs[/\\]", re.I),  # nested docs/docs duplicate
     re.compile(r"docs[/\\]strategy[/\\]", re.I),  # trading strategy docs
     re.compile(r"docs[/\\]CURSOR_AGENT", re.I),  # Cursor agent spec
@@ -97,7 +102,7 @@ def get_version() -> str:
                         return m.group(1)
     except Exception:
         pass
-    return "7.0"
+    return "8.0"
 
 
 def main():
@@ -122,6 +127,11 @@ def main():
 
     if not files:
         raise SystemExit("No files from git ls-files. Run from repo root.")
+
+    # Include scanner files that exist on disk but may be untracked
+    for extra in ["scanner/finbert_scorer.py", "scanner/run_all_scans.py"]:
+        if extra not in files and (ROOT / extra.replace("/", os.sep)).is_file():
+            files.append(extra)
 
     # Remove old zip if present
     if out_path.exists():

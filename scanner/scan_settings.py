@@ -206,8 +206,9 @@ def load_config():
         # Google AI (Gemini) – free-tier models, adds to consensus when key set
         "google_ai_api_key": "",
         "google_ai_model": "gemini-2.5-flash",  # Free: gemini-2.0-flash, gemini-2.5-flash, gemini-2.5-pro, gemini-3-flash-preview
-        # Alpha Vantage (optional news sentiment; NEWS_SENTIMENT endpoint)
+        # Alpha Vantage (optional news sentiment; headlines fed to FinBERT)
         "alpha_vantage_api_key": "",
+        "sentiment_spike_threshold": 0.4,  # FinBERT 1h vs 4h/1d delta to flag spike
         # Alpaca (market data failover: price/bars when yfinance unavailable)
         "alpaca_api_key": "",
         "alpaca_secret_key": "",

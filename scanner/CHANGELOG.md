@@ -6,9 +6,23 @@ All notable changes to ClearBlueSky Stock Scanner are documented here.
 
 ## [Unreleased]
 
-### Removed
+## [8.0] – 2026-02-17
 
-- **Premarket scanner** — Pre-Market scan type, `premarket_volume_scanner.py`, and velocity premarket hunter have been removed. Scan types are now: Velocity Trend Growth, Swing – Dips, Watchlist. `velocity_scanner.py` is a stub exporting only `SCAN_UNIVERSE` for use by the emotional dip scanner.
+### Added
+
+- **Earnings window flags** — `earnings_flag` (pre/post/none), `earnings_days_to`, `earnings_time`, `earnings_status`, `earnings_source` — ±5 trading days approximation. Used in reports and AI context. Source: yfinance enrichment.
+- **FinBERT local sentiment** — New `finbert_scorer.py` using ProsusAI/finbert (Hugging Face). Runs locally; no API cost. Requires `transformers` and `torch` (in requirements.txt).
+- **Rolling sentiment** — 1h, 4h, 1d windows. Reports include `finbert_score_1h/4h/1d`, `finbert_count_1h/4h/1d`.
+- **Sentiment spike alerts** — Detects sudden sentiment shifts (1h vs 4h/1d). Reports: `finbert_spike`, `finbert_spike_reason`, `finbert_delta_vs_4h`, `finbert_delta_vs_1d`. Config: `sentiment_spike_threshold` (default 0.4).
+- **Alpha Vantage + FinBERT** — When `alpha_vantage_api_key` is set, uses Alpha Vantage headlines as input and applies local FinBERT scoring.
+- **Run All Scans** — `run_all_scans.py` runs velocity_trend_growth → swing → watchlist in sequence. GUI checkbox to run all three with one click.
+- **6-model AI consensus** — OpenRouter: DeepSeek, Arcee Trinity, Gemini Vision, Llama 3.3 70B, GPT-OSS 120B, StepFun Step 3.5. Optional Google AI adds a 7th model. Synthesis step produces final summary.
+
+### Changed
+
+- Report enrichment pipeline computes FinBERT rolling scores and sentiment spikes when Alpha Vantage key is set.
+- Settings: News/Sentiment section updated for Alpha Vantage + FinBERT. Added sentiment spike threshold field.
+- Version labels: app.py, README, INSTALL.bat, Help text updated to v8.0.
 
 ## [7.87] – 2026-02-11
 

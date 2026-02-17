@@ -1,9 +1,9 @@
 # ============================================================
-# ClearBlueSky Stock Scanner v7.90
+# ClearBlueSky Stock Scanner v8.0
 # ============================================================
 
 import tkinter as tk
-VERSION = "7.90"
+VERSION = "8.0"
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import sys
@@ -1672,9 +1672,9 @@ class TradeBotApp:
         # --- News / Sentiment (Alpha Vantage) ---
         sep_av = tk.Frame(scroll_frame, bg="#ddd", height=1)
         sep_av.pack(fill="x", padx=20, pady=8)
-        tk.Label(scroll_frame, text="News / Sentiment (Alpha Vantage)", font=("Arial", 10, "bold"),
+        tk.Label(scroll_frame, text="News / Sentiment (Alpha Vantage + FinBERT)", font=("Arial", 10, "bold"),
                 bg="white", fg="#333").pack(anchor="w", padx=20)
-        tk.Label(scroll_frame, text="Optional. Add sentiment score and earnings-in-news flag per ticker (NEWS_SENTIMENT). Free tier: 25 requests/day.",
+        tk.Label(scroll_frame, text="Optional. Alpha Vantage headlines fed to local FinBERT for sentiment. Rolling 1h/4h/1d scores + spike alerts. Free tier: 25 requests/day.",
                 font=("Arial", 8), bg="white", fg="#666", wraplength=540, justify="left").pack(anchor="w", padx=20)
         av_f = tk.Frame(scroll_frame, bg="white", padx=20)
         av_f.pack(fill="x")
@@ -1686,6 +1686,9 @@ class TradeBotApp:
             av_entry.config(show="*" if av_var.get() else "")
         av_var.trace("w", av_mask)
         av_mask()
+        tk.Label(av_f, text="Sentiment spike threshold (0.0–1.0, default 0.4):", font=("Arial", 9), bg="white", fg="#666").pack(anchor="w", pady=(6, 0))
+        spike_var = tk.StringVar(value=str(self.config.get("sentiment_spike_threshold", 0.4)))
+        tk.Entry(av_f, textvariable=spike_var, width=8).pack(anchor="w", pady=(2, 4))
 
         # --- Alpaca (Data API) ---
         sep_alpaca = tk.Frame(scroll_frame, bg="#ddd", height=1)
@@ -1860,6 +1863,10 @@ class TradeBotApp:
             self.config['google_ai_api_key'] = google_api_var.get().strip()
             self.config['google_ai_model'] = (google_model_var.get() or "gemini-2.5-flash").strip()
             self.config['alpha_vantage_api_key'] = av_var.get().strip()
+            try:
+                self.config['sentiment_spike_threshold'] = float(spike_var.get().strip() or "0.4")
+            except (ValueError, TypeError):
+                self.config['sentiment_spike_threshold'] = 0.4
             self.config['alpaca_api_key'] = alpaca_key_var.get().strip()
             self.config['alpaca_secret_key'] = alpaca_secret_var.get().strip()
             self.config['use_market_intel'] = market_intel_var.get()
@@ -2181,13 +2188,13 @@ class TradeBotApp:
 
     def show_help(self):
         help_text = """
-ClearBlueSky Stock Scanner v7.90
+ClearBlueSky Stock Scanner v8.0
 
 QUICK START:
 1. Select scan type and Universe (S&P 500 or ETFs).
 2. Click Run Scan. You get: single .md report (YAML frontmatter + data + AI analysis).
 3. Optional: Check "Run all scans" (may take 15+ min; rate-limited).
-4. If OpenRouter API key is set (Settings): 3-model AI consensus is included in the .md file.
+4. If OpenRouter API key is set (Settings): 6-model AI consensus is included in the .md file.
 5. AI status shows: Connected (green), No key, or Invalid.
 
 OUTPUTS (per run):
@@ -2201,7 +2208,7 @@ SCANNERS (3 total):
 See app/WORKFLOW.md for full pipeline. Scores: 90–100 Elite | 70–89 Strong | 60–69 Decent | <60 Skip.
 ─────────────────────────────────
 AI Stock Research Tool
-ClearBlueSky v7.90
+ClearBlueSky v8.0
 ─────────────────────────────────
         """
         # Scrollable Help window (instead of messagebox which overflows on small screens)

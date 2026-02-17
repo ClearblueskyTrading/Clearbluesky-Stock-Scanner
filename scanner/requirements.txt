@@ -2,10 +2,14 @@ finviz>=0.14
 finvizfinance>=0.14
 pandas>=2.0,<3.0
 requests>=2.28
-pygame>=2.1
+# pygame build failed on this environment; skip unless needed
+# pygame>=2.1
 yfinance>=0.2.36
 pandas-ta>=0.3.14b0
 chromadb>=0.4,<1.0
 PyMuPDF>=1.23
 feedparser>=6.0
 PyYAML>=6.0
+# FinBERT (ProsusAI/finbert) for news sentiment — loaded via transformers
+transformers>=4.40
+torch>=2.1

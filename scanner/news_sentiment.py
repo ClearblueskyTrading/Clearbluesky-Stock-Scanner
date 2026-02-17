@@ -1,6 +1,9 @@
 """
-ClearBlueSky – News & sentiment (Alpha Vantage NEWS_SENTIMENT).
-Optional: score headline sentiment, flag earnings in topics.
+ClearBlueSky – News & sentiment.
+
+Sources:
+- Alpha Vantage NEWS_SENTIMENT (if API key provided)
+- Optional FinBERT local scoring (transformers) for headline sentiment
 """
 
 import time
@@ -86,3 +89,84 @@ def get_sentiment_for_ticker(ticker, api_key, limit=LIMIT_PER_TICKER):
     except Exception:
         pass
     return out
+
+
+# ---- FinBERT local scoring ----
+def get_finbert_sentiment(headlines):
+    """
+    Optional local sentiment using FinBERT.
+    Requires: pip install transformers torch
+    headlines: list of headline strings
+    Returns: dict with sentiment_score (-1..1), sentiment_label, per_item breakdown.
+    """
+    try:
+        from finbert_scorer import score_headlines
+    except Exception:
+        return {"sentiment_score": None, "sentiment_label": None, "per_item": []}
+    return score_headlines(headlines or [])
+
+
+def finbert_rolling_from_headlines(headlines_with_time, now_ts=None):
+    """
+    Compute FinBERT sentiment with rolling windows using headline timestamps.
+    headlines_with_time: list of dicts {title, time_published: YYYYMMDDHHMM...}
+    Returns dict with overall + 1h/4h/1d scores and counts.
+    """
+    from datetime import datetime, timedelta
+    try:
+        from finbert_scorer import score_headlines
+    except Exception:
+        return {
+            "finbert_score": None,
+            "finbert_label": None,
+            "finbert_score_1h": None,
+            "finbert_score_4h": None,
+            "finbert_score_1d": None,
+            "finbert_count_1h": 0,
+            "finbert_count_4h": 0,
+            "finbert_count_1d": 0,
+        }
+
+    now = now_ts or datetime.utcnow()
+
+    def parse_ts(ts_str):
+        if not ts_str:
+            return None
+        try:
+            return datetime.strptime(ts_str[:12], "%Y%m%d%H%M")
+        except Exception:
+            try:
+                return datetime.strptime(ts_str[:8], "%Y%m%d")
+            except Exception:
+                return None
+
+    # Overall
+    texts = [h.get("title") for h in headlines_with_time if h.get("title")]
+    overall = score_headlines(texts) if texts else {"sentiment_score": None, "sentiment_label": None}
+
+    def window_scores(hours):
+        cutoff = now - timedelta(hours=hours)
+        texts_w = []
+        for h in headlines_with_time:
+            ts = parse_ts(h.get("time_published"))
+            if ts and ts >= cutoff and h.get("title"):
+                texts_w.append(h["title"])
+        if not texts_w:
+            return None, 0
+        res = score_headlines(texts_w)
+        return res.get("sentiment_score"), len(texts_w)
+
+    s1, c1 = window_scores(1)
+    s4, c4 = window_scores(4)
+    s24, c24 = window_scores(24)
+
+    return {
+        "finbert_score": overall.get("sentiment_score"),
+        "finbert_label": overall.get("sentiment_label"),
+        "finbert_score_1h": s1,
+        "finbert_score_4h": s4,
+        "finbert_score_1d": s24,
+        "finbert_count_1h": c1,
+        "finbert_count_4h": c4,
+        "finbert_count_1d": c24,
+    }

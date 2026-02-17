@@ -67,7 +67,7 @@ CLI.bat --scan swing --index sp500 --reports-dir D:\reports
 - **.md** – Single Markdown file with:
   - **YAML frontmatter** – Structured data (stocks, market_breadth, market_intel, etc.)
   - **Report body** – Elite Swing Trader directive + per-ticker data
-  - **AI Analysis** – Consensus from 3 models (Llama, OpenAI, DeepSeek) when `openrouter_api_key` is set
+  - **AI Analysis** – Consensus from 6 models (OpenRouter) + optional Google when `openrouter_api_key` is set
 
 Chart data (30-day OHLC, recent daily bars) is included in the JSON for AI analysis; no image generation.
 
@@ -85,7 +85,7 @@ Chart data (30-day OHLC, recent daily bars) is included in the JSON for AI analy
 
 - **`user_config.json`** in the app folder (same as GUI).
 - Universe (`scan_index`): `sp500` or `etfs` – or override with `--index`.
-- OpenRouter API key enables 3-model AI analysis (free models only).
+- OpenRouter API key enables 6-model AI analysis (free models only).
 
 ---
 

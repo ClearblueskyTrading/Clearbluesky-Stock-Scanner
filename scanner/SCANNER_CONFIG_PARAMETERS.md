@@ -151,7 +151,7 @@ Config key used for report min score in `app.py`: `self.config.get(f'{scan_type.
 - `play_alarm_on_complete` – Play sound when scan finishes (default: true).
 - `alarm_sound_choice` – `"beep"` \| `"asterisk"` \| `"exclamation"` (system-style beeps).
 - `finviz_api_key` – Optional Finviz API key.
-- **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). 3 free models (Meta Llama 3.3 70B, OpenAI GPT-OSS 120B, DeepSeek R1T2 Chimera) run consensus analysis. Chart data (30-day OHLC, recent daily bars) in JSON; no chart images. No credits required. Selectable in Settings under “OpenRouter API (AI analysis)”.
+- **OpenRouter API (AI analysis):** `openrouter_api_key` – API key for OpenRouter (optional; used when sending analysis package to AI). 6 free models (DeepSeek, Arcee Trinity, Gemini Vision, Llama, GPT-OSS, StepFun) run consensus; optional Google adds 7th. Chart data (30-day OHLC, recent daily bars) in JSON; no chart images. No credits required. Selectable in Settings under “OpenRouter API (AI analysis)”.
 - **Technical analysis in report:** `include_ta_in_report` – When true (default), each ticker in the .md report gets programmatic TA from `ta_engine` (yfinance + pandas-ta): EMA8, SMAs (20/50/200), RSI, MACD histogram, Bollinger Bands, ATR, OBV, Fib 38/50/62. Set to false in Settings to skip TA and speed up report generation.
 - Risk/position (legacy Settings tab): `account_size`, `risk_per_trade_percent`, `max_position_dollars`, `max_daily_loss_dollars`, `max_concurrent_positions`.
 

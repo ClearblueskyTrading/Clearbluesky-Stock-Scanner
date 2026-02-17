@@ -6,10 +6,11 @@ Generates date/time-stamped .md reports (YAML frontmatter + body + AI analysis).
 import os
 import sys
 import time
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 import json
 import re
+from typing import Tuple, Optional
 
 # Get the directory where this script is located (portable support)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +39,34 @@ def _is_below_ema8(ema8_status, ta_dict):
             except (TypeError, ValueError):
                 pass
     return False
+
+
+def _compute_sentiment_spike(row, threshold: float) -> Tuple[bool, Optional[str], Optional[float], Optional[float]]:
+    """
+    Detect sentiment spike using FinBERT rolling scores.
+    Spike if 1h score differs from 4h or 1d by >= threshold.
+    """
+    s1 = row.get("finbert_score_1h")
+    s4 = row.get("finbert_score_4h")
+    s24 = row.get("finbert_score_1d")
+    c1 = row.get("finbert_count_1h") or 0
+    if s1 is None:
+        return False, None, None, None
+
+    reasons = []
+    d4 = d24 = None
+    if s4 is not None:
+        d4 = round(s1 - s4, 4)
+        if abs(d4) >= threshold and c1 >= 1:
+            reasons.append(f"Δ1h vs 4h = {d4:+.2f}")
+    if s24 is not None:
+        d24 = round(s1 - s24, 4)
+        if abs(d24) >= threshold and c1 >= 1:
+            reasons.append(f"Δ1h vs 1d = {d24:+.2f}")
+
+    if reasons:
+        return True, "; ".join(reasons), d4, d24
+    return False, None, d4, d24
 
 
 def _default_risk_checks():
@@ -833,22 +862,57 @@ class ReportGenerator:
                 row['score'] = max(0, int(round((row.get('score', 0) or 0) - penalty)))
             try:
                 av_key = (config or {}).get("alpha_vantage_api_key") or ""
+                from news_sentiment import get_sentiment_for_ticker, finbert_rolling_from_headlines
+                row["sentiment_score"] = row["sentiment_label"] = row["relevance_avg"] = None
+                row["earnings_in_topics"] = False
+                row["av_headlines"] = []
+                row["finbert_score"] = row["finbert_label"] = None
+                row["finbert_score_1h"] = row["finbert_score_4h"] = row["finbert_score_1d"] = None
+                row["finbert_count_1h"] = row["finbert_count_4h"] = row["finbert_count_1d"] = 0
+                row["finbert_items"] = []
+
+                # Alpha Vantage sentiment (if key provided)
+                av_headlines = []
                 if av_key.strip():
-                    from news_sentiment import get_sentiment_for_ticker
-                    sent = get_sentiment_for_ticker(ticker, av_key, limit=10)
-                    row["sentiment_score"] = sent.get("sentiment_score")
-                    row["sentiment_label"] = sent.get("sentiment_label")
-                    row["earnings_in_topics"] = sent.get("earnings_in_topics", False)
-                    row["relevance_avg"] = sent.get("relevance_avg")
-                    row["av_headlines"] = sent.get("headlines", [])[:5]
-                else:
-                    row["sentiment_score"] = row["sentiment_label"] = row["relevance_avg"] = None
-                    row["earnings_in_topics"] = False
-                    row["av_headlines"] = []
+                    try:
+                        sent = get_sentiment_for_ticker(ticker, av_key, limit=10)
+                        row["sentiment_score"] = sent.get("sentiment_score")
+                        row["sentiment_label"] = sent.get("sentiment_label")
+                        row["earnings_in_topics"] = sent.get("earnings_in_topics", False)
+                        row["relevance_avg"] = sent.get("relevance_avg")
+                        av_headlines = sent.get("headlines", [])[:5]
+                        row["av_headlines"] = av_headlines
+                    except Exception:
+                        pass
+
+                # FinBERT local scoring on headlines (overall + rolling windows)
+                try:
+                    fin = finbert_rolling_from_headlines(av_headlines)
+                    row["finbert_score"] = fin.get("finbert_score")
+                    row["finbert_label"] = fin.get("finbert_label")
+                    row["finbert_score_1h"] = fin.get("finbert_score_1h")
+                    row["finbert_score_4h"] = fin.get("finbert_score_4h")
+                    row["finbert_score_1d"] = fin.get("finbert_score_1d")
+                    row["finbert_count_1h"] = fin.get("finbert_count_1h")
+                    row["finbert_count_4h"] = fin.get("finbert_count_4h")
+                    row["finbert_count_1d"] = fin.get("finbert_count_1d")
+                    # Spike detection
+                    thresh = float((config or {}).get("sentiment_spike_threshold", 0.4))
+                    spike, reason, d4, d24 = _compute_sentiment_spike(row, thresh)
+                    row["finbert_spike"] = spike
+                    row["finbert_spike_reason"] = reason
+                    row["finbert_delta_vs_4h"] = d4
+                    row["finbert_delta_vs_1d"] = d24
+                except Exception:
+                    pass
             except Exception:
                 row["sentiment_score"] = row["sentiment_label"] = row["relevance_avg"] = None
                 row["earnings_in_topics"] = False
                 row["av_headlines"] = []
+                row["finbert_score"] = row["finbert_label"] = None
+                row["finbert_score_1h"] = row["finbert_score_4h"] = row["finbert_score_1d"] = None
+                row["finbert_count_1h"] = row["finbert_count_4h"] = row["finbert_count_1d"] = 0
+                row["finbert_items"] = []
             if (config or {}).get("use_sec_insider_context") and any(row.get(k) for k in ("Owner", "Transaction", "Date", "Value")):
                 try:
                     from sec_edgar import get_insider_10b5_1_context
@@ -891,10 +955,13 @@ class ReportGenerator:
 
         # Prefer yfinance earnings enrichment when available; it is usually
         # more accurate for upcoming earnings than raw Finviz date text.
+        # Add earnings window flags (±5 trading-day approximation using calendar days).
         for s in stocks_data:
             e = s.get("earnings") or {}
             ed = e.get("earnings_date")
             days_away = e.get("days_away")
+
+            # Earnings risk checks
             if ed:
                 rc = s.get("risk_checks") or _default_risk_checks()
                 rc["earnings_date"] = ed
@@ -906,6 +973,20 @@ class ReportGenerator:
                     rc["days_until_earnings"] = None
                     rc["earnings_safe"] = True
                 s["risk_checks"] = rc
+
+            # Earnings window flags (calendar-day approximation to ±5 trading days)
+            flag = "none"
+            if isinstance(days_away, (int, float)):
+                d = int(days_away)
+                if 0 <= d <= 5:
+                    flag = "pre"
+                elif -5 <= d < 0:
+                    flag = "post"
+            s["earnings_flag"] = flag
+            s["earnings_days_to"] = days_away if isinstance(days_away, (int, float)) else None
+            s["earnings_time"] = None  # not available from yfinance; placeholder for future BMO/AMC
+            s["earnings_status"] = "estimated" if ed else None
+            s["earnings_source"] = "yfinance" if ed else None
 
         # Elite second-round scoring (earnings, sentiment, RSI, etc.) — gates TOP 5
         try:
@@ -1420,7 +1501,7 @@ def build_markdown_report(analysis_package: dict, report_text: str, ai_response:
     if ai_response and ai_response.strip():
         body.append(ai_response)
     else:
-        body.append("*Set OpenRouter API key in Settings for 3-model consensus analysis.*")
+        body.append("*Set OpenRouter API key in Settings for 6-model consensus analysis.*")
 
     body.append(f"\n\n---\n*Generated by ClearBlueSky Stock Scanner. {SCANNER_GITHUB_URL}*")
     return frontmatter + "\n".join(body)

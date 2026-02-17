@@ -42,7 +42,7 @@ Every scan produces a single **.md** file in the `reports/` folder:
 
 | File | Description |
 |------|-------------|
-| `*.md` | Single Markdown report: YAML frontmatter (structured data), report body (per-ticker data, market breadth, price history), and AI analysis (when OpenRouter key is set). 3-model consensus (Llama, OpenAI, DeepSeek). Chart data included as JSON (30-day OHLC, recent daily bars) — no chart images. |
+| `*.md` | Single Markdown report: YAML frontmatter (structured data), report body (per-ticker data, market breadth, price history), and AI analysis (when OpenRouter key is set). 6-model consensus (DeepSeek, Arcee Trinity, Gemini Vision, Llama, GPT-OSS, StepFun) + optional Google. Chart data included as JSON (30-day OHLC, recent daily bars) — no chart images. |
 
 ---
 
@@ -253,11 +253,11 @@ Every scan generates a single **.md** file with:
 
 1. **YAML frontmatter** — Structured data: stocks (ticker, score, price, TA, etc.), market_breadth, market_intel, price_history_30d (with recent daily OHLC for chart-like data).
 2. **Report body** — Per-ticker sections, score, price, change %, news headlines, analyst rating, technical data, Elite Swing Trader directive.
-3. **AI Analysis** — When OpenRouter key is set: consensus from 3 models (Llama, OpenAI, DeepSeek). Chart data (30-day high/low/close, recent daily bars) is in the JSON sent to the AI — no chart images. The AI response is appended to the .md file.
+3. **AI Analysis** — When OpenRouter key is set: consensus from 6 OpenRouter models (DeepSeek, Arcee Trinity, Gemini Vision, Llama, GPT-OSS, StepFun) + optional Google AI. Chart data (30-day high/low/close, recent daily bars) is in the JSON sent to the AI — no chart images. The AI response is appended to the .md file.
 
-### AI Consensus (3 models)
+### AI Consensus (6 models)
 
-The app sends the analysis package to 3 free OpenRouter models: Meta Llama 3.3 70B, OpenAI GPT-OSS 120B, and DeepSeek R1T2 Chimera. The combined consensus is included in the .md file. All models receive the same data including price history; no chart images are sent.
+The app sends the analysis package to 6 free OpenRouter models: DeepSeek R1T2 Chimera, Arcee Trinity Large, Google Gemini 2.0 Flash (Vision), Meta Llama 3.3 70B, OpenAI GPT-OSS 120B, StepFun Step 3.5 Flash. Optional Google AI (gemini-2.5-flash) adds a 7th. A synthesis step produces a final summary. All models receive the same data including price history; no chart images are sent.
 
 ### GitHub Attribution
 
@@ -547,7 +547,7 @@ Read the output files from each model and look for:
 - Check your API key in Settings
 - The AI status line shows: Connected (green), No key, or Invalid
 - The app retries up to 3 times on network errors
-- All 3 models are free — no credits required
+- All 6 models are free — no credits required
 
 ### Reports not opening
 - Check the Reports folder path in Settings

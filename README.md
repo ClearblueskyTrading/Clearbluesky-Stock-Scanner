@@ -2,13 +2,13 @@
 
 **Project:** Cursor Desktop Addons — desktop tooling, Agent GUI, and integrations for Cursor AI.
 
-**Sub-project:** [ClearBlueSky Stock Scanner](scanner/) (v7.90) — separate project within this workspace; kept distinct but integrated as needed.
+**Sub-project:** [ClearBlueSky Stock Scanner](scanner/) (v8.0) — separate project within this workspace; kept distinct but integrated as needed.
 
 ---
 
-## ClearBlueSky Stock Scanner v7.90
+## ClearBlueSky Stock Scanner v8.0
 
-**Free desktop app** that scans the market for trading ideas and generates **single .md reports** (YAML + body + 3-model AI consensus) you can use with any AI (in-app via OpenRouter).
+**Free desktop app** that scans the market for trading ideas and generates **single .md reports** (YAML + body + 6-model AI consensus) you can use with any AI (in-app via OpenRouter).
 
 - **3 Scanners** – Velocity Trend Growth (sector-first momentum), Swing (emotional dips), Watchlist (Down % today or All) — S&P 500 / ETFs universe
 - **ETF Universe Guardrails** – Curated ETF set (including leveraged bull + bear core tickers) with a hard minimum avg-volume floor of `100k` shares
@@ -20,8 +20,8 @@
 - **Run all scans** – Optional checkbox runs all three scanners in sequence (rate-limited)
 - **CLI** – Run scans from the command line for automation: `python app/scanner_cli.py --scan <type>`. See **app/CLI_FOR_AI.md**.
 - **Watchlist** – 2 beeps + WATCHLIST when a watchlist ticker appears in any scan
-- **Outputs** – Single .md report (YAML frontmatter, per-stock data, SMA200/EMA8, invalidation cues). 3-model AI consensus (Llama, OpenAI, DeepSeek) when OpenRouter key set. Chart data in JSON (30-day OHLC, no images).
-- **Optional AI pipeline** – OpenRouter API key → 3-model consensus analysis in .md; optional RAG (.txt/.pdf books), TA, sentiment, SEC insider context
+- **Outputs** – Single .md report (YAML frontmatter, per-stock data, SMA200/EMA8, invalidation cues). 6-model AI consensus when OpenRouter key set. Chart data in JSON (30-day OHLC, no images).
+- **Optional AI pipeline** – OpenRouter API key → 6-model consensus analysis in .md; optional RAG (.txt/.pdf books), TA, FinBERT sentiment, SEC insider context
 - **In-app Update & Rollback** – **Update** backs up your version and applies the latest release from GitHub; **Rollback** restores the previous version. **Your `user_config.json` is never overwritten.** See **UPDATE.md**.
 - **Update notice** – On startup, checks for a newer version and offers to download, apply, and restart
 
@@ -34,7 +34,7 @@ No API key required for the scanners. Optional keys in **Settings**: Finviz, Ope
 1. **Install** – Run `INSTALL.bat` (installs Python and dependencies if needed).
 2. **Run** – Use the Desktop shortcut or run `app/START.bat` (or `python app/app.py` from `app/`).
 3. **Scan** – Choose scan type and Universe (S&P 500 or ETFs); click **Run Scan**. Optional: check **Run all scans** (rate-limited).
-4. **Report** – Single .md file opens when done. If OpenRouter key is set in Settings, 3-model AI consensus is included. Progress shows step labels and elapsed time.
+4. **Report** – Single .md file opens when done. If OpenRouter key is set in Settings, 6-model AI consensus is included. Progress shows step labels and elapsed time.
 
 **CLI (no GUI):** From the app folder run `python scanner_cli.py --scan velocity_trend_growth` (or swing, watchlist). Exit 0 = success. See **app/CLI_FOR_AI.md**.
 
